@@ -1,3 +1,7 @@
+// HCC Dashboard — Next.js 16 Proxy (formerly Middleware)
+// NOTE: In Next.js 16, middleware.js is deprecated → renamed to proxy.js
+// Function export must be named 'proxy' not 'middleware'
+
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
@@ -15,7 +19,7 @@ async function verifyToken(token) {
   }
 }
 
-// ── Public routes — never require auth ───────────────────────────────────────
+// ── Routes that skip auth entirely ────────────────────────────────────────────
 const PUBLIC_PREFIXES = [
   '/login', '/access-denied', '/register',
   '/api/auth/login', '/api/auth/logout',
@@ -32,15 +36,15 @@ function isPublic(pathname) {
 
 // ── Map pathname → page slug (for permission check) ──────────────────────────
 function getPageSlug(pathname) {
-  if (pathname === '/')                             return 'dashboard';
-  if (pathname.startsWith('/reports/monthly'))     return 'monthly';
-  if (pathname.startsWith('/reports'))             return 'reports';
-  if (pathname.startsWith('/banner'))              return 'banner';
-  if (pathname.startsWith('/pickleball'))          return 'pickleball';
-  if (pathname.startsWith('/settings/users'))      return 'users';
-  if (pathname.startsWith('/settings'))            return 'settings';
-  if (pathname.startsWith('/api/auth/users'))      return 'users';
-  return null; // API routes not mapped to a page — allow if authenticated
+  if (pathname === '/')                          return 'dashboard';
+  if (pathname.startsWith('/reports/monthly'))  return 'monthly';
+  if (pathname.startsWith('/reports'))          return 'reports';
+  if (pathname.startsWith('/banner'))           return 'banner';
+  if (pathname.startsWith('/pickleball'))       return 'pickleball';
+  if (pathname.startsWith('/settings/users'))   return 'users';
+  if (pathname.startsWith('/settings'))         return 'settings';
+  if (pathname.startsWith('/api/auth/users'))   return 'users';
+  return null;
 }
 
 function hasAccess(allowedPages, slug) {
@@ -49,7 +53,8 @@ function hasAccess(allowedPages, slug) {
   return pages.includes('*') || pages.includes(slug);
 }
 
-export async function middleware(request) {
+// ── Next.js 16: exported function MUST be named 'proxy' ──────────────────────
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
 
   if (isPublic(pathname)) return NextResponse.next();
@@ -96,6 +101,6 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)).*)',
+    '/((?!api|_next/static|_next/image|.*\\.png$).*)',
   ],
 };
