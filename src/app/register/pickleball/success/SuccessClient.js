@@ -2,143 +2,169 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const C = {
-  saffron: '#F4A40B',
-  gold:    '#D4AF37',
-  green:   '#10B981',
-  bg:      '#060D1A',
+// ── Design tokens — matches flyer palette ──────────────────────────────────────
+const T = {
+  navy:    '#04111F',
+  navyMid: '#071A2E',
+  navyCard:'rgba(7,26,50,0.9)',
+  lime:    '#A8D62E',
+  teal:    '#0E9E8A',
+  muted:   '#6B8BAE',
+  white:   '#FFFFFF',
 };
 
 export default function SuccessClient() {
   const searchParams = useSearchParams();
   const regNumber    = searchParams.get('reg') || '';
-  const [dots, setDots] = useState('');
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const t = setInterval(() => setDots(d => d.length >= 3 ? '' : d + '.'), 500);
-    return () => clearInterval(t);
+    setTimeout(() => setShow(true), 100);
   }, []);
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: `linear-gradient(135deg, ${C.bg} 0%, #0D1220 60%, rgba(16,185,129,0.05) 100%)`,
+      background: T.navy,
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      color: 'white',
+      color: T.white,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '40px 20px',
+      padding: '40px 20px', position: 'relative', overflow: 'hidden',
     }}>
 
-      {/* Background orb */}
+      {/* Background glows */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }}>
-        <div style={{
-          position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%)',
-          width: '600px', height: '600px',
-          background: 'radial-gradient(circle, rgba(16,185,129,0.06), transparent 70%)',
-          borderRadius: '50%',
-        }}/>
+        <div style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', width: '700px', height: '700px', background: `radial-gradient(circle, ${T.lime}07, transparent 60%)`, borderRadius: '50%' }}/>
+        <div style={{ position: 'absolute', bottom: '0%', right: '0%', width: '500px', height: '500px', background: `radial-gradient(circle, ${T.teal}08, transparent 60%)`, borderRadius: '50%' }}/>
       </div>
 
-      <div style={{ maxWidth: '560px', width: '100%', textAlign: 'center', position: 'relative' }}>
+      <div style={{
+        maxWidth: '560px', width: '100%', textAlign: 'center', position: 'relative',
+        opacity: show ? 1 : 0, transform: show ? 'translateY(0)' : 'translateY(20px)',
+        transition: 'all 0.5s ease',
+      }}>
+
+        {/* Top badge */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: `${T.teal}18`, border: `1px solid ${T.teal}35`, padding: '6px 16px', borderRadius: '20px', marginBottom: '24px' }}>
+          <span style={{ fontSize: '13px', fontWeight: '800', color: T.teal, letterSpacing: '1px' }}>HCC YOUTH CLUB PRESENTS</span>
+        </div>
 
         {/* Success icon */}
         <div style={{
-          width: '100px', height: '100px', borderRadius: '50%', margin: '0 auto 32px',
-          background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1))',
-          border: '2px solid rgba(16,185,129,0.4)',
+          width: '110px', height: '110px', borderRadius: '50%', margin: '0 auto 28px',
+          background: `linear-gradient(135deg, ${T.lime}25, ${T.lime}10)`,
+          border: `2px solid ${T.lime}40`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '50px',
-          boxShadow: '0 0 60px rgba(16,185,129,0.2)',
+          fontSize: '56px',
+          boxShadow: `0 0 60px ${T.lime}25, 0 0 120px ${T.lime}10`,
           animation: 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both',
         }}>
-          ✅
+          🏓
         </div>
 
-        <h1 style={{ margin: '0 0 12px', fontSize: '40px', fontWeight: '900', letterSpacing: '-1px' }}>
-          You're{' '}
-          <span style={{
-            background: `linear-gradient(135deg, ${C.green}, #059669)`,
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          }}>
-            Registered!
-          </span>
+        {/* Heading */}
+        <h1 style={{ margin: '0 0 8px', fontSize: 'clamp(34px, 6vw, 52px)', fontWeight: '900', letterSpacing: '-1.5px', lineHeight: 0.95, textTransform: 'uppercase', color: T.white }}>
+          You're In!
         </h1>
-
-        <p style={{ margin: '0 0 32px', color: '#64748B', fontSize: '16px', lineHeight: '1.6' }}>
-          Your payment was successful and your spot is confirmed. 🏓
+        <h2 style={{ margin: '0 0 12px', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: '900', letterSpacing: '-1px', lineHeight: 1, textTransform: 'uppercase', color: T.lime }}>
+          Registration Confirmed ✅
+        </h2>
+        <p style={{ margin: '0 0 36px', color: T.muted, fontSize: '16px', lineHeight: '1.6' }}>
+          Your payment was successful and your spot is locked in.<br/>
+          A confirmation email has been sent to your inbox.
         </p>
 
-        {/* Reg number card */}
+        {/* Registration number card */}
         {regNumber && (
           <div style={{
-            background: 'rgba(13,20,38,0.9)', border: '1px solid rgba(16,185,129,0.3)',
-            borderRadius: '16px', padding: '28px', marginBottom: '28px',
-            boxShadow: '0 0 40px rgba(16,185,129,0.08)',
+            background: T.navyCard, border: `1px solid ${T.lime}25`, borderRadius: '18px',
+            padding: '28px', marginBottom: '20px',
+            backdropFilter: 'blur(12px)',
+            boxShadow: `0 0 40px ${T.lime}12`,
           }}>
-            <div style={{ fontSize: '12px', fontWeight: '700', color: '#475569',
-              textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px' }}>
               Your Registration Number
             </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '32px', fontWeight: '900', color: C.saffron, letterSpacing: '3px' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '34px', fontWeight: '900', color: T.lime, letterSpacing: '4px' }}>
               {regNumber}
             </div>
-            <div style={{ fontSize: '13px', color: '#475569', marginTop: '10px' }}>
-              Save this number — you'll need it for check-in
+            <div style={{ fontSize: '13px', color: T.muted, marginTop: '10px' }}>
+              Save this — you'll need it for check-in on game day
             </div>
           </div>
         )}
 
-        {/* What's next */}
+        {/* Event details */}
         <div style={{
-          background: 'rgba(13,20,38,0.8)', border: '1px solid rgba(51,65,85,0.6)',
-          borderRadius: '16px', padding: '28px', marginBottom: '28px', textAlign: 'left',
+          background: T.navyCard, border: `1px solid rgba(255,255,255,0.06)`, borderRadius: '18px',
+          padding: '24px', marginBottom: '20px', textAlign: 'left',
+          backdropFilter: 'blur(12px)',
         }}>
-          <div style={{ fontSize: '14px', fontWeight: '800', color: '#94A3B8',
-            textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px' }}>
-            What Happens Next
+          <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '18px' }}>
+            Event Details
           </div>
           {[
-            { icon: '📧', title: 'Confirmation Email',    desc: 'A confirmation email has been sent to your inbox' },
-            { icon: '📋', title: 'Admin Notified',         desc: 'HCC staff have been notified of your registration' },
-            { icon: '🏓', title: 'See You on the Court',  desc: 'Bring your registration number on event day for check-in' },
+            { icon: '📅', label: 'Date', value: 'Saturday, July 11, 2026' },
+            { icon: '⏰', label: 'Start Time', value: '12:00 PM — arrive early!' },
+            { icon: '📍', label: 'Location', value: '8580 Hickory Creek Rd, Lenoir City, TN 37771' },
+            { icon: '🎾', label: 'Paddle Rental', value: '$5 available on-site' },
           ].map((item, i) => (
-            <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 2 ? '16px' : 0 }}>
-              <div style={{ fontSize: '24px', flexShrink: 0 }}>{item.icon}</div>
+            <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 3 ? '14px' : 0 }}>
+              <div style={{ fontSize: '22px', flexShrink: 0, width: '28px', textAlign: 'center' }}>{item.icon}</div>
               <div>
-                <div style={{ fontWeight: '700', color: 'white', marginBottom: '2px' }}>{item.title}</div>
-                <div style={{ fontSize: '13px', color: '#64748B' }}>{item.desc}</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>{item.label}</div>
+                <div style={{ fontWeight: '700', color: T.white, fontSize: '14px' }}>{item.value}</div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Syncing notice */}
+        {/* What's next */}
         <div style={{
-          background: 'rgba(244,164,11,0.05)', border: '1px solid rgba(244,164,11,0.15)',
-          borderRadius: '12px', padding: '14px 18px', marginBottom: '32px',
-          fontSize: '13px', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '10px',
+          background: T.navyCard, border: `1px solid ${T.teal}20`, borderRadius: '18px',
+          padding: '24px', marginBottom: '32px', textAlign: 'left',
+          backdropFilter: 'blur(12px)',
         }}>
-          <span style={{ fontSize: '18px' }}>⚙️</span>
-          <span>Syncing your registration to HCC database{dots}</span>
+          <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '18px' }}>
+            What Happens Next
+          </div>
+          {[
+            { icon: '📧', title: 'Confirmation Email Sent', desc: 'Check your inbox (and spam) for your confirmation' },
+            { icon: '🏆', title: 'Bracket Assignment', desc: 'You will be notified of your bracket and schedule' },
+            { icon: '🏓', title: 'See You on the Court!', desc: 'Compete. Have fun. Build community.' },
+          ].map((item, i) => (
+            <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 2 ? '14px' : 0 }}>
+              <div style={{ fontSize: '22px', flexShrink: 0 }}>{item.icon}</div>
+              <div>
+                <div style={{ fontWeight: '700', color: T.white, marginBottom: '2px' }}>{item.title}</div>
+                <div style={{ fontSize: '13px', color: T.muted }}>{item.desc}</div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Back button */}
-        <a href="/" style={{
-          display: 'inline-block', padding: '16px 40px', borderRadius: '12px', textDecoration: 'none',
-          background: `linear-gradient(135deg, ${C.saffron}, ${C.gold})`,
-          color: '#000', fontWeight: '800', fontSize: '16px',
-          boxShadow: '0 0 30px rgba(244,164,11,0.25)',
-          transition: 'all 0.2s',
-        }}>
-          ← Back to HCC Home
+        {/* CTA tag line */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '12px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '32px' }}>
+          <span>🏆 All Skill Levels Welcome</span>
+          <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
+          <span>🤝 Doubles Tournament</span>
+          <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
+          <span>📍 Lenoir City, TN</span>
+        </div>
+
+        {/* Questions footer */}
+        <div style={{ fontSize: '13px', color: T.muted, marginBottom: '8px' }}>Questions? We're here to help.</div>
+        <a href="mailto:knoxvillehcc@gmail.com" style={{ color: T.lime, textDecoration: 'none', fontWeight: '700', fontSize: '14px' }}>
+          knoxvillehcc@gmail.com
         </a>
       </div>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
         @keyframes popIn {
-          0%   { transform: scale(0); opacity: 0; }
-          100% { transform: scale(1); opacity: 1; }
+          0%   { transform: scale(0.5); opacity: 0; }
+          60%  { transform: scale(1.1); }
+          100% { transform: scale(1);   opacity: 1; }
         }
       `}</style>
     </div>
