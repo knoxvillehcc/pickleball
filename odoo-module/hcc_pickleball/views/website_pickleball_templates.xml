@@ -1,0 +1,621 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             LAYOUT: HCC Pickleball Public Page (no sidebar, own header/footer)
+        ══════════════════════════════════════════════════════════════ -->
+        <template id="pickleball_layout" name="HCC Pickleball Layout">
+            <t t-call="web.layout">
+                <t t-set="head">
+                    <t t-call-assets="web.assets_frontend" t-js="false"/>
+                    <t t-call-assets="hcc_pickleball.assets_frontend" t-js="false"/>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                    <meta name="description" content="Register for the HCC Pickleball Tournament at Knoxville Hindu Community Center"/>
+                </t>
+                <t t-set="body_classname">pb-page o_website_page</t>
+                <div class="pb-page">
+                    <t t-out="0"/>
+                    <!-- Footer -->
+                    <footer class="pb-footer">
+                        <p>Knoxville Hindu Community Center | 🏓 Pickleball Registration</p>
+                        <p>
+                            Questions? Email us at 
+                            <a href="mailto:knoxvillehcc@gmail.com">knoxvillehcc@gmail.com</a>
+                        </p>
+                    </footer>
+                </div>
+            </t>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             PAGE: Registration Form
+             Route: /pickleball-registration
+        ══════════════════════════════════════════════════════════════ -->
+        <template id="pickleball_registration_page" name="Pickleball Registration Form">
+            <t t-call="hcc_pickleball.pickleball_layout">
+
+                <!-- ── Header ─────────────────────────────────────── -->
+                <header class="pb-header">
+                    <div class="pb-header-inner">
+                        <div class="pb-logo-badge">🏓</div>
+                        <h1>HCC <span>Pickleball</span> Registration</h1>
+                        <p class="pb-subtitle">Knoxville Hindu Community Center</p>
+                    </div>
+                </header>
+
+                <!-- ── Event Info Strip ───────────────────────────── -->
+                <div class="pb-event-strip">
+                    <div class="pb-event-strip-inner">
+                        <t t-if="config.get('event_name')">
+                            <div class="pb-event-item">
+                                <span class="icon">🏆</span>
+                                <span t-esc="config['event_name']"/>
+                            </div>
+                        </t>
+                        <t t-if="config.get('event_date')">
+                            <div class="pb-event-item">
+                                <span class="icon">📅</span>
+                                <span t-esc="config['event_date']"/>
+                            </div>
+                        </t>
+                        <t t-if="config.get('event_time')">
+                            <div class="pb-event-item">
+                                <span class="icon">⏰</span>
+                                <span t-esc="config['event_time']"/>
+                            </div>
+                        </t>
+                        <t t-if="config.get('event_location')">
+                            <div class="pb-event-item">
+                                <span class="icon">📍</span>
+                                <span t-esc="config['event_location']"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- ── Spots Remaining ───────────────────────────── -->
+                <t t-if="spots_left > 0">
+                    <div class="pb-spots-banner">
+                        🎯 <t t-esc="spots_left"/> spots remaining out of <t t-esc="config.get('max_participants', 64)"/> total
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="pb-spots-banner" style="background: #DC2626;">
+                        ⚠️ Registration is FULL. Please check back or contact us.
+                    </div>
+                </t>
+
+                <!-- ── Main Content ──────────────────────────────── -->
+                <main class="pb-main">
+
+                    <!-- Error Messages -->
+                    <t t-if="error_messages">
+                        <div class="pb-errors">
+                            <h3>⚠️ Please fix the following errors:</h3>
+                            <ul>
+                                <t t-foreach="error_messages" t-as="msg">
+                                    <li t-esc="msg"/>
+                                </t>
+                            </ul>
+                        </div>
+                    </t>
+
+                    <form method="POST" action="/pickleball-registration/submit" id="pb-registration-form">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                        <!-- ── SECTION 1: Personal Information ─── -->
+                        <div class="pb-card">
+                            <div class="pb-card-header">
+                                <span class="icon">👤</span>
+                                <h2>Personal Information</h2>
+                            </div>
+                            <div class="pb-card-body">
+                                <div class="pb-form-grid">
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="first_name">
+                                            First Name <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="text" id="first_name" name="first_name"
+                                               placeholder="Enter your first name"
+                                               t-att-value="form_data.get('first_name', '')"
+                                               required="required" autocomplete="given-name"/>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="last_name">
+                                            Last Name <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="text" id="last_name" name="last_name"
+                                               placeholder="Enter your last name"
+                                               t-att-value="form_data.get('last_name', '')"
+                                               required="required" autocomplete="family-name"/>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="email">
+                                            Email Address <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="email" id="email" name="email"
+                                               placeholder="your@email.com"
+                                               t-att-value="form_data.get('email', '')"
+                                               required="required" autocomplete="email"/>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="phone">
+                                            Phone Number <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="tel" id="phone" name="phone"
+                                               placeholder="(555) 123-4567"
+                                               t-att-value="form_data.get('phone', '')"
+                                               required="required" autocomplete="tel"/>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="date_of_birth">
+                                            Date of Birth <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="date" id="date_of_birth" name="date_of_birth"
+                                               t-att-value="form_data.get('date_of_birth', '')"
+                                               required="required" autocomplete="bday"/>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="gender">
+                                            Gender <span class="required">*</span>
+                                        </label>
+                                        <select class="pb-select" id="gender" name="gender" required="required">
+                                            <option value="">— Select Gender —</option>
+                                            <option value="male"   t-att-selected="form_data.get('gender') == 'male'">Male</option>
+                                            <option value="female" t-att-selected="form_data.get('gender') == 'female'">Female</option>
+                                            <option value="other"  t-att-selected="form_data.get('gender') == 'other'">Other / Prefer not to say</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── SECTION 2: Address ─────────────── -->
+                        <div class="pb-card">
+                            <div class="pb-card-header">
+                                <span class="icon">🏠</span>
+                                <h2>Address</h2>
+                            </div>
+                            <div class="pb-card-body">
+                                <div class="pb-form-grid">
+
+                                    <div class="pb-field span-2">
+                                        <label class="pb-label" for="street">
+                                            Street Address <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="text" id="street" name="street"
+                                               placeholder="123 Main Street"
+                                               t-att-value="form_data.get('street', '')"
+                                               required="required" autocomplete="street-address"/>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="city">
+                                            City <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="text" id="city" name="city"
+                                               placeholder="Knoxville"
+                                               t-att-value="form_data.get('city', '')"
+                                               required="required" autocomplete="address-level2"/>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="state_id">
+                                            State <span class="required">*</span>
+                                        </label>
+                                        <select class="pb-select" id="state_id" name="state_id" required="required">
+                                            <option value="">— Select State —</option>
+                                            <t t-foreach="us_states" t-as="state">
+                                                <option t-att-value="state.id"
+                                                        t-att-selected="str(form_data.get('state_id', '')) == str(state.id)">
+                                                    <t t-esc="state.name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="zip_code">
+                                            Zip Code <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="text" id="zip_code" name="zip_code"
+                                               placeholder="37901"
+                                               t-att-value="form_data.get('zip_code', '')"
+                                               required="required" autocomplete="postal-code" maxlength="10"/>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── SECTION 3: Emergency Contact ────── -->
+                        <div class="pb-card">
+                            <div class="pb-card-header">
+                                <span class="icon">🚨</span>
+                                <h2>Emergency Contact</h2>
+                            </div>
+                            <div class="pb-card-body">
+                                <div class="pb-form-grid">
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="emergency_contact_name">
+                                            Contact Name <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="text" id="emergency_contact_name"
+                                               name="emergency_contact_name"
+                                               placeholder="Full name of emergency contact"
+                                               t-att-value="form_data.get('emergency_contact_name', '')"
+                                               required="required"/>
+                                    </div>
+
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="emergency_contact_phone">
+                                            Contact Phone <span class="required">*</span>
+                                        </label>
+                                        <input class="pb-input" type="tel" id="emergency_contact_phone"
+                                               name="emergency_contact_phone"
+                                               placeholder="(555) 987-6543"
+                                               t-att-value="form_data.get('emergency_contact_phone', '')"
+                                               required="required"/>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── SECTION 4: Pickleball Details ──── -->
+                        <div class="pb-card">
+                            <div class="pb-card-header">
+                                <span class="icon">🏓</span>
+                                <h2>Pickleball Details</h2>
+                            </div>
+                            <div class="pb-card-body">
+
+                                <!-- Skill Level -->
+                                <div class="pb-field" style="margin-bottom: 24px;">
+                                    <label class="pb-label">
+                                        Skill Level <span class="required">*</span>
+                                    </label>
+                                    <div class="pb-skill-grid">
+                                        <div class="pb-skill-option">
+                                            <input type="radio" id="skill_beginner" name="skill_level"
+                                                   value="beginner" required="required"
+                                                   t-att-checked="form_data.get('skill_level') == 'beginner'"/>
+                                            <label class="pb-skill-label" for="skill_beginner">
+                                                <span class="pb-skill-emoji">🌱</span>
+                                                <span class="pb-skill-name">Beginner</span>
+                                                <span class="pb-skill-desc">New to pickleball or just learning</span>
+                                            </label>
+                                        </div>
+                                        <div class="pb-skill-option">
+                                            <input type="radio" id="skill_intermediate" name="skill_level"
+                                                   value="intermediate"
+                                                   t-att-checked="form_data.get('skill_level') == 'intermediate'"/>
+                                            <label class="pb-skill-label" for="skill_intermediate">
+                                                <span class="pb-skill-emoji">⭐</span>
+                                                <span class="pb-skill-name">Intermediate</span>
+                                                <span class="pb-skill-desc">Play regularly, know the rules</span>
+                                            </label>
+                                        </div>
+                                        <div class="pb-skill-option">
+                                            <input type="radio" id="skill_advanced" name="skill_level"
+                                                   value="advanced"
+                                                   t-att-checked="form_data.get('skill_level') == 'advanced'"/>
+                                            <label class="pb-skill-label" for="skill_advanced">
+                                                <span class="pb-skill-emoji">🏆</span>
+                                                <span class="pb-skill-name">Advanced</span>
+                                                <span class="pb-skill-desc">Competitive player, tournament experience</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pb-form-grid">
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="partner_name">
+                                            Partner Name
+                                            <span class="optional-tag">Optional</span>
+                                        </label>
+                                        <input class="pb-input" type="text" id="partner_name" name="partner_name"
+                                               placeholder="Preferred partner's name (if any)"
+                                               t-att-value="form_data.get('partner_name', '')"/>
+                                    </div>
+                                    <div class="pb-field">
+                                        <label class="pb-label" for="special_notes">
+                                            Special Notes
+                                            <span class="optional-tag">Optional</span>
+                                        </label>
+                                        <textarea class="pb-textarea" id="special_notes" name="special_notes"
+                                                  placeholder="Any accessibility needs, dietary restrictions, or other requests..."
+                                                  rows="3"><t t-esc="form_data.get('special_notes', '')"/></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- ── SECTION 5: Liability Waiver ────── -->
+                        <div class="pb-card">
+                            <div class="pb-card-header">
+                                <span class="icon">📋</span>
+                                <h2>Liability Waiver</h2>
+                            </div>
+                            <div class="pb-card-body">
+                                <div class="pb-waiver-box">
+                                    <p class="pb-waiver-text">
+                                        "I acknowledge that participation in HCC pickleball activities is voluntary 
+                                        and at my own risk. I understand that pickleball involves physical activity 
+                                        which could result in injury. I agree to follow all HCC facility rules and 
+                                        activity policies. I release the Knoxville Hindu Community Center and its 
+                                        officers, volunteers, and members from any liability arising from my 
+                                        participation. In case of medical emergency, I authorize HCC to seek 
+                                        appropriate medical attention on my behalf."
+                                    </p>
+                                    <label class="pb-waiver-check">
+                                        <input type="checkbox" id="liability_accepted" name="liability_accepted"
+                                               value="1" required="required"
+                                               t-att-checked="form_data.get('liability_accepted')"/>
+                                        <span class="pb-waiver-check-label">
+                                            ✅ I have read and agree to the liability waiver above. 
+                                            I understand this is required to participate.
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── SECTION 6: Fee Summary & Submit ── -->
+                        <div class="pb-fee-summary">
+                            <div>
+                                <div class="pb-fee-label">Registration Fee</div>
+                                <div class="pb-fee-note">Secure online payment via Stripe</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="pb-fee-amount">
+                                    $<t t-esc="'%.2f' % config.get('registration_fee', 25.00)"/>
+                                </div>
+                                <div class="pb-fee-note">Per person, non-refundable</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 24px;">
+                            <button type="submit" class="pb-btn-primary" id="pb-submit-btn">
+                                <span>🔒</span>
+                                Continue to Secure Payment
+                                <span>→</span>
+                            </button>
+                            <p style="text-align: center; margin-top: 12px; font-size: 13px; color: #9CA3AF;">
+                                You will be redirected to our secure payment processor to complete payment of 
+                                $<t t-esc="'%.2f' % config.get('registration_fee', 25.00)"/>
+                            </p>
+                        </div>
+
+                    </form>
+                </main>
+
+                <!-- Prevent double submit -->
+                <script>
+                    (function() {
+                        var form = document.getElementById('pb-registration-form');
+                        var btn = document.getElementById('pb-submit-btn');
+                        if (form) {
+                            form.addEventListener('submit', function() {
+                                btn.disabled = true;
+                                btn.innerHTML = '⏳ Processing... Please wait';
+                            });
+                        }
+                    })();
+                </script>
+
+            </t>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             PAGE: Payment Success
+             Route: /pickleball-registration/success/<reg_number>
+        ══════════════════════════════════════════════════════════════ -->
+        <template id="pickleball_success_page" name="Pickleball Registration Success">
+            <t t-call="hcc_pickleball.pickleball_layout">
+
+                <header class="pb-header">
+                    <div class="pb-header-inner">
+                        <div class="pb-logo-badge">🏓</div>
+                        <h1>HCC <span>Pickleball</span> Registration</h1>
+                        <p class="pb-subtitle">Knoxville Hindu Community Center</p>
+                    </div>
+                </header>
+
+                <main class="pb-main">
+
+                    <!-- Success Hero -->
+                    <div class="pb-success-hero">
+                        <div class="pb-success-icon">✅</div>
+                        <h1 class="pb-success-title">Registration Successful!</h1>
+                        <p class="pb-success-sub">
+                            Your payment has been received and your spot is confirmed.
+                        </p>
+                        <div class="pb-reg-number-badge">
+                            <t t-esc="registration.registration_number"/>
+                        </div>
+                        <p style="color: #6B7280; font-size: 14px; margin-top: 8px;">
+                            A confirmation email has been sent to <strong t-esc="registration.email"/>
+                        </p>
+                    </div>
+
+                    <!-- Registration Details Card -->
+                    <div class="pb-card">
+                        <div class="pb-card-header">
+                            <span class="icon">📋</span>
+                            <h2>Registration Details</h2>
+                        </div>
+                        <div class="pb-card-body">
+                            <table class="pb-detail-table">
+                                <tr>
+                                    <td>Registration Number</td>
+                                    <td>
+                                        <span style="font-family: monospace; font-size: 18px; font-weight: 800; color: #7B1C1C;">
+                                            <t t-esc="registration.registration_number"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Registrant Name</td>
+                                    <td><t t-esc="registration.full_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Event</td>
+                                    <td><t t-esc="registration.event_name or 'HCC Pickleball Tournament 2026'"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Event Date</td>
+                                    <td>
+                                        <t t-if="registration.event_date">
+                                            <t t-esc="registration.event_date"/>
+                                        </t>
+                                        <t t-else="">TBD</t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Event Time</td>
+                                    <td><t t-esc="registration.event_time or 'TBD'"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Location</td>
+                                    <td><t t-esc="registration.event_location or 'HCC Facility'"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Skill Level</td>
+                                    <td style="text-transform: capitalize;"><t t-esc="registration.skill_level"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Amount Paid</td>
+                                    <td style="color: #059669; font-weight: 800; font-size: 18px;">
+                                        $<t t-esc="'%.2f' % registration.amount_paid"/>
+                                    </td>
+                                </tr>
+                                <t t-if="registration.payment_status != 'paid'">
+                                    <tr>
+                                        <td>Payment Status</td>
+                                        <td>
+                                            <span style="color: #D97706; font-weight: 700;">
+                                                ⏳ Payment Processing
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- What's Next -->
+                    <div class="pb-card" style="border-color: rgba(16,185,129,0.3);">
+                        <div class="pb-card-header" style="background: linear-gradient(135deg, #065F46, #059669);">
+                            <span class="icon">📌</span>
+                            <h2>What's Next?</h2>
+                        </div>
+                        <div class="pb-card-body">
+                            <ul style="margin: 0; padding-left: 20px; line-height: 2; font-size: 15px; color: #374151;">
+                                <li>Check your email for a detailed confirmation</li>
+                                <li>Save your registration number: <strong t-esc="registration.registration_number"/></li>
+                                <li>Arrive 15 minutes early on event day</li>
+                                <li>Bring non-marking court shoes and your own paddle</li>
+                            </ul>
+                            <div style="margin-top: 24px; text-align: center;">
+                                <a href="/" class="pb-btn-secondary">
+                                    ← Return to HCC Home Page
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+            </t>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             PAGE: Pending Payment (fallback)
+        ══════════════════════════════════════════════════════════════ -->
+        <template id="pickleball_pending_page" name="Pickleball Pending Payment">
+            <t t-call="hcc_pickleball.pickleball_layout">
+                <header class="pb-header">
+                    <div class="pb-header-inner">
+                        <div class="pb-logo-badge">🏓</div>
+                        <h1>HCC <span>Pickleball</span> Registration</h1>
+                    </div>
+                </header>
+                <main class="pb-main">
+                    <div class="pb-card">
+                        <div class="pb-card-header" style="background: linear-gradient(135deg, #92400E, #D97706);">
+                            <span class="icon">⏳</span>
+                            <h2>Registration Received – Payment Pending</h2>
+                        </div>
+                        <div class="pb-card-body" style="text-align: center;">
+                            <p style="font-size: 18px; color: #374151; margin-bottom: 16px;">
+                                Your registration <strong t-esc="registration.registration_number"/> has been saved.
+                            </p>
+                            <p style="color: #6B7280;">
+                                Your payment could not be processed at this time. Please contact us at
+                                <a href="mailto:knoxvillehcc@gmail.com" style="color: #7B1C1C;">knoxvillehcc@gmail.com</a>
+                                to complete your registration.
+                            </p>
+                            <div style="margin-top: 28px;">
+                                <a href="/pickleball-registration" class="pb-btn-secondary">
+                                    ← Try Again
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </t>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             PAGE: Registration Closed
+        ══════════════════════════════════════════════════════════════ -->
+        <template id="pickleball_closed_page" name="Pickleball Registration Closed">
+            <t t-call="hcc_pickleball.pickleball_layout">
+                <header class="pb-header">
+                    <div class="pb-header-inner">
+                        <div class="pb-logo-badge">🏓</div>
+                        <h1>HCC <span>Pickleball</span> Registration</h1>
+                    </div>
+                </header>
+                <main class="pb-main">
+                    <div class="pb-card" style="text-align: center;">
+                        <div class="pb-card-body" style="padding: 48px;">
+                            <div style="font-size: 64px; margin-bottom: 20px;">🔒</div>
+                            <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; color: #7B1C1C; margin-bottom: 12px;">
+                                Registration Closed
+                            </h2>
+                            <p style="color: #6B7280; font-size: 16px; max-width: 500px; margin: 0 auto 28px;">
+                                Registration for <strong t-esc="config.get('event_name', 'this event')"/> 
+                                is currently closed. Please contact us for more information.
+                            </p>
+                            <a href="mailto:knoxvillehcc@gmail.com" class="pb-btn-secondary">
+                                Contact Us
+                            </a>
+                        </div>
+                    </div>
+                </main>
+            </t>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             WEBSITE MENU: Activities → Pickleball Registration
+        ══════════════════════════════════════════════════════════════ -->
+        <record id="website_menu_pickleball" model="website.menu">
+            <field name="name">Pickleball Registration</field>
+            <field name="url">/pickleball-registration</field>
+            <field name="sequence">50</field>
+        </record>
+
+    </data>
+</odoo>

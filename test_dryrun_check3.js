@@ -1,0 +1,9 @@
+async function test() {
+  const res = await fetch("http://localhost:3001/api/dry-run", {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({})
+  });
+  const text = await res.text();
+  console.log("Status:", res.status);
+  console.log("Response (300 chars):", text.substring(0, 300));
+}
+test();

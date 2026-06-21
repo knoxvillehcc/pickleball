@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             REGISTRATION LIST VIEW
+        ══════════════════════════════════════════════════════════════ -->
+        <record id="view_hcc_pickleball_registration_tree" model="ir.ui.view">
+            <field name="name">hcc.pickleball.registration.tree</field>
+            <field name="model">hcc.pickleball.registration</field>
+            <field name="arch" type="xml">
+                <tree string="Pickleball Registrations"
+                      decoration-success="payment_status == 'paid'"
+                      decoration-warning="payment_status == 'pending'"
+                      decoration-danger="payment_status == 'failed'"
+                      decoration-muted="payment_status == 'refunded'">
+                    <field name="registration_number" string="Reg #"/>
+                    <field name="full_name" string="Name"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="skill_level" string="Skill"/>
+                    <field name="registration_date" string="Date" widget="datetime"/>
+                    <field name="payment_status" string="Payment" widget="badge"
+                           decoration-success="payment_status == 'paid'"
+                           decoration-warning="payment_status == 'pending'"
+                           decoration-danger="payment_status == 'failed'"/>
+                    <field name="amount_paid" string="Amount" widget="monetary"/>
+                    <field name="event_name" string="Event" optional="hide"/>
+                    <field name="partner_name" string="Partner" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             REGISTRATION FORM VIEW
+        ══════════════════════════════════════════════════════════════ -->
+        <record id="view_hcc_pickleball_registration_form" model="ir.ui.view">
+            <field name="name">hcc.pickleball.registration.form</field>
+            <field name="model">hcc.pickleball.registration</field>
+            <field name="arch" type="xml">
+                <form string="Pickleball Registration">
+                    <header>
+                        <button name="action_mark_paid" type="object"
+                                string="Mark as Paid" class="btn-primary"
+                                attrs="{'invisible': [('payment_status', '=', 'paid')]}"
+                                confirm="Mark this registration as paid manually?"/>
+                        <button name="action_send_confirmation_email" type="object"
+                                string="Re-send Confirmation Email" class="btn-secondary"
+                                attrs="{'invisible': [('payment_status', '!=', 'paid')]}"/>
+                        <field name="payment_status" widget="statusbar"
+                               statusbar_visible="pending,paid"
+                               readonly="1"/>
+                    </header>
+                    <sheet>
+                        <!-- Registration Number Banner -->
+                        <div class="oe_title">
+                            <label for="registration_number" class="oe_edit_only"/>
+                            <h1>
+                                <field name="registration_number" readonly="1" class="oe_inline"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <!-- Personal Information -->
+                            <group string="Personal Information">
+                                <field name="first_name" required="1"/>
+                                <field name="last_name" required="1"/>
+                                <field name="email" required="1"/>
+                                <field name="phone" required="1"/>
+                                <field name="date_of_birth"/>
+                                <field name="gender"/>
+                            </group>
+
+                            <!-- Event & Payment -->
+                            <group string="Payment Information">
+                                <field name="payment_status" readonly="1"/>
+                                <field name="amount_paid" widget="monetary"/>
+                                <field name="payment_date" readonly="1"/>
+                                <field name="stripe_payment_ref" readonly="1"/>
+                                <field name="invoice_id" readonly="1"/>
+                                <field name="registration_date" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <!-- Address -->
+                            <group string="Address">
+                                <field name="street"/>
+                                <field name="city"/>
+                                <field name="state_id"/>
+                                <field name="zip_code"/>
+                            </group>
+
+                            <!-- Emergency Contact -->
+                            <group string="Emergency Contact">
+                                <field name="emergency_contact_name"/>
+                                <field name="emergency_contact_phone"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <!-- Pickleball Info -->
+                            <group string="Pickleball Details">
+                                <field name="skill_level"/>
+                                <field name="partner_name"/>
+                                <field name="liability_accepted" readonly="1"/>
+                                <field name="liability_accepted_date" readonly="1"/>
+                            </group>
+
+                            <!-- Event Snapshot -->
+                            <group string="Event (at time of registration)">
+                                <field name="event_name" readonly="1"/>
+                                <field name="event_date" readonly="1"/>
+                                <field name="event_time" readonly="1"/>
+                                <field name="event_location" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <!-- Special Notes -->
+                        <group string="Special Notes">
+                            <field name="special_notes" nolabel="1"/>
+                        </group>
+
+                        <!-- Chatter -->
+                        <group string="Odoo Contact">
+                            <field name="partner_id" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             SEARCH VIEW WITH FILTERS
+        ══════════════════════════════════════════════════════════════ -->
+        <record id="view_hcc_pickleball_registration_search" model="ir.ui.view">
+            <field name="name">hcc.pickleball.registration.search</field>
+            <field name="model">hcc.pickleball.registration</field>
+            <field name="arch" type="xml">
+                <search string="Search Registrations">
+                    <field name="registration_number" string="Registration #"/>
+                    <field name="full_name" string="Name"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="skill_level"/>
+
+                    <!-- Filters -->
+                    <filter name="filter_paid" string="Paid" domain="[('payment_status', '=', 'paid')]"/>
+                    <filter name="filter_pending" string="Unpaid / Pending" domain="[('payment_status', '=', 'pending')]"/>
+                    <filter name="filter_failed" string="Failed" domain="[('payment_status', '=', 'failed')]"/>
+                    <separator/>
+                    <filter name="filter_beginner" string="Beginner" domain="[('skill_level', '=', 'beginner')]"/>
+                    <filter name="filter_intermediate" string="Intermediate" domain="[('skill_level', '=', 'intermediate')]"/>
+                    <filter name="filter_advanced" string="Advanced" domain="[('skill_level', '=', 'advanced')]"/>
+                    <separator/>
+                    <filter name="filter_today" string="Registered Today"
+                            domain="[('registration_date', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="filter_this_week" string="This Week"
+                            domain="[('registration_date', '>=', (context_today() - relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
+
+                    <!-- Group By -->
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_skill" string="Skill Level" context="{'group_by': 'skill_level'}"/>
+                        <filter name="group_by_payment" string="Payment Status" context="{'group_by': 'payment_status'}"/>
+                        <filter name="group_by_date" string="Registration Date" context="{'group_by': 'registration_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             PIVOT / GRAPH VIEWS
+        ══════════════════════════════════════════════════════════════ -->
+        <record id="view_hcc_pickleball_registration_pivot" model="ir.ui.view">
+            <field name="name">hcc.pickleball.registration.pivot</field>
+            <field name="model">hcc.pickleball.registration</field>
+            <field name="arch" type="xml">
+                <pivot string="Pickleball Registrations Analysis">
+                    <field name="skill_level" type="row"/>
+                    <field name="payment_status" type="col"/>
+                    <field name="amount_paid" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             CONFIG FORM VIEW (for Pickleball Event Settings)
+        ══════════════════════════════════════════════════════════════ -->
+        <record id="view_hcc_pickleball_config_form" model="ir.ui.view">
+            <field name="name">hcc.pickleball.config.form</field>
+            <field name="model">hcc.pickleball.config</field>
+            <field name="arch" type="xml">
+                <form string="Pickleball Event Configuration">
+                    <header>
+                        <button name="action_save_config" type="object"
+                                string="Save Configuration" class="btn-primary"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>Pickleball Event Settings</h1>
+                            <p class="text-muted">
+                                Update event information here. Changes take effect immediately on the public registration page — no code changes needed.
+                            </p>
+                        </div>
+                        <group>
+                            <group string="Event Information">
+                                <field name="event_name" required="1"/>
+                                <field name="event_date"/>
+                                <field name="event_time"/>
+                                <field name="event_location"/>
+                                <field name="registration_deadline"/>
+                            </group>
+                            <group string="Registration Settings">
+                                <field name="registration_fee" widget="monetary"/>
+                                <field name="max_participants"/>
+                                <field name="registration_open"/>
+                                <field name="admin_email"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ACTIONS
+        ══════════════════════════════════════════════════════════════ -->
+        <record id="action_hcc_pickleball_registrations" model="ir.actions.act_window">
+            <field name="name">Pickleball Registrations</field>
+            <field name="res_model">hcc.pickleball.registration</field>
+            <field name="view_mode">tree,form,pivot</field>
+            <field name="search_view_id" ref="view_hcc_pickleball_registration_search"/>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No registrations yet!
+                </p>
+                <p>
+                    Registrations will appear here once participants submit the online form at
+                    <strong>/pickleball-registration</strong> on your website.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_hcc_pickleball_config" model="ir.actions.act_window">
+            <field name="name">Event Configuration</field>
+            <field name="res_model">hcc.pickleball.config</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             MENU STRUCTURE
+             HCC Activities
+             └── Pickleball Registrations
+             └── Event Configuration
+        ══════════════════════════════════════════════════════════════ -->
+        <menuitem id="menu_hcc_activities_root"
+                  name="HCC Activities"
+                  sequence="80"/>
+
+        <menuitem id="menu_hcc_pickleball"
+                  name="Pickleball"
+                  parent="menu_hcc_activities_root"
+                  sequence="10"/>
+
+        <menuitem id="menu_hcc_pickleball_registrations"
+                  name="Registrations"
+                  parent="menu_hcc_pickleball"
+                  action="action_hcc_pickleball_registrations"
+                  sequence="10"/>
+
+        <menuitem id="menu_hcc_pickleball_config"
+                  name="Event Configuration"
+                  parent="menu_hcc_pickleball"
+                  action="action_hcc_pickleball_config"
+                  sequence="20"
+                  groups="hcc_pickleball.group_pickleball_admin"/>
+
+    </data>
+</odoo>

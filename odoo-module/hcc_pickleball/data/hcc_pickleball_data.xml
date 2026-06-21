@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ── Registration Number Sequence ─────────────────────────────── -->
+        <record id="seq_hcc_pickleball_registration" model="ir.sequence">
+            <field name="name">HCC Pickleball Registration Number</field>
+            <field name="code">hcc.pickleball.registration</field>
+            <field name="prefix">PB-%(year)s-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="implementation">standard</field>
+        </record>
+
+        <!-- ── Pickleball Registration Product ──────────────────────────── -->
+        <record id="product_pickleball_registration" model="product.product">
+            <field name="name">Pickleball Registration Fee</field>
+            <field name="default_code">HCC-PB-REG</field>
+            <field name="list_price">25.00</field>
+            <field name="type">service</field>
+            <field name="description_sale">HCC Pickleball Tournament Registration Fee</field>
+            <field name="invoice_policy">order</field>
+        </record>
+
+        <!-- ── Email: Participant Confirmation ──────────────────────────── -->
+        <record id="email_template_pickleball_confirmation" model="mail.template">
+            <field name="name">Pickleball Registration – Participant Confirmation</field>
+            <field name="model_id" ref="hcc_pickleball.model_hcc_pickleball_registration"/>
+            <field name="subject">HCC Pickleball Registration Confirmation – {{ object.registration_number }}</field>
+            <field name="email_from">{{ (object.env.company.email or 'knoxvillehcc@gmail.com') | safe }}</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #7B1C1C 0%, #800000 50%, #A0522D 100%); padding: 40px 32px; text-align: center;">
+        <h1 style="color: #FFD700; font-size: 28px; margin: 0; font-weight: 800; letter-spacing: 1px;">
+            🏓 HCC Pickleball
+        </h1>
+        <p style="color: #FFF8DC; font-size: 14px; margin: 8px 0 0;">
+            Knoxville Hindu Community Center
+        </p>
+    </div>
+
+    <!-- Success Banner -->
+    <div style="background-color: #F4A40B; padding: 20px 32px; text-align: center;">
+        <h2 style="color: #ffffff; font-size: 22px; margin: 0; font-weight: 700;">
+            ✅ Registration Confirmed!
+        </h2>
+    </div>
+
+    <!-- Body -->
+    <div style="padding: 32px; background-color: #FFFEF7;">
+
+        <p style="font-size: 16px; color: #333; margin: 0 0 16px;">
+            Dear <strong>{{ object.first_name }} {{ object.last_name }}</strong>,
+        </p>
+        <p style="font-size: 15px; color: #555; line-height: 1.7;">
+            Thank you for registering for the HCC Pickleball Tournament! Your registration has been 
+            confirmed and payment has been received. We look forward to seeing you on the court!
+        </p>
+
+        <!-- Registration Details Box -->
+        <div style="background-color: #FFF3CD; border-left: 4px solid #F4A40B; border-radius: 8px; padding: 24px; margin: 24px 0;">
+            <h3 style="color: #7B1C1C; margin: 0 0 16px; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;">
+                📋 Registration Details
+            </h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px; width: 45%;"><strong>Registration #:</strong></td>
+                    <td style="padding: 8px 0; color: #7B1C1C; font-size: 16px; font-weight: 800; font-family: monospace;">
+                        {{ object.registration_number }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px;"><strong>Name:</strong></td>
+                    <td style="padding: 8px 0; color: #333; font-size: 14px;">{{ object.full_name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px;"><strong>Event:</strong></td>
+                    <td style="padding: 8px 0; color: #333; font-size: 14px;">{{ object.event_name or 'HCC Pickleball Tournament 2026' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px;"><strong>Event Date:</strong></td>
+                    <td style="padding: 8px 0; color: #333; font-size: 14px;">
+                        {{ object.event_date | date('MMMM d, yyyy') if object.event_date else 'TBD' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px;"><strong>Event Time:</strong></td>
+                    <td style="padding: 8px 0; color: #333; font-size: 14px;">{{ object.event_time or 'TBD' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px;"><strong>Location:</strong></td>
+                    <td style="padding: 8px 0; color: #333; font-size: 14px;">{{ object.event_location or 'HCC Facility' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px;"><strong>Skill Level:</strong></td>
+                    <td style="padding: 8px 0; color: #333; font-size: 14px;">{{ object.skill_level | capitalize }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px;"><strong>Amount Paid:</strong></td>
+                    <td style="padding: 8px 0; color: #2e7d32; font-size: 16px; font-weight: 700;">
+                        ${{ '%.2f' % object.amount_paid }}
+                    </td>
+                </tr>
+                {% if object.stripe_payment_ref %}
+                <tr>
+                    <td style="padding: 8px 0; color: #666; font-size: 14px;"><strong>Transaction Ref:</strong></td>
+                    <td style="padding: 8px 0; color: #555; font-size: 12px; font-family: monospace;">
+                        {{ object.stripe_payment_ref }}
+                    </td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+
+        <!-- What to Bring -->
+        <div style="background-color: #EBF5EB; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: #2e7d32; margin: 0 0 12px; font-size: 14px;">📌 Important Reminders</h3>
+            <ul style="margin: 0; padding-left: 20px; color: #555; font-size: 14px; line-height: 1.8;">
+                <li>Please bring this confirmation email (printed or on your phone)</li>
+                <li>Arrive at least 15 minutes before your scheduled time</li>
+                <li>Bring your own paddle (loaners available on a first-come basis)</li>
+                <li>Wear non-marking court shoes</li>
+                <li>Water and light snacks will be available</li>
+            </ul>
+        </div>
+
+        <p style="font-size: 14px; color: #555; margin-top: 24px;">
+            If you have any questions, please contact us at 
+            <a href="mailto:knoxvillehcc@gmail.com" style="color: #7B1C1C;">knoxvillehcc@gmail.com</a>
+        </p>
+
+        <p style="font-size: 15px; color: #7B1C1C; font-weight: 600; margin-top: 24px;">
+            Jay Shri Krishna! 🙏<br/>
+            <span style="color: #555; font-weight: 400; font-size: 13px;">
+                Knoxville Hindu Community Center
+            </span>
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #7B1C1C; padding: 20px 32px; text-align: center;">
+        <p style="color: #FFF8DC; font-size: 12px; margin: 0;">
+            Knoxville Hindu Community Center | Knoxville, TN
+        </p>
+        <p style="color: rgba(255,248,220,0.6); font-size: 11px; margin: 4px 0 0;">
+            This is an automated confirmation. Please do not reply to this email.
+        </p>
+    </div>
+
+</div>
+            ]]></field>
+            <field name="auto_delete">True</field>
+        </record>
+
+        <!-- ── Email: Admin Notification ─────────────────────────────────── -->
+        <record id="email_template_pickleball_admin" model="mail.template">
+            <field name="name">Pickleball Registration – Admin Notification</field>
+            <field name="model_id" ref="hcc_pickleball.model_hcc_pickleball_registration"/>
+            <field name="subject">🏓 New Pickleball Registration – {{ object.registration_number }}</field>
+            <field name="email_from">{{ (object.env.company.email or 'knoxvillehcc@gmail.com') | safe }}</field>
+            <field name="email_to">knoxvillehcc@gmail.com</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+
+    <!-- Header -->
+    <div style="background-color: #1a1a2e; padding: 28px 32px;">
+        <h1 style="color: #FFD700; font-size: 22px; margin: 0;">🏓 New Pickleball Registration</h1>
+        <p style="color: #94A3B8; font-size: 13px; margin: 6px 0 0;">HCC Admin Notification</p>
+    </div>
+
+    <!-- Alert Banner -->
+    <div style="background-color: #F4A40B; padding: 12px 32px;">
+        <p style="color: #fff; font-size: 14px; margin: 0; font-weight: 700;">
+            ✅ Payment Received – Registration Complete
+        </p>
+    </div>
+
+    <!-- Details -->
+    <div style="padding: 28px 32px; background-color: #F8FAFC;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <tr style="background-color: #EFF6FF;">
+                <td style="padding: 10px 16px; font-weight: 700; color: #374151; width: 40%; border-bottom: 1px solid #E5E7EB;">Registration #</td>
+                <td style="padding: 10px 16px; color: #7B1C1C; font-weight: 800; font-family: monospace; font-size: 15px; border-bottom: 1px solid #E5E7EB;">{{ object.registration_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 16px; color: #6B7280; border-bottom: 1px solid #E5E7EB;">First Name</td>
+                <td style="padding: 10px 16px; color: #111827; border-bottom: 1px solid #E5E7EB;">{{ object.first_name }}</td>
+            </tr>
+            <tr style="background-color: #F9FAFB;">
+                <td style="padding: 10px 16px; color: #6B7280; border-bottom: 1px solid #E5E7EB;">Last Name</td>
+                <td style="padding: 10px 16px; color: #111827; border-bottom: 1px solid #E5E7EB;">{{ object.last_name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 16px; color: #6B7280; border-bottom: 1px solid #E5E7EB;">Email</td>
+                <td style="padding: 10px 16px; color: #111827; border-bottom: 1px solid #E5E7EB;">{{ object.email }}</td>
+            </tr>
+            <tr style="background-color: #F9FAFB;">
+                <td style="padding: 10px 16px; color: #6B7280; border-bottom: 1px solid #E5E7EB;">Phone</td>
+                <td style="padding: 10px 16px; color: #111827; border-bottom: 1px solid #E5E7EB;">{{ object.phone }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 16px; color: #6B7280; border-bottom: 1px solid #E5E7EB;">Skill Level</td>
+                <td style="padding: 10px 16px; color: #111827; border-bottom: 1px solid #E5E7EB;">{{ object.skill_level | capitalize }}</td>
+            </tr>
+            <tr style="background-color: #F9FAFB;">
+                <td style="padding: 10px 16px; color: #6B7280; border-bottom: 1px solid #E5E7EB;">Registration Date</td>
+                <td style="padding: 10px 16px; color: #111827; border-bottom: 1px solid #E5E7EB;">{{ object.registration_date | date('MMMM d, yyyy h:mm a') }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 16px; color: #6B7280; border-bottom: 1px solid #E5E7EB;">Amount Paid</td>
+                <td style="padding: 10px 16px; color: #2e7d32; font-weight: 700; font-size: 15px; border-bottom: 1px solid #E5E7EB;">${{ '%.2f' % object.amount_paid }}</td>
+            </tr>
+            {% if object.stripe_payment_ref %}
+            <tr style="background-color: #F9FAFB;">
+                <td style="padding: 10px 16px; color: #6B7280; border-bottom: 1px solid #E5E7EB;">Stripe Ref</td>
+                <td style="padding: 10px 16px; color: #555; font-family: monospace; font-size: 12px; border-bottom: 1px solid #E5E7EB;">{{ object.stripe_payment_ref }}</td>
+            </tr>
+            {% endif %}
+        </table>
+
+        <div style="margin-top: 24px; padding: 16px; background-color: #EFF6FF; border-radius: 6px; border-left: 4px solid #3B82F6;">
+            <p style="margin: 0; color: #1D4ED8; font-size: 13px;">
+                <strong>Action:</strong> View and manage this registration in the HCC Odoo backend under 
+                <em>HCC Activities → Pickleball Registrations</em>
+            </p>
+        </div>
+    </div>
+
+    <div style="background-color: #1a1a2e; padding: 16px 32px; text-align: center;">
+        <p style="color: #64748B; font-size: 11px; margin: 0;">Automated notification from HCC Pickleball Registration System</p>
+    </div>
+</div>
+            ]]></field>
+            <field name="auto_delete">True</field>
+        </record>
+
+        <!-- ── Default Config Parameters ─────────────────────────────────── -->
+        <record id="param_event_name" model="ir.config_parameter">
+            <field name="key">hcc_pickleball.event_name</field>
+            <field name="value">HCC Pickleball Tournament 2026</field>
+        </record>
+        <record id="param_event_time" model="ir.config_parameter">
+            <field name="key">hcc_pickleball.event_time</field>
+            <field name="value">9:00 AM – 5:00 PM</field>
+        </record>
+        <record id="param_event_location" model="ir.config_parameter">
+            <field name="key">hcc_pickleball.event_location</field>
+            <field name="value">HCC Sports Complex, Knoxville, TN</field>
+        </record>
+        <record id="param_registration_fee" model="ir.config_parameter">
+            <field name="key">hcc_pickleball.registration_fee</field>
+            <field name="value">25.00</field>
+        </record>
+        <record id="param_max_participants" model="ir.config_parameter">
+            <field name="key">hcc_pickleball.max_participants</field>
+            <field name="value">64</field>
+        </record>
+        <record id="param_admin_email" model="ir.config_parameter">
+            <field name="key">hcc_pickleball.admin_email</field>
+            <field name="value">knoxvillehcc@gmail.com</field>
+        </record>
+        <record id="param_registration_open" model="ir.config_parameter">
+            <field name="key">hcc_pickleball.registration_open</field>
+            <field name="value">True</field>
+        </record>
+
+    </data>
+</odoo>

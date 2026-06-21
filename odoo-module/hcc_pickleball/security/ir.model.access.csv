@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hcc_pickleball_registration_manager,hcc.pickleball.registration (Manager),model_hcc_pickleball_registration,hcc_pickleball.group_pickleball_manager,1,1,1,0
+access_hcc_pickleball_registration_admin,hcc.pickleball.registration (Admin),model_hcc_pickleball_registration,hcc_pickleball.group_pickleball_admin,1,1,1,1
+access_hcc_pickleball_registration_public,hcc.pickleball.registration (Public Read),model_hcc_pickleball_registration,base.group_public,0,0,1,0
+access_hcc_pickleball_config_manager,hcc.pickleball.config (Manager),model_hcc_pickleball_config,hcc_pickleball.group_pickleball_manager,1,1,1,0
+access_hcc_pickleball_config_admin,hcc.pickleball.config (Admin),model_hcc_pickleball_config,hcc_pickleball.group_pickleball_admin,1,1,1,1

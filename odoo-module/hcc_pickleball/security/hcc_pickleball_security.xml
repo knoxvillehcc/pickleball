@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ── Category ─────────────────────────────────────────────────── -->
+        <record id="module_category_hcc_activities" model="ir.module.category">
+            <field name="name">HCC Activities</field>
+            <field name="description">Modules for managing HCC community activities</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- ── Security Groups ──────────────────────────────────────────── -->
+        <record id="group_pickleball_manager" model="res.groups">
+            <field name="name">Pickleball Manager</field>
+            <field name="category_id" ref="module_category_hcc_activities"/>
+            <field name="comment">Can view, create, and edit pickleball registrations. Cannot delete records.</field>
+        </record>
+
+        <record id="group_pickleball_admin" model="res.groups">
+            <field name="name">Pickleball Administrator</field>
+            <field name="category_id" ref="module_category_hcc_activities"/>
+            <field name="implied_ids" eval="[(4, ref('group_pickleball_manager'))]"/>
+            <field name="comment">Full access including delete and configuration changes.</field>
+        </record>
+
+    </data>
+</odoo>
