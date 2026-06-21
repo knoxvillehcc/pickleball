@@ -213,16 +213,23 @@ export default function PickleballDashboard() {
   const [isPublished,  setIsPublished]  = useState(false);
   const [publishing,   setPublishing]   = useState(false);
   const [urlCopied,    setUrlCopied]    = useState(false);
+  const [currentUser,  setCurrentUser]  = useState(null);
+  const [resendingId,  setResendingId]  = useState(null);
+  const [resendDone,   setResendDone]   = useState({});
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/pickleball`
     : '/register/pickleball';
 
-  // Load publish status on mount
+  // Load publish status + current user role on mount
   useEffect(() => {
     fetch('/api/pickleball/settings?key=is_published')
       .then(r => r.json())
       .then(d => setIsPublished(d.is_published === true || d.value === 'true'))
+      .catch(() => {});
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => setCurrentUser(d.user || null))
       .catch(() => {});
   }, []);
 
@@ -334,13 +341,34 @@ export default function PickleballDashboard() {
   const setSkillFilter   = (v) => setFilter(f => ({ ...f, skill:   f.skill   === v ? '' : v }));
   const clearFilters     = () => { setFilter({ payment: '', skill: '' }); setSearch(''); };
 
+  const handleResendEmail = async (reg) => {
+    setResendingId(reg.registration_number);
+    try {
+      const res  = await fetch('/api/pickleball/resend-email', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registration_number: reg.registration_number }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setResendDone(prev => ({ ...prev, [reg.registration_number]: true }));
+        setTimeout(() => setResendDone(prev => ({ ...prev, [reg.registration_number]: false })), 3000);
+      } else {
+        alert('Resend failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert('Resend failed: ' + e.message);
+    } finally {
+      setResendingId(null);
+    }
+  };
+
   // ── Render ──────────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '60px' }}>
       {payLinkReg && <PaymentLinkModal reg={payLinkReg} onClose={() => setPayLinkReg(null)} />}
 
-      {/* ── Publish Banner ──────────────────────────────────────────────── */}
-      <div style={{
+      {/* ── Publish Banner — super_admin only ────────────────────────── */}
+      {currentUser?.role === 'super_admin' && <div style={{
         ...card,
         padding: '20px 24px',
         background: isPublished
@@ -397,7 +425,7 @@ export default function PickleballDashboard() {
         }}>
           {publishing ? '⏳ Saving...' : isPublished ? '🔒 Unpublish Page' : '🌐 Publish Page'}
         </button>
-      </div>
+      </div>}
 
       {/* ── Page Header ────────────────────────────────────────────────── */}
       <div style={{
@@ -549,17 +577,7 @@ export default function PickleballDashboard() {
               {sorted.length} records
             </span>
           </div>
-          <a
-            href="https://supabase.com/dashboard"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              color: C.saffron, fontSize: '13px', fontWeight: '600', textDecoration: 'none',
-            }}
-          >
-            Open in Supabase ↗
-          </a>
+
         </div>
 
         {/* Table body */}
@@ -649,7 +667,23 @@ export default function PickleballDashboard() {
                         </button>
                       )}
                       {r.payment_status === 'paid' && (
-                        <span style={{ color: '#10B981', fontSize: '12px', fontWeight: '700' }}>✓ Paid</span>
+                        <button
+                          onClick={() => handleResendEmail(r)}
+                          disabled={resendingId === r.registration_number}
+                          title="Resend confirmation email"
+                          style={{
+                            padding: '6px 12px', borderRadius: '8px', cursor: resendingId === r.registration_number ? 'not-allowed' : 'pointer',
+                            border: `1px solid ${resendDone[r.registration_number] ? 'rgba(16,185,129,0.5)' : 'rgba(14,158,138,0.4)'}`,
+                            background: resendDone[r.registration_number] ? 'rgba(16,185,129,0.15)' : 'rgba(14,158,138,0.08)',
+                            color: resendDone[r.registration_number] ? '#10B981' : '#0E9E8A',
+                            fontWeight: '700', fontSize: '12px', whiteSpace: 'nowrap', transition: 'all 0.2s',
+                          }}
+                        >
+                          {resendingId === r.registration_number
+                            ? <><span style={{ display:'inline-block',width:'10px',height:'10px',border:'2px solid rgba(14,158,138,0.3)',borderTop:'2px solid #0E9E8A',borderRadius:'50%',animation:'spin 0.7s linear infinite',marginRight:'5px' }}/> Sending...</>
+                            : resendDone[r.registration_number] ? '✅ Sent!' : '📧 Resend Email'
+                          }
+                        </button>
                       )}
                     </td>
                   </tr>
