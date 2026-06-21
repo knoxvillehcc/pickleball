@@ -14,16 +14,18 @@ const CalIcon      = () => <svg width="18" height="18" viewBox="0 0 24 24" fill=
 const BannerIcon   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>;
 const PBIcon       = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>;
 const SettingsIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+const UsersIcon    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
 const SunIcon      = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>;
 const MoonIcon     = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
 
 const navLinks = [
-  { href: '/',               label: 'Dashboard',     icon: <HomeIcon /> },
-  { href: '/reports',        label: 'Membership',    icon: <ReportsIcon /> },
-  { href: '/reports/monthly',label: 'Monthly Report',icon: <CalIcon /> },
-  { href: '/banner',         label: 'Banner In',     icon: <BannerIcon /> },
-  { href: '/pickleball',     label: 'Pickleball',    icon: <PBIcon /> },
-  { href: '/settings',       label: 'Settings',      icon: <SettingsIcon /> },
+  { href: '/',                label: 'Dashboard',      icon: <HomeIcon />,     slug: 'dashboard' },
+  { href: '/reports',        label: 'Membership',     icon: <ReportsIcon />,  slug: 'reports' },
+  { href: '/reports/monthly',label: 'Monthly Report', icon: <CalIcon />,      slug: 'monthly' },
+  { href: '/banner',         label: 'Banner In',      icon: <BannerIcon />,   slug: 'banner' },
+  { href: '/pickleball',     label: 'Pickleball',     icon: <PBIcon />,       slug: 'pickleball' },
+  { href: '/settings',       label: 'Settings',       icon: <SettingsIcon />, slug: 'settings' },
+  { href: '/settings/users', label: 'User Management',icon: <UsersIcon />,    slug: 'users', adminOnly: true },
 ];
 
 // ── Public routes — no sidebar ─────────────────────────────────────────────────────
@@ -121,7 +123,12 @@ export default function ClientLayout({ children }) {
             <div style={{ fontSize: '10px', fontWeight: '700', color: textMuted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', paddingLeft: '12px' }}>
               NAVIGATION
             </div>
-            {navLinks.map(({ href, label, icon }) => {
+            {navLinks.filter(link => {
+              if (link.adminOnly) return user?.role === 'super_admin';
+              if (!user) return true; // show all while loading
+              const pages = user.allowedPages || [];
+              return pages.includes('*') || pages.includes(link.slug);
+            }).map(({ href, label, icon }) => {
               const active = pathname === href || (href !== '/' && pathname.startsWith(href));
               return (
                 <Link key={href} href={href} style={{
