@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { insertRegistration } from '@/lib/supabaseClient';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Prevent Next.js from statically analyzing this route at build time
+export const dynamic = 'force-dynamic';
+
+// Lazy init — only runs at request time, not during build
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 
 function generateRegNumber() {
   const d    = new Date();
@@ -95,6 +99,7 @@ export async function POST(request) {
     const saved = await insertRegistration(regData);
 
     // ── Create Stripe Checkout Session ─────────────────────────────────────────
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode:                 'payment',

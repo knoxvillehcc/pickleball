@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+export const dynamic = 'force-dynamic';
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // ── POST: Generate a fresh Stripe payment link for a pending registration ──────
 export async function POST(request) {
@@ -56,6 +57,7 @@ export async function POST(request) {
     const eventLabel   = isDoubles ? 'Doubles' : 'Singles';
 
     // 3. Create a fresh Stripe Checkout Session
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode:                 'payment',

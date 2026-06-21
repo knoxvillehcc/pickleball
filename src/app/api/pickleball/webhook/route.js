@@ -3,7 +3,8 @@ import Stripe from 'stripe';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
 import { sendAllConfirmationEmails } from '@/lib/emailService';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+export const dynamic = 'force-dynamic';
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // ── Sync confirmed registration to Odoo as a Contact ──────────────────────────
 async function syncToOdoo(regData, amountPaid, stripeRef) {
@@ -125,6 +126,7 @@ export async function POST(request) {
 
   let event;
   try {
+    const stripe = getStripe();
     event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     console.error('[Webhook] Signature verification failed:', err.message);
