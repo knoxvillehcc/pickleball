@@ -1,6 +1,6 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
 const C = {
   saffron: '#F4A40B',
@@ -9,12 +9,12 @@ const C = {
   bg:      '#060D1A',
 };
 
-export default function PickleballSuccessPage() {
+// ── Inner component that uses useSearchParams ──────────────────────────────────
+function SuccessContent() {
   const searchParams = useSearchParams();
   const regNumber    = searchParams.get('reg') || '';
   const [dots, setDots] = useState('');
 
-  // Animated dots for "syncing to Odoo" message
   useEffect(() => {
     const t = setInterval(() => setDots(d => d.length >= 3 ? '' : d + '.'), 500);
     return () => clearInterval(t);
@@ -98,8 +98,8 @@ export default function PickleballSuccessPage() {
             What Happens Next
           </div>
           {[
-            { icon: '📧', title: 'Confirmation Email', desc: 'A confirmation email has been sent to your inbox' },
-            { icon: '📋', title: 'Admin Notified',      desc: 'HCC staff have been notified of your registration' },
+            { icon: '📧', title: 'Confirmation Email',   desc: 'A confirmation email has been sent to your inbox' },
+            { icon: '📋', title: 'Admin Notified',        desc: 'HCC staff have been notified of your registration' },
             { icon: '🏓', title: 'See You on the Court', desc: 'Bring your registration number on event day for check-in' },
           ].map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start',
@@ -143,5 +143,18 @@ export default function PickleballSuccessPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+// ── Root export with Suspense wrapper (required for useSearchParams in Next.js 16) ──
+export default function PickleballSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', background: '#060D1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#10B981', fontSize: '18px', fontFamily: 'Inter, sans-serif' }}>Loading...</div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }

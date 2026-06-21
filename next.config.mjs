@@ -4,10 +4,6 @@ const nextConfig = {
   // Produces a self-contained build in .next/standalone that runs with: node server.js
   output: 'standalone',
 
-  // ── Prevent ESLint/TS from failing the production build ──────────────────
-  eslint:     { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors:  true },
-
   // ── Security headers ──────────────────────────────────────────────────────
   async headers() {
     return [
