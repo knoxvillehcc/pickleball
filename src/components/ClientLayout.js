@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect, createContext, useContext } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 // ── Theme Context ──────────────────────────────────────────────────────────────
@@ -26,15 +26,17 @@ const navLinks = [
   { href: '/settings',       label: 'Settings',      icon: <SettingsIcon /> },
 ];
 
-// ── Public routes — no sidebar ─────────────────────────────────────────────────
-const PUBLIC_PREFIXES = ['/register'];
+// ── Public routes — no sidebar ─────────────────────────────────────────────────────
+const PUBLIC_PREFIXES = ['/register', '/login'];
 const isPublicRoute = (path) => PUBLIC_PREFIXES.some(p => path.startsWith(p));
 
 // ── Main ClientLayout ──────────────────────────────────────────────────────────
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
-  const [theme, setTheme] = useState('dark');
+  const router   = useRouter();
+  const [theme,   setTheme]   = useState('dark');
   const [mounted, setMounted] = useState(false);
+  const [user,    setUser]    = useState(null);
 
   // Load saved theme
   useEffect(() => {
@@ -43,6 +45,19 @@ export default function ClientLayout({ children }) {
     document.documentElement.setAttribute('data-theme', saved);
     setMounted(true);
   }, []);
+
+  // Fetch current user
+  useEffect(() => {
+    if (!isPublicRoute(pathname)) {
+      fetch('/api/auth/me').then(r => r.json()).then(d => setUser(d.user || null)).catch(() => {});
+    }
+  }, [pathname]);
+
+  const handleLogout = useCallback(async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setUser(null);
+    router.push('/login');
+  }, [router]);
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
@@ -163,25 +178,50 @@ export default function ClientLayout({ children }) {
               </span>
             </button>
 
-            {/* User info */}
+            {/* User info + Logout */}
             <div style={{
-              display: 'flex', alignItems: 'center', gap: '12px',
               padding: '12px 14px', borderRadius: '12px',
               backgroundColor: isDark ? 'rgba(30,41,59,0.6)' : 'rgba(241,245,249,0.8)',
               border: `1px solid ${sidebarBorder}`,
             }}>
-              <div style={{
-                width: '34px', height: '34px', borderRadius: '50%',
-                backgroundColor: isDark ? '#1E293B' : '#E2E8F0',
-                border: '2px solid rgba(99,102,241,0.4)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '12px', fontWeight: '700', color: '#818CF8', flexShrink: 0,
-              }}>AD</div>
-              <div>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: textPrimary, lineHeight: 1.2 }}>Admin User</div>
-                <div style={{ fontSize: '11px', color: textMuted, marginTop: '2px' }}>Active Session</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: user ? '10px' : '0' }}>
+                <div style={{
+                  width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
+                  backgroundColor: isDark ? '#1E293B' : '#E2E8F0',
+                  border: '2px solid rgba(99,102,241,0.4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '12px', fontWeight: '700', color: '#818CF8',
+                }}>
+                  {user ? user.email[0].toUpperCase() : 'AD'}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: textPrimary, lineHeight: 1.2 }}>
+                    {user ? user.name || 'Admin' : 'Admin User'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: textMuted, marginTop: '2px',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {user ? user.email : 'Active Session'}
+                  </div>
+                </div>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%',
+                  backgroundColor: '#10B981', boxShadow: '0 0 6px #10B981', flexShrink: 0 }}/>
               </div>
-              <div style={{ marginLeft: 'auto', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 6px #10B981' }}/>
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.25)',
+                    background: 'rgba(239,68,68,0.08)', color: '#FC8181',
+                    fontSize: '12px', fontWeight: '700', cursor: 'pointer',
+                    fontFamily: 'inherit', letterSpacing: '0.5px',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.25)'; }}
+                >
+                  🚪 Logout
+                </button>
+              )}
             </div>
           </div>
         </aside>
