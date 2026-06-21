@@ -81,6 +81,15 @@ export async function proxy(request) {
   }
 
   // ── Page permission check ──────────────────────────────────────────────────
+  // Super admin always has full access
+  if (payload.role === 'super_admin') {
+    const headers = new Headers(request.headers);
+    headers.set('x-user-email',         payload.email  || '');
+    headers.set('x-user-role',           'super_admin');
+    headers.set('x-user-allowed-pages',  '["*"]');
+    return NextResponse.next({ request: { headers } });
+  }
+
   const slug = getPageSlug(pathname);
   if (slug) {
     const allowed = hasAccess(payload.allowedPages, slug);
