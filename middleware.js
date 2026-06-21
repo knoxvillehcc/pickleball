@@ -1,25 +1,43 @@
 // HCC Dashboard — Next.js Edge Middleware
-// Protects all admin routes. Public routes are always accessible.
+// IMPORTANT: This file runs on the Edge runtime.
+// Do NOT import from @/lib/auth — it uses bcryptjs + next/headers (Node-only).
+// JWT verification is inlined here using jose directly.
 
 import { NextResponse } from 'next/server';
-import { verifyToken, COOKIE_NAME } from '@/lib/auth';
+import { jwtVerify } from 'jose';
 
-// ── Routes that are always public ────────────────────────────────────────────
+const COOKIE_NAME = 'hcc_access';
+const JWT_SECRET  = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'fallback-dev-secret-change-in-prod'
+);
+
+async function verifyToken(token) {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+// ── Routes that skip auth entirely ────────────────────────────────────────────
 const PUBLIC_PREFIXES = [
   '/login',
-  '/register',                         // public registration pages
-  '/api/auth/login',                   // login API
-  '/api/auth/logout',                  // logout API
-  '/api/pickleball/register',          // registration form submission
-  '/api/pickleball/webhook',           // Stripe webhook
-  '/api/pickleball/settings',          // publish/unpublish check (public)
-  '/api/health',                       // health check
-  '/_next',                            // Next.js internals
+  '/register',
+  '/api/auth/login',
+  '/api/auth/logout',
+  '/api/pickleball/register',
+  '/api/pickleball/webhook',
+  '/api/pickleball/settings',
+  '/api/health',
+  '/_next',
   '/favicon',
 ];
 
 function isPublic(pathname) {
-  return PUBLIC_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '?'));
+  return PUBLIC_PREFIXES.some(
+    p => pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '?')
+  );
 }
 
 export async function middleware(request) {
@@ -28,43 +46,40 @@ export async function middleware(request) {
   // Always allow public paths
   if (isPublic(pathname)) return NextResponse.next();
 
-  // Get token from cookie
+  // Get JWT from cookie
   const token = request.cookies.get(COOKIE_NAME)?.value;
 
   if (!token) {
-    // API routes → 401 JSON
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: 'Unauthorized — please log in' }, { status: 401 });
     }
-    // Page routes → redirect to login
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+    const url = new URL('/login', request.url);
+    url.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(url);
   }
 
   // Verify JWT
   const payload = await verifyToken(token);
   if (!payload) {
     if (pathname.startsWith('/api/')) {
-      return NextResponse.json({ error: 'Session expired — please log in again' }, { status: 401 });
+      return NextResponse.json({ error: 'Session expired' }, { status: 401 });
     }
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    loginUrl.searchParams.set('expired', '1');
-    return NextResponse.redirect(loginUrl);
+    const url = new URL('/login', request.url);
+    url.searchParams.set('redirect', pathname);
+    url.searchParams.set('expired', '1');
+    return NextResponse.redirect(url);
   }
 
-  // Inject user info as headers for server components
+  // Pass user info to server via headers
   const headers = new Headers(request.headers);
   headers.set('x-user-email', payload.email);
   headers.set('x-user-role',  payload.role || 'admin');
-
   return NextResponse.next({ request: { headers } });
 }
 
 export const config = {
   matcher: [
-    // Match all routes except static files
+    // Match all routes except static assets
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)).*)',
   ],
 };

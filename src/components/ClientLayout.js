@@ -184,7 +184,7 @@ export default function ClientLayout({ children }) {
               backgroundColor: isDark ? 'rgba(30,41,59,0.6)' : 'rgba(241,245,249,0.8)',
               border: `1px solid ${sidebarBorder}`,
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: user ? '10px' : '0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                 <div style={{
                   width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
                   backgroundColor: isDark ? '#1E293B' : '#E2E8F0',
@@ -206,22 +206,20 @@ export default function ClientLayout({ children }) {
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%',
                   backgroundColor: '#10B981', boxShadow: '0 0 6px #10B981', flexShrink: 0 }}/>
               </div>
-              {user && (
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.25)',
-                    background: 'rgba(239,68,68,0.08)', color: '#FC8181',
-                    fontSize: '12px', fontWeight: '700', cursor: 'pointer',
-                    fontFamily: 'inherit', letterSpacing: '0.5px',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.25)'; }}
-                >
-                  🚪 Logout
-                </button>
-              )}
+              <button
+                onClick={handleLogout}
+                style={{
+                  width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.25)',
+                  background: 'rgba(239,68,68,0.08)', color: '#FC8181',
+                  fontSize: '12px', fontWeight: '700', cursor: 'pointer',
+                  fontFamily: 'inherit', letterSpacing: '0.5px',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.18)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.5)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.25)'; }}
+              >
+                🚪 Logout
+              </button>
             </div>
           </div>
         </aside>
