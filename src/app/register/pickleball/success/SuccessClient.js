@@ -138,7 +138,7 @@ export default function SuccessClient() {
                 </svg>
               ),
               label: 'Location',
-              value: '8580 Hickory Creek Rd, Lenoir City, TN 37771'
+              value: 'HCC — 8580 Hickory Creek Rd, Lenoir City, TN 37771'
             },
             {
               icon: (
@@ -223,7 +223,7 @@ export default function SuccessClient() {
           <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
           <span>Doubles Tournament</span>
           <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
-          <span>Lenoir City, TN</span>
+          <span>HCC</span>
         </div>
 
         {/* Questions footer */}

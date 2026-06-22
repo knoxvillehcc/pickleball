@@ -262,7 +262,7 @@ function RegistrationForm() {
                 ),
                 color: T.lime,
                 label: 'Location',
-                value: 'Lenoir City',
+                value: 'HCC',
                 sub: '8580 Hickory Creek Rd, TN'
               },
               {
