@@ -57,7 +57,7 @@ function Card({ title, icon, accent = T.lime, children }) {
   return (
     <div style={{ background: T.navyCard, border: `1px solid ${accent}22`, borderRadius: '18px', overflow: 'hidden', backdropFilter: 'blur(12px)', boxShadow: '0 8px 40px rgba(0,0,0,0.35)' }}>
       <div style={{ padding: '16px 24px', borderBottom: `1px solid ${accent}18`, display: 'flex', alignItems: 'center', gap: '12px', background: `${accent}08` }}>
-        <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: `${accent}20`, border: `1px solid ${accent}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', flexShrink: 0 }}>{icon}</div>
+        <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: `${accent}20`, border: `1px solid ${accent}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: accent, flexShrink: 0 }}>{icon}</div>
         <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: T.white, letterSpacing: '0.2px' }}>{title}</h2>
       </div>
       <div style={{ padding: '24px' }}>{children}</div>
@@ -65,7 +65,7 @@ function Card({ title, icon, accent = T.lime, children }) {
   );
 }
 
-function BracketPill({ emoji, label, selected, onClick }) {
+function BracketPill({ icon, label, selected, onClick }) {
   return (
     <button type="button" onClick={onClick} style={{
       flex: 1, padding: '16px', borderRadius: '14px', cursor: 'pointer', textAlign: 'center',
@@ -73,8 +73,9 @@ function BracketPill({ emoji, label, selected, onClick }) {
       background: selected ? `${T.teal}18` : 'rgba(255,255,255,0.03)',
       boxShadow: selected ? `0 0 20px ${T.teal}30` : 'none',
       transition: 'all 0.2s', fontFamily: 'inherit',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', justifyContent: 'center'
     }}>
-      <div style={{ fontSize: '28px', marginBottom: '8px' }}>{emoji}</div>
+      <div style={{ color: selected ? T.teal : T.muted, transition: 'color 0.2s' }}>{icon}</div>
       <div style={{ fontSize: '13px', fontWeight: '800', color: selected ? T.teal : T.light, lineHeight: 1.3 }}>{label}</div>
     </button>
   );
@@ -96,11 +97,21 @@ function RegistrationClosed() {
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${T.navy}, ${T.navyMid})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', padding: '24px' }}>
       <div style={{ maxWidth: '440px', width: '100%', textAlign: 'center' }}>
-        <div style={{ width: '90px', height: '90px', borderRadius: '24px', background: `linear-gradient(135deg, ${T.teal}, ${T.tealDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '44px', margin: '0 auto 24px', boxShadow: `0 0 50px ${T.teal}40` }}>🏓</div>
+        <div style={{ width: '90px', height: '90px', borderRadius: '24px', background: `linear-gradient(135deg, ${T.teal}, ${T.tealDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: `0 0 50px ${T.teal}40` }}>
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={T.white} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="10" cy="10" r="7" fill="currentColor" fillOpacity="0.1" />
+            <path d="m15 15 5 5" />
+            <circle cx="18" cy="8" r="2" fill="currentColor" />
+          </svg>
+        </div>
         <h1 style={{ margin: '0 0 12px', fontSize: '32px', fontWeight: '900', color: T.white, letterSpacing: '-0.5px' }}>Registration Closed</h1>
         <p style={{ color: T.muted, fontSize: '15px', lineHeight: '1.7', margin: '0 0 32px' }}>The HCC Pickleball Tournament registration is not currently open. Contact us to be notified when it opens.</p>
-        <a href="mailto:knoxvillehcc@gmail.com?subject=Pickleball Registration Inquiry" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: T.lime, fontWeight: '700', fontSize: '15px', textDecoration: 'none', padding: '12px 24px', borderRadius: '12px', background: `${T.lime}12`, border: `1px solid ${T.lime}30` }}>
-          ✉️ knoxvillehcc@gmail.com
+        <a href="mailto:knoxvillehcc@gmail.com?subject=Pickleball Registration Inquiry" style={{ display: 'inline-flex', alignItems: 'center', color: T.lime, fontWeight: '700', fontSize: '15px', textDecoration: 'none', padding: '12px 24px', borderRadius: '12px', background: `${T.lime}12`, border: `1px solid ${T.lime}30` }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+          knoxvillehcc@gmail.com
         </a>
         <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
           <a href="tel:8659249286" style={{ color: T.muted, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}><span style={{ color: T.lime }}>Love</span> · 865-924-9286</a>
@@ -108,7 +119,6 @@ function RegistrationClosed() {
         </div>
         <div style={{ marginTop: '12px', fontSize: '12px', color: T.muted }}>Knoxville Hindu Community Center</div>
       </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
@@ -185,7 +195,13 @@ function RegistrationForm() {
       <div style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid rgba(255,255,255,0.06)`, background: 'rgba(4,17,31,0.95)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', padding: '0 24px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', height: '62px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: `linear-gradient(135deg, ${T.lime}, ${T.teal})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>🏓</div>
+            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: `linear-gradient(135deg, ${T.lime}, ${T.teal})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.navy }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="10" cy="10" r="7" fill="currentColor" fillOpacity="0.1" />
+                <path d="m15 15 5 5" />
+                <circle cx="18" cy="8" r="2" fill="currentColor" />
+              </svg>
+            </div>
             <div>
               <div style={{ fontSize: '14px', fontWeight: '900', color: T.white }}>HCC Youth Club</div>
               <div style={{ fontSize: '11px', color: T.muted, fontWeight: '600' }}>Pickleball Tournament · July 26, 2026</div>
@@ -211,23 +227,90 @@ function RegistrationForm() {
           {/* Info cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '12px', marginBottom: '28px' }}>
             {[
-              { icon: '📅', label: 'Date',      value: 'Sunday',      sub: 'July 26, 2026' },
-              { icon: '⏰', label: 'Start Time', value: '12:00 PM',    sub: 'Doors open early' },
-              { icon: '📍', label: 'Location',   value: 'Lenoir City', sub: '8580 Hickory Creek Rd, TN' },
-              { icon: '💰', label: 'Entry Fee',  value: '$25/player',  sub: 'Doubles only · $50/team' },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                ),
+                color: T.lime,
+                label: 'Date',
+                value: 'Sunday',
+                sub: 'July 26, 2026'
+              },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                ),
+                color: T.teal,
+                label: 'Start Time',
+                value: '12:00 PM',
+                sub: 'Doors open early'
+              },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                ),
+                color: T.lime,
+                label: 'Location',
+                value: 'Lenoir City',
+                sub: '8580 Hickory Creek Rd, TN'
+              },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                ),
+                color: T.teal,
+                label: 'Entry Fee',
+                value: '$25/player',
+                sub: 'Doubles only · $50/team'
+              },
             ].map(info => (
-              <div key={info.label} style={{ background: T.navyCard, border: `1px solid rgba(255,255,255,0.07)`, borderRadius: '14px', padding: '16px', textAlign: 'left' }}>
-                <div style={{ fontSize: '20px', marginBottom: '8px' }}>{info.icon}</div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>{info.label}</div>
-                <div style={{ fontSize: '16px', fontWeight: '900', color: T.white }}>{info.value}</div>
-                <div style={{ fontSize: '11px', color: T.muted, marginTop: '2px' }}>{info.sub}</div>
+              <div key={info.label} style={{
+                background: T.navyCard,
+                border: `1.5px solid ${info.color}35`,
+                borderRadius: '14px',
+                padding: '18px 16px',
+                textAlign: 'left',
+                boxShadow: `0 8px 30px rgba(0,0,0,0.4), inset 0 0 12px ${info.color}08`,
+                transition: 'transform 0.2s, border-color 0.2s',
+              }}>
+                <div style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  background: `${info.color}15`,
+                  border: `1.2px solid ${info.color}40`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '12px',
+                  color: info.color
+                }}>
+                  {info.icon}
+                </div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '4px' }}>{info.label}</div>
+                <div style={{ fontSize: '16px', fontWeight: '900', color: T.white, letterSpacing: '-0.3px' }}>{info.value}</div>
+                <div style={{ fontSize: '11px', color: T.muted, marginTop: '2px', lineHeight: '1.3' }}>{info.sub}</div>
               </div>
             ))}
           </div>
 
           {/* Brackets */}
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
-            {[{ bg: T.teal, text: '🎓 Middle School & High School' }, { bg: T.lime, text: '👤 Adults' }].map(b => (
+            {[{ bg: T.teal, text: 'Middle School & High School' }, { bg: T.lime, text: 'Adults (18+)' }].map(b => (
               <div key={b.text} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: `${b.bg}20`, border: `1px solid ${b.bg}40`, padding: '7px 16px', borderRadius: '20px' }}>
                 <span style={{ fontSize: '13px', fontWeight: '800', color: b.bg }}>{b.text}</span>
               </div>
@@ -236,16 +319,21 @@ function RegistrationForm() {
 
           {/* Tag line */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '12px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>
-            <span>🏆 Compete. Have Fun. Build Community.</span>
+            <span>Compete. Have Fun. Build Community.</span>
             <span style={{ color: 'rgba(255,255,255,0.15)' }}>|</span>
-            <span>🏓 All Skill Levels Welcome</span>
+            <span>All Skill Levels Welcome</span>
             <span style={{ color: 'rgba(255,255,255,0.15)' }}>|</span>
-            <span>🎾 Paddle Rental $5</span>
+            <span>Paddle Rental $5</span>
           </div>
 
           {/* Contact */}
           <div style={{ marginTop: '20px', padding: '14px 20px', background: T.navyCard, border: `1px solid rgba(255,255,255,0.08)`, borderRadius: '14px', display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ fontSize: '11px', fontWeight: '800', color: T.teal, textTransform: 'uppercase', letterSpacing: '1.5px' }}>📞 Contact for Inquiries</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: '800', color: T.teal, textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+              Contact for Inquiries
+            </div>
             <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)' }}/>
             <a href="tel:8659249286" style={{ color: T.white, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>
               <span style={{ color: T.lime }}>Love</span> 865-924-9286
@@ -260,7 +348,11 @@ function RegistrationForm() {
         {/* Alerts */}
         {wasCancelled && (
           <div style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '20px' }}>⚠️</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FCA5A5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
             <div>
               <div style={{ fontWeight: '800', color: '#FCA5A5', fontSize: '14px' }}>Payment Cancelled</div>
               <div style={{ color: T.muted, fontSize: '13px', marginTop: '2px' }}>Your registration was not completed. Fill out the form again to proceed.</div>
@@ -269,7 +361,11 @@ function RegistrationForm() {
         )}
         {error && (
           <div style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '20px' }}>❌</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FCA5A5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="15" y1="9" x2="9" y2="15" />
+              <line x1="9" y1="9" x2="15" y2="15" />
+            </svg>
             <div>
               <div style={{ fontWeight: '800', color: '#FCA5A5', fontSize: '14px' }}>Registration Error</div>
               <div style={{ color: T.muted, fontSize: '13px', marginTop: '2px' }}>{error}</div>
@@ -282,7 +378,12 @@ function RegistrationForm() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
             {/* Step 1: Contact */}
-            <Card title="Your Contact Information" icon="👤">
+            <Card title="Your Contact Information" icon={
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            } accent={T.lime}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <Field label="First Name" required value={form.first_name} onChange={e => set('first_name', e.target.value)} placeholder="John" />
                 <Field label="Last Name"  required value={form.last_name}  onChange={e => set('last_name',  e.target.value)} placeholder="Doe" />
@@ -304,7 +405,15 @@ function RegistrationForm() {
             </Card>
 
             {/* Step 2: Team & Bracket */}
-            <Card title="Team & Player Category" icon="🏆" accent={T.lime}>
+            <Card title="Team & Player Category" icon={
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                <path d="M4 22h16" />
+                <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34" />
+                <path d="M12 2a5 5 0 0 0-5 5v3c0 2.2 1.8 4 4 4h2c2.2 0 4-1.8 4-4V7a5 5 0 0 0-5-5z" />
+              </svg>
+            } accent={T.lime}>
               <div style={{ marginBottom: '20px' }}>
                 <Field label="Team Name" required hint="Give your team a fun name!" value={form.team_name} onChange={e => set('team_name', e.target.value)} placeholder="e.g. HCC Warriors" />
               </div>
@@ -314,8 +423,18 @@ function RegistrationForm() {
                   Player Category <span style={{ color: T.lime }}>*</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <BracketPill emoji="🎓" label={'Middle School &\nHigh School'} selected={form.player_type === 'middle_high_school'} onClick={() => set('player_type', 'middle_high_school')} />
-                  <BracketPill emoji="👤" label="Adults (18+)" selected={form.player_type === 'adult'} onClick={() => set('player_type', 'adult')} />
+                  <BracketPill icon={
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                    </svg>
+                  } label={'Middle School &\nHigh School'} selected={form.player_type === 'middle_high_school'} onClick={() => set('player_type', 'middle_high_school')} />
+                  <BracketPill icon={
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  } label="Adults (18+)" selected={form.player_type === 'adult'} onClick={() => set('player_type', 'adult')} />
                 </div>
               </div>
 
@@ -326,7 +445,14 @@ function RegistrationForm() {
                   <div style={{ position: 'absolute', top: '8px', right: '10px', fontSize: '9px', fontWeight: '900', color: '#000', background: T.lime, padding: '2px 8px', borderRadius: '20px' }}>ONLY</div>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '26px' }}>🤝</span>
+                      <div style={{ color: T.lime }}>
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                          <circle cx="9" cy="7" r="4" />
+                          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                      </div>
                       <span style={{ fontWeight: '900', fontSize: '18px', color: T.lime }}>Doubles</span>
                     </div>
                     <div style={{ fontSize: '12px', color: T.muted }}>2 players · $25.00 per player</div>
@@ -340,11 +466,17 @@ function RegistrationForm() {
             </Card>
 
             {/* Step 3: Players */}
-            <Card title="Player Details" icon="🏓" accent={T.teal}>
+            <Card title="Player Details" icon={
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="10" cy="10" r="7" fill="currentColor" fillOpacity="0.1" />
+                <path d="m15 15 5 5" />
+                <circle cx="18" cy="8" r="2" fill="currentColor" />
+              </svg>
+            } accent={T.teal}>
               {/* Player 1 */}
               <div style={{ background: `${T.lime}08`, border: `1px solid ${T.lime}20`, borderRadius: '12px', padding: '16px 18px', marginBottom: '16px' }}>
                 <div style={{ fontSize: '11px', fontWeight: '800', color: T.lime, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
-                  🏅 Player 1 (You — auto-filled from Step 1)
+                  Player 1 (You — auto-filled from Step 1)
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   {[
@@ -362,7 +494,7 @@ function RegistrationForm() {
               {/* Player 2 — always required */}
               <div style={{ background: `${T.teal}08`, border: `2px solid ${T.teal}40`, borderRadius: '12px', padding: '18px' }}>
                 <div style={{ fontSize: '11px', fontWeight: '800', color: T.teal, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>
-                  🤝 Player 2 — Your Doubles Partner <span style={{ color: '#EF4444' }}>*</span>
+                  Player 2 — Your Doubles Partner <span style={{ color: '#EF4444' }}>*</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                   <Field label="First Name" required value={form.player2_first_name} onChange={e => set('player2_first_name', e.target.value)} placeholder="Jane" />
@@ -373,7 +505,12 @@ function RegistrationForm() {
             </Card>
 
             {/* Step 4: Waivers */}
-            <Card title="Liability Waiver & Terms" icon="📋" accent="#EF4444">
+            <Card title="Liability Waiver & Terms" icon={
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+              </svg>
+            } accent="#EF4444">
               <div style={{ marginBottom: '18px' }}>
                 <div style={{ fontSize: '12px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Liability Waiver</div>
                 <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '14px 16px', marginBottom: '12px', fontSize: '13px', color: T.muted, lineHeight: '1.75', maxHeight: '130px', overflowY: 'auto' }}>
@@ -401,7 +538,12 @@ function RegistrationForm() {
             </Card>
 
             {/* Step 5: Payment */}
-            <Card title="Review & Pay" icon="💳" accent={T.lime}>
+            <Card title="Review & Pay" icon={
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+            } accent={T.lime}>
               {/* Order summary */}
               <div style={{ background: T.navyMid, border: `1px solid ${T.lime}18`, borderRadius: '14px', padding: '20px', marginBottom: '20px' }}>
                 <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '16px' }}>Order Summary</div>
@@ -420,7 +562,7 @@ function RegistrationForm() {
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid rgba(255,255,255,0.07)` }}>
                   <span style={{ fontSize: '13px', color: T.muted }}>Bracket</span>
-                  <span style={{ fontSize: '13px', fontWeight: '700', color: T.white }}>{form.player_type === 'middle_high_school' ? '🎓 Middle / High School' : '👤 Adult'}</span>
+                  <span style={{ fontSize: '13px', fontWeight: '700', color: T.white }}>{form.player_type === 'middle_high_school' ? 'Middle / High School' : 'Adult'}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid rgba(255,255,255,0.07)` }}>
                   <span style={{ fontSize: '13px', color: T.muted }}>Date</span>
@@ -431,7 +573,11 @@ function RegistrationForm() {
                   <span style={{ fontSize: '40px', fontWeight: '900', color: T.lime, letterSpacing: '-2px' }}>${TOTAL}.00</span>
                 </div>
                 <div style={{ marginTop: '14px', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '12px', color: T.muted, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  🔒 Secure checkout via <strong style={{ color: '#94A3B8' }}>Stripe</strong> · Visa, Mastercard, Amex, Discover
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }}>
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  Secure checkout via <strong style={{ color: '#94A3B8' }}>Stripe</strong> · Visa, Mastercard, Amex, Discover
                 </div>
               </div>
 
@@ -448,8 +594,18 @@ function RegistrationForm() {
                     { done: form.terms_accepted,                                                label: 'Terms & Conditions' },
                   ].map(item => (
                     <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '14px' }}>{item.done ? '✅' : '⬜'}</span>
-                      <span style={{ fontSize: '13px', color: item.done ? T.muted : '#94A3B8', textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                        {item.done ? (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={T.lime} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                          </svg>
+                        )}
+                      </span>
+                      <span style={{ fontSize: '13px', color: item.done ? T.muted : '#94A3B8', textDecoration: item.done ? 'line-through' : 'none', marginLeft: '6px' }}>{item.label}</span>
                     </div>
                   ))}
                 </div>
@@ -474,7 +630,7 @@ function RegistrationForm() {
                     Redirecting to secure checkout...
                   </>
                 ) : (
-                  <>🏓 Register & Pay ${TOTAL}.00 →</>
+                  <>Register & Pay ${TOTAL}.00 →</>
                 )}
               </button>
             </Card>
