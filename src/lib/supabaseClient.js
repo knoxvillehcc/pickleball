@@ -39,7 +39,7 @@ export async function queryRegistrations({ paymentStatus, skillLevel, search, li
     'email', 'phone', 'skill_level', 'registration_date',
     'payment_status', 'amount_paid', 'stripe_payment_ref',
     'event_name', 'event_date', 'partner_name', 'gender',
-    'city', 'state', 'liability_accepted',
+    'city', 'state', 'liability_accepted', 'team_name',
   ].join(','));
 
   // Exact-match filters
@@ -80,7 +80,7 @@ export async function getAllRegistrations(limit = 5000) {
       'id', 'registration_number', 'full_name', 'email', 'phone',
       'skill_level', 'registration_date', 'payment_status',
       'amount_paid', 'stripe_payment_ref', 'event_name', 'event_date',
-      'gender', 'city', 'state', 'partner_name',
+      'gender', 'city', 'state', 'partner_name', 'team_name',
     ].join(','),
     order: 'registration_date.desc',
     limit: String(limit),

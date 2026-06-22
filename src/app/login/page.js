@@ -16,7 +16,7 @@ const C = {
 function LoginContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
-  const redirect     = searchParams.get('redirect') || '/pickleball';
+  const redirect     = searchParams.get('redirect') || '/';
   const expired      = searchParams.get('expired') === '1';
 
   const [step,    setStep]    = useState('email');

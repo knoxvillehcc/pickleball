@@ -37,6 +37,8 @@ function isPublic(pathname) {
 // ── Map pathname → page slug (for permission check) ──────────────────────────
 function getPageSlug(pathname) {
   if (pathname === '/')                          return 'dashboard';
+  if (pathname.startsWith('/api/dry-run'))       return 'dashboard';
+  if (pathname.startsWith('/api/execute'))       return 'dashboard';
   if (pathname.startsWith('/reports/monthly'))  return 'monthly';
   if (pathname.startsWith('/reports'))          return 'reports';
   if (pathname.startsWith('/banner'))           return 'banner';
@@ -92,12 +94,15 @@ export async function proxy(request) {
 
   const slug = getPageSlug(pathname);
   if (slug) {
-    const allowed = hasAccess(payload.allowedPages, slug);
-    if (!allowed) {
-      if (pathname.startsWith('/api/')) {
-        return NextResponse.json({ error: 'Access denied to this resource' }, { status: 403 });
+    // Every logged-in user is allowed to access the welcome landing page at '/'
+    if (pathname !== '/') {
+      const allowed = hasAccess(payload.allowedPages, slug);
+      if (!allowed) {
+        if (pathname.startsWith('/api/')) {
+          return NextResponse.json({ error: 'Access denied to this resource' }, { status: 403 });
+        }
+        return NextResponse.redirect(new URL('/access-denied', request.url));
       }
-      return NextResponse.redirect(new URL('/access-denied', request.url));
     }
   }
 

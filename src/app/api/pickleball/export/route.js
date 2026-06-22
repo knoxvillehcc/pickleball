@@ -11,7 +11,7 @@ export async function GET(request) {
     // ── CSV ────────────────────────────────────────────────────────────────
     if (format === 'csv') {
       const headers = [
-        'Registration #', 'Full Name', 'Email', 'Phone', 'Skill Level',
+        'Registration #', 'Full Name', 'Team Name', 'Email', 'Phone', 'Skill Level',
         'Registration Date', 'Payment Status', 'Amount Paid ($)',
         'Stripe Reference', 'Event Name', 'Event Date',
         'Gender', 'City', 'State', 'Partner Name',
@@ -20,6 +20,7 @@ export async function GET(request) {
       const rows = records.map(r => [
         r.registration_number || '',
         r.full_name            || '',
+        r.team_name            || '',
         r.email                || '',
         r.phone                || '',
         r.skill_level          || '',
@@ -49,7 +50,7 @@ export async function GET(request) {
     // ── Excel (XLSX via simple XML-based format) ────────────────────────
     if (format === 'excel') {
       const headers = [
-        'Registration #', 'Full Name', 'Email', 'Phone', 'Skill Level',
+        'Registration #', 'Full Name', 'Team Name', 'Email', 'Phone', 'Skill Level',
         'Registration Date', 'Payment Status', 'Amount Paid ($)',
         'Stripe Reference', 'Event Name', 'Event Date', 'Gender', 'City',
         'State', 'Partner Name',
@@ -64,6 +65,7 @@ export async function GET(request) {
         const cells = [
           r.registration_number || '',
           r.full_name            || '',
+          r.team_name            || '',
           r.email                || '',
           r.phone                || '',
           r.skill_level          || '',
@@ -118,6 +120,7 @@ export async function GET(request) {
         <tr style="background:${i % 2 === 0 ? '#FFF8F0' : '#fff'}">
           <td style="font-family:monospace;font-weight:700;color:#7B1C1C">${r.registration_number || ''}</td>
           <td>${r.full_name || ''}</td>
+          <td>${r.team_name || ''}</td>
           <td>${r.email || ''}</td>
           <td>${r.phone || ''}</td>
           <td style="text-transform:capitalize">${r.skill_level || ''}</td>
@@ -172,7 +175,7 @@ export async function GET(request) {
   <table>
     <thead>
       <tr>
-        <th>Reg #</th><th>Name</th><th>Email</th><th>Phone</th>
+        <th>Reg #</th><th>Name</th><th>Team Name</th><th>Email</th><th>Phone</th>
         <th>Skill</th><th>Date</th><th>Status</th><th>Amount</th>
       </tr>
     </thead>

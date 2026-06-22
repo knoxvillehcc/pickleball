@@ -604,6 +604,7 @@ export default function PickleballDashboard() {
                   {[
                     ['registration_number', 'Reg #'],
                     ['full_name',           'Name'],
+                    ['team_name',           'Team Name'],
                     ['email',               'Email'],
                     ['phone',               'Phone'],
                     ['skill_level',         'Skill'],
@@ -639,6 +640,7 @@ export default function PickleballDashboard() {
                       {r.registration_number}
                     </td>
                     <td style={{ padding: '13px 16px', color: 'white', fontWeight: '600' }}>{r.full_name}</td>
+                    <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.team_name || '–'}</td>
                     <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.email}</td>
                     <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.phone}</td>
                     <td style={{ padding: '13px 16px' }}><SkillBadge level={r.skill_level}/></td>
