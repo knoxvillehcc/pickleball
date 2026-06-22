@@ -210,6 +210,7 @@ export default function PickleballDashboard() {
   const [sortDir,      setSortDir]      = useState('desc');
   const [exporting,    setExporting]    = useState('');
   const [payLinkReg,   setPayLinkReg]   = useState(null);
+  const [editingReg,   setEditingReg]   = useState(null);
   const [isPublished,  setIsPublished]  = useState(false);
   const [publishing,   setPublishing]   = useState(false);
   const [urlCopied,    setUrlCopied]    = useState(false);
@@ -362,10 +363,19 @@ export default function PickleballDashboard() {
     }
   };
 
-  // ── Render ──────────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '60px' }}>
       {payLinkReg && <PaymentLinkModal reg={payLinkReg} onClose={() => setPayLinkReg(null)} />}
+      {editingReg && (
+        <EditRegistrationModal
+          reg={editingReg}
+          onClose={() => setEditingReg(null)}
+          onSave={(updatedRecord) => {
+            setRecords(prev => prev.map(r => r.id === updatedRecord.id ? { ...r, ...updatedRecord } : r));
+            fetchData();
+          }}
+        />
+      )}
 
       {/* ── Publish Banner — super_admin only ────────────────────────── */}
       {currentUser?.role === 'super_admin' && <div style={{
@@ -652,41 +662,57 @@ export default function PickleballDashboard() {
                       ${(r.amount_paid || 0).toFixed(2)}
                     </td>
                     <td style={{ padding: '13px 16px' }}>
-                      {r.payment_status !== 'paid' && (
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                         <button
-                          onClick={() => setPayLinkReg(r)}
-                          title="Generate & send payment link to this player"
+                          onClick={() => setEditingReg(r)}
+                          title="Edit registration details"
                           style={{
-                            padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(244,164,11,0.4)',
-                            background: 'rgba(244,164,11,0.08)', color: '#F4A40B',
+                            padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(129,140,248,0.4)',
+                            background: 'rgba(129,140,248,0.08)', color: '#818CF8',
                             fontWeight: '700', fontSize: '12px', cursor: 'pointer',
                             whiteSpace: 'nowrap', transition: 'all 0.2s',
                           }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(244,164,11,0.18)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(244,164,11,0.08)'}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(129,140,248,0.18)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(129,140,248,0.08)'}
                         >
-                          📧 Send Link
+                          ✏️ Edit
                         </button>
-                      )}
-                      {r.payment_status === 'paid' && (
-                        <button
-                          onClick={() => handleResendEmail(r)}
-                          disabled={resendingId === r.registration_number}
-                          title="Resend confirmation email"
-                          style={{
-                            padding: '6px 12px', borderRadius: '8px', cursor: resendingId === r.registration_number ? 'not-allowed' : 'pointer',
-                            border: `1px solid ${resendDone[r.registration_number] ? 'rgba(16,185,129,0.5)' : 'rgba(14,158,138,0.4)'}`,
-                            background: resendDone[r.registration_number] ? 'rgba(16,185,129,0.15)' : 'rgba(14,158,138,0.08)',
-                            color: resendDone[r.registration_number] ? '#10B981' : '#0E9E8A',
-                            fontWeight: '700', fontSize: '12px', whiteSpace: 'nowrap', transition: 'all 0.2s',
-                          }}
-                        >
-                          {resendingId === r.registration_number
-                            ? <><span style={{ display:'inline-block',width:'10px',height:'10px',border:'2px solid rgba(14,158,138,0.3)',borderTop:'2px solid #0E9E8A',borderRadius:'50%',animation:'spin 0.7s linear infinite',marginRight:'5px' }}/> Sending...</>
-                            : resendDone[r.registration_number] ? '✅ Sent!' : '📧 Resend Email'
-                          }
-                        </button>
-                      )}
+                        {r.payment_status !== 'paid' && (
+                          <button
+                            onClick={() => setPayLinkReg(r)}
+                            title="Generate & send payment link to this player"
+                            style={{
+                              padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(244,164,11,0.4)',
+                              background: 'rgba(244,164,11,0.08)', color: '#F4A40B',
+                              fontWeight: '700', fontSize: '12px', cursor: 'pointer',
+                              whiteSpace: 'nowrap', transition: 'all 0.2s',
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(244,164,11,0.18)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(244,164,11,0.08)'}
+                          >
+                            📧 Send Link
+                          </button>
+                        )}
+                        {r.payment_status === 'paid' && (
+                          <button
+                            onClick={() => handleResendEmail(r)}
+                            disabled={resendingId === r.registration_number}
+                            title="Resend confirmation email"
+                            style={{
+                              padding: '6px 12px', borderRadius: '8px', cursor: resendingId === r.registration_number ? 'not-allowed' : 'pointer',
+                              border: `1px solid ${resendDone[r.registration_number] ? 'rgba(16,185,129,0.5)' : 'rgba(14,158,138,0.4)'}`,
+                              background: resendDone[r.registration_number] ? 'rgba(16,185,129,0.15)' : 'rgba(14,158,138,0.08)',
+                              color: resendDone[r.registration_number] ? '#10B981' : '#0E9E8A',
+                              fontWeight: '700', fontSize: '12px', whiteSpace: 'nowrap', transition: 'all 0.2s',
+                            }}
+                          >
+                            {resendingId === r.registration_number
+                              ? <><span style={{ display:'inline-block',width:'10px',height:'10px',border:'2px solid rgba(14,158,138,0.3)',borderTop:'2px solid #0E9E8A',borderRadius:'50%',animation:'spin 0.7s linear infinite',marginRight:'5px' }}/> Sending...</>
+                              : resendDone[r.registration_number] ? '✅ Sent!' : '📧 Resend Email'
+                            }
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -701,6 +727,200 @@ export default function PickleballDashboard() {
         input::placeholder { color: #475569; }
         input:focus { border-color: rgba(244,164,11,0.5) !important; outline: none; }
       `}</style>
+    </div>
+  );
+}
+
+// ── Edit Registration Modal Component ──────────────────────────────────────────
+const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' };
+const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(51,65,85,0.6)`, color: '#E2E8F0', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' };
+
+function EditRegistrationModal({ reg, onClose, onSave }) {
+  const [form, setForm] = useState({
+    first_name: reg.first_name || '',
+    last_name: reg.last_name || '',
+    email: reg.email || '',
+    phone: reg.phone || '',
+    skill_level: reg.skill_level || 'beginner',
+    payment_status: reg.payment_status || 'pending',
+    amount_paid: reg.amount_paid || 0,
+    team_name: reg.team_name || '',
+    partner_name: reg.partner_name || '',
+    gender: reg.gender || 'male',
+    city: reg.city || '',
+    state: reg.state || '',
+  });
+
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!reg.first_name && reg.full_name) {
+      const parts = reg.full_name.split(' ');
+      const first = parts[0] || '';
+      const last = parts.slice(1).join(' ') || '';
+      setForm(prev => ({ ...prev, first_name: first, last_name: last }));
+    }
+  }, [reg]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      const res = await fetch('/api/pickleball/registrations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: reg.id, ...form }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to update registration');
+      }
+      onSave(data.record);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (field, val) => {
+    setForm(prev => ({ ...prev, [field]: val }));
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 9999, padding: '20px', backdropFilter: 'blur(4px)',
+    }} onClick={onClose}>
+      <div style={{
+        background: 'rgb(13,20,38)', border: '1px solid rgba(51,65,85,0.8)',
+        borderRadius: '20px', padding: '32px', maxWidth: '640px', width: '100%',
+        maxHeight: '90vh', overflowY: 'auto',
+        boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
+      }} onClick={e => e.stopPropagation()}>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'white' }}>
+            ✏️ Edit Registration
+          </h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
+        </div>
+
+        {error && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', marginBottom: '20px', color: '#FCA5A5', fontSize: '13px' }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Row 1: Name */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>First Name</label>
+              <input value={form.first_name} onChange={e => handleChange('first_name', e.target.value)} required style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Last Name</label>
+              <input value={form.last_name} onChange={e => handleChange('last_name', e.target.value)} required style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Row 2: Email & Phone */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Email</label>
+              <input type="email" value={form.email} onChange={e => handleChange('email', e.target.value)} required style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Phone</label>
+              <input value={form.phone} onChange={e => handleChange('phone', e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Row 3: Team Details */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Team Name</label>
+              <input value={form.team_name} onChange={e => handleChange('team_name', e.target.value)} style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Partner Name</label>
+              <input value={form.partner_name} onChange={e => handleChange('partner_name', e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Row 4: Skill & Gender */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Skill Level</label>
+              <select value={form.skill_level} onChange={e => handleChange('skill_level', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Gender</label>
+              <select value={form.gender} onChange={e => handleChange('gender', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer_not_to_say">Prefer Not To Say</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Row 5: City & State */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>City</label>
+              <input value={form.city} onChange={e => handleChange('city', e.target.value)} style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>State</label>
+              <input value={form.state} onChange={e => handleChange('state', e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Row 6: Payment Info */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Payment Status</label>
+              <select value={form.payment_status} onChange={e => handleChange('payment_status', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="pending">⏳ Pending</option>
+                <option value="paid">✓ Paid</option>
+                <option value="failed">✗ Failed</option>
+                <option value="refunded">↩ Refunded</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Amount Paid ($)</label>
+              <input type="number" step="0.01" value={form.amount_paid} onChange={e => handleChange('amount_paid', e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid rgba(51,65,85,0.6)',
+              background: '#1E293B', color: '#94A3B8', fontWeight: '600', fontSize: '14px', cursor: 'pointer',
+            }}>
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} style={{
+              flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
+              background: 'linear-gradient(135deg, #F4A40B, #D4AF37)', color: '#000', fontWeight: '800', fontSize: '14px',
+              cursor: saving ? 'not-allowed' : 'pointer',
+            }}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

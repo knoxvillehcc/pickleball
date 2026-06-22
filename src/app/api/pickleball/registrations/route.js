@@ -36,3 +36,38 @@ export async function GET(request) {
     );
   }
 }
+
+export async function PUT(request) {
+  try {
+    const body = await request.json();
+    const { id, first_name, last_name, email, phone, skill_level, payment_status, amount_paid, team_name, partner_name, gender, city, state } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Registration ID is required' }, { status: 400 });
+    }
+
+    const { updateRegistration } = await import('@/lib/supabaseClient');
+
+    const updates = {};
+    if (first_name !== undefined) updates.first_name = first_name;
+    if (last_name !== undefined)  updates.last_name = last_name;
+    if (email !== undefined)      updates.email = email;
+    if (phone !== undefined)      updates.phone = phone;
+    if (skill_level !== undefined) updates.skill_level = skill_level;
+    if (payment_status !== undefined) updates.payment_status = payment_status;
+    if (amount_paid !== undefined) updates.amount_paid = parseFloat(amount_paid || 0);
+    if (team_name !== undefined)  updates.team_name = team_name;
+    if (partner_name !== undefined) updates.partner_name = partner_name;
+    if (gender !== undefined)     updates.gender = gender;
+    if (city !== undefined)       updates.city = city;
+    if (state !== undefined)      updates.state = state;
+
+    const result = await updateRegistration(id, updates);
+    return NextResponse.json({ success: true, record: result });
+  } catch (err) {
+    return NextResponse.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
+  }
+}
