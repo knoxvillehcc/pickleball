@@ -57,7 +57,7 @@ async function syncToOdoo(regData, amountPaid, stripeRef) {
         <tr><td style="padding:4px 8px"><b>Phone</b></td><td style="padding:4px 8px">${regData.phone || '—'}</td></tr>
         <tr><td style="padding:4px 8px"><b>Team Name</b></td><td style="padding:4px 8px">${regData.team_name || '—'}</td></tr>
         <tr><td style="padding:4px 8px"><b>Player Type</b></td><td style="padding:4px 8px">${regData.player_type === 'middle_high_school' ? 'Middle/High School' : 'Adult'}</td></tr>
-        <tr><td style="padding:4px 8px"><b>Registration</b></td><td style="padding:4px 8px">${regData.registration_type === 'doubles' ? 'Doubles' : 'Singles'}</td></tr>
+        <tr><td style="padding:4px 8px"><b>Registration</b></td><td style="padding:4px 8px">Doubles</td></tr>
         <tr><td style="padding:4px 8px"><b>Players</b></td><td style="padding:4px 8px">${regData.player_count || 1}</td></tr>
         <tr><td style="padding:4px 8px"><b>Address</b></td><td style="padding:4px 8px">${regData.address || ''}, ${regData.city || ''}, ${regData.state || ''} ${regData.zip || ''}</td></tr>
         <tr><td style="padding:4px 8px"><b>Event Date</b></td><td style="padding:4px 8px">${regData.event_date || 'TBD'}</td></tr>

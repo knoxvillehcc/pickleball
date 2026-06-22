@@ -52,9 +52,8 @@ export async function POST(request) {
     }
 
     const baseUrl      = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const isDoubles    = reg.registration_type === 'doubles';
-    const amountCents  = isDoubles ? 5000 : 2500;
-    const eventLabel   = isDoubles ? 'Doubles' : 'Singles';
+    const amountCents  = 5000; // Doubles-only: $50 per team
+    const eventLabel   = 'Doubles';
 
     // 3. Create a fresh Stripe Checkout Session
     const stripe = getStripe();
@@ -79,7 +78,7 @@ export async function POST(request) {
         full_name:           reg.full_name,
         email:               reg.email,
         skill_level:         reg.skill_level        || '',
-        registration_type:   reg.registration_type  || 'singles',
+        registration_type:   'doubles',
         partner_name:        reg.partner_name       || '',
         gender:              reg.gender             || '',
         city:                reg.city               || '',

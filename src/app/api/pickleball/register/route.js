@@ -40,11 +40,11 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'You must accept the Terms & Conditions.' }, { status: 400 });
     }
 
-    // ── Build players list ─────────────────────────────────────────────────────
-    const isDoubles    = body.registration_type === 'doubles';
-    const playerCount  = isDoubles ? 2 : 1;
-    const amountCents  = playerCount * 2500; // $25 per player
-    const amountDollars = amountCents / 100;
+    // Doubles-only tournament — always 2 players at $25 each
+    const isDoubles    = true;
+    const playerCount  = 2;
+    const amountCents  = 5000; // $50 per team
+    const amountDollars = 50;
 
     // Player 1 = registering person
     const player1 = {
@@ -64,7 +64,7 @@ export async function POST(request) {
     const fullName    = `${body.first_name.trim()} ${body.last_name.trim()}`;
     const regNumber   = generateRegNumber();
     const baseUrl     = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const eventLabel  = isDoubles ? 'Doubles' : 'Singles';
+    const eventLabel  = 'Doubles';
 
     // ── Save PENDING registration to Supabase ──────────────────────────────────
     const regData = {
@@ -80,7 +80,7 @@ export async function POST(request) {
       zip:                 body.zip.trim(),
       player_type:         body.player_type,
       team_name:           body.team_name.trim(),
-      registration_type:   body.registration_type || 'singles',
+      registration_type:   'doubles',
       player_count:        playerCount,
       players_data:        playersData,
       skill_level:         body.skill_level || 'intermediate',

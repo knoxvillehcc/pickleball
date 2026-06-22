@@ -219,7 +219,7 @@ export async function sendCaptainConfirmation(regData) {
           <table width="100%" cellpadding="0" cellspacing="0" border="0">
             ${infoRow('Team Name', regData.team_name || '&mdash;')}
             ${infoRow('Category', regData.player_type === 'middle_high_school' ? '&#127891; Middle / High School' : '&#128100; Adult')}
-            ${infoRow('Type', regData.registration_type === 'doubles' ? '&#129309; Doubles (2 Players)' : '&#127934; Singles (1 Player)')}
+            ${infoRow('Type', '&#129309; Doubles (2 Players)')}
             ${infoRow('Players', String(regData.player_count || 1))}
             ${infoRow('Payment Ref', `<span style="font-size:10px;color:#2A4060;font-family:Courier New,monospace;">${(regData.stripe_payment_ref || '').substring(0, 30)}...</span>`)}
           </table>

@@ -426,8 +426,8 @@ function RegistrationForm() {
                 <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '16px' }}>Order Summary</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: `1px solid rgba(255,255,255,0.07)` }}>
                   <div>
-                    <div style={{ fontSize: '15px', fontWeight: '700', color: T.white }}>{isDoubles ? 'Doubles Registration' : 'Singles Registration'}</div>
-                    <div style={{ fontSize: '12px', color: T.muted, marginTop: '3px' }}>{isDoubles ? '2 players' : '1 player'} × $25.00 per player</div>
+                    <div style={{ fontSize: '15px', fontWeight: '700', color: T.white }}>Doubles Registration</div>
+                    <div style={{ fontSize: '12px', color: T.muted, marginTop: '3px' }}>2 players × $25.00 per player</div>
                   </div>
                   <div style={{ fontSize: '20px', fontWeight: '900', color: T.white }}>${total}.00</div>
                 </div>
