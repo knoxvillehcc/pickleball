@@ -40,6 +40,11 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'You must accept the Terms & Conditions.' }, { status: 400 });
     }
 
+    // Doubles-only: both players are required
+    if (!body.player2_first_name?.trim() || !body.player2_last_name?.trim()) {
+      return NextResponse.json({ success: false, error: 'Player 2 first and last name are required. This is a doubles-only tournament.' }, { status: 400 });
+    }
+
     // Doubles-only tournament — always 2 players at $25 each
     const isDoubles    = true;
     const playerCount  = 2;

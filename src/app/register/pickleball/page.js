@@ -135,16 +135,15 @@ function RegistrationForm() {
       .catch(() => setPublishStatus('closed'));
   }, []);
 
-  const set       = (k, v) => setForm(f => ({ ...f, [k]: v }));
-  const isDoubles = form.registration_type === 'doubles';
-  const total     = isDoubles ? 50 : 25;
+  const set   = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const total  = 50; // Doubles-only: always $50
 
   const isValid =
     form.first_name && form.last_name && form.email && form.phone &&
     form.address && form.city && form.state && form.zip &&
     form.team_name && form.player_type &&
-    form.liability_accepted && form.terms_accepted &&
-    (!isDoubles || (form.player2_first_name && form.player2_last_name));
+    form.player2_first_name && form.player2_last_name &&
+    form.liability_accepted && form.terms_accepted;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -369,23 +368,17 @@ function RegistrationForm() {
                 </div>
               </div>
 
-              {/* Player 2 */}
-              {isDoubles ? (
-                <div style={{ background: `${T.teal}08`, border: `1px solid ${T.teal}25`, borderRadius: '12px', padding: '18px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: '800', color: T.teal, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>
-                    🤝 Player 2 — Your Doubles Partner
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                    <Field label="First Name" required value={form.player2_first_name} onChange={e => set('player2_first_name', e.target.value)} placeholder="Jane" />
-                    <Field label="Last Name"  required value={form.player2_last_name}  onChange={e => set('player2_last_name',  e.target.value)} placeholder="Doe" />
-                  </div>
-                  <Field label="Partner Email" type="email" hint="Confirmation will be sent here too" value={form.player2_email} onChange={e => set('player2_email', e.target.value)} placeholder="partner@example.com" />
+              {/* Player 2 — always required */}
+              <div style={{ background: `${T.teal}08`, border: `1px solid ${T.teal}25`, borderRadius: '12px', padding: '18px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: T.teal, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>
+                  🤝 Player 2 — Your Doubles Partner <span style={{ color: '#EF4444' }}>*</span>
                 </div>
-              ) : (
-                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '16px', textAlign: 'center', color: T.muted, fontSize: '13px' }}>
-                  Switch to <strong style={{ color: T.lime }}>Doubles</strong> in Step 2 to add your partner
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                  <Field label="First Name" required value={form.player2_first_name} onChange={e => set('player2_first_name', e.target.value)} placeholder="Jane" />
+                  <Field label="Last Name"  required value={form.player2_last_name}  onChange={e => set('player2_last_name',  e.target.value)} placeholder="Doe" />
                 </div>
-              )}
+                <Field label="Partner Email" type="email" hint="Confirmation email will be sent here too" value={form.player2_email} onChange={e => set('player2_email', e.target.value)} placeholder="partner@example.com" />
+              </div>
             </Card>
 
             {/* STEP 4: Waivers */}
