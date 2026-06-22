@@ -104,7 +104,7 @@ export default function SuccessClient() {
             Event Details
           </div>
           {[
-            { icon: '📅', label: 'Date', value: 'Saturday, July 11, 2026' },
+            { icon: '📅', label: 'Date', value: 'Sunday, July 26, 2026' },
             { icon: '⏰', label: 'Start Time', value: '12:00 PM — arrive early!' },
             { icon: '📍', label: 'Location', value: '8580 Hickory Creek Rd, Lenoir City, TN 37771' },
             { icon: '🎾', label: 'Paddle Rental', value: '$5 available on-site' },

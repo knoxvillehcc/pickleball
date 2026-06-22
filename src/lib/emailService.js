@@ -79,7 +79,7 @@ function buildEmail(bodyHtml) {
                 <tr>
                   <td bgcolor="#0E1E30" style="border:1px solid #1A3248;border-radius:8px;padding:8px 16px;">
                     <p style="margin:0;font-size:13px;color:#A8D62E;font-weight:700;letter-spacing:0.5px;">
-                      &#128197; Saturday, July 11, 2026 &nbsp;·&nbsp; 12:00 PM
+                      &#128197; Sunday, July 26, 2026 &nbsp;·&nbsp; 12:00 PM
                     </p>
                   </td>
                 </tr>
@@ -254,7 +254,7 @@ export async function sendCaptainConfirmation(regData) {
             <tr>
               <td style="padding:8px 0;width:50%;vertical-align:top;">
                 <p style="margin:0 0 4px;font-size:10px;color:#5A7A96;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Date &amp; Time</p>
-                <p style="margin:0;font-size:14px;color:#FFFFFF;font-weight:700;">Saturday, July 11, 2026</p>
+                <p style="margin:0;font-size:14px;color:#FFFFFF;font-weight:700;">Sunday, July 26, 2026</p>
                 <p style="margin:2px 0 0;font-size:13px;color:#A8D62E;font-weight:600;">12:00 PM</p>
               </td>
               <td style="padding:8px 0;width:50%;vertical-align:top;padding-left:20px;">
@@ -348,7 +348,7 @@ export async function sendPlayerNotification(player, regData) {
             <tr>
               <td style="padding:8px 0;width:50%;vertical-align:top;">
                 <p style="margin:0 0 4px;font-size:10px;color:#5A7A96;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Date &amp; Time</p>
-                <p style="margin:0;font-size:14px;color:#FFFFFF;font-weight:700;">Saturday, July 11, 2026</p>
+                <p style="margin:0;font-size:14px;color:#FFFFFF;font-weight:700;">Sunday, July 26, 2026</p>
                 <p style="margin:2px 0 0;font-size:13px;color:#A8D62E;font-weight:600;">12:00 PM</p>
               </td>
               <td style="padding:8px 0;width:50%;vertical-align:top;padding-left:20px;">

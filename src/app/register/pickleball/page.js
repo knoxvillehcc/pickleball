@@ -184,7 +184,7 @@ function RegistrationForm() {
             <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: `linear-gradient(135deg, ${T.lime}, ${T.teal})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>🏓</div>
             <div>
               <div style={{ fontSize: '14px', fontWeight: '900', color: T.white, letterSpacing: '-0.2px' }}>HCC Youth Club</div>
-              <div style={{ fontSize: '11px', color: T.muted, fontWeight: '600' }}>Pickleball Tournament · July 11, 2026</div>
+              <div style={{ fontSize: '11px', color: T.muted, fontWeight: '600' }}>Pickleball Tournament · July 26, 2026</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: `${T.lime}12`, border: `1px solid ${T.lime}30`, padding: '6px 14px', borderRadius: '20px' }}>
@@ -214,7 +214,7 @@ function RegistrationForm() {
           {/* ── Tournament info cards ────────────────────────────────────── */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '28px' }}>
             {[
-              { icon: '📅', label: 'Date', value: 'Saturday', sub: 'July 11, 2026' },
+              { icon: '📅', label: 'Date', value: 'Sunday', sub: 'July 26, 2026' },
               { icon: '⏰', label: 'Start Time', value: '12:00 PM', sub: 'Doors open early' },
               { icon: '📍', label: 'Location', value: 'Lenoir City', sub: '8580 Hickory Creek Rd, TN' },
               { icon: '💰', label: 'Entry Fee', value: '$25/player', sub: 'Doubles only · $50/team' },
@@ -247,6 +247,19 @@ function RegistrationForm() {
             <span>🏓 All Skill Levels Welcome</span>
             <span style={{ color: 'rgba(255,255,255,0.15)' }}>|</span>
             <span>🎾 Paddle Rental $5</span>
+          </div>
+
+          {/* Contact for inquiries */}
+          <div style={{ marginTop: '20px', padding: '14px 20px', background: T.navyCard, border: `1px solid rgba(255,255,255,0.08)`, borderRadius: '14px', display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', alignItems: 'center', backdropFilter: 'blur(8px)' }}>
+            <div style={{ fontSize: '11px', fontWeight: '800', color: T.teal, textTransform: 'uppercase', letterSpacing: '1.5px' }}>📞 Contact for Inquiries</div>
+            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)' }}/>
+            <a href="tel:8659249286" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: T.white, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>
+              <span style={{ color: T.lime }}>Love</span> 865-924-9286
+            </a>
+            <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: '14px' }}>·</span>
+            <a href="tel:8653154494" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: T.white, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>
+              <span style={{ color: T.lime }}>Om</span> 865-315-4494
+            </a>
           </div>
         </div>
 
@@ -314,36 +327,24 @@ function RegistrationForm() {
                 </div>
               </div>
 
-              {/* Registration type */}
+              {/* Registration type — Doubles Only */}
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
-                  Registration Type <span style={{ color: T.lime }}>*</span>
+                  Registration Type
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  {[
-                    { value: 'doubles', emoji: '🤝', label: 'Doubles', price: '$50', note: '2 players · $25/player', badge: 'FEATURED', badgeColor: T.lime },
-                    { value: 'singles', emoji: '🎾', label: 'Singles', price: '$25', note: '1 player', badge: null, badgeColor: T.teal },
-                  ].map(o => (
-                    <button key={o.value} type="button" onClick={() => set('registration_type', o.value)} style={{
-                      padding: '16px', borderRadius: '14px', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
-                      border: `2px solid ${form.registration_type === o.value ? T.lime : 'rgba(255,255,255,0.08)'}`,
-                      background: form.registration_type === o.value ? `${T.lime}12` : 'rgba(255,255,255,0.02)',
-                      boxShadow: form.registration_type === o.value ? `0 0 24px ${T.lime}20` : 'none',
-                      transition: 'all 0.2s', position: 'relative', overflow: 'hidden',
-                    }}>
-                      {o.badge && (
-                        <div style={{ position: 'absolute', top: '8px', right: '8px', fontSize: '9px', fontWeight: '900', color: '#000', background: o.badgeColor, padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px' }}>{o.badge}</div>
-                      )}
-                      <div style={{ fontSize: '24px', marginBottom: '8px' }}>{o.emoji}</div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <div style={{ fontWeight: '800', fontSize: '15px', color: form.registration_type === o.value ? T.lime : T.white, marginBottom: '2px' }}>{o.label}</div>
-                          <div style={{ fontSize: '12px', color: T.muted }}>{o.note}</div>
-                        </div>
-                        <div style={{ fontWeight: '900', fontSize: '22px', color: T.lime }}>{o.price}</div>
-                      </div>
-                    </button>
-                  ))}
+                <div style={{ padding: '18px 20px', borderRadius: '14px', border: `2px solid ${T.lime}`, background: `${T.lime}12`, boxShadow: `0 0 28px ${T.lime}18`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: '8px', right: '10px', fontSize: '9px', fontWeight: '900', color: '#000', background: T.lime, padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.5px' }}>ONLY</div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '26px' }}>🤝</span>
+                      <span style={{ fontWeight: '900', fontSize: '18px', color: T.lime }}>Doubles</span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: T.muted }}>2 players · $25.00 per player</div>
+                  </div>
+                  <div style={{ fontWeight: '900', fontSize: '28px', color: T.lime }}>$50</div>
+                </div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: T.muted, padding: '0 4px' }}>
+                  This tournament is <strong style={{ color: T.white }}>doubles format only</strong>. Add your partner details in Step 3 below.
                 </div>
               </div>
             </Card>
@@ -442,11 +443,11 @@ function RegistrationForm() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid rgba(255,255,255,0.07)` }}>
                   <span style={{ fontSize: '13px', color: T.muted }}>Date</span>
-                  <span style={{ fontSize: '13px', fontWeight: '700', color: T.white }}>Saturday, July 11, 2026</span>
+                  <span style={{ fontSize: '13px', fontWeight: '700', color: T.white }}>Sunday, July 26, 2026</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px' }}>
                   <span style={{ fontSize: '16px', fontWeight: '800', color: T.white }}>Total Due</span>
-                  <span style={{ fontSize: '40px', fontWeight: '900', color: T.lime, letterSpacing: '-2px' }}>${total}.00</span>
+                  <span style={{ fontSize: '40px', fontWeight: '900', color: T.lime, letterSpacing: '-2px' }}>$50.00</span>
                 </div>
                 <div style={{ marginTop: '14px', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '12px', color: T.muted, display: 'flex', alignItems: 'center', gap: '6px' }}>
                   🔒 Secure checkout via <strong style={{ color: '#94A3B8' }}>Stripe</strong> · Visa, Mastercard, Amex, Discover
@@ -501,10 +502,18 @@ function RegistrationForm() {
         </form>
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: '48px', padding: '24px 0', borderTop: `1px solid rgba(255,255,255,0.06)` }}>
+        <div style={{ textAlign: 'center', marginTop: '48px', padding: '28px 0', borderTop: `1px solid rgba(255,255,255,0.06)` }}>
           <div style={{ fontSize: '13px', color: T.muted, marginBottom: '6px' }}>Knoxville Hindu Community Center · HCC Youth Club Presents</div>
           <a href="mailto:knoxvillehcc@gmail.com" style={{ color: T.lime, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>knoxvillehcc@gmail.com</a>
-          <div style={{ marginTop: '8px', fontSize: '12px', color: 'rgba(107,139,174,0.5)' }}>8580 Hickory Creek Rd, Lenoir City, TN 37771</div>
+          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
+            <a href="tel:8659249286" style={{ color: T.muted, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>
+              <span style={{ color: T.teal }}>Love</span> · 865-924-9286
+            </a>
+            <a href="tel:8653154494" style={{ color: T.muted, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>
+              <span style={{ color: T.teal }}>Om</span> · 865-315-4494
+            </a>
+          </div>
+          <div style={{ marginTop: '10px', fontSize: '12px', color: 'rgba(107,139,174,0.5)' }}>8580 Hickory Creek Rd, Lenoir City, TN 37771</div>
         </div>
       </div>
 
