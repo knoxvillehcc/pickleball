@@ -3,12 +3,12 @@ import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const C = {
-  bg:      '#060D1A',
-  card:    '#0D1627',
-  border:  'rgba(51,65,85,0.6)',
-  gold:    '#F4A40B',
-  text:    '#E2E8F0',
-  muted:   '#64748B',
+  bg:      'var(--bg-primary)',
+  card:    'var(--bg-card)',
+  border:  'var(--border)',
+  gold:    'var(--accent)',
+  text:    'var(--text-primary)',
+  muted:   'var(--text-secondary)',
   error:   '#EF4444',
   success: '#10B981',
 };
@@ -201,11 +201,11 @@ function LoginContent() {
                     style={{
                       width: '48px', height: '58px', textAlign: 'center',
                       fontSize: '24px', fontWeight: '800', borderRadius: '12px',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: `2px solid ${digit ? C.gold : C.border}`,
+                      background: 'var(--bg-input)',
+                      border: `2px solid ${digit ? 'var(--accent)' : 'var(--border)'}`,
                       color: C.text, outline: 'none',
                       transition: 'border-color 0.15s',
-                      boxShadow: digit ? `0 0 12px rgba(244,164,11,0.2)` : 'none',
+                      boxShadow: digit ? `0 0 12px var(--accent-glow)` : 'none',
                     }}
                   />
                 ))}
@@ -266,9 +266,9 @@ function ErrorBox({ msg }) {
 function btnStyle(color) {
   return {
     width: '100%', padding: '14px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-    background: `linear-gradient(135deg, ${color}, #D4AF37)`,
-    color: '#000', fontWeight: '800', fontSize: '15px',
-    boxShadow: `0 4px 20px rgba(244,164,11,0.25)`,
+    background: 'linear-gradient(135deg, var(--accent), var(--accent-glow))',
+    color: '#fff', fontWeight: '800', fontSize: '15px',
+    boxShadow: '0 4px 20px var(--accent-glow)',
     transition: 'all 0.2s',
   };
 }

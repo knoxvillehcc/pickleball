@@ -12,8 +12,8 @@ const C = {
 };
 
 const card = {
-  backgroundColor: 'rgba(13, 20, 38, 0.8)',
-  border: '1px solid rgba(51,65,85,0.6)',
+  backgroundColor: 'var(--bg-card)',
+  border: '1px solid var(--border)',
   borderRadius: '16px',
   overflow: 'hidden',
 };
@@ -132,22 +132,22 @@ function PaymentLinkModal({ reg, onClose }) {
       zIndex: 9999, padding: '20px',
     }} onClick={onClose}>
       <div style={{
-        background: 'rgb(13,20,38)', border: '1px solid rgba(51,65,85,0.8)',
+        background: 'var(--bg-modal)', border: '1px solid var(--border-modal)',
         borderRadius: '20px', padding: '32px', maxWidth: '540px', width: '100%',
         boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
       }} onClick={e => e.stopPropagation()}>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'white' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
             📧 Send Payment Link
           </h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
         </div>
 
-        <div style={{ background: 'rgba(8,12,24,0.6)', borderRadius: '12px', padding: '16px', marginBottom: '24px' }}>
-          <div style={{ fontSize: '13px', color: '#64748B', marginBottom: '4px' }}>Player</div>
-          <div style={{ fontWeight: '700', color: 'white' }}>{reg.full_name}</div>
-          <div style={{ fontSize: '13px', color: '#94A3B8', marginTop: '4px' }}>{reg.email}</div>
+        <div style={{ background: 'var(--bg-input)', borderRadius: '12px', padding: '16px', marginBottom: '24px' }}>
+          <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}>Player</div>
+          <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{reg.full_name}</div>
+          <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>{reg.email}</div>
           <div style={{ fontSize: '12px', color: '#F59E0B', marginTop: '6px', fontFamily: 'monospace' }}>{reg.registration_number} · ⏳ Pending Payment</div>
         </div>
 
@@ -170,7 +170,7 @@ function PaymentLinkModal({ reg, onClose }) {
           </button>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ background: 'rgba(8,12,24,0.8)', border: '1px solid rgba(51,65,85,0.6)', borderRadius: '10px', padding: '12px', wordBreak: 'break-all', fontSize: '12px', color: '#94A3B8', fontFamily: 'monospace' }}>
+            <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px', wordBreak: 'break-all', fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
               {linkUrl}
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -189,7 +189,7 @@ function PaymentLinkModal({ reg, onClose }) {
                 📧 Open Email
               </button>
             </div>
-            <p style={{ margin: 0, fontSize: '12px', color: '#475569', textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
               "Open Email" will open your email app pre-filled with the payment link ready to send.
             </p>
           </div>
@@ -344,12 +344,14 @@ export default function PickleballDashboard() {
     try {
       const doc = new jsPDF('landscape');
       const dateStr = new Date().toLocaleDateString();
+      const timeStr = new Date().toLocaleTimeString();
+      const userName = currentUser?.name || currentUser?.email || 'Admin';
 
       doc.setFontSize(20);
       doc.text('HCC Pickleball Tournament Registrations', 10, 15);
-      doc.setFontSize(11);
+      doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text('Generated on: ' + dateStr, 10, 22);
+      doc.text(`Printed by: ${userName}  |  Date: ${dateStr}  |  Time: ${timeStr}`, 10, 22);
 
       const tableBody = sorted.map(r => [
         r.registration_number || '',
@@ -617,15 +619,15 @@ export default function PickleballDashboard() {
       <div style={{ ...card, padding: 0 }}>
         {/* Table header */}
         <div style={{
-          padding: '18px 24px', borderBottom: '1px solid rgba(51,65,85,0.5)',
-          backgroundColor: 'rgba(8,12,20,0.6)',
+          padding: '18px 24px', borderBottom: '1px solid var(--border-table)',
+          backgroundColor: 'var(--bg-table-header)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'white' }}>
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
               Registration List
             </h2>
-            <span style={{ backgroundColor: 'rgba(51,65,85,0.8)', color: '#94A3B8', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px' }}>
+            <span style={{ backgroundColor: 'var(--bg-badge-pill)', color: 'var(--text-badge-pill)', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px' }}>
               {sorted.length} records
             </span>
           </div>
@@ -634,14 +636,14 @@ export default function PickleballDashboard() {
 
         {/* Table body */}
         {loading ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#475569' }}>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '3px solid rgba(244,164,11,0.3)', borderTop: `3px solid ${C.saffron}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite', marginBottom: '16px' }}/>
             <div>Loading registrations...</div>
           </div>
         ) : sorted.length === 0 ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#475569' }}>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏓</div>
-            <div style={{ fontSize: '18px', fontWeight: '700', color: 'white', marginBottom: '8px' }}>No registrations found</div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '8px' }}>No registrations found</div>
             <div style={{ fontSize: '14px' }}>
               {(filter.payment || filter.skill || search)
                 ? 'Try clearing the filters'
@@ -652,7 +654,7 @@ export default function PickleballDashboard() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', whiteSpace: 'nowrap' }}>
               <thead>
-                <tr style={{ backgroundColor: 'rgba(8,12,20,0.4)', borderBottom: '1px solid rgba(51,65,85,0.5)' }}>
+                <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>
                   {[
                     ['registration_number', 'Reg #'],
                     ['full_name',           'Name'],
@@ -669,7 +671,7 @@ export default function PickleballDashboard() {
                     <th key={field}
                       onClick={() => handleSort(field)}
                       style={{
-                        padding: '14px 16px', fontSize: '11px', fontWeight: '700', color: '#475569',
+                        padding: '14px 16px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)',
                         textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: 'left',
                         cursor: 'pointer', userSelect: 'none',
                       }}>
@@ -682,23 +684,23 @@ export default function PickleballDashboard() {
                 {sorted.map((r, i) => (
                   <tr key={r.id || i}
                     style={{
-                      borderBottom: '1px solid rgba(51,65,85,0.3)',
-                      backgroundColor: i % 2 !== 0 ? 'rgba(15,23,42,0.4)' : 'transparent',
+                      borderBottom: '1px solid var(--border-table)',
+                      backgroundColor: i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent',
                       transition: 'background 0.15s',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(244,164,11,0.04)'}
-                    onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'rgba(15,23,42,0.4)' : 'transparent'}
+                    onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                    onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent'}
                   >
                     <td style={{ padding: '13px 16px', fontFamily: 'monospace', fontWeight: '800', color: C.saffron, fontSize: '13px' }}>
                       {r.registration_number}
                     </td>
-                    <td style={{ padding: '13px 16px', color: 'white', fontWeight: '600' }}>{r.full_name}</td>
-                    <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.team_name || '–'}</td>
-                    <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.partner_name || '–'}</td>
-                    <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.email}</td>
-                    <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.phone}</td>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-primary)', fontWeight: '600' }}>{r.full_name}</td>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-secondary)' }}>{r.team_name || '–'}</td>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-secondary)' }}>{r.partner_name || '–'}</td>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-secondary)' }}>{r.email}</td>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-secondary)' }}>{r.phone}</td>
                     <td style={{ padding: '13px 16px' }}><SkillBadge level={r.skill_level}/></td>
-                    <td style={{ padding: '13px 16px', color: '#64748B', fontSize: '12px' }}>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-muted)', fontSize: '12px' }}>
                       {r.registration_date ? r.registration_date.split(' ')[0] : '–'}
                     </td>
                     <td style={{ padding: '13px 16px' }}><Badge status={r.payment_status}/></td>
@@ -776,8 +778,8 @@ export default function PickleballDashboard() {
 }
 
 // ── Edit Registration Modal Component ──────────────────────────────────────────
-const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' };
-const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(51,65,85,0.6)`, color: '#E2E8F0', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' };
+const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' };
+const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' };
 
 function EditRegistrationModal({ reg, onClose, onSave }) {
   const [form, setForm] = useState({
@@ -841,14 +843,14 @@ function EditRegistrationModal({ reg, onClose, onSave }) {
       zIndex: 9999, padding: '20px', backdropFilter: 'blur(4px)',
     }} onClick={onClose}>
       <div style={{
-        background: 'rgb(13,20,38)', border: '1px solid rgba(51,65,85,0.8)',
+        background: 'var(--bg-modal)', border: '1px solid var(--border-modal)',
         borderRadius: '20px', padding: '32px', maxWidth: '640px', width: '100%',
         maxHeight: '90vh', overflowY: 'auto',
         boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
       }} onClick={e => e.stopPropagation()}>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'white' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
             ✏️ Edit Registration
           </h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
@@ -950,8 +952,8 @@ function EditRegistrationModal({ reg, onClose, onSave }) {
           {/* Buttons */}
           <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
             <button type="button" onClick={onClose} style={{
-              flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid rgba(51,65,85,0.6)',
-              background: '#1E293B', color: '#94A3B8', fontWeight: '600', fontSize: '14px', cursor: 'pointer',
+              flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid var(--border-button-secondary)',
+              background: 'var(--bg-button-secondary)', color: 'var(--text-button-secondary)', fontWeight: '600', fontSize: '14px', cursor: 'pointer',
             }}>
               Cancel
             </button>

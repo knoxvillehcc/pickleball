@@ -4,8 +4,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const card = {
-  backgroundColor: 'rgba(13, 20, 38, 0.8)',
-  border: '1px solid rgba(51,65,85,0.6)',
+  backgroundColor: 'var(--bg-card)',
+  border: '1px solid var(--border)',
   borderRadius: '16px',
   transition: 'all 0.3s',
 };
@@ -13,6 +13,7 @@ const card = {
 export default function ReportsPage() {
   const [data,    setData]    = useState({ summary: {}, results: [] });
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     fetch('/api/reports')
@@ -20,18 +21,24 @@ export default function ReportsPage() {
       .then(d => { if (d.success) setData({ summary: d.summary, results: d.results }); })
       .catch(console.error)
       .finally(() => setLoading(false));
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => setCurrentUser(d.user || null))
+      .catch(() => {});
   }, []);
 
   const downloadPDF = () => {
     try {
       const doc     = new jsPDF('landscape');
       const dateStr = new Date().toLocaleDateString();
+      const timeStr = new Date().toLocaleTimeString();
+      const userName = currentUser?.name || currentUser?.email || 'Admin';
 
       doc.setFontSize(20);
       doc.text('Active Subscription Report', 10, 15);
-      doc.setFontSize(11);
+      doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text('Generated on: ' + dateStr, 10, 22);
+      doc.text(`Printed by: ${userName}  |  Date: ${dateStr}  |  Time: ${timeStr}`, 10, 22);
 
       let totalCount = 0, totalRevenue = 0;
       const summaryBody = Object.entries(data.summary).map(([type, stats]) => {
@@ -82,19 +89,19 @@ export default function ReportsPage() {
       {/* Hero */}
       <div style={{
         ...card,
-        background: 'linear-gradient(135deg, rgba(13,20,38,0.95) 0%, rgba(6,30,50,0.4) 100%)',
-        borderColor: 'rgba(99,102,241,0.2)',
+        background: 'var(--bg-banner-grad)',
+        borderColor: 'var(--border-hover)',
         padding: '48px', position: 'relative', overflow: 'hidden',
-        boxShadow: '0 0 80px -20px rgba(99,102,241,0.12)',
+        boxShadow: '0 0 80px -20px var(--accent-glow)',
         display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
       }}>
-        <div style={{ position:'absolute', top:'-60px', right:'-60px', width:'300px', height:'300px', background:'radial-gradient(circle, rgba(99,102,241,0.1), transparent 70%)', borderRadius:'50%', pointerEvents:'none' }}></div>
+        <div style={{ position:'absolute', top:'-60px', right:'-60px', width:'300px', height:'300px', background:'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius:'50%', pointerEvents:'none' }}></div>
         <div style={{ position: 'relative' }}>
-          <h1 style={{ margin: 0, fontSize: '42px', fontWeight: '900', color: 'white', lineHeight: 1.1, letterSpacing: '-1px' }}>
+          <h1 style={{ margin: 0, fontSize: '42px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
             Membership{' '}
             <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Reports</span>
           </h1>
-          <p style={{ margin: '12px 0 0', color: '#64748B', fontSize: '15px', lineHeight: 1.6, maxWidth: '480px' }}>
+          <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.6, maxWidth: '480px' }}>
             Complete overview of all active memberships, revenue, and subscription details.
           </p>
         </div>
@@ -117,7 +124,7 @@ export default function ReportsPage() {
       {loading ? (
         <div style={{ ...card, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '100px 24px', gap: '16px' }}>
           <div style={{ width: '48px', height: '48px', border: '3px solid rgba(99,102,241,0.2)', borderTop: '3px solid #6366F1', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
-          <div style={{ color: '#475569', fontWeight: '600', fontSize: '16px' }}>Loading Membership Data...</div>
+          <div style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '16px' }}>Loading Membership Data...</div>
         </div>
       ) : (
         <>
@@ -128,8 +135,8 @@ export default function ReportsPage() {
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Active Members</div>
-                <div style={{ fontSize: '40px', fontWeight: '900', color: 'white', lineHeight: 1 }}>{totalMembers}</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Active Members</div>
+                <div style={{ fontSize: '40px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
               </div>
             </div>
 
@@ -138,7 +145,7 @@ export default function ReportsPage() {
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Revenue Collected</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Revenue Collected</div>
                 <div style={{ fontSize: '36px', fontWeight: '900', color: '#10B981', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
               </div>
             </div>
@@ -149,15 +156,15 @@ export default function ReportsPage() {
             {Object.entries(data.summary).map(([type, stats]) => (
               <div key={type} style={{ ...card, padding: '28px', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', inset: 'auto 0 auto 0', top: 0, height: '2px', background: 'linear-gradient(90deg, #6366F1, #38BDF8 60%, transparent)' }}></div>
-                <div style={{ fontSize: '14px', fontWeight: '700', color: '#CBD5E1', marginBottom: '24px', lineHeight: 1.4 }}>{type}</div>
+                <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '24px', lineHeight: 1.4 }}>{type}</div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Active Members</div>
-                    <div style={{ fontSize: '44px', fontWeight: '900', color: 'white', lineHeight: 1 }}>{stats.count}</div>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Active Members</div>
+                    <div style={{ fontSize: '44px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>{stats.count}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Revenue</div>
-                    <div style={{ fontSize: '22px', fontWeight: '800', color: '#818CF8' }}>${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Revenue</div>
+                    <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--accent)' }}>${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                   </div>
                 </div>
               </div>
@@ -166,10 +173,10 @@ export default function ReportsPage() {
 
           {/* Detail Table */}
           <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
-            <div style={{ padding: '20px 28px', borderBottom: '1px solid rgba(51,65,85,0.5)', backgroundColor: 'rgba(8,12,20,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border-table)', backgroundColor: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'white' }}>Member Detail</h2>
-                <span style={{ backgroundColor: 'rgba(99,102,241,0.15)', color: '#818CF8', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px', border: '1px solid rgba(99,102,241,0.25)' }}>
+                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>Member Detail</h2>
+                <span style={{ backgroundColor: 'var(--bg-badge-pill)', color: 'var(--text-badge-pill)', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px', border: '1px solid var(--border-badge-pill)' }}>
                   {data.results.length} records
                 </span>
               </div>
@@ -178,23 +185,23 @@ export default function ReportsPage() {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap', fontSize: '14px' }}>
                 <thead>
-                  <tr style={{ backgroundColor: 'rgba(8,12,20,0.4)', borderBottom: '1px solid rgba(51,65,85,0.5)' }}>
+                  <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>
                     {[['Customer Name','left'],['Subscription Type','left'],['Order Ref','left'],['Start Date','left'],['Amount','right']].map(([h, align]) => (
-                      <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: align }}>{h}</th>
+                      <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: align }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {data.results.map((row, i) => (
                     <tr key={row.id || i}
-                      style={{ borderBottom: '1px solid rgba(51,65,85,0.25)', backgroundColor: i % 2 !== 0 ? 'rgba(15,23,42,0.45)' : 'transparent', transition: 'background 0.15s' }}
-                      onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.06)'}
-                      onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'rgba(15,23,42,0.45)' : 'transparent'}
+                      style={{ borderBottom: '1px solid var(--border-table)', backgroundColor: i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                      onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent'}
                     >
-                      <td style={{ padding: '14px 24px', fontWeight: '700', color: 'white' }}>{row.customer}</td>
-                      <td style={{ padding: '14px 24px', color: '#818CF8', fontWeight: '600' }}>{row.type}</td>
-                      <td style={{ padding: '14px 24px', fontFamily: 'monospace', fontSize: '12px', color: '#475569' }}>{row.order}</td>
-                      <td style={{ padding: '14px 24px', color: '#94A3B8' }}>{row.date}</td>
+                      <td style={{ padding: '14px 24px', fontWeight: '700', color: 'var(--text-primary)' }}>{row.customer}</td>
+                      <td style={{ padding: '14px 24px', color: 'var(--accent)', fontWeight: '600' }}>{row.type}</td>
+                      <td style={{ padding: '14px 24px', fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-muted)' }}>{row.order}</td>
+                      <td style={{ padding: '14px 24px', color: 'var(--text-secondary)' }}>{row.date}</td>
                       <td style={{ padding: '14px 24px', textAlign: 'right', fontWeight: '800', color: '#10B981' }}>${(row.amount||0).toFixed(2)}</td>
                     </tr>
                   ))}

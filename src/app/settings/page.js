@@ -16,12 +16,23 @@ const WifiIcon = () => (
 
 const InputField = ({ label, hint, ...props }) => (
   <div>
-    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{label}</label>
+    <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>{label}</label>
     <input
-      className="w-full bg-slate-950/50 border border-slate-700/50 rounded-xl px-5 py-4 text-white font-medium placeholder-slate-600 focus:outline-none focus:border-indigo-500/70 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+      style={{
+        width: '100%',
+        padding: '14px 20px',
+        backgroundColor: 'var(--bg-input)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        color: 'var(--text-primary)',
+        fontSize: '14px',
+        fontWeight: '500',
+        outline: 'none',
+        fontFamily: 'inherit',
+      }}
       {...props}
     />
-    {hint && <p className="text-xs text-slate-500 mt-2 font-medium">{hint}</p>}
+    {hint && <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px', fontWeight: '500' }}>{hint}</p>}
   </div>
 );
 
@@ -81,40 +92,39 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="glass-panel flex justify-center items-center py-40 rounded-2xl max-w-3xl mx-auto">
-        <div className="flex flex-col items-center gap-4">
-           <div className="animate-spin rounded-full h-12 w-12 border-2 border-slate-700 border-t-indigo-500"></div>
-           <div className="text-lg font-bold text-slate-400">Loading Configuration...</div>
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: '16px' }}>
+        <div style={{ width: '48px', height: '48px', border: '3px solid var(--border)', borderTop: '3px solid var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+        <div style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px' }}>Loading Configuration...</div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '60px' }}>
       
       {/* Page Header */}
       <div>
-        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-           System <span className="text-gradient-primary">Settings</span>
+        <h1 style={{ margin: 0, fontSize: '38px', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+           System <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Settings</span>
         </h1>
-        <p className="text-slate-400 mt-3 text-base leading-relaxed">
+        <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.6 }}>
            Configure your Odoo instance connection to enable live database access.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
         {/* Connection Config Card */}
-        <div className="glass-panel rounded-2xl overflow-hidden">
-           <div className="px-8 py-6 border-b border-slate-800/50 bg-slate-900/30 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400"><ServerIcon /></div>
+        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden' }}>
+           <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', display: 'flex', alignItems: 'center', color: '#818CF8', justifyContent: 'center' }}><ServerIcon /></div>
               <div>
-                 <h2 className="text-lg font-bold text-white leading-tight">Odoo Connection</h2>
-                 <p className="text-slate-500 text-xs">Instance URL, database name and credentials</p>
+                 <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>Odoo Connection</h2>
+                 <p style={{ margin: '2px 0 0', color: 'var(--text-secondary)', fontSize: '12px' }}>Instance URL, database name and credentials</p>
               </div>
            </div>
-           <div className="p-8 space-y-6">
+           <div style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <InputField
                 label="Odoo URL"
                 type="text"
@@ -123,7 +133,7 @@ export default function SettingsPage() {
                 placeholder="https://your-company.odoo.com"
                 required
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                 <InputField
                   label="Database Name"
                   type="text"
@@ -154,11 +164,11 @@ export default function SettingsPage() {
         </div>
 
         {/* Security Note Card */}
-        <div className="glass-card rounded-2xl p-6 flex items-start gap-4 border-indigo-500/10">
-           <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 mt-0.5"><ShieldIcon /></div>
+        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+           <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', flexShrink: 0 }}><ShieldIcon /></div>
            <div>
-              <h3 className="text-sm font-bold text-slate-200 mb-1">Security Notice</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">
+              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>Security Notice</h3>
+              <p style={{ margin: '6px 0 0', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
                  Credentials are stored locally in your environment file and are never transmitted to third parties. Use a dedicated API key with least-privilege access for enhanced security.
               </p>
            </div>
@@ -166,30 +176,35 @@ export default function SettingsPage() {
 
         {/* Test Result */}
         {testResult && (
-          <div className={`p-5 rounded-xl border font-medium flex items-start gap-3 ${testResult.success ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-rose-500/10 border-rose-500/20 text-rose-300'}`}>
-            <span className="text-xl mt-0.5">{testResult.success ? '✓' : '✗'}</span>
+          <div style={{ padding: '16px 20px', borderRadius: '12px', border: '1px solid ' + (testResult.success ? 'rgba(16,185,129,0.3)' : 'rgba(244,63,94,0.3)'), backgroundColor: testResult.success ? 'rgba(16,185,129,0.1)' : 'rgba(244,63,94,0.1)', color: testResult.success ? '#10B981' : '#F43F5E', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '18px' }}>{testResult.success ? '✓' : '✗'}</span>
             <span>{testResult.message}</span>
           </div>
         )}
 
         {/* Save Success */}
         {saveSuccess && (
-          <div className="p-5 rounded-xl border bg-emerald-500/10 border-emerald-500/20 text-emerald-300 font-medium flex items-center gap-3">
-            <span className="text-xl">✓</span>
+          <div style={{ padding: '16px 20px', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.3)', backgroundColor: 'rgba(16,185,129,0.1)', color: '#10B981', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '18px' }}>✓</span>
             <span>Settings saved successfully!</span>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col md:flex-row gap-4">
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', flexWrap: 'wrap' }}>
            <button
               type="button"
               onClick={handleTestConnection}
               disabled={testing || !formData.url || !formData.db || !formData.username || !formData.password}
-              className="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 hover:border-slate-600 disabled:opacity-40 disabled:pointer-events-none text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 text-base cursor-pointer"
+              style={{
+                flex: 1, minWidth: '200px', backgroundColor: 'var(--bg-button-secondary)', border: '1px solid var(--border-button-secondary)',
+                color: 'var(--text-button-secondary)', fontWeight: '700', padding: '14px 28px', borderRadius: '12px',
+                cursor: (testing || !formData.url || !formData.db || !formData.username || !formData.password) ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '15px', transition: 'all 0.3s',
+              }}
            >
               {testing ? (
-                <><div className="animate-spin rounded-full h-5 w-5 border-2 border-slate-500 border-t-white"></div> Testing...</>
+                <><span style={{ display:'inline-block', width:'16px', height:'16px', border:'2px solid rgba(255,255,255,0.3)', borderTop:'2px solid white', borderRadius:'50%', animation:'spin 0.8s linear infinite' }}></span> Testing...</>
               ) : (
                 <><WifiIcon /> Test Connection</>
               )}
@@ -198,10 +213,16 @@ export default function SettingsPage() {
            <button
               type="submit"
               disabled={saving}
-              className="flex-1 bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-bold py-4 px-8 rounded-xl shadow-[0_0_40px_-10px_rgba(99,102,241,0.5)] hover:shadow-[0_0_60px_-15px_rgba(99,102,241,0.7)] hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3 text-base cursor-pointer"
+              style={{
+                flex: 1, minWidth: '200px', background: 'linear-gradient(135deg, #6366F1, #22D3EE)',
+                color: 'white', fontWeight: '700', padding: '14px 28px', borderRadius: '12px', border: 'none',
+                cursor: saving ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '15px', transition: 'all 0.3s',
+                boxShadow: '0 0 30px -8px rgba(99,102,241,0.4)',
+              }}
            >
               {saving ? (
-                <><div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div> Saving...</>
+                <><span style={{ display:'inline-block', width:'16px', height:'16px', border:'2px solid rgba(255,255,255,0.3)', borderTop:'2px solid white', borderRadius:'50%', animation:'spin 0.8s linear infinite' }}></span> Saving...</>
               ) : (
                 <><SaveIcon /> Save Configuration</>
               )}
@@ -209,6 +230,7 @@ export default function SettingsPage() {
         </div>
 
       </form>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

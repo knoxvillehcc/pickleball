@@ -121,6 +121,8 @@ export async function GET(request) {
       const today = new Date().toLocaleDateString('en-US', {
         year: 'numeric', month: 'long', day: 'numeric'
       });
+      const printTime = new Date().toLocaleTimeString('en-US');
+      const userName = auth.user?.name || auth.user?.email || 'Admin';
 
       const tableRows = records.map((r, i) => `
         <tr style="background:${i % 2 === 0 ? '#FFF8F0' : '#fff'}">
@@ -171,7 +173,7 @@ export async function GET(request) {
 <body>
   <div class="header">
     <h1>🏓 HCC Pickleball Registrations</h1>
-    <p>Knoxville Hindu Community Center &nbsp;|&nbsp; Generated: ${today}</p>
+    <p>Knoxville Hindu Community Center &nbsp;|&nbsp; Printed by: ${userName} on ${today} at ${printTime}</p>
   </div>
   <div class="stats">
     <div class="stat-box"><div class="label">Total</div><div class="value">${records.length}</div></div>

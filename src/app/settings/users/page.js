@@ -12,14 +12,20 @@ const HCC_PAGES = [
 ];
 
 const ROLE_COLORS = {
-  super_admin: { bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.35)', text: '#A78BFA' },
-  staff:       { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)',  text: '#60A5FA' },
+  super_admin: { bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.25)', text: '#8B5CF6' },
+  staff:       { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.25)',  text: '#2563EB' },
 };
 
 const C = {
-  bg:     '#060D1A', card:   '#0D1627', border: 'rgba(51,65,85,0.6)',
-  gold:   '#F4A40B', text:   '#E2E8F0', muted:  '#64748B',
-  green:  '#10B981', red:    '#EF4444', indigo: '#818CF8',
+  bg:     'var(--bg-primary)',
+  card:   'var(--bg-card)',
+  border: 'var(--border)',
+  gold:   'var(--accent)',
+  text:   'var(--text-primary)',
+  muted:  'var(--text-secondary)',
+  green:  '#10B981',
+  red:    '#EF4444',
+  indigo: 'var(--accent)',
 };
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
@@ -30,10 +36,10 @@ function Toast({ toast }) {
     <div style={{
       position: 'fixed', top: '20px', right: '20px', zIndex: 100,
       padding: '12px 18px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px',
-      background: isErr ? 'rgba(127,29,29,0.95)' : 'rgba(13,20,38,0.97)',
-      border: `1px solid ${isErr ? 'rgba(239,68,68,0.4)' : 'rgba(16,185,129,0.3)'}`,
+      background: isErr ? 'rgba(127,29,29,0.95)' : 'var(--bg-modal)',
+      border: `1px solid ${isErr ? 'rgba(239,68,68,0.4)' : 'var(--border-modal)'}`,
       color: isErr ? '#FCA5A5' : '#6EE7B7', fontSize: '14px', fontWeight: '600',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      boxShadow: '0 8px 32px var(--shadow)',
     }}>
       {isErr ? '⚠️' : '✅'} {toast.msg}
     </div>
@@ -80,12 +86,12 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
       background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', padding: '16px',
     }}>
       <div style={{
-        background: C.card, border: `1px solid ${C.border}`,
+        background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`,
         borderRadius: '20px', width: '100%', maxWidth: '540px',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
+        boxShadow: '0 24px 80px var(--shadow)',
       }}>
         {/* Header */}
-        <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: C.text }}>Manage Access</h2>
             <p style={{ margin: '4px 0 0', fontSize: '13px', color: C.muted }}>{targetUser.email}</p>
@@ -97,8 +103,8 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
         <div style={{ padding: '20px 28px 0' }}>
           <label style={{
             display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer',
-            background: allAccess ? 'rgba(244,164,11,0.08)' : 'rgba(30,41,59,0.5)',
-            border: `1px solid ${allAccess ? 'rgba(244,164,11,0.25)' : C.border}`,
+            background: allAccess ? 'rgba(244,164,11,0.08)' : 'var(--bg-input)',
+            border: `1px solid ${allAccess ? 'rgba(244,164,11,0.25)' : 'var(--border)'}`,
             borderRadius: '12px', padding: '14px 16px',
           }}>
             <input
@@ -128,8 +134,8 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
             return (
               <label key={page.key} style={{
                 display: 'flex', alignItems: 'center', gap: '12px', cursor: allAccess ? 'default' : 'pointer',
-                background: on ? 'rgba(129,140,248,0.08)' : 'rgba(30,41,59,0.3)',
-                border: `1px solid ${on ? 'rgba(129,140,248,0.25)' : C.border}`,
+                background: on ? 'rgba(129,140,248,0.08)' : 'var(--bg-input)',
+                border: `1px solid ${on ? 'rgba(129,140,248,0.25)' : 'var(--border)'}`,
                 borderRadius: '10px', padding: '12px 14px', transition: 'all 0.15s',
               }}>
                 <input
@@ -150,9 +156,9 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: '16px 28px 24px', borderTop: `1px solid ${C.border}`, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-          <button onClick={onClose} style={btnStyle('#1E293B', C.border, C.muted)}>Cancel</button>
-          <button onClick={handleSave} disabled={saving} style={btnStyle(C.gold, 'transparent', '#000', true)}>
+        <div style={{ padding: '16px 28px 24px', borderTop: `1px solid var(--border)`, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          <button onClick={onClose} style={btnStyle('var(--bg-button-secondary)', 'var(--border-button-secondary)', 'var(--text-button-secondary)')}>Cancel</button>
+          <button onClick={handleSave} disabled={saving} style={btnStyle('var(--accent)', 'transparent', 'white', true)}>
             {saving ? '⏳ Saving…' : '💾 Save Access'}
           </button>
         </div>
@@ -184,7 +190,7 @@ function ResetPinModal({ targetUser, onClose, onToast }) {
       position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', padding: '16px',
     }}>
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '360px' }}>
+      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '360px' }}>
         <h3 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: '800', color: C.text }}>Reset PIN</h3>
         <p style={{ margin: '0 0 20px', fontSize: '13px', color: C.muted }}>{targetUser.email}</p>
         <input
@@ -193,14 +199,14 @@ function ResetPinModal({ targetUser, onClose, onToast }) {
           placeholder="New 6-digit PIN"
           style={{
             width: '100%', padding: '14px', borderRadius: '12px', marginBottom: '16px',
-            background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`,
+            background: 'var(--bg-input)', border: `1px solid var(--border)`,
             color: C.text, fontSize: '24px', textAlign: 'center', letterSpacing: '8px',
             outline: 'none', boxSizing: 'border-box',
           }}
         />
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={onClose} style={{ ...btnStyle('#1E293B', C.border, C.muted), flex: 1 }}>Cancel</button>
-          <button onClick={handleReset} disabled={saving || pin.length !== 6} style={{ ...btnStyle(C.gold, 'transparent', '#000', true), flex: 1, opacity: pin.length !== 6 ? 0.5 : 1 }}>
+          <button onClick={onClose} style={{ ...btnStyle('var(--bg-button-secondary)', 'var(--border-button-secondary)', 'var(--text-button-secondary)'), flex: 1 }}>Cancel</button>
+          <button onClick={handleReset} disabled={saving || pin.length !== 6} style={{ ...btnStyle('var(--accent)', 'transparent', 'white', true), flex: 1, opacity: pin.length !== 6 ? 0.5 : 1 }}>
             {saving ? 'Resetting…' : 'Reset PIN'}
           </button>
         </div>
@@ -240,8 +246,8 @@ function AddUserModal({ onClose, onCreated, onToast }) {
       position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', padding: '16px',
     }}>
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '20px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
-        <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '20px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: C.text }}>Add User</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: '20px' }}>✕</button>
         </div>
@@ -273,8 +279,8 @@ function AddUserModal({ onClose, onCreated, onToast }) {
           <div>
             <label style={labelStyle}>Page Access</label>
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer',
-              background: allAccess ? 'rgba(244,164,11,0.08)' : 'rgba(30,41,59,0.4)',
-              border: `1px solid ${allAccess ? 'rgba(244,164,11,0.25)' : C.border}`,
+              background: allAccess ? 'rgba(244,164,11,0.08)' : 'var(--bg-input)',
+              border: `1px solid ${allAccess ? 'rgba(244,164,11,0.25)' : 'var(--border)'}`,
               borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
               <input type="checkbox" checked={allAccess} onChange={e => { setAllAccess(e.target.checked); if(e.target.checked) setForm(f=>({...f,allowedPages:HCC_PAGES.map(p=>p.key)})); }}
                 style={{ width:'16px',height:'16px',accentColor:C.gold,cursor:'pointer' }} />
@@ -285,8 +291,8 @@ function AddUserModal({ onClose, onCreated, onToast }) {
                 const on = form.allowedPages.includes(page.key);
                 return (
                   <label key={page.key} style={{ display:'flex',alignItems:'center',gap:'10px',cursor:allAccess?'default':'pointer',
-                    background: on?'rgba(129,140,248,0.08)':'rgba(30,41,59,0.3)',
-                    border:`1px solid ${on?'rgba(129,140,248,0.2)':C.border}`,
+                    background: on?'rgba(129,140,248,0.08)':'var(--bg-input)',
+                    border:`1px solid ${on?'rgba(129,140,248,0.2)':'var(--border)'}`,
                     borderRadius:'8px',padding:'9px 12px' }}>
                     <input type="checkbox" checked={on} disabled={allAccess} onChange={() => togglePage(page.key)}
                       style={{ width:'15px',height:'15px',accentColor:C.indigo,cursor:allAccess?'default':'pointer' }} />
@@ -298,8 +304,8 @@ function AddUserModal({ onClose, onCreated, onToast }) {
           </div>
 
           <div style={{ display: 'flex', gap: '10px', paddingTop: '4px' }}>
-            <button type="button" onClick={onClose} style={{ ...btnStyle('#1E293B', C.border, C.muted), flex: 1 }}>Cancel</button>
-            <button type="submit" disabled={saving} style={{ ...btnStyle(C.gold, 'transparent', '#000', true), flex: 1 }}>
+            <button type="button" onClick={onClose} style={{ ...btnStyle('var(--bg-button-secondary)', 'var(--border-button-secondary)', 'var(--text-button-secondary)'), flex: 1 }}>Cancel</button>
+            <button type="submit" disabled={saving} style={{ ...btnStyle('var(--accent)', 'transparent', 'white', true), flex: 1 }}>
               {saving ? 'Creating…' : '+ Create User'}
             </button>
           </div>
@@ -310,8 +316,8 @@ function AddUserModal({ onClose, onCreated, onToast }) {
 }
 
 // ── Shared style helpers ──────────────────────────────────────────────────────
-const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' };
-const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: `1px solid rgba(51,65,85,0.6)`, color: '#E2E8F0', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' };
+const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' };
+const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-input)', border: `1px solid var(--border)`, color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' };
 function btnStyle(bg, borderColor, color, bold = false) {
   return { padding: '11px 20px', borderRadius: '10px', border: `1px solid ${borderColor}`, background: bg, color, fontSize: '13px', fontWeight: bold ? '800' : '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s' };
 }
@@ -373,7 +379,7 @@ export default function UsersPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👥</div>
           <div>
-            <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '900', color: '#F1F5F9', letterSpacing: '-0.5px' }}>User Management</h1>
+            <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>User Management</h1>
             <p style={{ margin: '2px 0 0', fontSize: '13px', color: C.muted }}>{users.length} user{users.length !== 1 ? 's' : ''} registered</p>
           </div>
         </div>
@@ -396,9 +402,9 @@ export default function UsersPage() {
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
-              <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+              <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: `1px solid ${C.border}` }}>
                 {['User', 'Role', 'Page Access', 'Status', 'Joined', isSA ? 'Actions' : ''].map((h, i) => (
-                  <th key={i} style={{ padding: '16px 20px', textAlign: i >= 4 ? 'center' : 'left', fontSize: '11px', fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{h}</th>
+                  <th key={i} style={{ padding: '16px 20px', textAlign: i >= 4 ? 'center' : 'left', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -408,8 +414,8 @@ export default function UsersPage() {
                 const pages = Array.isArray(u.allowed_pages) ? u.allowed_pages : (typeof u.allowed_pages === 'string' ? JSON.parse(u.allowed_pages) : []);
                 const isFullAccess = pages.includes('*');
                 return (
-                  <tr key={u.id} style={{ borderBottom: `1px solid rgba(51,65,85,0.4)`, transition: 'background 0.15s' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(30,41,59,0.4)'}
+                  <tr key={u.id} style={{ borderBottom: `1px solid var(--border-table)`, transition: 'background 0.15s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-glow)'}
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                     {/* User */}
                     <td style={{ padding: '16px 20px' }}>
@@ -418,7 +424,7 @@ export default function UsersPage() {
                           {(u.name || u.email)[0].toUpperCase()}
                         </div>
                         <div>
-                          <div style={{ fontWeight: '700', color: '#F1F5F9' }}>{u.name || '—'}</div>
+                          <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{u.name || '—'}</div>
                           <div style={{ fontSize: '12px', color: C.muted }}>{u.email}</div>
                         </div>
                       </div>
@@ -438,12 +444,12 @@ export default function UsersPage() {
                           {pages.length === 0 ? (
                             <span style={{ fontSize: '12px', color: C.muted }}>No access</span>
                           ) : pages.map(pk => {
-                            const page = HCC_PAGES.find(p => p.key === pk);
-                            return (
-                              <span key={pk} style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '20px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo }}>
-                                {page?.label || pk}
-                              </span>
-                            );
+                             const page = HCC_PAGES.find(p => p.key === pk);
+                             return (
+                               <span key={pk} style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '20px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo }}>
+                                 {page?.label || pk}
+                               </span>
+                             );
                           })}
                         </div>
                       )}
@@ -451,22 +457,22 @@ export default function UsersPage() {
                     {/* Status */}
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: u.active ? C.green : C.muted, boxShadow: u.active ? `0 0 6px ${C.green}` : 'none' }}/>
-                        <span style={{ fontSize: '13px', color: u.active ? C.green : C.muted, fontWeight: '600' }}>{u.active ? 'Active' : 'Inactive'}</span>
+                        <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: u.active ? C.green : 'var(--text-muted)', boxShadow: u.active ? `0 0 6px ${C.green}` : 'none' }}/>
+                        <span style={{ fontSize: '13px', color: u.active ? C.green : 'var(--text-muted)', fontWeight: '600' }}>{u.active ? 'Active' : 'Inactive'}</span>
                       </div>
                     </td>
                     {/* Joined */}
-                    <td style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', color: C.muted }}>
+                    <td style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)' }}>
                       {new Date(u.created_at).toLocaleDateString()}
                     </td>
                     {/* Actions */}
                     {isSA && (
                       <td style={{ padding: '16px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                          <ActionBtn onClick={() => setManagingUser(u)} color="#818CF8" bg="rgba(129,140,248,0.1)" label="🔑 Access" />
-                          <ActionBtn onClick={() => setResetPinUser(u)} color={C.muted} bg="rgba(30,41,59,0.6)" label="🔢 PIN" />
+                          <ActionBtn onClick={() => setManagingUser(u)} color="var(--accent)" bg="rgba(129,140,248,0.08)" label="🔑 Access" />
+                          <ActionBtn onClick={() => setResetPinUser(u)} color="var(--text-secondary)" bg="var(--bg-button-secondary)" label="🔢 PIN" />
                           {u.role !== 'super_admin' && (
-                            <ActionBtn onClick={() => handleToggleActive(u)} color={u.active ? '#F59E0B' : C.green} bg={u.active ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)'} label={u.active ? '⏸ Disable' : '▶ Enable'} />
+                            <ActionBtn onClick={() => handleToggleActive(u)} color={u.active ? '#D97706' : C.green} bg={u.active ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)'} label={u.active ? '⏸ Disable' : '▶ Enable'} />
                           )}
                           {String(u.id) !== String(me?.id) && u.role !== 'super_admin' && (
                             <ActionBtn onClick={() => handleDelete(u)} color="#FC8181" bg="rgba(239,68,68,0.1)" label="🗑 Delete" />
@@ -492,7 +498,7 @@ export default function UsersPage() {
 function ActionBtn({ onClick, color, bg, label }) {
   return (
     <button onClick={onClick} style={{
-      padding: '6px 12px', borderRadius: '8px', border: `1px solid ${color}33`,
+      padding: '6px 12px', borderRadius: '8px', border: `1px solid var(--border)`,
       background: bg, color, fontSize: '12px', fontWeight: '700', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
       whiteSpace: 'nowrap', transition: 'all 0.15s',
     }}>{label}</button>

@@ -80,11 +80,11 @@ export default function ClientLayout({ children }) {
   }
 
   // ── Admin pages: full sidebar layout ──────────────────────────────────────
-  const sidebarBg    = isDark ? 'rgba(10,15,28,0.97)' : '#FFFFFF';
-  const sidebarBorder= isDark ? 'rgba(51,65,85,0.5)'  : 'rgba(203,213,225,0.9)';
-  const mainBg       = isDark ? '#080C14'              : '#F0F4F8';
-  const textPrimary  = isDark ? '#FFFFFF'              : '#0F172A';
-  const textMuted    = isDark ? '#64748B'              : '#94A3B8';
+  const sidebarBg    = 'var(--bg-sidebar)';
+  const sidebarBorder= 'var(--border)';
+  const mainBg       = 'var(--bg-primary)';
+  const textPrimary  = 'var(--text-primary)';
+  const textMuted    = 'var(--text-secondary)';
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, isDark }}>
@@ -100,7 +100,7 @@ export default function ClientLayout({ children }) {
           borderRight: `1px solid ${sidebarBorder}`,
           display: 'flex', flexDirection: 'column', position: 'relative',
           zIndex: 20, flexShrink: 0,
-          boxShadow: isDark ? 'none' : '2px 0 12px rgba(0,0,0,0.06)',
+          boxShadow: isDark ? 'none' : '2px 0 12px var(--shadow)',
           transition: 'background-color 0.3s, border-color 0.3s',
         }}>
 
@@ -163,7 +163,7 @@ export default function ClientLayout({ children }) {
               style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '10px 14px', borderRadius: '12px', border: `1px solid ${sidebarBorder}`,
-                backgroundColor: isDark ? 'rgba(30,41,59,0.4)' : 'rgba(241,245,249,0.8)',
+                backgroundColor: 'var(--bg-input)',
                 color: textMuted, cursor: 'pointer', width: '100%',
                 fontFamily: 'inherit', fontSize: '13px', fontWeight: '600',
                 transition: 'all 0.2s',
@@ -179,7 +179,7 @@ export default function ClientLayout({ children }) {
               <span style={{
                 marginLeft: 'auto', display: 'flex', alignItems: 'center',
                 width: '36px', height: '20px', borderRadius: '10px', padding: '2px',
-                backgroundColor: isDark ? 'rgba(99,102,241,0.3)' : '#6366F1',
+                backgroundColor: 'var(--accent)',
                 transition: 'background-color 0.3s',
               }}>
                 <span style={{
@@ -193,16 +193,16 @@ export default function ClientLayout({ children }) {
             {/* User info + Logout */}
             <div style={{
               padding: '12px 14px', borderRadius: '12px',
-              backgroundColor: isDark ? 'rgba(30,41,59,0.6)' : 'rgba(241,245,249,0.8)',
+              backgroundColor: 'var(--bg-input)',
               border: `1px solid ${sidebarBorder}`,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                 <div style={{
                   width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
-                  backgroundColor: isDark ? '#1E293B' : '#E2E8F0',
+                  backgroundColor: 'var(--bg-primary)',
                   border: '2px solid rgba(99,102,241,0.4)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '12px', fontWeight: '700', color: '#818CF8',
+                  fontSize: '12px', fontWeight: '700', color: 'var(--accent)',
                 }}>
                   {user ? user.email[0].toUpperCase() : 'AD'}
                 </div>

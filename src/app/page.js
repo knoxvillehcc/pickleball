@@ -213,7 +213,7 @@ export default function Home() {
           {/* Welcome Greeting Banner */}
           <div style={{
             ...cardStyle,
-            background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(30,27,75,0.05) 100%)',
+            background: 'var(--bg-banner-grad)',
             borderColor: 'var(--border-hover)',
             padding: '48px',
             boxShadow: '0 0 60px -20px var(--accent-glow)',
@@ -356,16 +356,16 @@ export default function Home() {
           {/* Header Card */}
           <div style={{
             ...cardStyle,
-            background: 'linear-gradient(135deg, rgba(13,20,38,0.95) 0%, rgba(30,27,75,0.3) 100%)',
-            borderColor: 'rgba(99,102,241,0.2)',
+            background: 'var(--bg-banner-scanner)',
+            borderColor: 'var(--border)',
             padding: '48px',
-            boxShadow: '0 0 80px -20px rgba(99,102,241,0.15)',
+            boxShadow: '0 0 80px -20px var(--accent-glow)',
             position: 'relative', overflow: 'hidden',
             display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
           }}>
-            <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }}></div>
+            <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '300px', height: '300px', background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }}></div>
             <div style={{ position: 'relative' }}>
-              <h1 style={{ margin: 0, fontSize: '42px', fontWeight: '900', color: 'white', lineHeight: 1.1, letterSpacing: '-1px' }}>
+              <h1 style={{ margin: 0, fontSize: '42px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
                 System{' '}
                 <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   Scanner
@@ -432,13 +432,13 @@ export default function Home() {
               {/* Table Header */}
               <div style={{
                 padding: '20px 28px',
-                borderBottom: '1px solid rgba(51,65,85,0.5)',
-                backgroundColor: 'rgba(8,12,20,0.6)',
+                borderBottom: '1px solid var(--border-table)',
+                backgroundColor: 'var(--bg-table-header)',
                 display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'white' }}>Analysis Results</h2>
-                  <span style={{ backgroundColor: 'rgba(51,65,85,0.8)', color: '#94A3B8', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px', border: '1px solid rgba(71,85,105,0.5)' }}>
+                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)' }}>Analysis Results</h2>
+                  <span style={{ backgroundColor: 'var(--bg-badge-pill)', color: 'var(--text-badge-pill)', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px', border: '1px solid var(--border-badge-pill)' }}>
                     {results.length} records
                   </span>
                 </div>
@@ -477,9 +477,9 @@ export default function Home() {
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap', fontSize: '14px' }}>
                   <thead>
-                    <tr style={{ backgroundColor: 'rgba(8,12,20,0.4)', borderBottom: '1px solid rgba(51,65,85,0.5)' }}>
+                    <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>
                       {[['Order Ref','left'],['Customer','left'],['Product','left'],['Amount','right'],['Status','center']].map(([h, align]) => (
-                        <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: align }}>{h}</th>
+                        <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: align }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -487,17 +487,17 @@ export default function Home() {
                     {results.map((r, i) => (
                       <tr
                         key={i}
-                        style={{ borderBottom: '1px solid rgba(51,65,85,0.3)', backgroundColor: i % 2 !== 0 ? 'rgba(15,23,42,0.4)' : 'transparent', transition: 'background 0.15s' }}
-                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(99,102,241,0.06)'}
-                        onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'rgba(15,23,42,0.4)' : 'transparent'}
+                        style={{ borderBottom: '1px solid var(--border-table)', backgroundColor: i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent'}
                       >
                         <td style={{ padding: '15px 24px' }}>
-                          <div style={{ fontWeight: '700', color: 'white', fontSize: '13px' }}>{r.posOrder || '-'}</div>
-                          <div style={{ fontSize: '11px', color: '#475569', marginTop: '2px', fontFamily: 'monospace' }}>{r.invoiceNo || '-'}</div>
+                          <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '13px' }}>{r.posOrder || '-'}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px', fontFamily: 'monospace' }}>{r.invoiceNo || '-'}</div>
                         </td>
-                        <td style={{ padding: '15px 24px', color: '#CBD5E1', fontWeight: '600' }}>{r.customerName}</td>
-                        <td style={{ padding: '15px 24px', color: '#818CF8' }}>{r.product}</td>
-                        <td style={{ padding: '15px 24px', color: 'white', fontWeight: '700', textAlign: 'right' }}>${r.amount?.toFixed(2)}</td>
+                        <td style={{ padding: '15px 24px', color: 'var(--text-secondary)', fontWeight: '600' }}>{r.customerName}</td>
+                        <td style={{ padding: '15px 24px', color: 'var(--accent)' }}>{r.product}</td>
+                        <td style={{ padding: '15px 24px', color: 'var(--text-primary)', fontWeight: '700', textAlign: 'right' }}>${r.amount?.toFixed(2)}</td>
                         <td style={{ padding: '15px 24px', textAlign: 'center' }}>
                           {r.status === 'would_fix' ? (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.3)', borderRadius: '9999px', padding: '4px 12px', fontSize: '11px', fontWeight: '700', color: '#F43F5E' }}>
@@ -522,10 +522,10 @@ export default function Home() {
           {/* --- Execution Logs --- */}
           {logs.length > 0 && (
             <div style={{ ...cardStyle, padding: 0, overflow: 'hidden' }}>
-              <div style={{ padding: '20px 28px', borderBottom: '1px solid rgba(51,65,85,0.4)', backgroundColor: 'rgba(8,12,20,0.6)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border-table)', backgroundColor: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'white' }}>Execution Logs</h3>
-                <span style={{ backgroundColor: 'rgba(51,65,85,0.8)', color: '#94A3B8', fontSize: '12px', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px' }}>{logs.length}</span>
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>Execution Logs</h3>
+                <span style={{ backgroundColor: 'var(--bg-badge-pill)', color: 'var(--text-badge-pill)', fontSize: '12px', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px' }}>{logs.length}</span>
               </div>
               <div style={{ padding: '20px', maxHeight: '400px', overflowY: 'auto' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'monospace', fontSize: '13px' }}>
