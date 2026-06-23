@@ -25,6 +25,7 @@ function LoginContent() {
   const [error,   setError]   = useState(expired ? 'Session expired — please log in again.' : '');
   const [loading, setLoading] = useState(false);
   const [locked,  setLocked]  = useState('');
+  const [showPin, setShowPin] = useState(false);
 
   const emailRef = useRef(null);
   const pinRefs  = useRef([]);
@@ -185,12 +186,12 @@ function LoginContent() {
 
               {/* PIN inputs */}
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center',
-                marginBottom: '24px' }} onPaste={handlePaste}>
+                marginBottom: '20px' }} onPaste={handlePaste}>
                 {pin.map((digit, i) => (
                   <input
                     key={i}
                     ref={el => pinRefs.current[i] = el}
-                    type="text"
+                    type={showPin ? "text" : "password"}
                     inputMode="numeric"
                     maxLength={1}
                     value={digit}
@@ -209,6 +210,19 @@ function LoginContent() {
                     }}
                   />
                 ))}
+              </div>
+
+              {/* Show PIN Checkbox */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: C.muted, userSelect: 'none' }}>
+                  <input
+                    type="checkbox"
+                    checked={showPin}
+                    onChange={e => setShowPin(e.target.checked)}
+                    style={{ width: '16px', height: '16px', accentColor: C.gold, cursor: 'pointer' }}
+                  />
+                  Show PIN
+                </label>
               </div>
 
               {loading && (
