@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
+import { getSessionAndPermissions } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,11 @@ export const dynamic = 'force-dynamic';
 const BANNER_PRODUCT_IDS = [83, 84];
 
 export async function GET(request) {
+  const auth = await getSessionAndPermissions('banner');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
+
   try {
     const creds     = await getCredentials();
     const sessionId = await odooAuth(creds);

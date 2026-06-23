@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getAllRegistrations } from '@/lib/supabaseClient';
+import { getSessionAndPermissions } from '@/lib/auth';
 
 export async function GET(request) {
+  const auth = await getSessionAndPermissions('pickleball');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
+
   const { searchParams } = new URL(request.url);
   const format = searchParams.get('format') || 'csv'; // csv | excel | pdf
 

@@ -6,6 +6,7 @@
 
 const SUPABASE_URL      = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
 
 function getHeaders() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -17,6 +18,20 @@ function getHeaders() {
     'Content-Type':  'application/json',
     'apikey':         SUPABASE_ANON_KEY,
     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    'Prefer':         'return=representation',
+  };
+}
+
+function getServiceHeaders() {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    throw new Error(
+      'Missing Supabase credentials. Add SUPABASE_URL and SUPABASE_SERVICE_KEY to your .env.local file.'
+    );
+  }
+  return {
+    'Content-Type':  'application/json',
+    'apikey':         SUPABASE_SERVICE_KEY,
+    'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
     'Prefer':         'return=representation',
   };
 }
@@ -107,7 +122,7 @@ export async function getAllRegistrations(limit = 5000) {
 export async function insertRegistration(data) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/registrations`, {
     method:  'POST',
-    headers: getHeaders(),
+    headers: getServiceHeaders(),
     body:    JSON.stringify(data),
     cache:   'no-store',
   });
@@ -130,7 +145,7 @@ export async function insertRegistration(data) {
 export async function updateRegistration(id, data) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/registrations?id=eq.${id}`, {
     method:  'PATCH',
-    headers: getHeaders(),
+    headers: getServiceHeaders(),
     body:    JSON.stringify(data),
     cache:   'no-store',
   });
@@ -143,3 +158,92 @@ export async function updateRegistration(id, data) {
   const result = await res.json();
   return Array.isArray(result) ? result[0] : result;
 }
+
+/**
+ * Call RPC to generate the next unique sequence-based registration number.
+ * @returns {Promise<string>}
+ */
+export async function getNextRegistrationNumber() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_next_registration_number`, {
+    method:  'POST',
+    headers: getServiceHeaders(),
+    cache:   'no-store',
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Failed to call get_next_registration_number RPC: ${body}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Check if any player with the given emails is already registered and paid.
+ * @param {string} email1
+ * @param {string} [email2]
+ * @returns {Promise<{ duplicate: boolean, message?: string }>}
+ */
+export async function checkDuplicateRegistration(email1, email2) {
+  const emailsToCheck = [email1.toLowerCase().trim()];
+  if (email2) {
+    const clean2 = email2.toLowerCase().trim();
+    if (clean2) {
+      emailsToCheck.push(clean2);
+    }
+  }
+
+  // Fetch all registrations where payment_status = 'paid'
+  const params = new URLSearchParams({
+    payment_status: 'eq.paid',
+    select: 'registration_number,email,players_data'
+  });
+
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/registrations?${params}`, {
+    headers: getServiceHeaders(),
+    cache: 'no-store',
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Failed to query registrations for duplicate check: ${body}`);
+  }
+
+  const paidRegs = await res.json();
+
+  for (const reg of paidRegs) {
+    // Check main email
+    const regEmail = reg.email?.toLowerCase().trim();
+    if (emailsToCheck.includes(regEmail)) {
+      return {
+        duplicate: true,
+        message: `Email ${regEmail} is already registered under paid registration #${reg.registration_number}.`
+      };
+    }
+
+    // Check players_data array
+    let players = [];
+    if (Array.isArray(reg.players_data)) {
+      players = reg.players_data;
+    } else if (typeof reg.players_data === 'string') {
+      try {
+        players = JSON.parse(reg.players_data);
+      } catch {
+        players = [];
+      }
+    }
+
+    for (const p of players) {
+      const pEmail = p?.email?.toLowerCase().trim();
+      if (pEmail && emailsToCheck.includes(pEmail)) {
+        return {
+          duplicate: true,
+          message: `Email ${pEmail} is already registered under paid registration #${reg.registration_number}.`
+        };
+      }
+    }
+  }
+
+  return { duplicate: false };
+}
+

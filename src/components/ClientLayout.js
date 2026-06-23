@@ -126,6 +126,8 @@ export default function ClientLayout({ children }) {
             {navLinks.filter(link => {
               if (link.adminOnly) return user?.role === 'super_admin';
               if (!user) return true; // show all while loading
+              // Welcome page / Dashboard is always visible to any authenticated user
+              if (link.href === '/') return true;
               // Super admin always sees all non-adminOnly links
               if (user.role === 'super_admin') return true;
               // Staff: check allowed pages

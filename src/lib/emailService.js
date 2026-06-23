@@ -16,6 +16,81 @@ function getTransporter() {
   });
 }
 
+async function queueAndSendEmail(regId, toEmail, subject, htmlBody) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+
+  // 1. Insert into email_queue in pending state
+  const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/email_queue`, {
+    method: 'POST',
+    headers: {
+      'apikey':         KEY,
+      'Authorization': `Bearer ${KEY}`,
+      'Content-Type':  'application/json',
+      'Prefer':         'return=representation',
+    },
+    body: JSON.stringify({
+      registration_id: regId || null,
+      to_email:        toEmail,
+      subject:         subject,
+      body_html:       htmlBody,
+      status:          'pending',
+      attempts:        0,
+    }),
+  });
+
+  if (!insertRes.ok) {
+    const text = await insertRes.text();
+    console.error(`[Email Queue] Failed to queue email: ${text}`);
+    return;
+  }
+
+  const rows = await insertRes.json();
+  const queueItem = rows[0];
+
+  // 2. Attempt delivery
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `"HCC Pickleball" <${process.env.GMAIL_USER}>`,
+      to: toEmail,
+      subject: subject,
+      html: buildEmail(htmlBody),
+    });
+
+    // 3. Mark as sent
+    await fetch(`${SUPABASE_URL}/rest/v1/email_queue?id=eq.${queueItem.id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey':         KEY,
+        'Authorization': `Bearer ${KEY}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify({
+        status:   'sent',
+        attempts: 1,
+      }),
+    });
+    console.log(`[Email Queue] Email sent successfully to ${toEmail}`);
+  } catch (err) {
+    console.error(`[Email Queue] Failed to send email to ${toEmail}: ${err.message}`);
+    // 4. Mark as failed
+    await fetch(`${SUPABASE_URL}/rest/v1/email_queue?id=eq.${queueItem.id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey':         KEY,
+        'Authorization': `Bearer ${KEY}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify({
+        status:     'failed',
+        attempts:   1,
+        last_error: err.message,
+      }),
+    });
+  }
+}
+
 // ── Full email wrapper — email-client safe ─────────────────────────────────────
 function buildEmail(bodyHtml) {
   return `<!DOCTYPE html>
@@ -290,12 +365,8 @@ export async function sendCaptainConfirmation(regData) {
     </p>
   `;
 
-  await transporter.sendMail({
-    from:    `"HCC Pickleball" <${process.env.GMAIL_USER}>`,
-    to:      regData.email,
-    subject: `✅ You're Registered! Reg #${regData.registration_number} | HCC Pickleball Tournament`,
-    html:    buildEmail(body),
-  });
+  const subject = `✅ You're Registered! Reg #${regData.registration_number} | HCC Pickleball Tournament`;
+  await queueAndSendEmail(regData.id, regData.email, subject, body);
 }
 
 // ── Player partner notification ────────────────────────────────────────────────
@@ -382,12 +453,8 @@ export async function sendPlayerNotification(player, regData) {
     </p>
   `;
 
-  await transporter.sendMail({
-    from:    `"HCC Pickleball" <${process.env.GMAIL_USER}>`,
-    to:      player.email,
-    subject: `🏓 You're In! HCC Pickleball Tournament — Reg #${regData.registration_number}`,
-    html:    buildEmail(body),
-  });
+  const subject = `🏓 You're In! HCC Pickleball Tournament — Reg #${regData.registration_number}`;
+  await queueAndSendEmail(regData.id, player.email, subject, body);
 }
 
 // ── Send all emails after payment ──────────────────────────────────────────────

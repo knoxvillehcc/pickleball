@@ -1,10 +1,16 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { NextResponse } from 'next/server';
+import { getSessionAndPermissions } from '@/lib/auth';
 
 const credFilePath = path.join(process.cwd(), 'credentials.json');
 
-export async function GET() {
+export async function GET(request) {
+  const auth = await getSessionAndPermissions('settings');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
+
   try {
     const data = await fs.readFile(credFilePath, 'utf8');
     const parsed = JSON.parse(data);
@@ -18,6 +24,11 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const auth = await getSessionAndPermissions('settings');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
+
   try {
     const body = await request.json();
     let existing = {};

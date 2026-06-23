@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { getSessionAndPermissions } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // ── POST: Generate a fresh Stripe payment link for a pending registration ──────
 export async function POST(request) {
+  const auth = await getSessionAndPermissions('pickleball');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
   try {
     const body = await request.json();
     const { registration_number } = body;

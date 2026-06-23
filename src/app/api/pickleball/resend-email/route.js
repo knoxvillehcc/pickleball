@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { sendCaptainConfirmation } from '@/lib/emailService';
+import { getSessionAndPermissions } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
+  const auth = await getSessionAndPermissions('pickleball');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
   try {
     const { registration_number } = await request.json();
 

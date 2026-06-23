@@ -91,14 +91,14 @@ async function syncToOdoo(regData, amountPaid, stripeRef) {
 async function markAsPaid(regNumber, sessionId, amountPaid) {
   const { updateRegistration } = await import('@/lib/supabaseClient');
   const SUPABASE_URL      = process.env.SUPABASE_URL;
-  const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
 
   const findRes = await fetch(
     `${SUPABASE_URL}/rest/v1/registrations?registration_number=eq.${encodeURIComponent(regNumber)}&select=*`,
     {
       headers: {
-        'apikey':        SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey':        SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
       },
     }
   );
@@ -109,14 +109,56 @@ async function markAsPaid(regNumber, sessionId, amountPaid) {
     return null;
   }
 
-  const updated = await updateRegistration(found[0].id, {
+  const record = found[0];
+  if (record.payment_status === 'paid') {
+    return 'already_paid';
+  }
+
+  const updated = await updateRegistration(record.id, {
     payment_status:     'paid',
     amount_paid:        amountPaid,
     stripe_payment_ref: sessionId,
   });
 
   // Return full record for emails
-  return { ...found[0], payment_status: 'paid', amount_paid: amountPaid, stripe_payment_ref: sessionId };
+  return { ...record, payment_status: 'paid', amount_paid: amountPaid, stripe_payment_ref: sessionId };
+}
+
+async function isWebhookProcessed(webhookId) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+  const url = `${SUPABASE_URL}/rest/v1/webhook_logs?webhook_id=eq.${encodeURIComponent(webhookId)}&select=id&limit=1`;
+  
+  const res = await fetch(url, {
+    headers: {
+      'apikey':        KEY,
+      'Authorization': `Bearer ${KEY}`,
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) return false;
+  const rows = await res.json();
+  return rows && rows.length > 0;
+}
+
+async function logWebhook(webhookId, regNumber, result) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+  const url = `${SUPABASE_URL}/rest/v1/webhook_logs`;
+  
+  await fetch(url, {
+    method: 'POST',
+    headers: {
+      'apikey':         KEY,
+      'Authorization': `Bearer ${KEY}`,
+      'Content-Type':  'application/json',
+    },
+    body: JSON.stringify({
+      webhook_id:          webhookId,
+      registration_number: regNumber || '',
+      result:              result || '',
+    }),
+  });
 }
 
 // ── Webhook handler ────────────────────────────────────────────────────────────
@@ -140,10 +182,23 @@ export async function POST(request) {
     const amountPaid = (session.amount_total || 0) / 100;
     const stripeRef  = session.id;
 
+    // Check webhook log first
+    const processed = await isWebhookProcessed(event.id);
+    if (processed) {
+      console.log(`[Webhook] Duplicate webhook event ignored: ${event.id}`);
+      return NextResponse.json({ received: true, ignored: true, reason: 'Duplicate event' });
+    }
+
     console.log(`[Webhook] Payment confirmed for ${regNumber} — $${amountPaid}`);
 
     // 1. Update Supabase to PAID + get full record
     const fullReg = await markAsPaid(regNumber, stripeRef, amountPaid);
+
+    if (fullReg === 'already_paid') {
+      console.log(`[Webhook] Registration ${regNumber} was already marked paid. Skipping actions.`);
+      await logWebhook(event.id, regNumber, 'ignored: already paid');
+      return NextResponse.json({ received: true, ignored: true, reason: 'Registration already paid' });
+    }
 
     if (fullReg) {
       // 2. Send Gmail confirmation emails to all players
@@ -151,6 +206,11 @@ export async function POST(request) {
 
       // 3. Sync to Odoo
       await syncToOdoo(fullReg, amountPaid, stripeRef);
+
+      // 4. Log the webhook success
+      await logWebhook(event.id, regNumber, 'processed: paid and synced');
+    } else {
+      await logWebhook(event.id, regNumber, 'failed: registration not found');
     }
   }
 

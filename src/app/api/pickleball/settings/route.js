@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getSessionAndPermissions } from '@/lib/auth';
 
 // Force every request to be dynamic — never cache this route
 export const dynamic = 'force-dynamic';
@@ -57,6 +58,11 @@ export async function GET(request) {
 
 // ── POST: update a setting ─────────────────────────────────────────────────────
 export async function POST(request) {
+  const auth = await getSessionAndPermissions('settings');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
+
   try {
     const body  = await request.json();
     const key   = body.key   ?? 'is_published';

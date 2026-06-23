@@ -56,4 +56,26 @@ export function getTokenFromCookieHeader(cookieHeader) {
   return match ? match[1] : null;
 }
 
+export async function getSessionAndPermissions(requiredSlug) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  if (!token) return { success: false, error: 'Unauthorized — please log in', status: 401 };
+
+  const payload = await verifyToken(token);
+  if (!payload) return { success: false, error: 'Session expired', status: 401 };
+
+  if (payload.role === 'super_admin') {
+    return { success: true, user: payload };
+  }
+
+  if (requiredSlug) {
+    const allowed = payload.allowedPages?.includes('*') || payload.allowedPages?.includes(requiredSlug);
+    if (!allowed) {
+      return { success: false, error: 'Forbidden — insufficient permissions', status: 403 };
+    }
+  }
+
+  return { success: true, user: payload };
+}
+
 export { COOKIE_NAME };

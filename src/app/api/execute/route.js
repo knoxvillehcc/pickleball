@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
+import { getSessionAndPermissions } from '@/lib/auth';
 
 export async function POST(request) {
+  const auth = await getSessionAndPermissions('dashboard');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
+
   try {
     const { records, environment } = await request.json();
     

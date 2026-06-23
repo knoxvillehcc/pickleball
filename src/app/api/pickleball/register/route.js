@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { insertRegistration } from '@/lib/supabaseClient';
+import { insertRegistration, getNextRegistrationNumber, checkDuplicateRegistration } from '@/lib/supabaseClient';
+
+const US_STATES = new Set([
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+  'DC'
+]);
 
 // Prevent Next.js from statically analyzing this route at build time
 export const dynamic = 'force-dynamic';
@@ -32,6 +41,15 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Invalid email address' }, { status: 400 });
     }
 
+    if (!/^\d{5}(-\d{4})?$/.test(body.zip?.trim())) {
+      return NextResponse.json({ success: false, error: 'Invalid ZIP code format (should be 5 digits or 5+4)' }, { status: 400 });
+    }
+
+    const stateUpper = body.state?.trim().toUpperCase();
+    if (!US_STATES.has(stateUpper)) {
+      return NextResponse.json({ success: false, error: 'Invalid US state' }, { status: 400 });
+    }
+
     if (!body.liability_accepted) {
       return NextResponse.json({ success: false, error: 'You must accept the liability waiver.' }, { status: 400 });
     }
@@ -43,6 +61,12 @@ export async function POST(request) {
     // Doubles-only: both players are required
     if (!body.player2_first_name?.trim() || !body.player2_last_name?.trim()) {
       return NextResponse.json({ success: false, error: 'Player 2 first and last name are required. This is a doubles-only tournament.' }, { status: 400 });
+    }
+
+    // Duplicate email & partner email check
+    const dupCheck = await checkDuplicateRegistration(body.email, body.player2_email);
+    if (dupCheck.duplicate) {
+      return NextResponse.json({ success: false, error: dupCheck.message }, { status: 400 });
     }
 
     // Doubles-only tournament — always 2 players at $25 each
@@ -67,7 +91,16 @@ export async function POST(request) {
 
     const playersData = [player1, ...(player2 ? [player2] : [])];
     const fullName    = `${body.first_name.trim()} ${body.last_name.trim()}`;
-    const regNumber   = generateRegNumber();
+
+    // Get sequence-based registration number with fallback
+    let regNumber;
+    try {
+      regNumber = await getNextRegistrationNumber();
+    } catch (err) {
+      console.warn('[Register] Sequence number generation failed, falling back to random:', err.message);
+      regNumber = generateRegNumber();
+    }
+
     const baseUrl     = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const eventLabel  = 'Doubles';
 
@@ -81,7 +114,7 @@ export async function POST(request) {
       phone:               body.phone.trim(),
       address:             body.address.trim(),
       city:                body.city.trim(),
-      state:               body.state,
+      state:               stateUpper,
       zip:                 body.zip.trim(),
       player_type:         body.player_type,
       team_name:           body.team_name.trim(),
