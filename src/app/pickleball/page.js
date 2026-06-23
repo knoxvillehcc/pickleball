@@ -355,6 +355,7 @@ export default function PickleballDashboard() {
         r.registration_number || '',
         r.full_name || '',
         r.team_name || '',
+        r.partner_name || '',
         r.email || '',
         r.phone || '',
         r.skill_level ? r.skill_level.charAt(0).toUpperCase() + r.skill_level.slice(1) : '',
@@ -365,7 +366,7 @@ export default function PickleballDashboard() {
 
       autoTable(doc, {
         startY: 30,
-        head: [['Reg #', 'Name', 'Team Name', 'Email', 'Phone', 'Skill', 'Date', 'Status', 'Amount']],
+        head: [['Reg #', 'Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Skill', 'Date', 'Status', 'Amount']],
         body: tableBody,
         theme: 'striped',
         headStyles: { fillColor: [123, 28, 28] }, // Maroon (#7B1C1C)
@@ -656,6 +657,7 @@ export default function PickleballDashboard() {
                     ['registration_number', 'Reg #'],
                     ['full_name',           'Name'],
                     ['team_name',           'Team Name'],
+                    ['partner_name',        'Partner Name'],
                     ['email',               'Email'],
                     ['phone',               'Phone'],
                     ['skill_level',         'Skill'],
@@ -692,6 +694,7 @@ export default function PickleballDashboard() {
                     </td>
                     <td style={{ padding: '13px 16px', color: 'white', fontWeight: '600' }}>{r.full_name}</td>
                     <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.team_name || '–'}</td>
+                    <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.partner_name || '–'}</td>
                     <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.email}</td>
                     <td style={{ padding: '13px 16px', color: '#94A3B8' }}>{r.phone}</td>
                     <td style={{ padding: '13px 16px' }}><SkillBadge level={r.skill_level}/></td>
