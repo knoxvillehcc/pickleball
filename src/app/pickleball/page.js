@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // ── Color tokens ──────────────────────────────────────────────────────────────
 const C = {
@@ -338,6 +340,45 @@ export default function PickleballDashboard() {
     }
   };
 
+  const downloadPDF = () => {
+    try {
+      const doc = new jsPDF('landscape');
+      const dateStr = new Date().toLocaleDateString();
+
+      doc.setFontSize(20);
+      doc.text('HCC Pickleball Tournament Registrations', 10, 15);
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text('Generated on: ' + dateStr, 10, 22);
+
+      const tableBody = sorted.map(r => [
+        r.registration_number || '',
+        r.full_name || '',
+        r.team_name || '',
+        r.email || '',
+        r.phone || '',
+        r.skill_level ? r.skill_level.charAt(0).toUpperCase() + r.skill_level.slice(1) : '',
+        r.registration_date ? r.registration_date.split('T')[0] : '',
+        r.payment_status ? r.payment_status.toUpperCase() : '',
+        '$' + (r.amount_paid || 0).toFixed(2)
+      ]);
+
+      autoTable(doc, {
+        startY: 30,
+        head: [['Reg #', 'Name', 'Team Name', 'Email', 'Phone', 'Skill', 'Date', 'Status', 'Amount']],
+        body: tableBody,
+        theme: 'striped',
+        headStyles: { fillColor: [123, 28, 28] }, // Maroon (#7B1C1C)
+        styles: { fontSize: 8, cellPadding: 2 },
+        margin: { top: 10, bottom: 10, left: 10, right: 10 },
+      });
+
+      doc.save('Pickleball_Registrations_' + dateStr.replace(/\//g, '-') + '.pdf');
+    } catch (err) {
+      alert('PDF generation error: ' + err.message);
+    }
+  };
+
   const setPaymentFilter = (v) => setFilter(f => ({ ...f, payment: f.payment === v ? '' : v }));
   const setSkillFilter   = (v) => setFilter(f => ({ ...f, skill:   f.skill   === v ? '' : v }));
   const clearFilters     = () => { setFilter({ payment: '', skill: '' }); setSearch(''); };
@@ -486,7 +527,7 @@ export default function PickleballDashboard() {
 
           {/* Export buttons */}
           {['csv', 'excel', 'pdf'].map(fmt => (
-            <button key={fmt} onClick={() => handleExport(fmt)} disabled={!!exporting} style={{
+            <button key={fmt} onClick={() => fmt === 'pdf' ? downloadPDF() : handleExport(fmt)} disabled={!!exporting} style={{
               background: 'transparent',
               border: `1px solid rgba(244,164,11,0.4)`,
               color: C.saffron, fontWeight: '600', fontSize: '13px',
