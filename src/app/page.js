@@ -146,11 +146,14 @@ function PublicLanding() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      position: 'fixed',
+      inset: 0,
+      overflowY: 'auto',
       background: 'linear-gradient(160deg, #0A0F1E 0%, #0D1425 50%, #090D1A 100%)',
       fontFamily: "'Inter', -apple-system, sans-serif",
       display: 'flex',
       flexDirection: 'column',
+      zIndex: 9999,
     }}>
       {/* Top flag stripe */}
       <div style={{ height: '4px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', flexShrink: 0 }}/>

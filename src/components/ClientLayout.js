@@ -32,8 +32,8 @@ const navLinks = [
 ];
 
 // ── Public routes — no sidebar ─────────────────────────────────────────────────────
-const PUBLIC_PREFIXES = ['/register', '/login', '/'];
-const isPublicRoute = (path) => PUBLIC_PREFIXES.some(p => path === p || (p !== '/' && path.startsWith(p)));
+const PUBLIC_PREFIXES = ['/register', '/login'];
+const isPublicRoute = (path) => PUBLIC_PREFIXES.some(p => path.startsWith(p));
 
 // ── Main ClientLayout ──────────────────────────────────────────────────────────
 export default function ClientLayout({ children }) {
