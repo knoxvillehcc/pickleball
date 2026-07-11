@@ -278,7 +278,6 @@ export default function IndiafestVendorDashboard() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-            <span style={{ fontSize: '28px' }}>🇮🇳</span>
             <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '900', letterSpacing: '-0.5px' }}>India Fest 2026</h1>
           </div>
           <p style={{ margin: 0, color: '#64748B', fontSize: '14px' }}>Vendor Registrations Dashboard</p>

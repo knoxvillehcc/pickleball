@@ -347,7 +347,7 @@ function VendorFormContent() {
           <div style={{ height: '5px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', borderRadius: '99px', marginBottom: '40px', width: '200px', margin: '0 auto 40px' }}/>
           <div style={{ fontSize: '56px', marginBottom: '20px' }}>🔒</div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#FFF4E8', border: '1px solid #FFD4A0', padding: '6px 18px', borderRadius: '20px', marginBottom: '24px' }}>
-            <span>🇮🇳</span>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF9933', display: 'inline-block', flexShrink: 0 }}/>
             <span style={{ fontSize: '11px', fontWeight: '800', color: '#FF9933', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
           </div>
           <h1 style={{ margin: '0 0 6px', fontSize: '40px', fontWeight: '900', color: '#2D1A08', letterSpacing: '-1px' }}>India Fest 2026</h1>
@@ -405,7 +405,7 @@ function VendorFormContent() {
 
         {/* HCC badge */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '6px 18px', borderRadius: '99px', marginBottom: '24px', position: 'relative' }}>
-          <span>🇮🇳</span>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF9933', display: 'inline-block', flexShrink: 0, boxShadow: '0 0 8px rgba(255,153,51,0.6)' }}/>
           <span style={{ fontSize: '11px', fontWeight: '800', color: 'rgba(255,255,255,0.9)', letterSpacing: '2px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
         </div>
 
