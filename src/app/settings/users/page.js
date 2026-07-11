@@ -3,12 +3,13 @@ import { useState, useEffect, useCallback } from 'react';
 
 // ── HCC Pages that can be assigned ───────────────────────────────────────────
 const HCC_PAGES = [
-  { key: 'dashboard',  label: 'Dashboard',      desc: 'Main overview dashboard' },
-  { key: 'reports',    label: 'Membership',      desc: 'Member reports & data' },
-  { key: 'monthly',    label: 'Monthly Report',  desc: 'Monthly activity report' },
-  { key: 'banner',     label: 'Banner In',       desc: 'Banner management' },
-  { key: 'pickleball', label: 'Pickleball',      desc: 'Tournament registrations' },
-  { key: 'settings',   label: 'Settings',        desc: 'App settings' },
+  { key: 'dashboard',  label: 'Dashboard',           desc: 'Main overview dashboard' },
+  { key: 'reports',    label: 'Membership',           desc: 'Member reports & data' },
+  { key: 'monthly',    label: 'Monthly Report',       desc: 'Monthly activity report' },
+  { key: 'banner',     label: 'Banner In',            desc: 'Banner management' },
+  { key: 'pickleball', label: 'Pickleball',           desc: 'Tournament registrations' },
+  { key: 'indiafest',  label: 'India Fest 2026',      desc: 'Vendor booth registrations' },
+  { key: 'settings',   label: 'Settings',             desc: 'App settings' },
 ];
 
 const ROLE_COLORS = {

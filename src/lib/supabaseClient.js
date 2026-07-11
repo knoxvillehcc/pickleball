@@ -247,3 +247,51 @@ export async function checkDuplicateRegistration(email1, email2) {
   return { duplicate: false };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// India Fest 2026 Vendor Registration helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Insert a new vendor registration record.
+ * @param {object} data - vendor fields
+ * @returns {Promise<object>} - inserted record
+ */
+export async function insertVendorRegistration(data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/vendor_registrations`, {
+    method:  'POST',
+    headers: getServiceHeaders(),
+    body:    JSON.stringify(data),
+    cache:   'no-store',
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Supabase vendor insert failed (${res.status}): ${body}`);
+  }
+
+  const result = await res.json();
+  return Array.isArray(result) ? result[0] : result;
+}
+
+/**
+ * Update a vendor registration record by ID.
+ * @param {number} id
+ * @param {object} data - fields to update
+ * @returns {Promise<object>}
+ */
+export async function updateVendorRegistration(id, data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/vendor_registrations?id=eq.${id}`, {
+    method:  'PATCH',
+    headers: getServiceHeaders(),
+    body:    JSON.stringify(data),
+    cache:   'no-store',
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Supabase vendor update failed (${res.status}): ${body}`);
+  }
+
+  const result = await res.json();
+  return Array.isArray(result) ? result[0] : result;
+}

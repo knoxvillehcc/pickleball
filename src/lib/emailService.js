@@ -495,3 +495,173 @@ export async function sendAllConfirmationEmails(regData) {
   console.log(`[Email] Done. Sent to: ${[...sentTo].join(', ')}`);
   return { sent: true, sentTo: [...sentTo], errors };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// India Fest 2026 — Vendor Confirmation Email
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SPACE_LABELS = {
+  small:  'Small — 10×10 ft',
+  medium: 'Medium — 10×20 ft',
+  large:  'Large — 20×20 ft',
+};
+
+const SPACE_AMOUNTS = { small: '$100', medium: '$150', large: '$200' };
+
+function buildVendorEmail(htmlBody) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>India Fest 2026 Vendor Confirmation</title>
+</head>
+<body style="margin:0;padding:0;background:#0A0A1A;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <div style="max-width:620px;margin:40px auto;background:#0F0F2A;border-radius:20px;overflow:hidden;border:1px solid rgba(255,153,51,0.25);box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1A0A00 0%,#2D1500 40%,#1A0A00 100%);padding:40px 36px;text-align:center;border-bottom:2px solid rgba(255,153,51,0.4);">
+      <div style="font-size:13px;font-weight:800;letter-spacing:3px;color:#FF9933;text-transform:uppercase;margin-bottom:12px;">🇮🇳 Knoxville Hindu Community Center Presents</div>
+      <div style="font-size:42px;font-weight:900;letter-spacing:-1px;color:#FFFFFF;line-height:1.1;">India Fest</div>
+      <div style="font-size:28px;font-weight:900;color:#FF9933;letter-spacing:2px;margin-top:4px;">2026</div>
+      <div style="margin-top:18px;display:inline-block;background:rgba(255,153,51,0.15);border:1px solid rgba(255,153,51,0.4);border-radius:20px;padding:6px 20px;">
+        <span style="font-size:13px;font-weight:700;color:#FFD700;letter-spacing:1px;">VENDOR REGISTRATION CONFIRMED ✅</span>
+      </div>
+    </div>
+    <!-- Body -->
+    <div style="padding:36px;">
+      ${htmlBody}
+    </div>
+    <!-- Footer -->
+    <div style="background:rgba(255,153,51,0.05);border-top:1px solid rgba(255,153,51,0.15);padding:24px 36px;text-align:center;">
+      <div style="font-size:12px;color:#888;margin-bottom:8px;">Questions? Contact us at</div>
+      <a href="mailto:knoxvillehcc@gmail.com" style="color:#FF9933;font-weight:700;font-size:14px;text-decoration:none;">knoxvillehcc@gmail.com</a>
+      <div style="font-size:11px;color:#555;margin-top:16px;">Knoxville Hindu Community Center · 8580 Hickory Creek Rd, Lenoir City, TN 37771</div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Send a vendor confirmation email after successful India Fest payment.
+ * @param {object} reg - vendor_registrations record
+ */
+export async function sendVendorConfirmationEmail(reg) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+
+  const spaceLabel  = SPACE_LABELS[reg.space_type]  || reg.space_type;
+  const spaceAmount = SPACE_AMOUNTS[reg.space_type] || `$${(reg.amount_paid / 100).toFixed(2)}`;
+  const fullName    = `${reg.first_name} ${reg.last_name}`;
+
+  const htmlBody = `
+    <h2 style="margin:0 0 6px;font-size:24px;color:#FFFFFF;">Welcome, ${reg.first_name}! 🎉</h2>
+    <p style="color:#AAA;font-size:15px;margin:0 0 28px;line-height:1.6;">
+      Your vendor space is confirmed. We're thrilled to have <strong style="color:#FF9933;">${reg.company_name}</strong> at India Fest 2026!
+    </p>
+
+    <!-- Reg Number -->
+    <div style="background:rgba(255,153,51,0.08);border:1px solid rgba(255,153,51,0.3);border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">Registration Number</div>
+      <div style="font-family:monospace;font-size:28px;font-weight:900;color:#FF9933;letter-spacing:4px;">${reg.registration_number}</div>
+      <div style="font-size:12px;color:#666;margin-top:8px;">Save this for check-in at the event</div>
+    </div>
+
+    <!-- Details table -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px;">
+      ${[
+        ['Vendor Name',   fullName],
+        ['Company',       reg.company_name],
+        ['Email',         reg.email],
+        ['Phone',         reg.phone || '—'],
+        ['Address',       `${reg.address}, ${reg.city}, ${reg.state} ${reg.zip}`],
+        ['Space Type',    spaceLabel],
+        ['Amount Paid',   spaceAmount],
+      ].map(([label, value], i) => `
+      <tr style="background:${i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'};">
+        <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.8px;width:40%;border-bottom:1px solid rgba(255,255,255,0.05);">${label}</td>
+        <td style="padding:10px 14px;font-size:14px;color:#EEE;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);">${value}</td>
+      </tr>`).join('')}
+    </table>
+
+    <!-- What's next -->
+    <div style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:14px;padding:20px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:14px;">What Happens Next</div>
+      ${[
+        ['📧', 'Event details & setup instructions will be sent closer to the event date.'],
+        ['📍', 'Arrive early for booth setup. Our team will guide you to your assigned space.'],
+        ['🎊', 'India Fest 2026 — Celebrate culture, food, and community with Knoxville!'],
+      ].map(([icon, text]) => `
+      <div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;">
+        <span style="font-size:18px;flex-shrink:0;">${icon}</span>
+        <span style="font-size:13px;color:#CCC;line-height:1.5;">${text}</span>
+      </div>`).join('')}
+    </div>
+  `;
+
+  const subject = `✅ India Fest 2026 Vendor Confirmed — ${reg.registration_number}`;
+
+  // Queue + send via same mechanism as pickleball emails
+  const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/email_queue`, {
+    method: 'POST',
+    headers: {
+      'apikey':         KEY,
+      'Authorization': `Bearer ${KEY}`,
+      'Content-Type':  'application/json',
+      'Prefer':         'return=representation',
+    },
+    body: JSON.stringify({
+      registration_id: reg.id || null,
+      to_email:        reg.email,
+      subject,
+      body_html:       htmlBody,
+      status:          'pending',
+      attempts:        0,
+    }),
+  });
+
+  if (!insertRes.ok) {
+    console.error('[Vendor Email] Failed to queue email:', await insertRes.text());
+    return;
+  }
+
+  const rows = await insertRes.json();
+  const queueItem = rows[0];
+
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from:    `"India Fest 2026" <${process.env.GMAIL_USER}>`,
+      to:      reg.email,
+      subject,
+      html:    buildVendorEmail(htmlBody),
+    });
+
+    // Mark as sent in queue
+    if (queueItem?.id) {
+      await fetch(`${SUPABASE_URL}/rest/v1/email_queue?id=eq.${queueItem.id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey':         KEY,
+          'Authorization': `Bearer ${KEY}`,
+          'Content-Type':  'application/json',
+        },
+        body: JSON.stringify({ status: 'sent', sent_at: new Date().toISOString() }),
+      });
+    }
+    console.log(`[Vendor Email] ✅ Sent to ${reg.email}`);
+  } catch (err) {
+    console.error('[Vendor Email] ❌ Failed to send to ${reg.email}:', err.message);
+    if (queueItem?.id) {
+      await fetch(`${SUPABASE_URL}/rest/v1/email_queue?id=eq.${queueItem.id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey':         KEY,
+          'Authorization': `Bearer ${KEY}`,
+          'Content-Type':  'application/json',
+        },
+        body: JSON.stringify({ status: 'failed', error_message: err.message }),
+      });
+    }
+  }
+}

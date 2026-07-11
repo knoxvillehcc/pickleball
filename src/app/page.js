@@ -63,6 +63,16 @@ const moduleConfigs = [
     adminOnly: true,
   },
   {
+    slug: 'indiafest',
+    title: 'India Fest 2026 Vendors',
+    desc: 'Manage vendor booth registrations, track payment status, and export vendor lists for India Fest 2026.',
+    icon: '🇮🇳',
+    color: 'linear-gradient(135deg, #FF9933, #E07C1A)',
+    borderColor: 'rgba(255, 153, 51, 0.3)',
+    hoverGlow: 'rgba(255, 153, 51, 0.08)',
+    href: '/indiafest',
+  },
+  {
     slug: 'settings',
     title: 'App Settings',
     desc: 'Adjust portal configuration settings, check health endpoints, and toggle registration availability.',

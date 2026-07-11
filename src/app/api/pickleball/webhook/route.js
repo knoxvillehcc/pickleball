@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
-import { sendAllConfirmationEmails } from '@/lib/emailService';
+import { sendAllConfirmationEmails, sendVendorConfirmationEmail } from '@/lib/emailService';
+
 
 export const dynamic = 'force-dynamic';
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -124,6 +125,36 @@ async function markAsPaid(regNumber, sessionId, amountPaid) {
   return { ...record, payment_status: 'paid', amount_paid: amountPaid, stripe_payment_ref: sessionId };
 }
 
+// ── Mark an India Fest vendor registration as PAID ───────────────────────────────────
+async function vendorMarkAsPaid(regNumber, sessionId, amountPaid) {
+  const SUPABASE_URL      = process.env.SUPABASE_URL;
+  const KEY               = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+
+  const findRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/vendor_registrations?registration_number=eq.${encodeURIComponent(regNumber)}&select=*`,
+    { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } }
+  );
+
+  const found = await findRes.json();
+  if (!found?.length) {
+    console.warn(`[Webhook] Vendor registration ${regNumber} not found in Supabase`);
+    return null;
+  }
+
+  const record = found[0];
+  if (record.payment_status === 'paid') return 'already_paid';
+
+  const { updateVendorRegistration } = await import('@/lib/supabaseClient');
+  await updateVendorRegistration(record.id, {
+    payment_status:     'paid',
+    amount_paid:        amountPaid * 100,  // store in cents
+    stripe_payment_ref: sessionId,
+  });
+
+  return { ...record, payment_status: 'paid', amount_paid: amountPaid * 100, stripe_payment_ref: sessionId };
+}
+
+
 async function isWebhookProcessed(webhookId) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
@@ -182,13 +213,36 @@ export async function POST(request) {
     const amountPaid = (session.amount_total || 0) / 100;
     const stripeRef  = session.id;
 
-    // Check webhook log first
+    // Check webhook log first (idempotency)
     const processed = await isWebhookProcessed(event.id);
     if (processed) {
       console.log(`[Webhook] Duplicate webhook event ignored: ${event.id}`);
       return NextResponse.json({ received: true, ignored: true, reason: 'Duplicate event' });
     }
 
+    // ── Route: India Fest Vendor ───────────────────────────────────────────────
+    if (meta.source === 'indiafest_vendor') {
+      console.log(`[Webhook] India Fest vendor payment for ${regNumber} — $${amountPaid}`);
+
+      const vendorReg = await vendorMarkAsPaid(regNumber, stripeRef, amountPaid);
+
+      if (vendorReg === 'already_paid') {
+        console.log(`[Webhook] Vendor ${regNumber} already paid. Skipping.`);
+        await logWebhook(event.id, regNumber, 'ignored: vendor already paid');
+        return NextResponse.json({ received: true, ignored: true, reason: 'Vendor already paid' });
+      }
+
+      if (vendorReg) {
+        await sendVendorConfirmationEmail(vendorReg);
+        await logWebhook(event.id, regNumber, 'processed: vendor paid + email sent');
+      } else {
+        await logWebhook(event.id, regNumber, 'failed: vendor registration not found');
+      }
+
+      return NextResponse.json({ received: true });
+    }
+
+    // ── Route: HCC Pickleball (original logic unchanged) ───────────────────────
     console.log(`[Webhook] Payment confirmed for ${regNumber} — $${amountPaid}`);
 
     // 1. Update Supabase to PAID + get full record
