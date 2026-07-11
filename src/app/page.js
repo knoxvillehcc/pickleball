@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-// Card and UI style tokens using CSS variables for robust dark/light theme support
+// ── Card style tokens ──────────────────────────────────────────────────────────
 const cardStyle = {
   backgroundColor: 'var(--bg-card)',
   border: '1px solid var(--border)',
@@ -10,6 +10,7 @@ const cardStyle = {
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 };
 
+// ── Admin module configs ───────────────────────────────────────────────────────
 const moduleConfigs = [
   {
     slug: 'pickleball',
@@ -66,7 +67,7 @@ const moduleConfigs = [
     slug: 'indiafest',
     title: 'India Fest 2026 Vendors',
     desc: 'Manage vendor booth registrations, track payment status, and export vendor lists for India Fest 2026.',
-    icon: '🇮🇳',
+    icon: '🪔',
     color: 'linear-gradient(135deg, #FF9933, #E07C1A)',
     borderColor: 'rgba(255, 153, 51, 0.3)',
     hoverGlow: 'rgba(255, 153, 51, 0.08)',
@@ -84,10 +85,242 @@ const moduleConfigs = [
   },
 ];
 
+// ── Public landing page (shown to logged-out visitors) ─────────────────────────
+function PublicLanding() {
+  const options = [
+    {
+      title: 'Pickleball Registration',
+      desc: 'Register for the HCC Pickleball Tournament. Secure your spot and pay online.',
+      href: '/register/pickleball',
+      gradient: 'linear-gradient(135deg, #7B1C1C 0%, #A0522D 100%)',
+      accentColor: '#F4A40B',
+      glowColor: 'rgba(244, 164, 11, 0.25)',
+      borderColor: 'rgba(244, 164, 11, 0.35)',
+      icon: (
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          <path d="M2 12h20"/>
+        </svg>
+      ),
+      badge: 'Sports Event',
+      cta: 'Register Now',
+    },
+    {
+      title: 'India Fest Registration',
+      desc: 'Reserve your vendor booth at IndiaFest 2026 — East Tennessee\'s largest celebration of Indian culture.',
+      href: '/register/indiafest/vendor',
+      gradient: 'linear-gradient(135deg, #8B1E3F 0%, #6B1530 100%)',
+      accentColor: '#FF9933',
+      glowColor: 'rgba(255, 153, 51, 0.25)',
+      borderColor: 'rgba(255, 153, 51, 0.35)',
+      icon: (
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      ),
+      badge: 'Cultural Festival',
+      cta: 'Reserve Booth',
+    },
+    {
+      title: 'Admin Login',
+      desc: 'Staff and administrator access to the HCC portal dashboard, reports, and settings.',
+      href: '/login',
+      gradient: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
+      accentColor: '#818CF8',
+      glowColor: 'rgba(129, 140, 248, 0.2)',
+      borderColor: 'rgba(129, 140, 248, 0.3)',
+      icon: (
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      ),
+      badge: 'Staff Only',
+      cta: 'Sign In',
+    },
+  ];
+
+  const [hovered, setHovered] = useState(null);
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(160deg, #0A0F1E 0%, #0D1425 50%, #090D1A 100%)',
+      fontFamily: "'Inter', -apple-system, sans-serif",
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      {/* Top flag stripe */}
+      <div style={{ height: '4px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', flexShrink: 0 }}/>
+
+      {/* Ambient background glows */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+        <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '60vw', height: '60vw', maxWidth: '700px', maxHeight: '700px', background: 'radial-gradient(circle, rgba(129,140,248,0.05), transparent 60%)', borderRadius: '50%' }}/>
+        <div style={{ position: 'absolute', bottom: '0', right: '-10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, rgba(255,153,51,0.04), transparent 60%)', borderRadius: '50%' }}/>
+      </div>
+
+      {/* Main content */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', position: 'relative', zIndex: 1 }}>
+
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '56px', maxWidth: '640px' }}>
+          {/* HCC logo mark */}
+          <div style={{
+            width: '72px', height: '72px', borderRadius: '20px', margin: '0 auto 24px',
+            background: 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(129,140,248,0.05))',
+            border: '1px solid rgba(129,140,248,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 8px 32px rgba(129,140,248,0.12)',
+          }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+
+          <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+            Knoxville Hindu{' '}
+            <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              Community Center
+            </span>
+          </h1>
+          <p style={{ margin: 0, fontSize: '16px', color: 'rgba(255,255,255,0.5)', fontWeight: '400', lineHeight: '1.6' }}>
+            Select an option below to get started
+          </p>
+        </div>
+
+        {/* Three option cards */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '20px',
+          width: '100%',
+          maxWidth: '960px',
+        }}>
+          {options.map((opt, i) => (
+            <Link key={i} href={opt.href} style={{ textDecoration: 'none' }}>
+              <div
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                style={{
+                  background: hovered === i
+                    ? opt.gradient
+                    : 'linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+                  border: `1px solid ${hovered === i ? opt.borderColor : 'rgba(255,255,255,0.08)'}`,
+                  borderRadius: '20px',
+                  padding: '36px 32px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transform: hovered === i ? 'translateY(-6px)' : 'translateY(0)',
+                  boxShadow: hovered === i
+                    ? `0 20px 60px ${opt.glowColor}, 0 4px 20px rgba(0,0,0,0.3)`
+                    : '0 2px 12px rgba(0,0,0,0.2)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Glow overlay on hover */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '20px',
+                  background: hovered === i ? `radial-gradient(circle at top right, ${opt.glowColor}, transparent 60%)` : 'none',
+                  pointerEvents: 'none',
+                  transition: 'all 0.3s',
+                }}/>
+
+                {/* Badge */}
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: `${opt.accentColor}20`,
+                  border: `1px solid ${opt.accentColor}40`,
+                  borderRadius: '99px', padding: '4px 12px',
+                  marginBottom: '24px', alignSelf: 'flex-start',
+                  position: 'relative',
+                }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: opt.accentColor, display: 'inline-block', flexShrink: 0 }}/>
+                  <span style={{ fontSize: '11px', fontWeight: '700', color: opt.accentColor, letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                    {opt.badge}
+                  </span>
+                </div>
+
+                {/* Icon */}
+                <div style={{
+                  width: '64px', height: '64px', borderRadius: '16px',
+                  background: `${opt.accentColor}18`,
+                  border: `1px solid ${opt.accentColor}30`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: opt.accentColor, marginBottom: '20px',
+                  position: 'relative',
+                  boxShadow: hovered === i ? `0 0 24px ${opt.accentColor}30` : 'none',
+                  transition: 'box-shadow 0.3s',
+                }}>
+                  {opt.icon}
+                </div>
+
+                {/* Text */}
+                <h2 style={{
+                  margin: '0 0 10px',
+                  fontSize: '22px', fontWeight: '800',
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.3px',
+                  position: 'relative',
+                }}>
+                  {opt.title}
+                </h2>
+                <p style={{
+                  margin: '0 0 28px',
+                  fontSize: '14px', lineHeight: '1.65',
+                  color: 'rgba(255,255,255,0.55)',
+                  flex: 1,
+                  position: 'relative',
+                }}>
+                  {opt.desc}
+                </p>
+
+                {/* CTA */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  fontSize: '14px', fontWeight: '700',
+                  color: opt.accentColor,
+                  position: 'relative',
+                  transition: 'gap 0.2s',
+                }}>
+                  {opt.cta}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ transform: hovered === i ? 'translateX(4px)' : 'translateX(0)', transition: 'transform 0.2s' }}>
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div style={{ marginTop: '56px', textAlign: 'center' }}>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)', margin: 0 }}>
+            © 2026 Knoxville Hindu Community Center · All rights reserved
+          </p>
+        </div>
+      </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; }
+      `}</style>
+    </div>
+  );
+}
+
+// ── Admin dashboard ────────────────────────────────────────────────────────────
 export default function Home() {
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'scanner'
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Odoo Scanner diagnostics state
   const [loading, setLoading] = useState(false);
@@ -106,6 +339,23 @@ export default function Home() {
       .finally(() => setUserLoading(false));
   }, []);
 
+  // ── Loading spinner ────────────────────────────────────────────────────────
+  if (userLoading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: '16px' }}>
+        <div style={{ width: '48px', height: '48px', border: '3px solid var(--border)', borderTop: '3px solid var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+        <div style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px' }}>Loading...</div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  // ── Not logged in → show public landing ───────────────────────────────────
+  if (!user) {
+    return <PublicLanding />;
+  }
+
+  // ── Logged in → show admin dashboard ──────────────────────────────────────
   const hasDashboardAccess =
     user?.role === 'super_admin' ||
     user?.allowedPages?.includes('*') ||
@@ -162,17 +412,6 @@ export default function Home() {
 
   const missingCount = summary ? summary.wouldFix : 0;
 
-  if (userLoading) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: '16px' }}>
-        <div style={{ width: '48px', height: '48px', border: '3px solid var(--border)', borderTop: '3px solid var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
-        <div style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px' }}>Loading Portal Dashboard...</div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
-
-  // Filter modules based on user access
   const allowedModules = moduleConfigs.filter((mod) => {
     if (mod.adminOnly && user?.role !== 'super_admin') return false;
     const pages = user?.allowedPages || [];
@@ -181,7 +420,7 @@ export default function Home() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '60px' }}>
-      
+
       {/* --- Page Navigation Header / Tabs --- */}
       {hasDashboardAccess && (
         <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', paddingBottom: '2px', gap: '24px' }}>
@@ -216,11 +455,11 @@ export default function Home() {
         </div>
       )}
 
-      {/* --- OVERVIEW TAB CONTENT --- */}
+      {/* --- OVERVIEW TAB --- */}
       {activeTab === 'overview' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }} className="animate-in">
-          
-          {/* Welcome Greeting Banner */}
+
+          {/* Welcome Banner */}
           <div style={{
             ...cardStyle,
             background: 'var(--bg-banner-grad)',
@@ -254,22 +493,11 @@ export default function Home() {
             <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>
               Your Allowed Modules ({allowedModules.length})
             </div>
-            
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-              
-              {/* Allowed Pages Cards */}
               {allowedModules.map((mod) => (
                 <Link key={mod.slug} href={mod.href} style={{ textDecoration: 'none' }}>
                   <div
-                    style={{
-                      ...cardStyle,
-                      padding: '28px',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      cursor: 'pointer',
-                      position: 'relative',
-                    }}
+                    style={{ ...cardStyle, padding: '28px', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', position: 'relative' }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-4px)';
                       e.currentTarget.style.borderColor = mod.borderColor;
@@ -281,25 +509,11 @@ export default function Home() {
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
-                    {/* Icon circle */}
-                    <div style={{
-                      width: '48px', height: '48px', borderRadius: '12px',
-                      background: mod.color,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '22px', marginBottom: '20px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: mod.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', marginBottom: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
                       {mod.icon}
                     </div>
-
-                    <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                      {mod.title}
-                    </h3>
-                    
-                    <p style={{ margin: '0 0 24px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, flex: 1 }}>
-                      {mod.desc}
-                    </p>
-
+                    <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)' }}>{mod.title}</h3>
+                    <p style={{ margin: '0 0 24px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, flex: 1 }}>{mod.desc}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '700', color: 'var(--accent)' }}>
                       Manage Module <span>→</span>
                     </div>
@@ -307,19 +521,11 @@ export default function Home() {
                 </Link>
               ))}
 
-              {/* Special diagnostics shortcut card for dashboard admins */}
+              {/* Diagnostics shortcut card */}
               {hasDashboardAccess && (
                 <div
                   onClick={() => setActiveTab('scanner')}
-                  style={{
-                    ...cardStyle,
-                    padding: '28px',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    cursor: 'pointer',
-                    position: 'relative',
-                  }}
+                  style={{ ...cardStyle, padding: '28px', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', position: 'relative' }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
                     e.currentTarget.style.borderColor = 'rgba(236, 72, 153, 0.3)';
@@ -331,24 +537,13 @@ export default function Home() {
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
-                  <div style={{
-                    width: '48px', height: '48px', borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #EC4899, #F43F5E)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '22px', marginBottom: '20px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, #EC4899, #F43F5E)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', marginBottom: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
                     🔍
                   </div>
-
-                  <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                    Odoo Diagnostics Scanner
-                  </h3>
-                  
+                  <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)' }}>Odoo Diagnostics Scanner</h3>
                   <p style={{ margin: '0 0 24px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, flex: 1 }}>
                     Identify missing Pos recurring subscriptions and run instant database diagnostics on Odoo live.
                   </p>
-
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '700', color: '#EC4899' }}>
                     Open Scanner Tab <span>→</span>
                   </div>
@@ -359,11 +554,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* --- SCANNER TAB CONTENT (ADMIN DIAGNOSTICS) --- */}
+      {/* --- SCANNER TAB --- */}
       {activeTab === 'scanner' && hasDashboardAccess && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }} className="animate-in">
-          
-          {/* Header Card */}
           <div style={{
             ...cardStyle,
             background: 'var(--bg-banner-scanner)',
@@ -377,43 +570,29 @@ export default function Home() {
             <div style={{ position: 'relative' }}>
               <h1 style={{ margin: 0, fontSize: '42px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
                 System{' '}
-                <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Scanner
-                </span>
+                <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scanner</span>
               </h1>
               <p style={{ margin: '12px 0 0', color: '#64748B', fontSize: '15px', maxWidth: '480px', lineHeight: 1.6 }}>
                 Deep-scan Odoo live database to identify POS orders missing active recurring subscriptions.
               </p>
             </div>
-
-            <button
-              onClick={runScan}
-              disabled={loading}
-              style={{
-                background: loading ? 'rgba(99,102,241,0.5)' : 'linear-gradient(135deg, #6366F1, #22D3EE)',
-                color: 'white', fontWeight: '700', fontSize: '15px',
-                padding: '14px 32px', borderRadius: '12px', border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                display: 'flex', alignItems: 'center', gap: '10px',
-                boxShadow: '0 0 40px -10px rgba(99,102,241,0.5)',
-                transition: 'all 0.3s', whiteSpace: 'nowrap', position: 'relative',
-              }}
-            >
+            <button onClick={runScan} disabled={loading} style={{
+              background: loading ? 'rgba(99,102,241,0.5)' : 'linear-gradient(135deg, #6366F1, #22D3EE)',
+              color: 'white', fontWeight: '700', fontSize: '15px',
+              padding: '14px 32px', borderRadius: '12px', border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: '10px',
+              boxShadow: '0 0 40px -10px rgba(99,102,241,0.5)',
+              transition: 'all 0.3s', whiteSpace: 'nowrap', position: 'relative',
+            }}>
               {loading ? (
-                <>
-                  <span style={{ display: 'inline-block', width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></span>
-                  Scanning...
-                </>
+                <><span style={{ display: 'inline-block', width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></span>Scanning...</>
               ) : (
-                <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                  Run Diagnostics
-                </>
+                <><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Run Diagnostics</>
               )}
             </button>
           </div>
 
-          {/* --- Stat Cards --- */}
           {summary && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
               {[
@@ -422,12 +601,7 @@ export default function Home() {
                 { label: 'Valid (Skipped)',    value: summary.skipped,                  color: '#10B981', glow: false },
                 { label: 'Missing Subs',      value: summary.wouldFix,                 color: '#F43F5E', glow: true  },
               ].map(({ label, value, color, glow }) => (
-                <div key={label} style={{
-                  ...cardStyle,
-                  padding: '28px',
-                  borderTop: '2px solid ' + color,
-                  boxShadow: glow ? '0 0 30px -10px rgba(244,63,94,0.25)' : 'none',
-                }}>
+                <div key={label} style={{ ...cardStyle, padding: '28px', borderTop: '2px solid ' + color, boxShadow: glow ? '0 0 30px -10px rgba(244,63,94,0.25)' : 'none' }}>
                   <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px' }}>{label}</div>
                   <div style={{ fontSize: '48px', fontWeight: '900', color: color, lineHeight: 1 }}>{value}</div>
                 </div>
@@ -435,55 +609,19 @@ export default function Home() {
             </div>
           )}
 
-          {/* --- Results Table --- */}
           {results && results.length > 0 && (
             <div style={{ ...cardStyle, padding: 0, overflow: 'hidden' }}>
-
-              {/* Table Header */}
-              <div style={{
-                padding: '20px 28px',
-                borderBottom: '1px solid var(--border-table)',
-                backgroundColor: 'var(--bg-table-header)',
-                display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px',
-              }}>
+              <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border-table)', backgroundColor: 'var(--bg-table-header)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)' }}>Analysis Results</h2>
-                  <span style={{ backgroundColor: 'var(--bg-badge-pill)', color: 'var(--text-badge-pill)', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px', border: '1px solid var(--border-badge-pill)' }}>
-                    {results.length} records
-                  </span>
+                  <span style={{ backgroundColor: 'var(--bg-badge-pill)', color: 'var(--text-badge-pill)', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px', border: '1px solid var(--border-badge-pill)' }}>{results.length} records</span>
                 </div>
-
-                {/* Execute Fixes Button - shows when there are missing subs */}
                 {missingCount > 0 && (
-                  <button
-                    onClick={executeFixes}
-                    disabled={executing}
-                    style={{
-                      background: executing ? 'rgba(244,63,94,0.4)' : 'linear-gradient(135deg, #F43F5E, #E11D48)',
-                      color: 'white', fontWeight: '700', fontSize: '14px',
-                      padding: '12px 28px', borderRadius: '10px', border: 'none',
-                      cursor: executing ? 'not-allowed' : 'pointer',
-                      display: 'flex', alignItems: 'center', gap: '8px',
-                      boxShadow: '0 0 30px -8px rgba(244,63,94,0.6)',
-                      transition: 'all 0.3s',
-                    }}
-                  >
-                    {executing ? (
-                      <>
-                        <span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></span>
-                        Deploying Fixes...
-                      </>
-                    ) : (
-                      <>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                        Execute {missingCount} Fixes Now
-                      </>
-                    )}
+                  <button onClick={executeFixes} disabled={executing} style={{ background: executing ? 'rgba(244,63,94,0.4)' : 'linear-gradient(135deg, #F43F5E, #E11D48)', color: 'white', fontWeight: '700', fontSize: '14px', padding: '12px 28px', borderRadius: '10px', border: 'none', cursor: executing ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 0 30px -8px rgba(244,63,94,0.6)', transition: 'all 0.3s' }}>
+                    {executing ? (<><span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></span>Deploying Fixes...</>) : (<><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Execute {missingCount} Fixes Now</>)}
                   </button>
                 )}
               </div>
-
-              {/* Table Body */}
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap', fontSize: '14px' }}>
                   <thead>
@@ -495,12 +633,9 @@ export default function Home() {
                   </thead>
                   <tbody>
                     {results.map((r, i) => (
-                      <tr
-                        key={i}
-                        style={{ borderBottom: '1px solid var(--border-table)', backgroundColor: i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                      <tr key={i} style={{ borderBottom: '1px solid var(--border-table)', backgroundColor: i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
                         onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
-                        onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent'}
-                      >
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent'}>
                         <td style={{ padding: '15px 24px' }}>
                           <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '13px' }}>{r.posOrder || '-'}</div>
                           <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px', fontFamily: 'monospace' }}>{r.invoiceNo || '-'}</div>
@@ -511,13 +646,11 @@ export default function Home() {
                         <td style={{ padding: '15px 24px', textAlign: 'center' }}>
                           {r.status === 'would_fix' ? (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.3)', borderRadius: '9999px', padding: '4px 12px', fontSize: '11px', fontWeight: '700', color: '#F43F5E' }}>
-                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F43F5E', display: 'inline-block', animation: 'pulse 2s infinite' }}></span>
-                              Missing Sub
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F43F5E', display: 'inline-block', animation: 'pulse 2s infinite' }}></span>Missing Sub
                             </span>
                           ) : (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '9999px', padding: '4px 12px', fontSize: '11px', fontWeight: '700', color: '#10B981' }}>
-                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }}></span>
-                              Valid
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }}></span>Valid
                             </span>
                           )}
                         </td>
@@ -529,7 +662,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* --- Execution Logs --- */}
           {logs.length > 0 && (
             <div style={{ ...cardStyle, padding: 0, overflow: 'hidden' }}>
               <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border-table)', backgroundColor: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -540,12 +672,7 @@ export default function Home() {
               <div style={{ padding: '20px', maxHeight: '400px', overflowY: 'auto' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'monospace', fontSize: '13px' }}>
                   {logs.map((log, i) => (
-                    <div key={i} style={{
-                      display: 'flex', gap: '16px', flexWrap: 'wrap',
-                      padding: '12px 16px', borderRadius: '10px',
-                      backgroundColor: log.status === 'fixed' ? 'rgba(16,185,129,0.05)' : 'rgba(244,63,94,0.05)',
-                      border: '1px solid ' + (log.status === 'fixed' ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)'),
-                    }}>
+                    <div key={i} style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', padding: '12px 16px', borderRadius: '10px', backgroundColor: log.status === 'fixed' ? 'rgba(16,185,129,0.05)' : 'rgba(244,63,94,0.05)', border: '1px solid ' + (log.status === 'fixed' ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)') }}>
                       <span style={{ fontWeight: '700', width: '70px', flexShrink: 0, color: log.status === 'fixed' ? '#10B981' : '#F43F5E' }}>[{(log.status || '').toUpperCase()}]</span>
                       <span style={{ color: '#64748B', width: '90px', flexShrink: 0 }}>{log.id}</span>
                       <span style={{ color: '#CBD5E1', flex: 1 }}>{log.message || log.error}</span>
@@ -558,15 +685,10 @@ export default function Home() {
         </div>
       )}
 
-      {/* Slide-in Utility animation class */}
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(16px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .animate-in {
-          animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
       `}</style>
     </div>
