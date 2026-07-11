@@ -295,3 +295,22 @@ export async function updateVendorRegistration(id, data) {
   const result = await res.json();
   return Array.isArray(result) ? result[0] : result;
 }
+
+/**
+ * Fetch all vendor registrations (for export).
+ * @param {number} limit - max records to return
+ * @returns {Promise<object[]>}
+ */
+export async function getAllVendorRegistrations(limit = 5000) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/vendor_registrations?select=*&order=registration_date.desc&limit=${limit}`,
+    { headers: getServiceHeaders(), cache: 'no-store' }
+  );
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Supabase vendor fetch failed (${res.status}): ${body}`);
+  }
+
+  return res.json();
+}

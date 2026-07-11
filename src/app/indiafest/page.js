@@ -100,6 +100,7 @@ export default function IndiafestVendorDashboard() {
   const [publishing,    setPublishing]    = useState(false);
   const [urlCopied,     setUrlCopied]     = useState(false);
   const [currentUser,   setCurrentUser]   = useState(null);
+  const [exporting,     setExporting]     = useState('');
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/indiafest/vendor`
@@ -188,6 +189,26 @@ export default function IndiafestVendorDashboard() {
     a.click();
   }
 
+  // ── Export handler ────────────────────────────────────────────────────────
+  const handleExport = async (format) => {
+    setExporting(format);
+    try {
+      const res = await fetch(`/api/indiafest/export?format=${format}`);
+      const blob = await res.blob();
+      const ext = { csv: 'csv', excel: 'xls', pdf: 'html' }[format];
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a');
+      a.href = url;
+      a.download = `indiafest-vendors-${new Date().toISOString().split('T')[0]}.${ext}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Export failed: ' + e.message);
+    } finally {
+      setExporting('');
+    }
+  };
+
   const tdStyle = { padding: '14px 16px', fontSize: '13px', borderBottom: '1px solid var(--border)', verticalAlign: 'middle' };
 
   return (
@@ -264,28 +285,43 @@ export default function IndiafestVendorDashboard() {
         </div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button onClick={load} style={{
-            padding: '10px 18px', borderRadius: '10px', border: '1px solid var(--border)',
-            backgroundColor: 'transparent', color: '#94A3B8', fontSize: '13px', fontWeight: '600',
-            cursor: 'pointer',
+            background: loading ? 'rgba(255,153,51,0.3)' : 'linear-gradient(135deg, #7B3A00, #A05020)',
+            color: 'white', fontWeight: '700', fontSize: '14px', padding: '12px 24px',
+            borderRadius: '10px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s',
           }}>
-            ↻ Refresh
+            {loading
+              ? <><span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Loading...</>
+              : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.09-4.82"/></svg> Refresh</>
+            }
           </button>
-          <button onClick={exportCSV} style={{
-            padding: '10px 20px', borderRadius: '10px', border: 'none',
-            background: `linear-gradient(135deg, ${C.saffron}, #E07C1A)`,
-            color: '#1A0800', fontSize: '13px', fontWeight: '800', cursor: 'pointer',
-          }}>
-            ↓ Export CSV
-          </button>
+
+          {/* Export buttons */}
+          {['csv', 'excel', 'pdf'].map(fmt => (
+            <button key={fmt} onClick={() => handleExport(fmt)} disabled={!!exporting} style={{
+              background: 'transparent',
+              border: `1px solid rgba(255,153,51,0.4)`,
+              color: C.saffron, fontWeight: '600', fontSize: '13px',
+              padding: '12px 18px', borderRadius: '10px', cursor: exporting ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+              fontFamily: 'inherit',
+            }}>
+              {exporting === fmt
+                ? <><span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,153,51,0.3)', borderTop: `2px solid ${C.saffron}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Exporting...</>
+                : <>{fmt === 'csv' ? '📄' : fmt === 'excel' ? '📊' : '🖨️'} {fmt.toUpperCase()}</>
+              }
+            </button>
+          ))}
         </div>
       </div>
 
       {/* ── Stats ── */}
       <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '28px' }}>
-        <StatCard label="Total Vendors"   value={registrations.length} accent={C.saffron} sub="all registrations" />
-        <StatCard label="Confirmed (Paid)" value={paid.length}         accent="#10B981"   sub={`${pending.length} pending`} />
+        <StatCard label="Total Vendors"    value={registrations.length} accent={C.saffron} sub="all registrations" />
+        <StatCard label="Confirmed (Paid)" value={paid.length}          accent="#10B981"   sub={`${pending.length} pending`} />
         <StatCard label="Revenue Collected" value={`$${(revenue / 100).toFixed(0)}`} accent={C.gold} sub="from paid vendors" />
-        <StatCard label="Space Breakdown" value={`${smallCt}·${mediumCt}·${largeCt}`} accent="#818CF8" sub="S · M · L confirmed" />
+        <StatCard label="Home Business"    value={paid.filter(r => r.space_type === 'home_business').length}        accent="#FF9933" sub="$351/spot" />
+        <StatCard label="Established Biz"  value={paid.filter(r => r.space_type === 'established_business').length} accent="#FFD700" sub="$1,001/spot" />
       </div>
 
       {error && (

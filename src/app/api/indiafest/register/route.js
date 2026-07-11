@@ -10,10 +10,10 @@ const US_STATES = new Set([
   'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC',
 ]);
 
-const SPACE_PRICES = {
-  small:  { cents: 10000, label: 'Small (10×10 ft)',  dollars: 100 },
-  medium: { cents: 15000, label: 'Medium (10×20 ft)', dollars: 150 },
-  large:  { cents: 20000, label: 'Large (20×20 ft)',  dollars: 200 },
+// ── Vendor types — replaces old small/medium/large spaces ──────────────────────
+const VENDOR_TYPES = {
+  home_business:        { cents: 35100,  label: 'Vendor – Small Business from Home',  dollars: 351 },
+  established_business: { cents: 100100, label: 'Vendor – Established Business/Stores', dollars: 1001 },
 };
 
 export const dynamic = 'force-dynamic';
@@ -32,7 +32,7 @@ export async function POST(request) {
     const body = await request.json();
 
     // ── Validate required fields ──────────────────────────────────────────────
-    const required = ['first_name', 'last_name', 'company_name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'space_type'];
+    const required = ['first_name', 'last_name', 'company_name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'vendor_type'];
     for (const field of required) {
       if (!body[field]?.toString().trim()) {
         return NextResponse.json({ success: false, error: `Missing required field: ${field}` }, { status: 400 });
@@ -52,19 +52,24 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Invalid US state abbreviation' }, { status: 400 });
     }
 
-    const spaceKey = body.space_type?.toLowerCase();
-    if (!SPACE_PRICES[spaceKey]) {
-      return NextResponse.json({ success: false, error: 'Invalid space type. Choose small, medium, or large.' }, { status: 400 });
+    const vendorKey = body.vendor_type?.toLowerCase();
+    if (!VENDOR_TYPES[vendorKey]) {
+      return NextResponse.json({ success: false, error: 'Invalid vendor type. Choose home_business or established_business.' }, { status: 400 });
     }
+
+    // ── Quantity — default 1, max 10 ─────────────────────────────────────────
+    const quantity = Math.min(10, Math.max(1, parseInt(body.quantity, 10) || 1));
 
     if (!body.disclaimer_accepted) {
       return NextResponse.json({ success: false, error: 'You must accept the vendor disclaimer.' }, { status: 400 });
     }
 
-    const space      = SPACE_PRICES[spaceKey];
-    const regNumber  = generateVendorRegNumber();
-    const fullName   = `${body.first_name.trim()} ${body.last_name.trim()}`;
-    const baseUrl    = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const vendor      = VENDOR_TYPES[vendorKey];
+    const totalCents  = vendor.cents * quantity;
+    const totalDollars = vendor.dollars * quantity;
+    const regNumber   = generateVendorRegNumber();
+    const fullName    = `${body.first_name.trim()} ${body.last_name.trim()}`;
+    const baseUrl     = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
     // ── Save PENDING record to Supabase ──────────────────────────────────────
     const regData = {
@@ -78,8 +83,9 @@ export async function POST(request) {
       city:                body.city.trim(),
       state:               stateUpper,
       zip:                 body.zip.trim(),
-      space_type:          spaceKey,
-      amount_due:          space.cents,
+      space_type:          vendorKey,      // reuses existing column; stores new key
+      quantity:            quantity,
+      amount_due:          totalCents,
       payment_status:      'pending',
       amount_paid:         0,
       stripe_payment_ref:  '',
@@ -96,25 +102,26 @@ export async function POST(request) {
       mode:                 'payment',
       customer_email:       regData.email,
       line_items: [{
-        quantity:   1,
+        quantity:   quantity,
         price_data: {
           currency:     'usd',
-          unit_amount:  space.cents,
+          unit_amount:  vendor.cents,
           product_data: {
-            name:        `India Fest 2026 — Vendor Space (${space.label})`,
-            description: `Reg #${regNumber} · ${fullName} · ${body.company_name.trim()}`,
+            name:        `India Fest 2026 — ${vendor.label}`,
+            description: `Reg #${regNumber} · ${fullName} · ${body.company_name.trim()} · ${quantity} spot${quantity > 1 ? 's' : ''}`,
           },
         },
       }],
       metadata: {
-        source:              'indiafest_vendor',   // ← tells the webhook which flow to use
+        source:              'indiafest_vendor',
         registration_number: regNumber,
         registration_id:     String(saved?.id || ''),
         full_name:           fullName,
         email:               regData.email,
         company_name:        body.company_name.trim(),
-        space_type:          spaceKey,
-        space_label:         space.label,
+        vendor_type:         vendorKey,
+        vendor_label:        vendor.label,
+        quantity:            String(quantity),
       },
       success_url: `${baseUrl}/register/indiafest/vendor/success?session_id={CHECKOUT_SESSION_ID}&reg=${regNumber}`,
       cancel_url:  `${baseUrl}/register/indiafest/vendor?cancelled=1`,
@@ -125,7 +132,7 @@ export async function POST(request) {
       checkoutUrl: session.url,
       sessionId:   session.id,
       reg_number:  regNumber,
-      amount:      space.dollars,
+      amount:      totalDollars,
     });
 
   } catch (err) {
