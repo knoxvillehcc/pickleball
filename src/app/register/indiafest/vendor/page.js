@@ -41,25 +41,21 @@ const DISCLAIMER_TEXT = `VENDOR AGREEMENT & DISCLAIMER — INDIA FEST 2026
 
 1. SPACE ASSIGNMENT: Booth spaces are assigned by the Knoxville Hindu Community Center (HCC) at their sole discretion. Space assignments will be communicated prior to the event. HCC reserves the right to relocate vendors if necessary.
 
-2. PAYMENT & REFUND POLICY: All registration fees are non-refundable once payment is processed. In the event of cancellation by HCC due to circumstances beyond its control (weather, venue issues, etc.), HCC will issue a full credit toward a future event. No cash refunds will be issued.
+2. PAYMENT & REFUND POLICY: All registration fees are non-refundable once payment is processed. In the event of cancellation by HCC due to circumstances beyond its control (weather, venue issues, etc.), HCC will issue a credit toward a future event. No cash refunds will be issued.
 
 3. SETUP & BREAKDOWN: Vendors are responsible for the setup and teardown of their own display within their assigned space. Vendors must be fully set up 30 minutes before the event opens and must not begin teardown until the event officially closes.
 
 4. VENDOR CONDUCT: All vendors and their staff are expected to maintain professional, courteous conduct throughout the event. HCC reserves the right to ask any vendor to leave the event if their conduct is deemed inappropriate or disruptive, without refund.
 
-5. SALES & PERMITS: Vendors are solely responsible for obtaining any and all permits, licenses, and approvals required by local, state, or federal law to conduct their business at the event. HCC assumes no liability for failure to comply.
+5. INSURANCE: Vendors participate at their own risk. HCC, its officers, volunteers, and agents are not liable for theft, loss, or damage to vendor property. Vendors are encouraged to carry their own insurance.
 
-6. FOOD VENDORS: Food vendors must comply with all applicable health department regulations. Any vendor selling food items must present valid food handler certification upon request.
+6. ELECTRICITY & UTILITIES: Power access is included with your booth. Vendors requiring additional or specialized electrical connections must notify HCC in advance. HCC is not responsible for power outages.
 
-7. INSURANCE: Vendors participate at their own risk. HCC, its officers, volunteers, and agents are not liable for theft, loss, or damage to vendor property. Vendors are encouraged to carry their own insurance.
+7. MEDIA & PHOTOGRAPHY: By participating, vendors consent to HCC and its authorized photographers capturing images and video of their booth and products for promotional use across digital and print media.
 
-8. ELECTRICITY & UTILITIES: Power access is included with your booth. Vendors requiring additional or specialized electrical connections must notify HCC in advance. HCC is not responsible for power outages.
+8. COMPLIANCE: Vendors must comply with all event rules and regulations communicated by HCC staff. HCC reserves the right to modify event rules at any time. Registered vendors will be notified of any material changes.
 
-9. MEDIA & PHOTOGRAPHY: By participating, vendors consent to HCC and its authorized photographers capturing images and video of their booth and products for promotional use across digital and print media.
-
-10. COMPLIANCE: Vendors must comply with all event rules and regulations communicated by HCC staff. HCC reserves the right to modify event rules at any time. Registered vendors will be notified of any material changes.
-
-11. INDEMNIFICATION: Vendor agrees to indemnify, defend, and hold harmless the Knoxville Hindu Community Center, its board members, volunteers, employees, and agents from any claims, damages, liabilities, or expenses arising out of or related to vendor's participation in India Fest 2026.
+9. INDEMNIFICATION: Vendor agrees to indemnify, defend, and hold harmless the Knoxville Hindu Community Center, its board members, volunteers, employees, and agents from any claims, damages, liabilities, or expenses arising out of or related to vendor's participation in India Fest 2026.
 
 By checking the box below, you acknowledge that you have read, understood, and agree to all terms and conditions set forth in this Vendor Agreement & Disclaimer.`;
 
