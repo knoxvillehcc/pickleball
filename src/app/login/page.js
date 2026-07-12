@@ -136,13 +136,7 @@ function LoginContent() {
         </div>
 
         {/* Card */}
-        <div style={{
-          background: C.card,
-          border: `1px solid ${C.border}`,
-          borderRadius: '20px',
-          padding: '36px',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
-        }}>
+        <div className="login-card">
 
           {/* ── Email Step ── */}
           {step === 'email' && (
@@ -185,8 +179,7 @@ function LoginContent() {
               </div>
 
               {/* PIN inputs */}
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center',
-                marginBottom: '20px' }} onPaste={handlePaste}>
+              <div className="pin-container" onPaste={handlePaste}>
                 {pin.map((digit, i) => (
                   <input
                     key={i}
@@ -199,13 +192,9 @@ function LoginContent() {
                     onKeyDown={e => handlePinKey(i, e)}
                     disabled={loading}
                     aria-label={`PIN digit ${i + 1}`}
+                    className="pin-input"
                     style={{
-                      width: '48px', height: '58px', textAlign: 'center',
-                      fontSize: '24px', fontWeight: '800', borderRadius: '12px',
-                      background: 'var(--bg-input)',
                       border: `2px solid ${digit ? 'var(--accent)' : 'var(--border)'}`,
-                      color: C.text, outline: 'none',
-                      transition: 'border-color 0.15s',
                       boxShadow: digit ? `0 0 12px var(--accent-glow)` : 'none',
                     }}
                   />
@@ -262,6 +251,62 @@ function LoginContent() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
         input::placeholder { color: #475569; }
         input:focus { border-color: rgba(244,164,11,0.5) !important; box-shadow: 0 0 0 3px rgba(244,164,11,0.08); }
+        
+        .login-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          padding: 36px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        
+        .pin-container {
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+        
+        .pin-input {
+          width: 44px;
+          height: 54px;
+          text-align: center;
+          font-size: 22px;
+          font-weight: 800;
+          border-radius: 12px;
+          background: var(--bg-input);
+          color: var(--text-primary);
+          outline: none;
+          transition: all 0.15s;
+          box-sizing: border-box;
+        }
+
+        @media (max-width: 480px) {
+          .login-card {
+            padding: 28px 20px;
+          }
+          .pin-container {
+            gap: 6px;
+          }
+          .pin-input {
+            width: 36px;
+            height: 46px;
+            font-size: 18px;
+            border-radius: 8px;
+          }
+        }
+
+        @media (max-width: 350px) {
+          .pin-container {
+            gap: 4px;
+          }
+          .pin-input {
+            width: 30px;
+            height: 40px;
+            font-size: 16px;
+            border-radius: 6px;
+          }
+        }
       `}</style>
     </div>
   );

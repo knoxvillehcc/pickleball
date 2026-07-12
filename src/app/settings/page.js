@@ -105,7 +105,7 @@ export default function SettingsPage() {
       
       {/* Page Header */}
       <div>
-        <h1 style={{ margin: 0, fontSize: '38px', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+        <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
            System <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Settings</span>
         </h1>
         <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.6 }}>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
               onClick={handleTestConnection}
               disabled={testing || !formData.url || !formData.db || !formData.username || !formData.password}
               style={{
-                flex: 1, minWidth: '200px', backgroundColor: 'var(--bg-button-secondary)', border: '1px solid var(--border-button-secondary)',
+                flex: 1, minWidth: '140px', backgroundColor: 'var(--bg-button-secondary)', border: '1px solid var(--border-button-secondary)',
                 color: 'var(--text-button-secondary)', fontWeight: '700', padding: '14px 28px', borderRadius: '12px',
                 cursor: (testing || !formData.url || !formData.db || !formData.username || !formData.password) ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '15px', transition: 'all 0.3s',
@@ -214,7 +214,7 @@ export default function SettingsPage() {
               type="submit"
               disabled={saving}
               style={{
-                flex: 1, minWidth: '200px', background: 'linear-gradient(135deg, #6366F1, #22D3EE)',
+                flex: 1, minWidth: '140px', background: 'linear-gradient(135deg, #6366F1, #22D3EE)',
                 color: 'white', fontWeight: '700', padding: '14px 28px', borderRadius: '12px', border: 'none',
                 cursor: saving ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '15px', transition: 'all 0.3s',

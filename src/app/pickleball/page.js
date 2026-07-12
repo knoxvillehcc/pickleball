@@ -59,7 +59,7 @@ function StatCard({ label, value, accent, sub }) {
       ...card,
       padding: '24px',
       borderTop: `2px solid ${accent}`,
-      flex: '1 1 160px',
+      width: '100%',
     }}>
       <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>
         {label}
@@ -561,7 +561,7 @@ export default function PickleballDashboard() {
 
       {/* ── Stats Cards ─────────────────────────────────────────────────── */}
       {stats && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           <StatCard label="Total Registered" value={stats.total}     accent="#818CF8"/>
           <StatCard label="Paid"              value={stats.paid}      accent="#10B981"  sub={`$${(stats.totalRevenue || 0).toFixed(2)} collected`}/>
           <StatCard label="Pending Payment"   value={stats.pending}   accent="#F59E0B"/>
@@ -651,7 +651,7 @@ export default function PickleballDashboard() {
             </div>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div className="table-responsive">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', whiteSpace: 'nowrap' }}>
               <thead>
                 <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>

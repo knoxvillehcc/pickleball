@@ -401,7 +401,8 @@ export default function UsersPage() {
         </div>
       ) : (
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+          <div className="table-responsive">
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: `1px solid ${C.border}` }}>
                 {['User', 'Role', 'Page Access', 'Status', 'Joined', isSA ? 'Actions' : ''].map((h, i) => (
@@ -486,6 +487,7 @@ export default function UsersPage() {
               })}
             </tbody>
           </table>
+          </div>
           {users.length === 0 && (
             <div style={{ padding: '60px', textAlign: 'center', color: C.muted }}>No users yet. Click + Add User to create one.</div>
           )}

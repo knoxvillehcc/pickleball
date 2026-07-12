@@ -141,13 +141,13 @@ export default function BannerPage() {
         ...card,
         background: 'var(--bg-banner-grad)',
         borderColor: 'var(--border-hover)',
-        padding: '48px', position: 'relative', overflow: 'hidden',
+        padding: 'clamp(20px, 4vw, 48px)', position: 'relative', overflow: 'hidden',
         boxShadow: '0 0 80px -20px var(--accent-glow)',
         display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
       }}>
         <div style={{ position:'absolute', top:'-60px', right:'-60px', width:'300px', height:'300px', background:'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius:'50%', pointerEvents:'none' }}></div>
         <div style={{ position:'relative' }}>
-          <h1 style={{ margin:0, fontSize:'42px', fontWeight:'900', color:'var(--text-primary)', lineHeight:1.1, letterSpacing:'-1px' }}>
+          <h1 style={{ margin:0, fontSize:'clamp(24px, 4vw, 42px)', fontWeight:'900', color:'var(--text-primary)', lineHeight:1.1, letterSpacing:'-1px' }}>
             Banner{' '}
             <span style={{ background:'linear-gradient(135deg, #38BDF8, #818CF8)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>Check-In</span>
           </h1>
@@ -254,7 +254,7 @@ export default function BannerPage() {
           {results.length === 0 ? (
             <div style={{ padding:'80px 24px', textAlign:'center', color:'var(--text-muted)', fontSize:'16px', fontWeight:'600' }}>No invoices found.</div>
           ) : (
-            <div style={{ overflowX:'auto' }}>
+            <div className="table-responsive">
               <table style={{ width:'100%', borderCollapse:'collapse', whiteSpace:'nowrap', fontSize:'14px' }}>
                 <thead>
                   <tr style={{ backgroundColor:'var(--bg-table-header)', borderBottom:'1px solid var(--border-table)' }}>

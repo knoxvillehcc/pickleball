@@ -140,13 +140,13 @@ export default function MonthlyReportPage() {
         ...card,
         background: 'var(--bg-banner-grad)',
         borderColor: 'var(--border-hover)',
-        padding: '48px', position: 'relative', overflow: 'hidden',
+        padding: 'clamp(20px, 4vw, 48px)', position: 'relative', overflow: 'hidden',
         boxShadow: '0 0 80px -20px var(--accent-glow)',
         display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
       }}>
         <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '300px', height: '300px', background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
         <div style={{ position: 'relative' }}>
-          <h1 style={{ margin: 0, fontSize: '42px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
+          <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 42px)', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
             Monthly{' '}
             <span style={{ background: 'linear-gradient(135deg, #10B981, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Report</span>
           </h1>
@@ -282,7 +282,7 @@ export default function MonthlyReportPage() {
                     </div>
 
                     {/* Right: stats + chevron */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', flexShrink: 0 }}>
                       <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Members</div>
                         <div style={{ fontSize: '24px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1 }}>{month.count}</div>
@@ -291,7 +291,7 @@ export default function MonthlyReportPage() {
                         <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Revenue</div>
                         <div style={{ fontSize: '20px', fontWeight: '800', color: c2, lineHeight: 1.1 }}>${month.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'none', textAlign: 'right' }} className="desktop-avg">
                         <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Avg / Member</div>
                         <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-secondary)', lineHeight: 1.1 }}>${avgPerMember}</div>
                       </div>
@@ -306,7 +306,7 @@ export default function MonthlyReportPage() {
 
                   {/* Expandable member table */}
                   {isOpen && (
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="table-responsive">
                       <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap', fontSize: '14px' }}>
                         <thead>
                           <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>
@@ -357,7 +357,12 @@ export default function MonthlyReportPage() {
         </>
       )}
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (min-width: 640px) {
+          .desktop-avg { display: block !important; }
+        }
+      `}</style>
     </div>
   );
 }

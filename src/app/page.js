@@ -469,11 +469,11 @@ export default function Home() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }} className="animate-in">
 
           {/* Welcome Banner */}
-          <div style={{
+          <div className="mobile-p-4" style={{
             ...cardStyle,
             background: 'var(--bg-banner-grad)',
             borderColor: 'var(--border-hover)',
-            padding: '48px',
+            padding: 'clamp(20px, 4vw, 48px)',
             boxShadow: '0 0 60px -20px var(--accent-glow)',
             position: 'relative', overflow: 'hidden',
           }}>
@@ -485,7 +485,7 @@ export default function Home() {
                   {user?.role === 'super_admin' ? 'Super Admin Session' : 'Staff Session'}
                 </span>
               </div>
-              <h1 style={{ margin: 0, fontSize: '38px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
                 Welcome to the{' '}
                 <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   HCC Admin Portal
@@ -502,11 +502,11 @@ export default function Home() {
             <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>
               Your Allowed Modules ({allowedModules.length})
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
               {allowedModules.map((mod) => (
                 <Link key={mod.slug} href={mod.href} style={{ textDecoration: 'none' }}>
                   <div
-                    style={{ ...cardStyle, padding: '28px', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', position: 'relative' }}
+                    style={{ ...cardStyle, padding: '24px', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', position: 'relative' }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-4px)';
                       e.currentTarget.style.borderColor = mod.borderColor;
@@ -566,18 +566,18 @@ export default function Home() {
       {/* --- SCANNER TAB --- */}
       {activeTab === 'scanner' && hasDashboardAccess && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }} className="animate-in">
-          <div style={{
+          <div className="mobile-p-4" style={{
             ...cardStyle,
             background: 'var(--bg-banner-scanner)',
             borderColor: 'var(--border)',
-            padding: '48px',
+            padding: 'clamp(20px, 4vw, 48px)',
             boxShadow: '0 0 80px -20px var(--accent-glow)',
             position: 'relative', overflow: 'hidden',
             display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
           }}>
             <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '300px', height: '300px', background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }}></div>
             <div style={{ position: 'relative' }}>
-              <h1 style={{ margin: 0, fontSize: '42px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 42px)', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
                 System{' '}
                 <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scanner</span>
               </h1>
@@ -610,9 +610,9 @@ export default function Home() {
                 { label: 'Valid (Skipped)',    value: summary.skipped,                  color: '#10B981', glow: false },
                 { label: 'Missing Subs',      value: summary.wouldFix,                 color: '#F43F5E', glow: true  },
               ].map(({ label, value, color, glow }) => (
-                <div key={label} style={{ ...cardStyle, padding: '28px', borderTop: '2px solid ' + color, boxShadow: glow ? '0 0 30px -10px rgba(244,63,94,0.25)' : 'none' }}>
+                <div key={label} style={{ ...cardStyle, padding: '24px', borderTop: '2px solid ' + color, boxShadow: glow ? '0 0 30px -10px rgba(244,63,94,0.25)' : 'none' }}>
                   <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px' }}>{label}</div>
-                  <div style={{ fontSize: '48px', fontWeight: '900', color: color, lineHeight: 1 }}>{value}</div>
+                  <div style={{ fontSize: '36px', fontWeight: '900', color: color, lineHeight: 1 }}>{value}</div>
                 </div>
               ))}
             </div>
@@ -631,7 +631,7 @@ export default function Home() {
                   </button>
                 )}
               </div>
-              <div style={{ overflowX: 'auto' }}>
+              <div className="table-responsive">
                 <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap', fontSize: '14px' }}>
                   <thead>
                     <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>

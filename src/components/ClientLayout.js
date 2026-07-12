@@ -19,7 +19,6 @@ const UsersIcon    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill=
 const SunIcon      = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>;
 const MoonIcon     = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
 
-
 const navLinks = [
   { href: '/',                 label: 'Dashboard',       icon: <HomeIcon />,      slug: 'dashboard' },
   { href: '/reports',         label: 'Membership',      icon: <ReportsIcon />,   slug: 'reports' },
@@ -42,19 +41,29 @@ export default function ClientLayout({ children }) {
   const [theme,   setTheme]   = useState('dark');
   const [mounted, setMounted] = useState(false);
   const [user,    setUser]    = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Load saved theme
+  const applyTheme = (nextTheme) => {
+    setTheme(nextTheme);
+    localStorage.setItem('hcc-theme', nextTheme);
+    document.documentElement.setAttribute('data-theme', nextTheme);
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem('hcc-theme') || 'dark';
-    setTheme(saved);
-    document.documentElement.setAttribute('data-theme', saved);
+    applyTheme(saved);
     setMounted(true);
   }, []);
 
-  // Fetch current user
+  // Fetch current user & Close sidebar on navigation change
   useEffect(() => {
+    setSidebarOpen(false);
     if (!isPublicRoute(pathname)) {
-      fetch('/api/auth/me').then(r => r.json()).then(d => setUser(d.user || null)).catch(() => {});
+      fetch('/api/auth/me')
+        .then(r => r.json())
+        .then(d => setUser(d.user || null))
+        .catch(() => {});
     }
   }, [pathname]);
 
@@ -66,9 +75,7 @@ export default function ClientLayout({ children }) {
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('hcc-theme', next);
-    document.documentElement.setAttribute('data-theme', next);
+    applyTheme(next);
   };
 
   const isDark = theme === 'dark';
@@ -92,33 +99,152 @@ export default function ClientLayout({ children }) {
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, isDark }}>
       <div style={{
-        display: 'flex', height: '100vh', overflow: 'hidden',
+        display: 'flex',
+        height: '100vh',
+        width: '100vw',
+        overflow: 'hidden',
         fontFamily: "'Inter', sans-serif",
-        opacity: mounted ? 1 : 0, transition: 'opacity 0.2s',
+        opacity: mounted ? 1 : 0,
+        transition: 'opacity 0.2s',
+        position: 'relative',
       }}>
-        {/* ── Sidebar ──────────────────────────────────────────────────── */}
-        <aside style={{
-          width: '260px', minWidth: '260px', height: '100vh',
+        {/* Mobile top header bar */}
+        <header className="mobile-header-bar" style={{
+          display: 'none',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: '60px',
+          width: '100%',
           backgroundColor: sidebarBg,
-          borderRight: `1px solid ${sidebarBorder}`,
-          display: 'flex', flexDirection: 'column', position: 'relative',
-          zIndex: 20, flexShrink: 0,
-          boxShadow: isDark ? 'none' : '2px 0 12px var(--shadow)',
-          transition: 'background-color 0.3s, border-color 0.3s',
+          borderBottom: `1px solid ${sidebarBorder}`,
+          padding: '0 16px',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          zIndex: 990,
+          boxSizing: 'border-box',
         }}>
+          <button 
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open navigation menu"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: textPrimary,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px',
+              borderRadius: '8px',
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          
+          <span style={{ fontSize: '16px', fontWeight: '800', color: textPrimary, letterSpacing: '-0.3px' }}>
+            Agent<span style={{ color: '#818CF8' }}>Hub</span>
+          </span>
+          
+          <button 
+            onClick={toggleTheme}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: textMuted,
+              cursor: 'pointer',
+              padding: '8px',
+            }}
+          >
+            {isDark ? <SunIcon /> : <MoonIcon />}
+          </button>
+        </header>
 
+        {/* Mobile sidebar backdrop overlay */}
+        {sidebarOpen && (
+          <div 
+            onClick={() => setSidebarOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(3px)',
+              zIndex: 995,
+              animation: 'fadeIn 0.2s ease-out',
+            }}
+          />
+        )}
+
+        {/* ── Sidebar ──────────────────────────────────────────────────── */}
+        <aside 
+          className={`sidebar-container ${sidebarOpen ? 'mobile-open' : ''}`}
+          style={{
+            width: '260px',
+            minWidth: '260px',
+            height: '100vh',
+            backgroundColor: sidebarBg,
+            borderRight: `1px solid ${sidebarBorder}`,
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'relative',
+            zIndex: 1000,
+            flexShrink: 0,
+            boxShadow: isDark ? 'none' : '2px 0 12px var(--shadow)',
+            transition: 'background-color 0.3s, border-color 0.3s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+        >
           {/* Logo */}
-          <div style={{ padding: '28px 24px', borderBottom: `1px solid ${sidebarBorder}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '40px', height: '40px', borderRadius: '12px',
-              background: 'linear-gradient(135deg, #6366F1, #38BDF8)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', fontWeight: '900', fontSize: '18px',
-              boxShadow: '0 0 20px rgba(99,102,241,0.35)', flexShrink: 0,
-            }}>H</div>
-            <span style={{ fontSize: '18px', fontWeight: '800', color: textPrimary, letterSpacing: '-0.3px' }}>
-              Agent<span style={{ color: '#818CF8' }}>Hub</span>
-            </span>
+          <div style={{ 
+            padding: '28px 24px', 
+            borderBottom: `1px solid ${sidebarBorder}`, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            gap: '12px' 
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #6366F1, #38BDF8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: '900',
+                fontSize: '18px',
+                boxShadow: '0 0 20px rgba(99,102,241,0.35)',
+                flexShrink: 0,
+              }}>H</div>
+              <span style={{ fontSize: '18px', fontWeight: '800', color: textPrimary, letterSpacing: '-0.3px' }}>
+                Agent<span style={{ color: '#818CF8' }}>Hub</span>
+              </span>
+            </div>
+            
+            {/* Close button inside sidebar on mobile */}
+            <button 
+              className="mobile-close-btn"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close menu"
+              style={{
+                display: 'none',
+                background: 'none',
+                border: 'none',
+                color: textMuted,
+                cursor: 'pointer',
+                padding: '6px',
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
           </div>
 
           {/* Nav links */}
@@ -129,11 +255,8 @@ export default function ClientLayout({ children }) {
             {navLinks.filter(link => {
               if (link.adminOnly) return user?.role === 'super_admin';
               if (!user) return true; // show all while loading
-              // Welcome page / Dashboard is always visible to any authenticated user
               if (link.href === '/') return true;
-              // Super admin always sees all non-adminOnly links
               if (user.role === 'super_admin') return true;
-              // Staff: check allowed pages
               const pages = user.allowedPages || [];
               return pages.includes('*') || pages.includes(link.slug);
             }).map(({ href, label, icon }) => {
@@ -186,9 +309,13 @@ export default function ClientLayout({ children }) {
                 transition: 'background-color 0.3s',
               }}>
                 <span style={{
-                  width: '16px', height: '16px', borderRadius: '50%', background: 'white',
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  background: 'white',
                   transform: isDark ? 'translateX(0)' : 'translateX(16px)',
-                  transition: 'transform 0.3s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                  transition: 'transform 0.3s',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
                 }}/>
               </span>
             </button>
@@ -240,15 +367,28 @@ export default function ClientLayout({ children }) {
         </aside>
 
         {/* ── Main content ─────────────────────────────────────────────── */}
-        <main style={{
-          flex: 1, overflowY: 'auto', overflowX: 'hidden',
+        <main className="main-content-layout" style={{
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
           backgroundColor: mainBg,
           backgroundImage: isDark
             ? 'radial-gradient(at 0% 0%, rgba(30,27,75,0.35) 0, transparent 55%), radial-gradient(at 90% 10%, rgba(14,116,144,0.07) 0, transparent 50%)'
             : 'none',
           transition: 'background-color 0.3s',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          boxSizing: 'border-box',
         }}>
-          <div style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto', minHeight: '100%' }}>
+          <div style={{ 
+            padding: '40px 24px', 
+            maxWidth: '1400px', 
+            width: '100%',
+            margin: '0 auto', 
+            minHeight: '100%',
+            boxSizing: 'border-box',
+          }}>
             {children}
           </div>
         </main>
@@ -257,16 +397,51 @@ export default function ClientLayout({ children }) {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
+        
         .sidebar-link:hover {
           background-color: ${isDark ? 'rgba(99,102,241,0.1)' : 'rgba(99,102,241,0.06)'} !important;
           color: ${isDark ? 'white' : '#0F172A'} !important;
           border-color: ${isDark ? 'rgba(99,102,241,0.15)' : 'rgba(99,102,241,0.12)'} !important;
         }
-        ::-webkit-scrollbar { width: 6px; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(51,65,85,0.8); border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(71,85,105,1); }
+        ::-webkit-scrollbar-thumb { background: rgba(51,65,85,0.5); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(71,85,105,0.8); }
+
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Mobile Responsive styling breakpoint */
+        @media (max-width: 1024px) {
+          .mobile-header-bar {
+            display: flex !important;
+          }
+          
+          .main-content-layout {
+            padding-top: 60px !important;
+          }
+          
+          .sidebar-container {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            transform: translateX(-100%);
+            z-index: 1000 !important;
+            height: 100vh !important;
+          }
+          
+          .sidebar-container.mobile-open {
+            transform: translateX(0) !important;
+          }
+          
+          .mobile-close-btn {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+          }
+        }
       `}</style>
     </ThemeContext.Provider>
   );
