@@ -216,6 +216,79 @@ function ResetPinModal({ targetUser, onClose, onToast }) {
   );
 }
 
+// ── Edit User Modal ──────────────────────────────────────────────────────────
+function EditUserModal({ targetUser, onClose, onSave, onToast }) {
+  const [name,  setName]  = useState(targetUser.name || '');
+  const [email, setEmail] = useState(targetUser.email || '');
+  const [role,  setRole]  = useState(targetUser.role || 'staff');
+  const [saving,setSaving] = useState(false);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (!email.includes('@')) { onToast('Enter a valid email address', 'error'); return; }
+    setSaving(true);
+    
+    try {
+      const res = await fetch(`/api/auth/users/${targetUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, role }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        onToast('User details updated successfully');
+        onSave(data.user);
+        onClose();
+      } else {
+        onToast(data.error || 'Failed to update details', 'error');
+      }
+    } catch (err) {
+      onToast('Network error updating details', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', padding: '16px',
+    }}>
+      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '20px', width: '100%', maxWidth: '400px' }}>
+        <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: C.text }}>Edit User Details</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: '20px' }}>✕</button>
+        </div>
+
+        <form onSubmit={handleSave} style={{ padding: '20px 28px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div>
+            <label style={labelStyle}>Name</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. John Doe" required style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Email Address</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="user@example.com" required style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Role</label>
+            <select value={role} onChange={e => setRole(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+              <option value="staff">Staff</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            <button type="button" onClick={onClose} style={{ ...btnStyle('var(--bg-button-secondary)', 'var(--border-button-secondary)', 'var(--text-button-secondary)'), flex: 1 }}>Cancel</button>
+            <button type="submit" disabled={saving || !name || !email} style={{ ...btnStyle('var(--accent)', 'transparent', 'white', true), flex: 1, opacity: (!name || !email) ? 0.5 : 1 }}>
+              {saving ? 'Save Changes' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // ── Add User Modal ────────────────────────────────────────────────────────────
 function AddUserModal({ onClose, onCreated, onToast }) {
   const [form,   setForm]   = useState({ email: '', pin: '', name: '', role: 'staff', allowedPages: [] });
@@ -331,6 +404,7 @@ export default function UsersPage() {
   const [showAdd,      setShowAdd]      = useState(false);
   const [managingUser, setManagingUser] = useState(null);
   const [resetPinUser, setResetPinUser] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
   const [me,           setMe]           = useState(null);
 
   const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast(null), 3500); };
@@ -372,6 +446,7 @@ export default function UsersPage() {
       <Toast toast={toast} />
 
       {showAdd      && <AddUserModal onClose={() => setShowAdd(false)} onCreated={u => setUsers(us => [...us, u])} onToast={showToast} />}
+      {editingUser  && <EditUserModal targetUser={editingUser} onClose={() => setEditingUser(null)} onSave={updated => setUsers(us => us.map(u => u.id === updated.id ? updated : u))} onToast={showToast} />}
       {managingUser && <ManageAccessModal targetUser={managingUser} onClose={() => setManagingUser(null)} onSave={updated => setUsers(us => us.map(u => u.id === updated.id ? updated : u))} onToast={showToast} />}
       {resetPinUser && <ResetPinModal targetUser={resetPinUser} onClose={() => setResetPinUser(null)} onToast={showToast} />}
 
@@ -471,6 +546,7 @@ export default function UsersPage() {
                     {isSA && (
                       <td style={{ padding: '16px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                          <ActionBtn onClick={() => setEditingUser(u)} color="var(--text-primary)" bg="var(--bg-button-secondary)" label="✏️ Edit" />
                           <ActionBtn onClick={() => setManagingUser(u)} color="var(--accent)" bg="rgba(129,140,248,0.08)" label="🔑 Access" />
                           <ActionBtn onClick={() => setResetPinUser(u)} color="var(--text-secondary)" bg="var(--bg-button-secondary)" label="🔢 PIN" />
                           {u.role !== 'super_admin' && (

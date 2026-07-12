@@ -38,6 +38,7 @@ export async function PUT(request, { params }) {
   if (body.active       !== undefined) updates.active        = body.active;
   if (body.role         !== undefined) updates.role          = body.role;
   if (body.name         !== undefined) updates.name          = body.name;
+  if (body.email        !== undefined) updates.email         = body.email.toLowerCase().trim();
   if (body.pin) {
     if (!/^\d{6}$/.test(body.pin)) {
       return NextResponse.json({ error: 'PIN must be 6 digits' }, { status: 400 });
@@ -51,7 +52,14 @@ export async function PUT(request, { params }) {
     body: JSON.stringify(updates),
   });
 
-  if (!res.ok) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+  if (!res.ok) {
+    try {
+      const err = await res.json();
+      const msg = err?.[0]?.message || '';
+      if (msg.includes('unique')) return NextResponse.json({ error: 'Email already exists' }, { status: 409 });
+    } catch (e) {}
+    return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+  }
   const [user] = await res.json();
   return NextResponse.json({ success: true, user });
 }
