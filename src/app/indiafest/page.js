@@ -61,7 +61,7 @@ function StatCard({ label, value, accent, sub }) {
     <div style={{
       backgroundColor: C.bg, border: `1px solid ${C.border}`,
       borderRadius: '16px', padding: '24px', borderTop: `2px solid ${accent}`,
-      flex: '1 1 160px',
+      width: '100%',
     }}>
       <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>
         {label}
@@ -226,45 +226,94 @@ export default function IndiafestVendorDashboard() {
         }}>
           {/* Status dot + label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '0 0 auto' }}>
-      a.remove();
-    } catch (err) {
-      alert('Failed to export: ' + err.message);
-    } finally {
-      setExporting(null);
-    }
-  }
+            <span style={{
+              width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0, display: 'inline-block',
+              backgroundColor: isPublished ? '#10B981' : '#F59E0B',
+              boxShadow: isPublished ? '0 0 8px #10B981' : '0 0 8px #F59E0B',
+            }}/>
+            <span style={{ fontWeight: '800', fontSize: '15px', color: isPublished ? '#10B981' : '#F59E0B' }}>
+              Registration Page: {isPublished ? '🌐 LIVE' : '🔒 CLOSED'}
+            </span>
+          </div>
 
-  const paid    = registrations.filter(r => r.payment_status === 'paid');
-  const pending = registrations.filter(r => r.payment_status === 'pending');
-  const revenue = paid.reduce((acc, r) => acc + (r.amount_paid || 0), 0);
+          {/* URL + Copy + Preview — only when live */}
+          {isPublished && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
+              <span style={{ fontSize: '12px', color: '#64748B', fontFamily: 'monospace', background: 'rgba(8,12,24,0.5)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(51,65,85,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {PUBLIC_URL}
+              </span>
+              <button onClick={copyPublicUrl} style={{
+                padding: '4px 12px', borderRadius: '6px', border: '1px solid rgba(16,185,129,0.4)',
+                background: urlCopied ? 'rgba(16,185,129,0.2)' : 'transparent',
+                color: '#10B981', fontSize: '12px', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap',
+              }}>
+                {urlCopied ? '✅ Copied!' : '📋 Copy URL'}
+              </button>
+              <a href={PUBLIC_URL} target="_blank" rel="noreferrer" style={{
+                padding: '4px 12px', borderRadius: '6px', border: '1px solid rgba(16,185,129,0.3)',
+                background: 'transparent', color: '#10B981', fontSize: '12px',
+                fontWeight: '700', textDecoration: 'none', whiteSpace: 'nowrap',
+              }}>↗ Preview</a>
+            </div>
+          )}
 
-  const filtered = registrations.filter(r => {
-    const query = search.toLowerCase();
-    const matchesSearch =
-      (r.first_name || '').toLowerCase().includes(query) ||
-      (r.last_name  || '').toLowerCase().includes(query) ||
-      (r.company_name||'').toLowerCase().includes(query) ||
-      (r.email      || '').toLowerCase().includes(query) ||
-      (r.registration_number || '').toLowerCase().includes(query);
+          {/* Publish / Unpublish button */}
+          <button onClick={handlePublishToggle} disabled={publishing} style={{
+            marginLeft: 'auto', padding: '10px 20px', borderRadius: '10px', border: 'none',
+            background: publishing ? 'rgba(51,65,85,0.5)' : isPublished
+              ? 'linear-gradient(135deg, #EF4444, #DC2626)'
+              : 'linear-gradient(135deg, #10B981, #059669)',
+            color: publishing ? '#475569' : 'white',
+            fontWeight: '800', fontSize: '14px', cursor: publishing ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap',
+            boxShadow: publishing ? 'none' : isPublished ? '0 0 20px rgba(239,68,68,0.3)' : '0 0 20px rgba(16,185,129,0.3)',
+            transition: 'all 0.3s', fontFamily: 'inherit',
+          }}>
+            {publishing ? '⏳ Saving...' : isPublished ? '🔒 Unpublish Page' : '🌐 Publish Page'}
+          </button>
+        </div>
+      )}
 
-    const matchesStatus =
-      filter === 'all' ||
-      (filter === 'paid' && r.payment_status === 'paid') ||
-      (filter === 'pending' && r.payment_status === 'pending') ||
-      (filter === 'failed' && r.payment_status === 'failed');
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '900', letterSpacing: '-0.5px' }}>India Fest 2026</h1>
+          </div>
+          <p style={{ margin: 0, color: '#64748B', fontSize: '14px' }}>Vendor Registrations Dashboard</p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button onClick={load} style={{
+            background: loading ? 'rgba(255,153,51,0.3)' : 'linear-gradient(135deg, #7B3A00, #A05020)',
+            color: 'white', fontWeight: '700', fontSize: '14px', padding: '12px 24px',
+            borderRadius: '10px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s',
+          }}>
+            {loading
+              ? <><span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Loading...</>
+              : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.09-4.82"/></svg> Refresh</>
+            }
+          </button>
 
-    const matchesSpace =
-      spaceFilter === 'all' ||
-      (spaceFilter === 'small' && r.space_type === 'home_business') ||
-      (spaceFilter === 'medium' && r.space_type === 'established_business');
+          {/* Export buttons */}
+          {['csv', 'excel', 'pdf'].map(fmt => (
+            <button key={fmt} onClick={() => handleExport(fmt)} disabled={!!exporting} style={{
+              background: 'transparent',
+              border: `1px solid rgba(255,153,51,0.4)`,
+              color: C.saffron, fontWeight: '600', fontSize: '13px',
+              padding: '12px 18px', borderRadius: '10px', cursor: exporting ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+              fontFamily: 'inherit',
+            }}>
+              {exporting === fmt
+                ? <><span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,153,51,0.3)', borderTop: `2px solid ${C.saffron}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Exporting...</>
+                : <>{fmt === 'csv' ? '📄' : fmt === 'excel' ? '📊' : '🖨️'} {fmt.toUpperCase()}</>
+              }
+            </button>
+          ))}
+        </div>
+      </div>
 
-    return matchesSearch && matchesStatus && matchesSpace;
-  });
-
-  const tdStyle = { padding: '16px 20px', borderBottom: '1px solid var(--border)', textAlign: 'left' };
-
-  return (
-    <div style={{ paddingBottom: '60px' }}>
       {/* ── Stats ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '28px' }}>
         <StatCard label="Total Vendors"    value={registrations.length} accent={C.saffron} sub="all registrations" />
