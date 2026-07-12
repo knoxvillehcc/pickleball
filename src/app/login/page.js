@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTheme } from '@/components/ClientLayout';
 
 const C = {
   bg:      'var(--bg-primary)',
@@ -18,6 +19,7 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const redirect     = searchParams.get('redirect') || '/';
   const expired      = searchParams.get('expired') === '1';
+  const { theme, toggleTheme, isDark } = useTheme();
 
   const [step,    setStep]    = useState('email');
   const [email,   setEmail]   = useState('');
@@ -34,37 +36,6 @@ function LoginContent() {
     if (step === 'email' && emailRef.current) emailRef.current.focus();
     if (step === 'pin'   && pinRefs.current[0]) pinRefs.current[0].focus();
   }, [step]);
-
-  const handlePinChange = useCallback((i, val) => {
-    if (!/^\d*$/.test(val)) return;
-    const next = [...pin];
-    next[i] = val.slice(-1);
-    setPin(next);
-    setError('');
-    if (val && i < 5) pinRefs.current[i + 1]?.focus();
-    if (val && i === 5 && next.every(d => d !== '')) submitPin(next.join(''));
-  }, [pin]);
-
-  const handlePinKey = useCallback((i, e) => {
-    if (e.key === 'Backspace' && !pin[i] && i > 0) pinRefs.current[i - 1]?.focus();
-  }, [pin]);
-
-  const handlePaste = useCallback((e) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    if (pasted.length === 6) {
-      setPin(pasted.split(''));
-      pinRefs.current[5]?.focus();
-      submitPin(pasted);
-    }
-  }, []);
-
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    if (!email.includes('@')) { setError('Enter a valid email'); return; }
-    setError('');
-    setStep('pin');
-  };
 
   const submitPin = async (pinVal) => {
     setLoading(true);
@@ -96,73 +67,150 @@ function LoginContent() {
     }
   };
 
+  const handlePinChange = useCallback((i, val) => {
+    if (!/^\d*$/.test(val)) return;
+    const next = [...pin];
+    next[i] = val.slice(-1);
+    setPin(next);
+    setError('');
+    if (val && i < 5) pinRefs.current[i + 1]?.focus();
+    if (val && i === 5 && next.every(d => d !== '')) submitPin(next.join(''));
+  }, [pin]);
+
+  const handlePinKey = useCallback((i, e) => {
+    if (e.key === 'Backspace' && !pin[i] && i > 0) {
+      const next = [...pin];
+      next[i - 1] = '';
+      setPin(next);
+      pinRefs.current[i - 1]?.focus();
+    }
+  }, [pin]);
+
+  const handlePaste = useCallback((e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (pasted.length === 6) {
+      setPin(pasted.split(''));
+      pinRefs.current[5]?.focus();
+      submitPin(pasted);
+    }
+  }, []);
+
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    if (!email.includes('@')) { setError('Enter a valid email'); return; }
+    setError('');
+    setStep('pin');
+  };
+
+  // Keypad clicks logic
+  const handleKeypadPress = (num) => {
+    if (loading) return;
+    const idx = pin.findIndex(d => d === '');
+    if (idx !== -1) {
+      const next = [...pin];
+      next[idx] = String(num);
+      setPin(next);
+      setError('');
+      if (idx < 5) {
+        pinRefs.current[idx + 1]?.focus();
+      }
+      if (idx === 5 && next.every(d => d !== '')) {
+        submitPin(next.join(''));
+      }
+    }
+  };
+
+  const handleKeypadBackspace = () => {
+    if (loading) return;
+    let idx = pin.findIndex(d => d === '');
+    if (idx === -1) idx = 6;
+    if (idx > 0) {
+      const next = [...pin];
+      next[idx - 1] = '';
+      setPin(next);
+      setError('');
+      pinRefs.current[idx - 1]?.focus();
+    }
+  };
+
+  const handleKeypadClear = () => {
+    if (loading) return;
+    setPin(['', '', '', '', '', '']);
+    setError('');
+    pinRefs.current[0]?.focus();
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
-      background: `linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)`,
+      background: 'var(--bg-primary)',
       fontFamily: "'Inter', -apple-system, sans-serif",
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '24px',
+      padding: '24px', position: 'relative',
+      transition: 'background-color 0.3s, color 0.3s',
     }}>
-      {/* Background glow */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }}>
-        <div style={{
-          position: 'absolute', top: '30%', left: '50%', transform: 'translateX(-50%)',
-          width: '500px', height: '500px',
-          background: 'radial-gradient(circle, rgba(244,164,11,0.04) 0%, transparent 70%)',
-          borderRadius: '50%',
-        }}/>
+      {/* Top flag stripe */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '5px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)' }}/>
+
+      {/* Floating Theme Toggle (Top Right) */}
+      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 10 }}>
+        <button
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          style={{
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
+            borderRadius: '50%', width: '40px', height: '40px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--text-primary)', cursor: 'pointer', outline: 'none',
+            boxShadow: 'var(--shadow)', transition: 'all 0.25s', fontSize: '18px',
+          }}
+        >
+          {isDark ? '☀️' : '🌙'}
+        </button>
       </div>
 
-      <div style={{ width: '100%', maxWidth: '420px' }}>
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{
-            width: '72px', height: '72px', borderRadius: '50%', margin: '0 auto 20px',
-            background: 'linear-gradient(135deg, rgba(244,164,11,0.15), rgba(244,164,11,0.05))',
-            border: '1.5px solid rgba(244,164,11,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '30px',
-            boxShadow: '0 0 40px rgba(244,164,11,0.15)',
-          }}>
-            🏓
-          </div>
-          <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '800', color: C.text, letterSpacing: '-0.5px' }}>
-            HCC Dashboard
+      <div style={{ width: '100%', maxWidth: '400px', zIndex: 2 }}>
+        
+        {/* Mandir Branding Header */}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <img src="/hcc_logo.png" alt="HCC Logo" style={{ height: '48px', width: 'auto', marginBottom: '16px', objectFit: 'contain' }} />
+          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: C.text, letterSpacing: '-0.4px' }}>
+            Hindu Community Center
           </h1>
-          <p style={{ margin: '6px 0 0', fontSize: '13px', color: C.muted }}>
-            Admin access only
+          <p style={{ margin: '4px 0 0', fontSize: '12px', color: C.muted, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>
+            Operator & Staff Sign-In
           </p>
         </div>
 
-        {/* Card */}
-        <div className="login-card">
+        {/* Login Box */}
+        <div className="login-card" style={{ boxShadow: 'var(--shadow)' }}>
 
           {/* ── Email Step ── */}
           {step === 'email' && (
             <form onSubmit={handleEmailSubmit}>
-              <div style={{ marginBottom: '8px', fontSize: '11px', fontWeight: '700',
-                color: C.gold, textTransform: 'uppercase', letterSpacing: '2px' }}>
-                Email Address
+              <div style={{ marginBottom: '8px', fontSize: '11px', fontWeight: '800',
+                color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                Registered Staff Email
               </div>
               <input
                 ref={emailRef}
                 type="email"
                 value={email}
                 onChange={e => { setEmail(e.target.value); setError(''); }}
-                placeholder="knoxvillehcc@gmail.com"
+                placeholder="operator@knoxvillemandir.org"
                 autoComplete="email"
                 required
                 style={{
                   width: '100%', padding: '14px 16px', borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`,
+                  background: 'var(--bg-input)', border: `1px solid var(--border)`,
                   color: C.text, fontSize: '15px', outline: 'none', boxSizing: 'border-box',
-                  marginBottom: '20px',
+                  marginBottom: '20px', transition: 'border-color 0.2s',
                 }}
               />
               {error && <ErrorBox msg={error} />}
-              <button type="submit" style={btnStyle(C.gold)}>
-                Continue →
+              <button type="submit" style={btnStyle()}>
+                Proceed to Secure PIN →
               </button>
             </form>
           )}
@@ -170,15 +218,15 @@ function LoginContent() {
           {/* ── PIN Step ── */}
           {step === 'pin' && (
             <div>
-              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: C.gold,
-                  textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px' }}>
-                  Enter 6-Digit PIN
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--accent)',
+                  textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>
+                  Enter 6-Digit Login PIN
                 </div>
-                <div style={{ fontSize: '13px', color: C.muted }}>{email}</div>
+                <div style={{ fontSize: '13px', color: C.muted, wordBreak: 'break-all', fontWeight: '500' }}>{email}</div>
               </div>
 
-              {/* PIN inputs */}
+              {/* Secure PIN inputs */}
               <div className="pin-container" onPaste={handlePaste}>
                 {pin.map((digit, i) => (
                   <input
@@ -194,105 +242,191 @@ function LoginContent() {
                     aria-label={`PIN digit ${i + 1}`}
                     className="pin-input"
                     style={{
-                      border: `2px solid ${digit ? 'var(--accent)' : 'var(--border)'}`,
-                      boxShadow: digit ? `0 0 12px var(--accent-glow)` : 'none',
+                      border: `2.5px solid ${digit ? 'var(--accent)' : 'var(--border)'}`,
+                      boxShadow: digit ? `0 0 10px var(--accent-glow)` : 'none',
                     }}
                   />
                 ))}
               </div>
 
-              {/* Show PIN Checkbox */}
+              {/* Show PIN option */}
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: C.muted, userSelect: 'none' }}>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '12.5px', color: C.muted, userSelect: 'none', fontWeight: '600' }}>
                   <input
                     type="checkbox"
                     checked={showPin}
                     onChange={e => setShowPin(e.target.checked)}
-                    style={{ width: '16px', height: '16px', accentColor: C.gold, cursor: 'pointer' }}
+                    style={{ width: '16px', height: '16px', accentColor: 'var(--accent)', cursor: 'pointer' }}
                   />
-                  Show PIN
+                  Show Pin Characters
                 </label>
               </div>
 
+              {/* Lockouts and errors */}
               {loading && (
-                <div style={{ textAlign: 'center', color: C.gold, fontSize: '13px', marginBottom: '16px' }}>
-                  ⏳ Verifying…
+                <div style={{ textAlign: 'center', color: 'var(--accent)', fontSize: '13px', marginBottom: '16px', fontWeight: '700' }}>
+                  ⏳ Verifying code credentials…
                 </div>
               )}
 
               {locked && (
-                <div style={{ background: 'rgba(244,164,11,0.08)', border: '1px solid rgba(244,164,11,0.2)',
-                  borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#D4AF37',
-                  marginBottom: '16px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)',
+                  borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: 'var(--text-error)',
+                  marginBottom: '16px', display: 'flex', gap: '8px', alignItems: 'center', fontWeight: '600' }}>
                   🔒 {locked}
                 </div>
               )}
 
               {error && <ErrorBox msg={error} />}
 
+              {/* Tactile Keypad */}
+              <div className="keypad-grid">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => handleKeypadPress(num)}
+                    disabled={loading}
+                    className="keypad-btn"
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleKeypadClear}
+                  disabled={loading}
+                  className="keypad-btn keypad-special"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  C
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleKeypadPress(0)}
+                  disabled={loading}
+                  className="keypad-btn"
+                >
+                  0
+                </button>
+                <button
+                  type="button"
+                  onClick={handleKeypadBackspace}
+                  disabled={loading}
+                  className="keypad-btn keypad-special"
+                  aria-label="Backspace"
+                >
+                  ⌫
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={() => { setStep('email'); setPin(['','','','','','']); setError(''); setLocked(''); }}
                 disabled={loading}
-                style={{ width: '100%', background: 'none', border: 'none', color: C.muted,
-                  fontSize: '13px', cursor: 'pointer', padding: '10px', marginTop: '4px' }}>
-                ← Back to email
+                style={{ width: '100%', background: 'none', border: 'none', color: 'var(--accent)',
+                  fontSize: '13px', cursor: 'pointer', padding: '10px', marginTop: '16px', fontWeight: '800' }}>
+                ← Change Email Address
               </button>
             </div>
           )}
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: '11px', color: C.muted, marginTop: '24px' }}>
-          HCC · Knoxville, TN · Admin Portal
+        <p style={{ textAlign: 'center', fontSize: '12px', color: C.muted, marginTop: '28px', fontWeight: '500' }}>
+          Protected by security lockout thresholds.
         </p>
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-        input::placeholder { color: #475569; }
-        input:focus { border-color: rgba(244,164,11,0.5) !important; box-shadow: 0 0 0 3px rgba(244,164,11,0.08); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        input::placeholder { color: var(--text-muted); }
+        input:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-glow) !important; }
         
         .login-card {
           background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: 20px;
-          padding: 36px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+          padding: 32px 24px;
         }
         
         .pin-container {
           display: flex;
-          gap: 10px;
+          gap: 8px;
           justify-content: center;
           margin-bottom: 20px;
         }
         
         .pin-input {
-          width: 44px;
-          height: 54px;
+          width: 46px;
+          height: 56px;
           text-align: center;
-          font-size: 22px;
-          font-weight: 800;
+          font-size: 24px;
+          font-weight: 900;
           border-radius: 12px;
           background: var(--bg-input);
           color: var(--text-primary);
           outline: none;
-          transition: all 0.15s;
+          transition: all 0.2s;
           box-sizing: border-box;
+        }
+
+        .keypad-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          margin-top: 10px;
+        }
+
+        .keypad-btn {
+          height: 52px;
+          border-radius: 14px;
+          border: 1px solid var(--border);
+          background: var(--bg-input);
+          color: var(--text-primary);
+          font-size: 20px;
+          font-weight: 800;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
+          user-select: none;
+          touch-action: manipulation;
+        }
+
+        .keypad-btn:hover:not(:disabled) {
+          border-color: var(--accent);
+          background: var(--bg-secondary);
+          transform: scale(1.03);
+        }
+
+        .keypad-btn:active:not(:disabled) {
+          transform: scale(0.97);
+          opacity: 0.8;
+        }
+
+        .keypad-special {
+          font-size: 16px;
+          font-weight: 900;
         }
 
         @media (max-width: 480px) {
           .login-card {
-            padding: 28px 20px;
+            padding: 24px 16px;
           }
           .pin-container {
             gap: 6px;
           }
           .pin-input {
-            width: 36px;
-            height: 46px;
+            width: 38px;
+            height: 48px;
+            font-size: 20px;
+            border-radius: 10px;
+          }
+          .keypad-btn {
+            height: 48px;
             font-size: 18px;
-            border-radius: 8px;
+            border-radius: 10px;
           }
         }
 
@@ -301,10 +435,10 @@ function LoginContent() {
             gap: 4px;
           }
           .pin-input {
-            width: 30px;
-            height: 40px;
+            width: 32px;
+            height: 42px;
             font-size: 16px;
-            border-radius: 6px;
+            border-radius: 8px;
           }
         }
       `}</style>
@@ -316,18 +450,18 @@ function ErrorBox({ msg }) {
   return (
     <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)',
       borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: 'var(--text-error)',
-      marginBottom: '16px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+      marginBottom: '16px', display: 'flex', gap: '8px', alignItems: 'center', fontWeight: '600' }}>
       ⚠️ {msg}
     </div>
   );
 }
 
-function btnStyle(color) {
+function btnStyle() {
   return {
     width: '100%', padding: '14px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-    background: 'linear-gradient(135deg, var(--accent), var(--accent-glow))',
-    color: '#fff', fontWeight: '800', fontSize: '15px',
-    boxShadow: '0 4px 20px var(--accent-glow)',
+    background: 'var(--accent)',
+    color: '#FFF', fontWeight: '900', fontSize: '15px',
+    boxShadow: '0 4px 14px var(--accent-glow)',
     transition: 'all 0.2s',
   };
 }

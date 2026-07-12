@@ -484,30 +484,29 @@ export default function PickleballDashboard() {
       {/* ── Page Header ────────────────────────────────────────────────── */}
       <div style={{
         ...card,
-        background: `linear-gradient(135deg, rgba(13,20,38,0.95) 0%, rgba(123,28,28,0.2) 100%)`,
-        borderColor: `rgba(244,164,11,0.2)`,
-        padding: '40px',
-        boxShadow: `0 0 80px -20px rgba(244,164,11,0.1)`,
+        background: 'var(--bg-card)',
+        borderColor: 'var(--border)',
+        padding: '32px',
+        boxShadow: 'var(--shadow)',
         position: 'relative',
       }}>
-        <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '250px', height: '250px',
-          background: 'radial-gradient(circle, rgba(244,164,11,0.08), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }}/>
         <div style={{ position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
             <div style={{
               width: '52px', height: '52px', borderRadius: '14px',
-              background: `linear-gradient(135deg, ${C.maroon}, #A0522D)`,
+              background: 'var(--accent-glow)',
+              border: '1px solid var(--border)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '26px', boxShadow: `0 0 20px rgba(123,28,28,0.4)`,
+              fontSize: '26px',
             }}>🏓</div>
             <div>
-              <h1 style={{ margin: 0, fontSize: '32px', fontWeight: '900', color: 'white', letterSpacing: '-0.5px' }}>
+              <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '950', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
                 Pickleball{' '}
-                <span style={{ background: `linear-gradient(135deg, ${C.saffron}, ${C.gold})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                   Registrations
                 </span>
               </h1>
-              <p style={{ margin: 0, color: '#64748B', fontSize: '14px' }}>
+              <p style={{ margin: '4px 0 0', color: 'var(--text-secondary)', fontSize: '13.5px', fontWeight: '500' }}>
                 HCC Activities — Knoxville Hindu Community Center
               </p>
             </div>
@@ -562,22 +561,22 @@ export default function PickleballDashboard() {
       {/* ── Stats Cards ─────────────────────────────────────────────────── */}
       {stats && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-          <StatCard label="Total Registered" value={stats.total}     accent="#818CF8"/>
-          <StatCard label="Paid"              value={stats.paid}      accent="#10B981"  sub={`$${(stats.totalRevenue || 0).toFixed(2)} collected`}/>
-          <StatCard label="Pending Payment"   value={stats.pending}   accent="#F59E0B"/>
-          <StatCard label="Beginners"         value={stats.beginner}  accent="#10B981"/>
-          <StatCard label="Intermediate"      value={stats.intermediate} accent="#F59E0B"/>
-          <StatCard label="Advanced"          value={stats.advanced}  accent="#818CF8"/>
+          <StatCard label="Total Registered" value={stats.total}     accent="var(--accent)"/>
+          <StatCard label="Paid"              value={stats.paid}      accent="var(--text-success)"  sub={`$${(stats.totalRevenue || 0).toFixed(2)} collected`}/>
+          <StatCard label="Pending Payment"   value={stats.pending}   accent="var(--accent)"/>
+          <StatCard label="Beginners"         value={stats.beginner}  accent="var(--text-success)"/>
+          <StatCard label="Intermediate"      value={stats.intermediate} accent="var(--accent)"/>
+          <StatCard label="Advanced"          value={stats.advanced}  accent="var(--accent)"/>
         </div>
       )}
 
       {/* ── Filters & Search ────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: '20px 24px' }}>
+      <div style={{ ...card, padding: '20px 24px', boxShadow: 'var(--shadow)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
 
           {/* Search */}
           <div style={{ position: 'relative', flex: '1 1 240px' }}>
-            <svg style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#475569', flexShrink: 0 }}
+            <svg style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', flexShrink: 0 }}
               width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
@@ -587,8 +586,8 @@ export default function PickleballDashboard() {
               placeholder="Search name, email, phone, reg #..."
               style={{
                 width: '100%', padding: '10px 14px 10px 40px',
-                background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(51,65,85,0.6)',
-                borderRadius: '10px', color: 'white', fontSize: '14px', outline: 'none',
+                background: 'var(--bg-input)', border: '1px solid var(--border)',
+                borderRadius: '10px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none',
               }}
             />
           </div>

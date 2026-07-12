@@ -1,39 +1,39 @@
 :root, [data-theme="dark"] {
-  --bg-primary:    #080C14;
-  --bg-secondary:  rgba(13,20,38,0.85);
-  --bg-sidebar:    rgba(10,15,28,0.97);
-  --bg-card:       rgba(13,20,38,0.85);
-  --bg-input:      rgba(8,12,24,0.7);
-  --text-primary:  #F1F5F9;
-  --text-secondary:#94A3B8;
-  --text-muted:    #475569;
-  --border:        rgba(51,65,85,0.6);
-  --border-hover:  rgba(99,102,241,0.25);
-  --accent:        #818CF8;
-  --accent-glow:   rgba(99,102,241,0.15);
-  --shadow:        rgba(0,0,0,0.35);
+  --bg-primary:    #0f0d13;
+  --bg-secondary:  #16121c;
+  --bg-sidebar:    #110e16;
+  --bg-card:       #16121c;
+  --bg-input:      #0f0d13;
+  --text-primary:  #F8FAFC;
+  --text-secondary:#E2E8F0;
+  --text-muted:    #94A3B8;
+  --border:        rgba(139, 30, 63, 0.35);
+  --border-hover:  #FF9933;
+  --accent:        #FF9933;
+  --accent-glow:   rgba(255, 153, 51, 0.08);
+  --shadow:        rgba(0,0,0,0.5);
 
   /* Table styling */
-  --bg-table-header: rgba(8, 12, 20, 0.6);
-  --bg-table-stripe: rgba(15, 23, 42, 0.45);
-  --border-table: rgba(51, 65, 85, 0.4);
-  --text-table-header: #94A3B8;
+  --bg-table-header: #1b1624;
+  --bg-table-stripe: #120e18;
+  --border-table: rgba(139, 30, 63, 0.2);
+  --text-table-header: #E2E8F0;
   
   /* Banners */
-  --bg-banner-grad: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(30,27,75,0.05) 100%);
-  --bg-banner-scanner: linear-gradient(135deg, rgba(13,20,38,0.95) 0%, rgba(30,27,75,0.3) 100%);
+  --bg-banner-grad: linear-gradient(135deg, rgba(255,153,51,0.1) 0%, rgba(139,30,63,0.1) 100%);
+  --bg-banner-scanner: linear-gradient(135deg, #16121c 0%, rgba(139,30,63,0.2) 100%);
   
   /* Buttons & badges */
-  --bg-button-secondary: rgba(13,20,38,0.8);
-  --border-button-secondary: rgba(51,65,85,0.6);
-  --text-button-secondary: #94A3B8;
-  --bg-badge-pill: rgba(51,65,85,0.8);
-  --text-badge-pill: #94A3B8;
-  --border-badge-pill: rgba(71,85,105,0.5);
+  --bg-button-secondary: #16121c;
+  --border-button-secondary: rgba(139,30,63,0.35);
+  --text-button-secondary: #E2E8F0;
+  --bg-badge-pill: rgba(139,30,63,0.2);
+  --text-badge-pill: #FF9933;
+  --border-badge-pill: rgba(139,30,63,0.4);
   
   /* Modals */
-  --bg-modal: #0d1627;
-  --border-modal: rgba(51,65,85,0.8);
+  --bg-modal: #110e16;
+  --border-modal: rgba(139,30,63,0.45);
 
   /* IndiaFest Specific Theme Variables */
   --if-bg-grad: linear-gradient(160deg, #08070F 0%, #110E1C 60%, #180D15 100%);
@@ -55,37 +55,37 @@
 }
 
 [data-theme="light"] {
-  --bg-primary:    #F8FAFC;
+  --bg-primary:    #FFFDF9;
   --bg-secondary:  #FFFFFF;
   --bg-sidebar:    #FFFFFF;
   --bg-card:       #FFFFFF;
-  --bg-input:      #F1F5F9;
-  --text-primary:  #0F172A;
-  --text-secondary:#475569;
-  --text-muted:    #94A3B8;
-  --border:        rgba(226, 232, 240, 0.8);
-  --border-hover:  rgba(99,102,241,0.4);
-  --accent:        #4F46E5;
-  --accent-glow:   rgba(79, 70, 229, 0.06);
-  --shadow:        0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --bg-input:      #FFFBF6;
+  --text-primary:  #2D1A08;
+  --text-secondary:#5D4037;
+  --text-muted:    #8D6E63;
+  --border:        #EAE3D2;
+  --border-hover:  #8B1E3F;
+  --accent:        #8B1E3F;
+  --accent-glow:   rgba(139, 30, 63, 0.05);
+  --shadow:        0 10px 15px -3px rgba(139, 30, 63, 0.05), 0 4px 6px -4px rgba(139, 30, 63, 0.05);
 
   /* Table styling */
-  --bg-table-header: #F1F5F9;
-  --bg-table-stripe: #F8FAFC;
-  --border-table: #E2E8F0;
-  --text-table-header: #475569;
+  --bg-table-header: #FFF8F0;
+  --bg-table-stripe: #FFFDF9;
+  --border-table: #F3EFE0;
+  --text-table-header: #5D4037;
   
   /* Banners */
-  --bg-banner-grad: linear-gradient(135deg, rgba(79,70,229,0.06) 0%, rgba(241,245,249,0.6) 100%);
-  --bg-banner-scanner: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
+  --bg-banner-grad: linear-gradient(135deg, rgba(255,153,51,0.06) 0%, rgba(139,30,63,0.06) 100%);
+  --bg-banner-scanner: linear-gradient(135deg, #FFF8F0 0%, #F3EFE0 100%);
 
   /* Buttons & badges */
   --bg-button-secondary: #FFFFFF;
   --border-button-secondary: #CBD5E1;
-  --text-button-secondary: #475569;
-  --bg-badge-pill: #E2E8F0;
-  --text-badge-pill: #475569;
-  --border-badge-pill: #CBD5E1;
+  --text-button-secondary: #5D4037;
+  --bg-badge-pill: #FFF8F0;
+  --text-badge-pill: #8B1E3F;
+  --border-badge-pill: #EAE3D2;
 
   /* Modals */
   --bg-modal: #FFFFFF;

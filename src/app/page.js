@@ -89,62 +89,62 @@ const moduleConfigs = [
 // ── Public landing page (shown to logged-out visitors) ─────────────────────────
 function PublicLanding() {
   const { theme, toggleTheme, isDark } = useTheme();
+  const [pbOpen, setPbOpen] = useState(false);
+  const [ifOpen, setIfOpen] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/pickleball/settings?key=is_published').then(r => r.json()).catch(() => ({})),
+      fetch('/api/indiafest/settings?key=is_published').then(r => r.json()).catch(() => ({}))
+    ]).then(([pb, ifest]) => {
+      setPbOpen(pb.is_published === true || pb.value === 'true');
+      setIfOpen(ifest.is_published === true || ifest.value === 'true');
+    }).finally(() => {
+      setLoadingStatus(false);
+    });
+  }, []);
+
+  const [hovered, setHovered] = useState(null);
 
   const options = [
     {
       title: 'Pickleball Registration',
-      desc: 'Register for the HCC Pickleball Tournament. Secure your spot and pay online.',
+      desc: 'Register your doubles team for the HCC Pickleball Tournament. Flat entry fee of $50 per team.',
       href: '/register/pickleball',
       accentColor: 'var(--accent)',
       glowColor: 'var(--accent-glow)',
-      borderColor: 'var(--border-hover)',
-      icon: (
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M6 12a6 6 0 0 1 12 0"/>
-          <path d="M12 6a6 6 0 0 1 0 12"/>
-          <circle cx="12" cy="12" r="1" fill="currentColor"/>
-        </svg>
-      ),
+      borderColor: 'var(--border)',
+      icon: '🏸',
       badge: 'Sports Event',
-      cta: 'Register Now',
+      cta: pbOpen ? 'Register Online' : 'Registration Closed',
+      isOpen: pbOpen,
     },
     {
-      title: 'IndiaFest Registration',
-      desc: 'Reserve your vendor booth at IndiaFest 2026 — East Tennessee’s largest celebration of Indian culture.',
+      title: 'IndiaFest Vendor Registration',
+      desc: 'Reserve your booth for IndiaFest 2026 (Aug 23, 11am-5pm). Home Business ($351) or Established Store ($1001).',
       href: '/register/indiafest/vendor',
       accentColor: '#FF9933',
-      glowColor: 'rgba(255, 153, 51, 0.15)',
-      borderColor: 'rgba(255, 153, 51, 0.3)',
-      icon: (
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-          <path d="M2 17l10 5 10-5"/>
-          <path d="M2 12l10 5 10-5"/>
-        </svg>
-      ),
+      glowColor: 'rgba(255, 153, 51, 0.12)',
+      borderColor: 'var(--border)',
+      icon: '🎪',
       badge: 'Cultural Festival',
-      cta: 'Reserve Booth',
+      cta: ifOpen ? 'Book Space' : 'Registration Closed',
+      isOpen: ifOpen,
     },
     {
-      title: 'Admin Login',
-      desc: 'Staff and administrator access to the HCC portal dashboard, reports, and settings.',
+      title: 'Admin & Staff Portal',
+      desc: 'Authorized operator access to system configurations, Odoo discrepancy scanner, logs, and report lists.',
       href: '/login',
-      accentColor: '#818CF8',
-      glowColor: 'rgba(129, 140, 248, 0.12)',
-      borderColor: 'rgba(129, 140, 248, 0.25)',
-      icon: (
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-        </svg>
-      ),
+      accentColor: '#8B1E3F',
+      glowColor: 'rgba(139, 30, 63, 0.12)',
+      borderColor: 'var(--border)',
+      icon: '🔑',
       badge: 'Staff Only',
-      cta: 'Sign In',
+      cta: 'Operator Login',
+      isOpen: true,
     },
   ];
-
-  const [hovered, setHovered] = useState(null);
 
   return (
     <div style={{
@@ -160,192 +160,166 @@ function PublicLanding() {
       transition: 'background-color 0.3s, color 0.3s',
     }}>
       {/* Top flag stripe */}
-      <div style={{ height: '4px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', flexShrink: 0 }}/>
+      <div style={{ height: '5px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', flexShrink: 0 }}/>
 
-      {/* Floating Theme Toggle (Top Right) */}
-      <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10000 }}>
-        <button
-          onClick={toggleTheme}
-          aria-label="Toggle light/dark theme"
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border)',
-            borderRadius: '50%',
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--text-primary)',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
-          onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-        >
-          {isDark ? '☀️' : '🌙'}
-        </button>
-      </div>
-
-      {/* Ambient background glows */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <div style={{ position: 'absolute', top: '-10%', left: '10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius: '50%' }}/>
-        <div style={{ position: 'absolute', bottom: '-10%', right: '10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, rgba(244,164,11,0.03), transparent 70%)', borderRadius: '50%' }}/>
-      </div>
-
-      {/* Main content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', position: 'relative', zIndex: 1 }}>
-
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '48px', maxWidth: '680px' }}>
-          {/* HCC logo mark */}
-          <div style={{
-            width: '64px', height: '64px', borderRadius: '16px', margin: '0 auto 24px',
-            background: 'linear-gradient(135deg, var(--accent-glow), transparent)',
-            border: '1px solid var(--border)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: 'var(--shadow)',
-          }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-          </div>
-
-          <h1 style={{ margin: '0 0 14px', fontSize: 'clamp(28px, 4.5vw, 44px)', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-1.5px', lineHeight: 1.2 }}>
-            <div>Knoxville Hindu</div>
-            <div style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #38BDF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginTop: '6px' }}>
-              Community Center
+      {/* Responsive Rounded Pill Header Header */}
+      <header style={{ width: '100%', maxWidth: '1100px', margin: '24px auto 0', padding: '0 24px', flexShrink: 0 }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: 'var(--bg-card)', border: '1px solid var(--border)',
+          borderRadius: '50px', padding: '12px 28px',
+          boxShadow: 'var(--shadow)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src="/hcc_logo.png" alt="HCC Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+            <div style={{ borderLeft: '1.5px solid var(--border)', paddingLeft: '12px' }}>
+              <div style={{ fontSize: '14px', fontWeight: '850', color: 'var(--text-primary)', letterSpacing: '0.2px' }}>Hindu Community Center</div>
+              <div style={{ fontSize: '10px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Knoxville, TN</div>
             </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <a href="https://www.knoxvillemandir.org" target="_blank" rel="noreferrer" style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.2s' }}>
+              Visit Temple Website
+            </a>
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              style={{
+                background: 'var(--bg-input)', border: '1px solid var(--border)',
+                borderRadius: '50%', width: '38px', height: '38px',
+                display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center',
+                color: 'var(--text-primary)', cursor: 'pointer', outline: 'none',
+                transition: 'all 0.25s ease', fontSize: '16px',
+              }}
+            >
+              {isDark ? '☀️' : '🌙'}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main content body */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px 60px', position: 'relative' }}>
+        
+        {/* Welcome Hero */}
+        <div style={{ textAlign: 'center', marginBottom: '44px', maxWidth: '640px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--accent-glow)', border: '1px solid var(--border)', padding: '6px 16px', borderRadius: '20px', marginBottom: '20px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--if-primary)' }}/>
+            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--if-primary)', letterSpacing: '2px', textTransform: 'uppercase' }}>Jay Shri Krishna</span>
+          </div>
+          <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(32px, 5.5vw, 56px)', fontWeight: '950', color: 'var(--text-primary)', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+            HCC Registrations & Portal
           </h1>
-          <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-secondary)', fontWeight: '500', letterSpacing: '0.3px' }}>
-            Select an option below to get started
+          <p style={{ margin: 0, fontSize: '16px', color: 'var(--text-secondary)', lineHeight: 1.5, fontWeight: '500' }}>
+            Welcome to the Knoxville Hindu Community Center portal. Select an event below to register and secure your space.
           </p>
         </div>
 
-        {/* Three option cards */}
+        {/* Three Option Cards Grid */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
           gap: '24px',
           width: '100%',
-          maxWidth: '1020px',
+          maxWidth: '1000px',
         }}>
-          {options.map((opt, i) => (
-            <Link key={i} href={opt.href} style={{ textDecoration: 'none' }}>
-              <div
-                onMouseEnter={() => setHovered(i)}
-                onMouseLeave={() => setHovered(null)}
-                style={{
-                  background: 'var(--bg-card)',
-                  border: hovered === i
-                    ? `1px solid ${opt.accentColor}`
-                    : '1px solid var(--border)',
-                  borderRadius: '20px',
-                  padding: '40px 32px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: '100%',
-                  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                  transform: hovered === i ? 'translateY(-6px)' : 'translateY(0)',
-                  boxShadow: hovered === i
-                    ? `0 20px 40px ${opt.glowColor}, var(--shadow)`
-                    : 'var(--shadow)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-              >
-                {/* Glow overlay on hover */}
-                <div style={{
-                  position: 'absolute', inset: 0, borderRadius: '20px',
-                  background: hovered === i ? `radial-gradient(circle at 100% 0%, ${opt.glowColor}, transparent 70%)` : 'none',
-                  pointerEvents: 'none',
-                  transition: 'all 0.3s',
-                }}/>
+          {options.map((opt, i) => {
+            const active = hovered === i;
+            return (
+              <Link key={i} href={opt.isOpen ? opt.href : '#'} style={{ textDecoration: 'none', cursor: opt.isOpen ? 'pointer' : 'not-allowed' }}>
+                <div
+                  onMouseEnter={() => setHovered(i)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: active && opt.isOpen
+                      ? `2px solid ${opt.accentColor}`
+                      : '2px solid var(--border)',
+                    borderRadius: '20px',
+                    padding: '36px 28px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    transition: 'all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
+                    transform: active && opt.isOpen ? 'translateY(-6px)' : 'translateY(0)',
+                    boxShadow: active && opt.isOpen
+                      ? `0 12px 30px ${opt.glowColor}, var(--shadow)`
+                      : 'var(--shadow)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    opacity: opt.isOpen ? 1 : 0.65,
+                  }}
+                >
+                  {/* Category Badge & Status */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', width: '100%' }}>
+                    <div style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '6px',
+                      background: active && opt.isOpen ? `${opt.accentColor}25` : 'var(--bg-input)',
+                      borderRadius: '99px', padding: '4px 10px',
+                      border: '1px solid var(--border)',
+                    }}>
+                      <span style={{ fontSize: '10px', fontWeight: '850', color: active && opt.isOpen ? opt.accentColor : 'var(--text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                        {opt.badge}
+                      </span>
+                    </div>
 
-                {/* Badge */}
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: hovered === i ? `${opt.accentColor}25` : 'var(--bg-input)',
-                  border: hovered === i ? `1px solid ${opt.accentColor}40` : '1px solid var(--border)',
-                  borderRadius: '99px', padding: '5px 12px',
-                  marginBottom: '28px', alignSelf: 'flex-start',
-                  position: 'relative',
-                  transition: 'all 0.3s',
-                }}>
-                  <span style={{
-                    width: '6px', height: '6px', borderRadius: '50%',
-                    background: opt.accentColor, display: 'inline-block', flexShrink: 0,
-                    boxShadow: hovered === i ? `0 0 8px ${opt.accentColor}` : 'none'
-                  }}/>
-                  <span style={{ fontSize: '10px', fontWeight: '800', color: hovered === i ? opt.accentColor : 'var(--text-secondary)', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                    {opt.badge}
-                  </span>
+                    {opt.title !== 'Admin & Staff Portal' && (
+                      <span style={{
+                        fontSize: '11px', fontWeight: '700',
+                        color: opt.isOpen ? 'var(--text-success)' : 'var(--text-error)',
+                        display: 'flex', alignItems: 'center', gap: '6px'
+                      }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: opt.isOpen ? 'var(--text-success)' : 'var(--text-error)' }}/>
+                        {opt.isOpen ? 'Open' : 'Closed'}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Icon */}
+                  <div style={{
+                    width: '54px', height: '54px', borderRadius: '12px',
+                    background: 'var(--bg-input)', border: '1px solid var(--border)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '28px', marginBottom: '20px',
+                  }}>
+                    {opt.icon}
+                  </div>
+
+                  {/* Title & Desc */}
+                  <h2 style={{ margin: '0 0 10px', fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
+                    {opt.title}
+                  </h2>
+                  <p style={{ margin: '0 0 28px', fontSize: '13.5px', lineHeight: '1.6', color: 'var(--text-secondary)', flex: 1 }}>
+                    {opt.desc}
+                  </p>
+
+                  {/* Action Link Indicator */}
+                  <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    fontSize: '13.5px', fontWeight: '800',
+                    color: opt.isOpen ? opt.accentColor : 'var(--text-muted)',
+                    transition: 'all 0.25s',
+                  }}>
+                    <span>{opt.cta}</span>
+                    {opt.isOpen && <span style={{ transition: 'transform 0.2s', transform: active ? 'translateX(4px)' : 'translateX(0)' }}>→</span>}
+                  </div>
                 </div>
-
-                {/* Icon */}
-                <div style={{
-                  width: '56px', height: '56px', borderRadius: '14px',
-                  background: hovered === i ? `${opt.accentColor}20` : 'var(--bg-input)',
-                  border: hovered === i ? `1px solid ${opt.accentColor}40` : '1px solid var(--border)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: hovered === i ? opt.accentColor : 'var(--text-secondary)', marginBottom: '24px',
-                  position: 'relative',
-                  boxShadow: hovered === i ? `0 0 20px ${opt.accentColor}25` : 'none',
-                  transition: 'all 0.3s',
-                }}>
-                  {opt.icon}
-                </div>
-
-                {/* Text */}
-                <h2 style={{
-                  margin: '0 0 12px',
-                  fontSize: '21px', fontWeight: '800',
-                  color: 'var(--text-primary)',
-                  letterSpacing: '-0.3px',
-                  position: 'relative',
-                }}>
-                  {opt.title}
-                </h2>
-                
-                <p style={{
-                  margin: '0 0 32px',
-                  fontSize: '14px', lineHeight: '1.6',
-                  color: 'var(--text-secondary)',
-                  flex: 1,
-                  position: 'relative',
-                }}>
-                  {opt.desc}
-                </p>
-
-                {/* CTA */}
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  fontSize: '14px', fontWeight: '700',
-                  color: opt.accentColor,
-                  position: 'relative',
-                  transition: 'all 0.3s',
-                }}>
-                  <span>{opt.cta}</span>
-                  <span style={{
-                    transform: hovered === i ? 'translateX(4px)' : 'translateX(0)',
-                    transition: 'transform 0.2s',
-                    fontSize: '15px'
-                  }}>→</span>
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Footer */}
-        <div style={{ marginTop: '56px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', opacity: 0.5, margin: 0 }}>
+        {/* Footer info and address */}
+        <footer style={{ marginTop: '64px', textAlign: 'center', borderTop: '1px solid var(--border)', paddingTop: '28px', width: '100%', maxWidth: '1000px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: '700', marginBottom: '8px', flexWrap: 'wrap' }}>
+            <span>8580 Hickory Creek Rd, Lenoir City, TN 37771</span>
+            <span style={{ opacity: 0.4 }}>•</span>
+            <a href="tel:865-988-3820" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>+1 865-988-3820</a>
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600' }}>
             © 2026 Knoxville Hindu Community Center · All rights reserved
-          </p>
-        </div>
+          </div>
+        </footer>
       </div>
 
       <style>{`
@@ -510,19 +484,19 @@ export default function Home() {
           }}>
             <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '300px', height: '300px', background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
             <div style={{ position: 'relative' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '99px', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)', marginBottom: '20px' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 6px #10B981' }} />
-                <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '99px', background: 'var(--accent-glow)', border: '1px solid var(--border)', marginBottom: '20px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--text-success)', boxShadow: '0 0 6px var(--text-success)' }} />
+                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                   {user?.role === 'super_admin' ? 'Super Admin Session' : 'Staff Session'}
                 </span>
               </div>
-              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
                 Welcome to the{' '}
-                <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                   HCC Admin Portal
                 </span>
               </h1>
-              <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', maxWidth: '580px', lineHeight: 1.6 }}>
+              <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', maxWidth: '580px', lineHeight: 1.6, fontWeight: '500' }}>
                 Hello, <strong>{user?.name || 'User'}</strong>! Choose an action below or browse the sidebar to manage the Knoxville Hindu Community Center activities.
               </p>
             </div>
@@ -601,28 +575,27 @@ export default function Home() {
             ...cardStyle,
             background: 'var(--bg-banner-scanner)',
             borderColor: 'var(--border)',
-            padding: 'clamp(20px, 4vw, 48px)',
-            boxShadow: '0 0 80px -20px var(--accent-glow)',
+            padding: 'clamp(20px, 4vw, 32px)',
+            boxShadow: 'var(--shadow)',
             position: 'relative', overflow: 'hidden',
             display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
           }}>
-            <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '300px', height: '300px', background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }}></div>
             <div style={{ position: 'relative' }}>
-              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 42px)', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
                 System{' '}
-                <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scanner</span>
+                <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Scanner</span>
               </h1>
-              <p style={{ margin: '12px 0 0', color: '#64748B', fontSize: '15px', maxWidth: '480px', lineHeight: 1.6 }}>
+              <p style={{ margin: '8px 0 0', color: 'var(--text-secondary)', fontSize: '14px', maxWidth: '480px', lineHeight: 1.6, fontWeight: '500' }}>
                 Deep-scan Odoo live database to identify POS orders missing active recurring subscriptions.
               </p>
             </div>
             <button onClick={runScan} disabled={loading} style={{
-              background: loading ? 'rgba(99,102,241,0.5)' : 'linear-gradient(135deg, #6366F1, #22D3EE)',
-              color: 'white', fontWeight: '700', fontSize: '15px',
-              padding: '14px 32px', borderRadius: '12px', border: 'none',
+              background: loading ? 'rgba(51,65,85,0.5)' : 'var(--accent)',
+              color: 'white', fontWeight: '800', fontSize: '14.5px',
+              padding: '12px 28px', borderRadius: '12px', border: 'none',
               cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px',
-              boxShadow: '0 0 40px -10px rgba(99,102,241,0.5)',
+              boxShadow: '0 4px 12px var(--accent-glow)',
               transition: 'all 0.3s', whiteSpace: 'nowrap', position: 'relative',
             }}>
               {loading ? (
@@ -636,14 +609,14 @@ export default function Home() {
           {summary && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
               {[
-                { label: 'Active Subs',       value: summary.totalActiveSubscriptions, color: '#6366F1', glow: false },
-                { label: 'POS Sub Orders',    value: summary.posOrdersWithSubs,        color: '#38BDF8', glow: false },
-                { label: 'Valid (Skipped)',    value: summary.skipped,                  color: '#10B981', glow: false },
-                { label: 'Missing Subs',      value: summary.wouldFix,                 color: '#F43F5E', glow: true  },
+                { label: 'Active Subs',       value: summary.totalActiveSubscriptions, color: 'var(--accent)', glow: false },
+                { label: 'POS Sub Orders',    value: summary.posOrdersWithSubs,        color: 'var(--accent)', glow: false },
+                { label: 'Valid (Skipped)',    value: summary.skipped,                  color: 'var(--text-success)', glow: false },
+                { label: 'Missing Subs',      value: summary.wouldFix,                 color: 'var(--text-error)', glow: true  },
               ].map(({ label, value, color, glow }) => (
-                <div key={label} style={{ ...cardStyle, padding: '24px', borderTop: '2px solid ' + color, boxShadow: glow ? '0 0 30px -10px rgba(244,63,94,0.25)' : 'none' }}>
-                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px' }}>{label}</div>
-                  <div style={{ fontSize: '36px', fontWeight: '900', color: color, lineHeight: 1 }}>{value}</div>
+                <div key={label} style={{ ...cardStyle, padding: '24px', borderTop: '3.5px solid ' + color, boxShadow: glow ? '0 4px 12px var(--accent-glow)' : 'var(--shadow)' }}>
+                  <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px' }}>{label}</div>
+                  <div style={{ fontSize: '36px', fontWeight: '950', color: color, lineHeight: 1 }}>{value}</div>
                 </div>
               ))}
             </div>

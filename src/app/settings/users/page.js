@@ -13,8 +13,8 @@ const HCC_PAGES = [
 ];
 
 const ROLE_COLORS = {
-  super_admin: { bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.25)', text: '#8B5CF6' },
-  staff:       { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.25)',  text: '#2563EB' },
+  super_admin: { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.25)', text: '#FF9933' },
+  staff:       { bg: 'rgba(139,30,63,0.12)', border: 'rgba(139,30,63,0.25)',  text: '#8B1E3F' },
 };
 
 const C = {
@@ -24,8 +24,8 @@ const C = {
   gold:   'var(--accent)',
   text:   'var(--text-primary)',
   muted:  'var(--text-secondary)',
-  green:  '#10B981',
-  red:    '#EF4444',
+  green:  'var(--text-success)',
+  red:    'var(--text-error)',
   indigo: 'var(--accent)',
 };
 
@@ -483,16 +483,17 @@ export default function UsersPage() {
       {/* Page Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👥</div>
+          <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👥</div>
           <div>
             <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>User Management</h1>
-            <p style={{ margin: '2px 0 0', fontSize: '13px', color: C.muted }}>{users.length} user{users.length !== 1 ? 's' : ''} registered</p>
+            <p style={{ margin: '2px 0 0', fontSize: '13px', color: C.muted, fontWeight: '500' }}>{users.length} user{users.length !== 1 ? 's' : ''} registered</p>
           </div>
         </div>
         {isSA && (
           <button onClick={() => setShowAdd(true)} style={{
             display: 'flex', alignItems: 'center', gap: '8px', padding: '11px 20px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-            background: 'linear-gradient(135deg, #6366F1, #818CF8)', color: 'white', fontSize: '14px', fontWeight: '700', fontFamily: 'inherit',
+            background: 'var(--accent)', color: 'white', fontSize: '14px', fontWeight: '800', fontFamily: 'inherit',
+            boxShadow: '0 4px 12px var(--accent-glow)',
           }}>
             + Add User
           </button>
@@ -507,9 +508,9 @@ export default function UsersPage() {
             padding: '12px 20px',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'users' ? '2px solid var(--accent)' : '2px solid transparent',
+            borderBottom: activeTab === 'users' ? '2.5px solid var(--accent)' : '2.5px solid transparent',
             color: activeTab === 'users' ? 'var(--text-primary)' : 'var(--text-secondary)',
-            fontWeight: '700',
+            fontWeight: '800',
             fontSize: '14px',
             cursor: 'pointer',
             transition: 'all 0.15s',
@@ -523,9 +524,9 @@ export default function UsersPage() {
             padding: '12px 20px',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'activity' ? '2px solid var(--accent)' : '2px solid transparent',
+            borderBottom: activeTab === 'activity' ? '2.5px solid var(--accent)' : '2.5px solid transparent',
             color: activeTab === 'activity' ? 'var(--text-primary)' : 'var(--text-secondary)',
-            fontWeight: '700',
+            fontWeight: '800',
             fontSize: '14px',
             cursor: 'pointer',
             transition: 'all 0.15s',
@@ -539,10 +540,10 @@ export default function UsersPage() {
         /* Users Table */
         loading ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px', color: C.muted }}>
-            <div style={{ width: '28px', height: '28px', border: '2px solid #6366F1', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
+            <div style={{ width: '28px', height: '28px', border: '2px solid var(--accent)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
           </div>
         ) : (
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden' }}>
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
             <div className="table-responsive">
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
               <thead>
@@ -564,12 +565,12 @@ export default function UsersPage() {
                       {/* User */}
                       <td style={{ padding: '16px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(99,102,241,0.15)', border: '1.5px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '800', color: C.indigo, flexShrink: 0 }}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent-glow)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '800', color: 'var(--accent)', flexShrink: 0 }}>
                             {(u.name || u.email)[0].toUpperCase()}
                           </div>
                           <div>
                             <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{u.name || '—'}</div>
-                            <div style={{ fontSize: '12px', color: C.muted }}>{u.email}</div>
+                            <div style={{ fontSize: '12px', color: C.muted, fontWeight: '500' }}>{u.email}</div>
                           </div>
                         </div>
                       </td>

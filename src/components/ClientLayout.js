@@ -67,6 +67,18 @@ export default function ClientLayout({ children }) {
     }
   }, [pathname]);
 
+  // Background body scroll lock on mobile sidebar open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [sidebarOpen]);
+
   const handleLogout = useCallback(async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
@@ -146,9 +158,12 @@ export default function ClientLayout({ children }) {
             </svg>
           </button>
           
-          <span style={{ fontSize: '16px', fontWeight: '800', color: textPrimary, letterSpacing: '-0.3px' }}>
-            Agent<span style={{ color: '#818CF8' }}>Hub</span>
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img src="/hcc_logo.png" alt="HCC Logo" style={{ height: '24px', width: 'auto' }} />
+            <span style={{ fontSize: '15px', fontWeight: '850', color: textPrimary, letterSpacing: '-0.3px' }}>
+              HCC <span style={{ color: 'var(--accent)' }}>Portal</span>
+            </span>
+          </div>
           
           <button 
             onClick={toggleTheme}
@@ -199,30 +214,17 @@ export default function ClientLayout({ children }) {
         >
           {/* Logo */}
           <div style={{ 
-            padding: '28px 24px', 
+            padding: '20px 20px', 
             borderBottom: `1px solid ${sidebarBorder}`, 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between',
             gap: '12px' 
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #6366F1, #38BDF8)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: '900',
-                fontSize: '18px',
-                boxShadow: '0 0 20px rgba(99,102,241,0.35)',
-                flexShrink: 0,
-              }}>H</div>
-              <span style={{ fontSize: '18px', fontWeight: '800', color: textPrimary, letterSpacing: '-0.3px' }}>
-                Agent<span style={{ color: '#818CF8' }}>Hub</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src="/hcc_logo.png" alt="HCC Logo" style={{ height: '32px', width: 'auto' }} />
+              <span style={{ fontSize: '16px', fontWeight: '850', color: textPrimary, letterSpacing: '-0.3px' }}>
+                HCC <span style={{ color: 'var(--accent)' }}>Portal</span>
               </span>
             </div>
             
@@ -248,9 +250,9 @@ export default function ClientLayout({ children }) {
           </div>
 
           {/* Nav links */}
-          <nav style={{ flex: 1, padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'auto' }}>
-            <div style={{ fontSize: '10px', fontWeight: '700', color: textMuted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', paddingLeft: '12px' }}>
-              NAVIGATION
+          <nav style={{ flex: 1, padding: '20px 14px', display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'auto' }}>
+            <div style={{ fontSize: '10px', fontWeight: '800', color: textMuted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px', paddingLeft: '10px' }}>
+              Management
             </div>
             {navLinks.filter(link => {
               if (link.adminOnly) return user?.role === 'super_admin';
@@ -265,14 +267,14 @@ export default function ClientLayout({ children }) {
                 <Link key={href} href={href} style={{
                   display: 'flex', alignItems: 'center', gap: '12px',
                   padding: '11px 14px', borderRadius: '12px',
-                  color: active ? 'var(--accent)' : 'var(--text-secondary)',
+                  color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
                   backgroundColor: active ? 'var(--accent-glow)' : 'transparent',
-                  border: active ? '1px solid var(--border-hover)' : '1px solid transparent',
-                  fontWeight: active ? '700' : '600', fontSize: '14px',
+                  border: active ? '1px solid var(--border)' : '1px solid transparent',
+                  fontWeight: active ? '800' : '600', fontSize: '14px',
                   textDecoration: 'none', transition: 'all 0.2s',
                 }}
                 className="sidebar-link">
-                  <span style={{ opacity: active ? 1 : 0.7 }}>{icon}</span>
+                  <span style={{ opacity: active ? 1 : 0.7, color: active ? 'var(--accent)' : 'inherit' }}>{icon}</span>
                   {label}
                   {active && <span style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)' }}/>}
                 </Link>
@@ -291,13 +293,13 @@ export default function ClientLayout({ children }) {
                 padding: '10px 14px', borderRadius: '12px', border: `1px solid ${sidebarBorder}`,
                 backgroundColor: 'var(--bg-input)',
                 color: textMuted, cursor: 'pointer', width: '100%',
-                fontFamily: 'inherit', fontSize: '13px', fontWeight: '600',
+                fontFamily: 'inherit', fontSize: '13px', fontWeight: '700',
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = '#818CF8'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = sidebarBorder}
             >
-              <span style={{ color: isDark ? '#F59E0B' : '#6366F1' }}>
+              <span style={{ color: isDark ? '#F59E0B' : 'var(--accent)' }}>
                 {isDark ? <SunIcon /> : <MoonIcon />}
               </span>
               {isDark ? 'Light Mode' : 'Dark Mode'}

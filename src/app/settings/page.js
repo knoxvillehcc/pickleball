@@ -106,7 +106,7 @@ export default function SettingsPage() {
       {/* Page Header */}
       <div>
         <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-           System <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Settings</span>
+           System <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Settings</span>
         </h1>
         <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.6 }}>
            Configure your Odoo instance connection to enable live database access.
@@ -116,12 +116,12 @@ export default function SettingsPage() {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
         {/* Connection Config Card */}
-        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden' }}>
+        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
            <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', display: 'flex', alignItems: 'center', color: '#818CF8', justifyContent: 'center' }}><ServerIcon /></div>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', color: 'var(--accent)', justifyContent: 'center' }}><ServerIcon /></div>
               <div>
-                 <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>Odoo Connection</h2>
-                 <p style={{ margin: '2px 0 0', color: 'var(--text-secondary)', fontSize: '12px' }}>Instance URL, database name and credentials</p>
+                 <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '800', color: 'var(--text-primary)' }}>Odoo Connection</h2>
+                 <p style={{ margin: '2px 0 0', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: '500' }}>Instance URL, database name and credentials</p>
               </div>
            </div>
            <div style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -164,11 +164,11 @@ export default function SettingsPage() {
         </div>
 
         {/* Security Note Card */}
-        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px', boxShadow: 'var(--shadow)' }}>
            <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', flexShrink: 0 }}><ShieldIcon /></div>
            <div>
-              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>Security Notice</h3>
-              <p style={{ margin: '6px 0 0', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
+              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: 'var(--text-primary)' }}>Security Notice</h3>
+              <p style={{ margin: '6px 0 0', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6, fontWeight: '500' }}>
                  Credentials are stored locally in your environment file and are never transmitted to third parties. Use a dedicated API key with least-privilege access for enhanced security.
               </p>
            </div>
@@ -176,7 +176,7 @@ export default function SettingsPage() {
 
         {/* Test Result */}
         {testResult && (
-          <div style={{ padding: '16px 20px', borderRadius: '12px', border: '1px solid ' + (testResult.success ? 'rgba(16,185,129,0.3)' : 'rgba(244,63,94,0.3)'), backgroundColor: testResult.success ? 'rgba(16,185,129,0.1)' : 'rgba(244,63,94,0.1)', color: testResult.success ? '#10B981' : '#F43F5E', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ padding: '16px 20px', borderRadius: '12px', border: '1px solid ' + (testResult.success ? 'var(--text-success)' : 'var(--text-error)'), backgroundColor: testResult.success ? 'rgba(16,185,129,0.08)' : 'rgba(244,63,94,0.08)', color: testResult.success ? 'var(--text-success)' : 'var(--text-error)', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '18px' }}>{testResult.success ? '✓' : '✗'}</span>
             <span>{testResult.message}</span>
           </div>
@@ -184,7 +184,7 @@ export default function SettingsPage() {
 
         {/* Save Success */}
         {saveSuccess && (
-          <div style={{ padding: '16px 20px', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.3)', backgroundColor: 'rgba(16,185,129,0.1)', color: '#10B981', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ padding: '16px 20px', borderRadius: '12px', border: '1px solid var(--text-success)', backgroundColor: 'rgba(16,185,129,0.08)', color: 'var(--text-success)', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '18px' }}>✓</span>
             <span>Settings saved successfully!</span>
           </div>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
               disabled={testing || !formData.url || !formData.db || !formData.username || !formData.password}
               style={{
                 flex: 1, minWidth: '140px', backgroundColor: 'var(--bg-button-secondary)', border: '1px solid var(--border-button-secondary)',
-                color: 'var(--text-button-secondary)', fontWeight: '700', padding: '14px 28px', borderRadius: '12px',
+                color: 'var(--text-button-secondary)', fontWeight: '800', padding: '14px 28px', borderRadius: '12px',
                 cursor: (testing || !formData.url || !formData.db || !formData.username || !formData.password) ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '15px', transition: 'all 0.3s',
               }}
@@ -214,11 +214,11 @@ export default function SettingsPage() {
               type="submit"
               disabled={saving}
               style={{
-                flex: 1, minWidth: '140px', background: 'linear-gradient(135deg, #6366F1, #22D3EE)',
-                color: 'white', fontWeight: '700', padding: '14px 28px', borderRadius: '12px', border: 'none',
+                flex: 1, minWidth: '140px', background: 'var(--accent)',
+                color: 'white', fontWeight: '800', padding: '14px 28px', borderRadius: '12px', border: 'none',
                 cursor: saving ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '15px', transition: 'all 0.3s',
-                boxShadow: '0 0 30px -8px rgba(99,102,241,0.4)',
+                boxShadow: '0 4px 14px var(--accent-glow)',
               }}
            >
               {saving ? (

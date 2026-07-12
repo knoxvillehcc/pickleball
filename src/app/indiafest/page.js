@@ -3,31 +3,30 @@ import { useState, useEffect, useCallback } from 'react';
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const C = {
-  saffron: '#FF9933',
-  gold:    '#FFD700',
+  saffron: 'var(--accent)',
+  gold:    '#FF9933',
   bg:      'var(--bg-card)',
   border:  'var(--border)',
 };
 
 const SPACE_LABELS = {
-  small:  { label: 'Small',  size: '10×10 ft', price: '$100' },
-  medium: { label: 'Medium', size: '10×20 ft', price: '$150' },
-  large:  { label: 'Large',  size: '20×20 ft', price: '$200' },
+  home_business:        { label: 'Home Business',        size: '1 Spot', price: '$351' },
+  established_business: { label: 'Established Store',    size: '1 Spot', price: '$1001' },
 };
 
 // ── Badge ──────────────────────────────────────────────────────────────────────
 function Badge({ status }) {
   const map = {
-    paid:     { bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)', color: '#10B981', label: '✓ Paid' },
-    pending:  { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', color: '#F59E0B', label: '⏳ Pending' },
-    failed:   { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.4)',  color: '#EF4444', label: '✗ Failed' },
-    refunded: { bg: 'rgba(148,163,184,0.15)',border: 'rgba(148,163,184,0.4)',color: '#94A3B8', label: '↩ Refunded' },
+    paid:     { bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)', color: 'var(--text-success)', label: '✓ Paid' },
+    pending:  { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', color: 'var(--accent)', label: '⏳ Pending' },
+    failed:   { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.4)',  color: 'var(--text-error)', label: '✗ Failed' },
+    refunded: { bg: 'rgba(148,163,184,0.15)',border: 'rgba(148,163,184,0.4)',color: 'var(--text-muted)', label: '↩ Refunded' },
   };
   const s = map[status] || map.pending;
   return (
     <span style={{
       display: 'inline-block', padding: '4px 12px', borderRadius: '99px',
-      fontSize: '11px', fontWeight: '700',
+      fontSize: '11px', fontWeight: '800',
       backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.color,
     }}>
       {s.label}
@@ -39,18 +38,17 @@ function Badge({ status }) {
 function SpaceBadge({ type }) {
   const s = SPACE_LABELS[type] || { label: type, size: '', price: '' };
   const colors = {
-    small:  { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.3)', color: '#FF9933' },
-    medium: { bg: 'rgba(255,215,0,0.12)',  border: 'rgba(255,215,0,0.3)',  color: '#FFD700' },
-    large:  { bg: 'rgba(250,128,114,0.12)',border: 'rgba(250,128,114,0.3)',color: '#FA8072' },
+    home_business:        { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.3)', color: '#FF9933' },
+    established_business: { bg: 'rgba(139,30,63,0.12)',  border: 'rgba(139,30,63,0.3)',  color: '#8B1E3F' },
   };
-  const c = colors[type] || colors.small;
+  const c = colors[type] || { bg: 'var(--accent-glow)', border: 'var(--border)', color: 'var(--accent)' };
   return (
     <span style={{
       display: 'inline-block', padding: '4px 12px', borderRadius: '99px',
-      fontSize: '11px', fontWeight: '700',
+      fontSize: '11px', fontWeight: '800',
       backgroundColor: c.bg, border: `1px solid ${c.border}`, color: c.color,
     }}>
-      🏪 {s.label} · {s.size} · {s.price}
+      🏪 {s.label} ({s.price})
     </span>
   );
 }
@@ -60,14 +58,14 @@ function StatCard({ label, value, accent, sub }) {
   return (
     <div style={{
       backgroundColor: C.bg, border: `1px solid ${C.border}`,
-      borderRadius: '16px', padding: '24px', borderTop: `2px solid ${accent}`,
-      width: '100%',
+      borderRadius: '16px', padding: '24px', borderTop: `3.5px solid ${accent}`,
+      width: '100%', boxShadow: 'var(--shadow)',
     }}>
-      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>
         {label}
       </div>
-      <div style={{ fontSize: '40px', fontWeight: '900', color: accent, lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '6px' }}>{sub}</div>}
+      <div style={{ fontSize: '36px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', fontWeight: '600' }}>{sub}</div>}
     </div>
   );
 }
@@ -77,10 +75,11 @@ function FilterBtn({ active, children, onClick }) {
   return (
     <button onClick={onClick} style={{
       padding: '8px 16px', borderRadius: '8px',
-      border: `1px solid ${active ? C.saffron : 'var(--border)'}`,
-      backgroundColor: active ? 'var(--accent-glow)' : 'transparent',
-      color: active ? C.saffron : 'var(--text-secondary)',
-      fontWeight: '600', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s',
+      border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
+      backgroundColor: active ? 'var(--accent-glow)' : 'var(--bg-card)',
+      color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+      fontWeight: '800', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s',
+      fontFamily: 'inherit',
     }}>
       {children}
     </button>
@@ -219,19 +218,20 @@ export default function IndiafestVendorDashboard() {
         <div style={{
           borderRadius: '16px', padding: '18px 24px', marginBottom: '24px',
           background: isPublished
-            ? 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04))'
-            : 'linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02))',
-          border: `1px solid ${isPublished ? 'rgba(16,185,129,0.35)' : 'rgba(245,158,11,0.3)'}`,
+            ? 'rgba(16,185,129,0.08)'
+            : 'rgba(245,158,11,0.08)',
+          border: `1px solid ${isPublished ? 'var(--text-success)' : 'var(--accent)'}`,
           display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap',
+          boxShadow: 'var(--shadow)',
         }}>
           {/* Status dot + label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '0 0 auto' }}>
             <span style={{
               width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0, display: 'inline-block',
-              backgroundColor: isPublished ? '#10B981' : '#F59E0B',
-              boxShadow: isPublished ? '0 0 8px #10B981' : '0 0 8px #F59E0B',
+              backgroundColor: isPublished ? 'var(--text-success)' : 'var(--accent)',
+              boxShadow: isPublished ? '0 0 8px var(--text-success)' : '0 0 8px var(--accent)',
             }}/>
-            <span style={{ fontWeight: '800', fontSize: '15px', color: isPublished ? '#10B981' : '#F59E0B' }}>
+            <span style={{ fontWeight: '800', fontSize: '15px', color: isPublished ? 'var(--text-success)' : 'var(--accent)' }}>
               Registration Page: {isPublished ? '🌐 LIVE' : '🔒 CLOSED'}
             </span>
           </div>
@@ -239,19 +239,19 @@ export default function IndiafestVendorDashboard() {
           {/* URL + Copy + Preview — only when live */}
           {isPublished && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
-              <span style={{ fontSize: '12px', color: '#64748B', fontFamily: 'monospace', background: 'rgba(8,12,24,0.5)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(51,65,85,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'monospace', background: 'var(--bg-input)', padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--border)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {PUBLIC_URL}
               </span>
               <button onClick={copyPublicUrl} style={{
-                padding: '4px 12px', borderRadius: '6px', border: '1px solid rgba(16,185,129,0.4)',
-                background: urlCopied ? 'rgba(16,185,129,0.2)' : 'transparent',
-                color: '#10B981', fontSize: '12px', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap',
+                padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)',
+                background: urlCopied ? 'rgba(16,185,129,0.15)' : 'transparent',
+                color: 'var(--text-success)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap',
               }}>
                 {urlCopied ? '✅ Copied!' : '📋 Copy URL'}
               </button>
               <a href={PUBLIC_URL} target="_blank" rel="noreferrer" style={{
-                padding: '4px 12px', borderRadius: '6px', border: '1px solid rgba(16,185,129,0.3)',
-                background: 'transparent', color: '#10B981', fontSize: '12px',
+                padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)',
+                background: 'transparent', color: 'var(--text-success)', fontSize: '12px',
                 fontWeight: '700', textDecoration: 'none', whiteSpace: 'nowrap',
               }}>↗ Preview</a>
             </div>
@@ -262,11 +262,11 @@ export default function IndiafestVendorDashboard() {
             marginLeft: 'auto', padding: '10px 20px', borderRadius: '10px', border: 'none',
             background: publishing ? 'rgba(51,65,85,0.5)' : isPublished
               ? 'linear-gradient(135deg, #EF4444, #DC2626)'
-              : 'linear-gradient(135deg, #10B981, #059669)',
+              : 'var(--accent)',
             color: publishing ? '#475569' : 'white',
             fontWeight: '800', fontSize: '14px', cursor: publishing ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap',
-            boxShadow: publishing ? 'none' : isPublished ? '0 0 20px rgba(239,68,68,0.3)' : '0 0 20px rgba(16,185,129,0.3)',
+            boxShadow: publishing ? 'none' : isPublished ? '0 0 20px rgba(239,68,68,0.3)' : '0 4px 14px var(--accent-glow)',
             transition: 'all 0.3s', fontFamily: 'inherit',
           }}>
             {publishing ? '⏳ Saving...' : isPublished ? '🔒 Unpublish Page' : '🌐 Publish Page'}
@@ -274,20 +274,26 @@ export default function IndiafestVendorDashboard() {
         </div>
       )}
 
-      {/* ── Header ── */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
+      {/* ── Page Header ── */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '32px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '900', letterSpacing: '-0.5px' }}>India Fest 2026</h1>
+            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '950', letterSpacing: '-0.5px' }}>
+              IndiaFest{' '}
+              <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                Booth Manager
+              </span>
+            </h1>
           </div>
-          <p style={{ margin: 0, color: '#64748B', fontSize: '14px' }}>Vendor Registrations Dashboard</p>
+          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13.5px', fontWeight: '500' }}>Vendor Space Registrations Dashboard</p>
         </div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button onClick={load} style={{
-            background: loading ? 'rgba(255,153,51,0.3)' : 'linear-gradient(135deg, #7B3A00, #A05020)',
-            color: 'white', fontWeight: '700', fontSize: '14px', padding: '12px 24px',
+            background: loading ? 'rgba(255,153,51,0.3)' : 'var(--accent)',
+            color: 'white', fontWeight: '800', fontSize: '14px', padding: '12px 24px',
             borderRadius: '10px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s',
+            boxShadow: '0 4px 12px var(--accent-glow)',
           }}>
             {loading
               ? <><span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Loading...</>
@@ -338,22 +344,22 @@ export default function IndiafestVendorDashboard() {
           style={{
             flex: '1 1 260px', padding: '9px 14px', borderRadius: '10px',
             border: '1px solid var(--border)', background: 'var(--bg-card)',
-            color: 'var(--text)', fontSize: '13px', outline: 'none',
+            color: 'var(--text-primary)', fontSize: '13px', outline: 'none',
           }}
         />
         {/* Status */}
         {['all','paid','pending','failed'].map(s => (
           <FilterBtn key={s} active={filter === s} onClick={() => setFilter(s)}>
-            {s === 'all' ? 'All Status' : s.charAt(0).toUpperCase() + s.slice(1)}
+            {s === 'all' ? 'All Status' : s === 'paid' ? 'Paid' : s === 'pending' ? 'Pending' : 'Failed'}
           </FilterBtn>
         ))}
-        {/* Space */}
-        {['all','small','medium','large'].map(s => (
+        {/* Space Categories */}
+        {['all','home_business','established_business'].map(s => (
           <FilterBtn key={s} active={spaceFilter === s} onClick={() => setSpaceFilter(s)}>
-            {s === 'all' ? 'All Spaces' : `${s.charAt(0).toUpperCase() + s.slice(1)}`}
+            {s === 'all' ? 'All Categories' : s === 'home_business' ? 'Home Business' : 'Established Store'}
           </FilterBtn>
         ))}
-        <span style={{ fontSize: '12px', color: '#64748B', marginLeft: '4px' }}>
+        <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginLeft: '4px', fontWeight: '750' }}>
           {filtered.length} of {registrations.length}
         </span>
       </div>
