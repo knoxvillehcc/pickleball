@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTheme } from '@/components/ClientLayout';
 
 // ── Card style tokens ──────────────────────────────────────────────────────────
 const cardStyle = {
@@ -87,14 +88,16 @@ const moduleConfigs = [
 
 // ── Public landing page (shown to logged-out visitors) ─────────────────────────
 function PublicLanding() {
+  const { theme, toggleTheme, isDark } = useTheme();
+
   const options = [
     {
       title: 'Pickleball Registration',
       desc: 'Register for the HCC Pickleball Tournament. Secure your spot and pay online.',
       href: '/register/pickleball',
-      accentColor: '#F4A40B',
-      glowColor: 'rgba(244, 164, 11, 0.15)',
-      borderColor: 'rgba(244, 164, 11, 0.3)',
+      accentColor: 'var(--accent)',
+      glowColor: 'var(--accent-glow)',
+      borderColor: 'var(--border-hover)',
       icon: (
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10"/>
@@ -148,18 +151,46 @@ function PublicLanding() {
       position: 'fixed',
       inset: 0,
       overflowY: 'auto',
-      background: '#070B16', // Premium dark navy background
+      background: 'var(--bg-primary)',
       fontFamily: "'Inter', -apple-system, sans-serif",
       display: 'flex',
       flexDirection: 'column',
       zIndex: 9999,
+      color: 'var(--text-primary)',
+      transition: 'background-color 0.3s, color 0.3s',
     }}>
       {/* Top flag stripe */}
       <div style={{ height: '4px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', flexShrink: 0 }}/>
 
+      {/* Floating Theme Toggle (Top Right) */}
+      <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10000 }}>
+        <button
+          onClick={toggleTheme}
+          aria-label="Toggle light/dark theme"
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '50%',
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--text-primary)',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+          onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+        >
+          {isDark ? '☀️' : '🌙'}
+        </button>
+      </div>
+
       {/* Ambient background glows */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <div style={{ position: 'absolute', top: '-10%', left: '10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, rgba(129,140,248,0.06), transparent 70%)', borderRadius: '50%' }}/>
+        <div style={{ position: 'absolute', top: '-10%', left: '10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius: '50%' }}/>
         <div style={{ position: 'absolute', bottom: '-10%', right: '10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, rgba(244,164,11,0.03), transparent 70%)', borderRadius: '50%' }}/>
       </div>
 
@@ -171,24 +202,24 @@ function PublicLanding() {
           {/* HCC logo mark */}
           <div style={{
             width: '64px', height: '64px', borderRadius: '16px', margin: '0 auto 24px',
-            background: 'linear-gradient(135deg, rgba(129,140,248,0.12), rgba(129,140,248,0.03))',
-            border: '1px solid rgba(129,140,248,0.15)',
+            background: 'linear-gradient(135deg, var(--accent-glow), transparent)',
+            border: '1px solid var(--border)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+            boxShadow: 'var(--shadow)',
           }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
               <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
           </div>
 
-          <h1 style={{ margin: '0 0 14px', fontSize: 'clamp(28px, 4.5vw, 44px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-1.5px', lineHeight: 1.2 }}>
+          <h1 style={{ margin: '0 0 14px', fontSize: 'clamp(28px, 4.5vw, 44px)', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-1.5px', lineHeight: 1.2 }}>
             <div>Knoxville Hindu</div>
-            <div style={{ background: 'linear-gradient(135deg, #818CF8 30%, #38BDF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginTop: '6px' }}>
+            <div style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #38BDF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginTop: '6px' }}>
               Community Center
             </div>
           </h1>
-          <p style={{ margin: 0, fontSize: '15px', color: 'rgba(255,255,255,0.45)', fontWeight: '500', letterSpacing: '0.3px' }}>
+          <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-secondary)', fontWeight: '500', letterSpacing: '0.3px' }}>
             Select an option below to get started
           </p>
         </div>
@@ -207,10 +238,10 @@ function PublicLanding() {
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(null)}
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                  background: 'var(--bg-card)',
                   border: hovered === i
                     ? `1px solid ${opt.accentColor}`
-                    : '1px solid rgba(255,255,255,0.07)',
+                    : '1px solid var(--border)',
                   borderRadius: '20px',
                   padding: '40px 32px',
                   cursor: 'pointer',
@@ -220,8 +251,8 @@ function PublicLanding() {
                   transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
                   transform: hovered === i ? 'translateY(-6px)' : 'translateY(0)',
                   boxShadow: hovered === i
-                    ? `0 20px 40px ${opt.glowColor}, inset 0 1px 0 rgba(255,255,255,0.1)`
-                    : '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+                    ? `0 20px 40px ${opt.glowColor}, var(--shadow)`
+                    : 'var(--shadow)',
                   position: 'relative',
                   overflow: 'hidden',
                 }}
@@ -237,8 +268,8 @@ function PublicLanding() {
                 {/* Badge */}
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: hovered === i ? `${opt.accentColor}25` : 'rgba(255,255,255,0.04)',
-                  border: hovered === i ? `1px solid ${opt.accentColor}40` : '1px solid rgba(255,255,255,0.08)',
+                  background: hovered === i ? `${opt.accentColor}25` : 'var(--bg-input)',
+                  border: hovered === i ? `1px solid ${opt.accentColor}40` : '1px solid var(--border)',
                   borderRadius: '99px', padding: '5px 12px',
                   marginBottom: '28px', alignSelf: 'flex-start',
                   position: 'relative',
@@ -249,7 +280,7 @@ function PublicLanding() {
                     background: opt.accentColor, display: 'inline-block', flexShrink: 0,
                     boxShadow: hovered === i ? `0 0 8px ${opt.accentColor}` : 'none'
                   }}/>
-                  <span style={{ fontSize: '10px', fontWeight: '800', color: hovered === i ? opt.accentColor : 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                  <span style={{ fontSize: '10px', fontWeight: '800', color: hovered === i ? opt.accentColor : 'var(--text-secondary)', letterSpacing: '1px', textTransform: 'uppercase' }}>
                     {opt.badge}
                   </span>
                 </div>
@@ -257,10 +288,10 @@ function PublicLanding() {
                 {/* Icon */}
                 <div style={{
                   width: '56px', height: '56px', borderRadius: '14px',
-                  background: hovered === i ? `${opt.accentColor}20` : 'rgba(255,255,255,0.03)',
-                  border: hovered === i ? `1px solid ${opt.accentColor}40` : '1px solid rgba(255,255,255,0.06)',
+                  background: hovered === i ? `${opt.accentColor}20` : 'var(--bg-input)',
+                  border: hovered === i ? `1px solid ${opt.accentColor}40` : '1px solid var(--border)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: hovered === i ? opt.accentColor : 'rgba(255,255,255,0.6)', marginBottom: '24px',
+                  color: hovered === i ? opt.accentColor : 'var(--text-secondary)', marginBottom: '24px',
                   position: 'relative',
                   boxShadow: hovered === i ? `0 0 20px ${opt.accentColor}25` : 'none',
                   transition: 'all 0.3s',
@@ -272,7 +303,7 @@ function PublicLanding() {
                 <h2 style={{
                   margin: '0 0 12px',
                   fontSize: '21px', fontWeight: '800',
-                  color: '#FFFFFF',
+                  color: 'var(--text-primary)',
                   letterSpacing: '-0.3px',
                   position: 'relative',
                 }}>
@@ -282,7 +313,7 @@ function PublicLanding() {
                 <p style={{
                   margin: '0 0 32px',
                   fontSize: '14px', lineHeight: '1.6',
-                  color: 'rgba(255,255,255,0.45)',
+                  color: 'var(--text-secondary)',
                   flex: 1,
                   position: 'relative',
                 }}>
@@ -311,7 +342,7 @@ function PublicLanding() {
 
         {/* Footer */}
         <div style={{ marginTop: '56px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)', margin: 0 }}>
+          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', opacity: 0.5, margin: 0 }}>
             © 2026 Knoxville Hindu Community Center · All rights reserved
           </p>
         </div>

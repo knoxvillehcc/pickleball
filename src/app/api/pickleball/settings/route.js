@@ -1,14 +1,45 @@
 import { NextResponse } from 'next/server';
 import { getSessionAndPermissions } from '@/lib/auth';
+import fs from 'fs';
+import path from 'path';
 
 // Force every request to be dynamic — never cache this route
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+const SETTINGS_FILE = path.join(process.cwd(), '.pickleball_settings.json');
+
+// Helper to write local settings
+function writeLocalSetting(key, val) {
+  try {
+    let data = {};
+    if (fs.existsSync(SETTINGS_FILE)) {
+      try {
+        data = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'));
+      } catch (e) {}
+    }
+    data[key] = val;
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.warn(`[PickleballSettings] Failed to write local settings file: ${err.message}`);
+  }
+}
+
+// Helper to read local settings
+function readLocalSetting(key, defaultVal = 'false') {
+  try {
+    if (fs.existsSync(SETTINGS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'));
+      return data[key] ?? defaultVal;
+    }
+  } catch (err) {
+    console.warn(`[PickleballSettings] Failed to read local settings file: ${err.message}`);
+  }
+  return defaultVal;
+}
+
 // ── In-memory fallback (used when Supabase table doesn't exist yet) ────────────
-// This persists across requests in the same server process but resets on restart.
-// Run supabase_settings.sql to make it permanent in Supabase.
-const memoryStore = new Map([['is_published', 'false']]);
+const memoryStore = new Map();
 
 const SUPABASE_URL      = () => process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = () => process.env.SUPABASE_ANON_KEY;
@@ -36,20 +67,25 @@ export async function GET(request) {
       const rows = await res.json();
       if (Array.isArray(rows) && rows.length > 0) {
         const value = rows[0].value;
-        // Also sync memory store
+        // Sync memory store and local file
         memoryStore.set(key, value);
+        writeLocalSetting(key, value);
         return NextResponse.json({ key, value, is_published: value === 'true' });
       }
-      // Table exists but row missing → use memory/default
     } else {
-      console.warn(`[Settings GET] Supabase error ${res.status} — falling back to memory store. Run supabase_settings.sql to fix.`);
+      console.warn(`[Settings GET] Supabase error ${res.status} — using file/memory fallback.`);
     }
   } catch (err) {
-    console.warn(`[Settings GET] Supabase unreachable: ${err.message} — using memory store`);
+    console.warn(`[Settings GET] Supabase unreachable: ${err.message} — using file/memory fallback`);
   }
 
-  // 2. Fallback: in-memory store
-  const value = memoryStore.get(key) ?? 'false';
+  // 2. Fallback: local file, then memory store, then default
+  const localVal = readLocalSetting(key, null);
+  const value = localVal ?? memoryStore.get(key) ?? 'false';
+  
+  // Sync map
+  memoryStore.set(key, value);
+
   return NextResponse.json(
     { key, value, is_published: value === 'true' },
     { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
@@ -68,9 +104,10 @@ export async function POST(request) {
     const key   = body.key   ?? 'is_published';
     const value = String(body.value ?? 'false');
 
-    // Always update memory store immediately
+    // Always update memory store and local file immediately
     memoryStore.set(key, value);
-    console.log(`[Settings] Memory store: ${key} = ${value}`);
+    writeLocalSetting(key, value);
+    console.log(`[Settings] Memory/File: ${key} = ${value}`);
 
     // Try to persist to Supabase using PATCH (update existing row)
     try {
@@ -85,8 +122,6 @@ export async function POST(request) {
       );
 
       if (patchRes.ok) {
-        const data = await patchRes.json();
-        console.log(`[Settings] Updated in Supabase via PATCH: ${key} = ${value}`);
         return NextResponse.json({ success: true, key, value, is_published: value === 'true', source: 'supabase' });
       }
 
@@ -101,7 +136,6 @@ export async function POST(request) {
       );
 
       if (postRes.ok) {
-        console.log(`[Settings] Inserted in Supabase via POST: ${key} = ${value}`);
         return NextResponse.json({ success: true, key, value, is_published: value === 'true', source: 'supabase' });
       }
 
@@ -111,8 +145,8 @@ export async function POST(request) {
       console.warn(`[Settings POST] Supabase write failed: ${sbErr.message}`);
     }
 
-    // Return success from memory store even if Supabase failed
-    return NextResponse.json({ success: true, key, value, is_published: value === 'true', source: 'memory' });
+    // Return success from local file/memory store even if Supabase failed
+    return NextResponse.json({ success: true, key, value, is_published: value === 'true', source: 'local_file' });
 
   } catch (err) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

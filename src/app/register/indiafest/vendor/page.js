@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTheme } from '@/components/ClientLayout';
 
 // ── US States ──────────────────────────────────────────────────────────────────
 const US_STATES = [
@@ -68,14 +69,19 @@ const STEPS = [
 ];
 
 function ProgressBar({ active }) {
+  const { isDark } = useTheme();
+  const activeColor = isDark ? 'var(--if-secondary)' : '#8B1E3F';
+  const inactiveBg = 'var(--bg-input)';
+  const inactiveBorder = 'var(--border)';
+
   return (
     <div style={{
       position: 'sticky', top: 0, zIndex: 100,
-      background: 'rgba(255,255,255,0.95)',
+      background: 'var(--if-header-bg)',
       backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid #F0E6D3',
+      borderBottom: '1px solid var(--if-border)',
       padding: '14px 24px',
-      boxShadow: '0 2px 12px rgba(139,30,63,0.06)',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
     }}>
       <div style={{ maxWidth: '760px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 0 }}>
         {STEPS.map((step, i) => {
@@ -86,10 +92,10 @@ function ProgressBar({ active }) {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                 <div style={{
                   width: '34px', height: '34px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: done ? '#FF9933' : current ? '#8B1E3F' : '#F3EDE6',
-                  border: `2px solid ${done ? '#FF9933' : current ? '#8B1E3F' : '#E8D8C8'}`,
+                  background: done ? 'var(--if-primary)' : current ? activeColor : inactiveBg,
+                  border: `2px solid ${done ? 'var(--if-primary)' : current ? activeColor : inactiveBorder}`,
                   fontSize: done ? '14px' : '13px',
-                  color: done || current ? 'white' : '#A89070',
+                  color: done || current ? 'white' : 'var(--if-text-muted)',
                   fontWeight: '800',
                   transition: 'all 0.3s ease',
                   flexShrink: 0,
@@ -98,7 +104,7 @@ function ProgressBar({ active }) {
                 </div>
                 <span style={{
                   fontSize: '10px', fontWeight: '700',
-                  color: done ? '#FF9933' : current ? '#8B1E3F' : '#B0A090',
+                  color: done ? 'var(--if-primary)' : current ? activeColor : 'var(--if-text-muted)',
                   letterSpacing: '0.3px', whiteSpace: 'nowrap',
                 }}>
                   {step.label}
@@ -107,7 +113,7 @@ function ProgressBar({ active }) {
               {i < STEPS.length - 1 && (
                 <div style={{
                   flex: 1, height: '2px', margin: '0 8px', marginBottom: '18px',
-                  background: done ? '#FF9933' : '#F0E6D3',
+                  background: done ? 'var(--if-primary)' : 'var(--if-border)',
                   borderRadius: '2px',
                   transition: 'background 0.3s ease',
                 }}/>
@@ -125,17 +131,17 @@ function Field({ label, required, hint, type = 'text', value, onChange, placehol
   const [focused, setFocused] = useState(false);
   const inputStyle = {
     width: '100%', padding: '13px 16px', borderRadius: '10px', boxSizing: 'border-box',
-    border: `1.5px solid ${focused ? '#FF9933' : '#E8D8C8'}`,
-    background: focused ? '#FFFCF8' : '#FAFAF8',
-    color: '#2D1A08', fontSize: '15px', outline: 'none', fontFamily: 'inherit',
+    border: `1.5px solid ${focused ? 'var(--if-primary)' : 'var(--if-border)'}`,
+    background: 'var(--if-input-bg)',
+    color: 'var(--if-text)', fontSize: '15px', outline: 'none', fontFamily: 'inherit',
     boxShadow: focused ? '0 0 0 3px rgba(255,153,51,0.12)' : 'none',
     transition: 'all 0.2s ease',
   };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
-        <label style={{ fontSize: '12px', fontWeight: '700', color: '#8B6040', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-          {label}{required && <span style={{ color: '#FF9933', marginLeft: '3px' }}>*</span>}
+        <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--if-text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+          {label}{required && <span style={{ color: 'var(--if-primary)', marginLeft: '3px' }}>*</span>}
         </label>
       )}
       {as === 'select'
@@ -149,7 +155,7 @@ function Field({ label, required, hint, type = 'text', value, onChange, placehol
         : <input type={type} value={value} onChange={onChange} placeholder={placeholder} required={required}
             style={inputStyle} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
       }
-      {hint && <span style={{ fontSize: '11px', color: '#B09070' }}>{hint}</span>}
+      {hint && <span style={{ fontSize: '11px', color: 'var(--if-text-muted)' }}>{hint}</span>}
     </div>
   );
 }
@@ -159,21 +165,19 @@ function Section({ title, icon, step, children, active }) {
   const isActive = active >= step;
   return (
     <div id={`section-${step}`} style={{
-      background: '#FFFFFF',
-      border: `1px solid ${isActive ? '#F0D8C0' : '#F0EBE4'}`,
+      background: 'var(--if-card-bg)',
+      border: `1px solid ${isActive ? 'var(--if-border)' : 'var(--border)'}`,
       borderRadius: '20px',
-      boxShadow: isActive
-        ? '0 4px 24px rgba(139,30,63,0.06), 0 1px 3px rgba(0,0,0,0.04)'
-        : '0 1px 4px rgba(0,0,0,0.03)',
+      boxShadow: 'var(--shadow)',
       overflow: 'hidden',
       transition: 'all 0.3s ease',
     }}>
       {/* Section header */}
       <div style={{
         padding: '20px 28px',
-        borderBottom: '1px solid #F8F0E8',
+        borderBottom: '1px solid var(--if-border)',
         display: 'flex', alignItems: 'center', gap: '14px',
-        background: 'linear-gradient(90deg, #FFF8F2, #FFFFFF)',
+        background: 'var(--bg-secondary)',
       }}>
         <div style={{
           width: '40px', height: '40px', borderRadius: '12px', flexShrink: 0,
@@ -183,17 +187,17 @@ function Section({ title, icon, step, children, active }) {
           boxShadow: '0 4px 12px rgba(255,153,51,0.25)',
         }}>{icon}</div>
         <div>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: '#FF9933', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--if-primary)', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>
             Step {step} of 4
           </div>
-          <div style={{ fontSize: '17px', fontWeight: '800', color: '#2D1A08' }}>{title}</div>
+          <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--if-text)' }}>{title}</div>
         </div>
         <div style={{
           marginLeft: 'auto', width: '28px', height: '28px', borderRadius: '50%',
-          background: active > step ? '#FF9933' : active === step ? '#FFF4E8' : '#F5EDE5',
-          border: `2px solid ${active > step ? '#FF9933' : active === step ? '#FFD4A0' : '#E8D8C8'}`,
+          background: active > step ? 'var(--if-primary)' : active === step ? 'var(--accent-glow)' : 'var(--bg-input)',
+          border: `2px solid ${active > step ? 'var(--if-primary)' : active === step ? 'var(--if-border)' : 'var(--border)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '12px', color: active > step ? 'white' : '#C0A080', fontWeight: '800',
+          fontSize: '12px', color: active > step ? 'white' : 'var(--if-text-muted)', fontWeight: '800',
           flexShrink: 0,
         }}>
           {active > step ? '✓' : step}
@@ -206,16 +210,32 @@ function Section({ title, icon, step, children, active }) {
 
 // ── Vendor type card ──────────────────────────────────────────────────────────
 function VendorTypeCard({ vendor, selected, quantity, onSelect, onQuantity }) {
+  const { isDark } = useTheme();
   const subtotal = vendor.price * quantity;
+
+  // Theme-aware cards backgrounds
+  let cardBg = 'var(--bg-card)';
+  if (selected) {
+    if (vendor.key === 'home_business') {
+      cardBg = isDark ? 'rgba(255, 153, 51, 0.12)' : '#FFF8F0';
+    } else {
+      cardBg = isDark ? 'rgba(139, 30, 63, 0.15)' : '#FFF0F4';
+    }
+  } else {
+    cardBg = 'var(--bg-input)';
+  }
+
+  const cardBorder = selected ? vendor.color : 'var(--border)';
+
   return (
     <div onClick={onSelect} style={{
       cursor: 'pointer',
-      border: `2px solid ${selected ? vendor.color : '#F0E0D0'}`,
+      border: `2px solid ${cardBorder}`,
       borderRadius: '16px',
-      background: selected ? vendor.bg : '#FAFAF8',
+      background: cardBg,
       boxShadow: selected
-        ? `0 0 0 1px ${vendor.color}30, 0 8px 24px rgba(0,0,0,0.08)`
-        : '0 1px 4px rgba(0,0,0,0.04)',
+        ? `0 0 0 1px ${vendor.color}30, var(--shadow)`
+        : 'var(--shadow)',
       transition: 'all 0.25s ease',
       overflow: 'hidden',
     }}>
@@ -223,13 +243,13 @@ function VendorTypeCard({ vendor, selected, quantity, onSelect, onQuantity }) {
       <div style={{
         display: 'flex', alignItems: 'center', gap: '16px',
         padding: '20px 22px',
-        borderBottom: `1px solid ${selected ? vendor.border : '#F5EDE5'}`,
+        borderBottom: `1px solid ${selected ? vendor.border : 'var(--border)'}`,
       }}>
         {/* Radio */}
         <div style={{
           width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
-          border: `2px solid ${selected ? vendor.color : '#D0C0B0'}`,
-          background: selected ? `${vendor.color}18` : 'white',
+          border: `2px solid ${selected ? vendor.color : 'var(--border)'}`,
+          background: selected ? `${vendor.color}18` : 'var(--bg-input)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.2s',
         }}>
@@ -237,48 +257,48 @@ function VendorTypeCard({ vendor, selected, quantity, onSelect, onQuantity }) {
         </div>
         <span style={{ fontSize: '26px' }}>{vendor.emoji}</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '15px', fontWeight: '800', color: selected ? vendor.color : '#3D2010', marginBottom: '2px' }}>
+          <div style={{ fontSize: '15px', fontWeight: '800', color: selected ? vendor.color : 'var(--if-text)', marginBottom: '2px' }}>
             {vendor.label}
           </div>
-          <div style={{ fontSize: '12px', color: '#907060', fontWeight: '500' }}>{vendor.desc}</div>
+          <div style={{ fontSize: '12px', color: 'var(--if-text-muted)', fontWeight: '500' }}>{vendor.desc}</div>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: '24px', fontWeight: '900', color: selected ? vendor.color : '#907060' }}>
+          <div style={{ fontSize: '24px', fontWeight: '900', color: selected ? vendor.color : 'var(--if-text)' }}>
             ${vendor.price.toLocaleString()}
           </div>
-          <div style={{ fontSize: '11px', color: '#B09080' }}>per spot</div>
+          <div style={{ fontSize: '11px', color: 'var(--if-text-muted)' }}>per spot</div>
         </div>
       </div>
       {/* Quantity row */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '14px 22px',
-        background: selected ? `${vendor.bg}CC` : '#FAFAF8',
+        background: cardBg,
         flexWrap: 'wrap', gap: '10px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '13px', fontWeight: '600', color: '#907060' }}>Number of spots</span>
+          <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--if-text-muted)' }}>Number of spots</span>
           <select
             value={quantity}
             onChange={(e) => { e.stopPropagation(); onQuantity(Number(e.target.value)); }}
             onClick={(e) => e.stopPropagation()}
             style={{
               padding: '7px 30px 7px 12px', borderRadius: '8px', fontSize: '14px', fontWeight: '700',
-              background: 'white', border: `1.5px solid ${selected ? vendor.border : '#E0D0C0'}`,
-              color: selected ? vendor.color : '#5D3A20', outline: 'none', cursor: 'pointer',
+              background: 'var(--bg-card)', border: `1.5px solid ${selected ? vendor.border : 'var(--border)'}`,
+              color: selected ? vendor.color : 'var(--if-text)', outline: 'none', cursor: 'pointer',
               appearance: 'none',
               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23${selected ? vendor.color.replace('#','') : '907060'}' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
               backgroundRepeat: 'no-repeat', backgroundPosition: 'right 9px center', fontFamily: 'inherit',
             }}
           >
             {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
-              <option key={n} value={n}>{n}</option>
+              <option key={n} value={n} style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>{n}</option>
             ))}
           </select>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '11px', color: '#B09080', marginBottom: '1px' }}>Subtotal</div>
-          <div style={{ fontSize: '20px', fontWeight: '900', color: selected ? vendor.color : '#A09080' }}>
+          <div style={{ fontSize: '11px', color: 'var(--if-text-muted)', marginBottom: '1px' }}>Subtotal</div>
+          <div style={{ fontSize: '20px', fontWeight: '900', color: selected ? vendor.color : 'var(--if-text-muted)' }}>
             ${subtotal.toLocaleString()}.00
           </div>
         </div>
@@ -337,21 +357,24 @@ function VendorFormContent() {
   // ── Closed ─────────────────────────────────────────────────────────────────
   if (publishStatus === 'closed') {
     return (
-      <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #FFF8F2 0%, #FFF4EC 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', padding: '40px 20px' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--if-bg-grad)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', padding: '40px 20px' }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
           {/* Flag bar */}
           <div style={{ height: '5px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', borderRadius: '99px', marginBottom: '40px', width: '200px', margin: '0 auto 40px' }}/>
           <div style={{ fontSize: '56px', marginBottom: '20px' }}>🔒</div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#FFF4E8', border: '1px solid #FFD4A0', padding: '6px 18px', borderRadius: '20px', marginBottom: '24px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF9933', display: 'inline-block', flexShrink: 0 }}/>
-            <span style={{ fontSize: '11px', fontWeight: '800', color: '#FF9933', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--bg-input)', border: '1px solid var(--border)', padding: '6px 18px', borderRadius: '20px', marginBottom: '24px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--if-primary)', display: 'inline-block', flexShrink: 0 }}/>
+            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--if-primary)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
           </div>
-          <h1 style={{ margin: '0 0 6px', fontSize: '40px', fontWeight: '900', color: '#2D1A08', letterSpacing: '-1px' }}>India Fest 2026</h1>
-          <h2 style={{ margin: '0 0 20px', fontSize: '18px', fontWeight: '700', color: '#8B1E3F' }}>Vendor Registration Closed</h2>
-          <p style={{ color: '#907060', fontSize: '15px', lineHeight: '1.8', margin: '0 0 24px' }}>
+          <h1 style={{ margin: '0 0 6px', fontSize: '40px', fontWeight: '900', color: 'var(--if-text)', letterSpacing: '-1px' }}>India Fest 2026</h1>
+          <h2 style={{ margin: '0 0 10px', fontSize: '18px', fontWeight: '700', color: 'var(--if-secondary)' }}>Vendor Registration Closed</h2>
+          <div style={{ display: 'inline-block', background: 'var(--accent-glow)', border: '1.5px solid var(--if-border)', padding: '8px 16px', borderRadius: '10px', marginBottom: '20px', fontSize: '14px', fontWeight: '700', color: 'var(--if-primary)' }}>
+            📅 Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM
+          </div>
+          <p style={{ color: 'var(--if-text-muted)', fontSize: '15px', lineHeight: '1.8', margin: '0' }}>
             Vendor registration is not currently open.<br/>
             Please check back soon or contact us at<br/>
-            <a href="mailto:knoxvillehcc@gmail.com" style={{ color: '#FF9933', textDecoration: 'none', fontWeight: '700' }}>knoxvillehcc@gmail.com</a>
+            <a href="mailto:knoxvillehcc@gmail.com" style={{ color: 'var(--if-primary)', textDecoration: 'none', fontWeight: '700' }}>knoxvillehcc@gmail.com</a>
           </p>
         </div>
         <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');`}</style>
@@ -380,7 +403,7 @@ function VendorFormContent() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #FFF8F2 0%, #FFF4EC 60%, #FFFAF6 100%)', fontFamily: "'Inter', -apple-system, sans-serif", color: '#2D1A08' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--if-bg-grad)', fontFamily: "'Inter', -apple-system, sans-serif", color: 'var(--if-text)' }}>
 
       {/* ── India flag stripe ── */}
       <div style={{ height: '5px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)' }}/>
@@ -423,6 +446,7 @@ function VendorFormContent() {
         {/* Stats row */}
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '32px', flexWrap: 'wrap', position: 'relative' }}>
           {[
+            { icon: '📅', val: 'Aug 23, 2026', label: '11am to 5pm' },
             { icon: '👥', val: '2,000+', label: 'Expected Guests' },
             { icon: '🎪', val: '2 Tiers', label: 'Vendor Packages' },
             { icon: '📍', val: 'Knoxville, TN', label: 'Location' },
@@ -441,13 +465,13 @@ function VendorFormContent() {
 
         {/* Alerts */}
         {cancelled && (
-          <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', color: '#B91C1C', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', color: 'var(--text-error)', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '18px' }}>⚠️</span>
             Your payment was cancelled — registration is not complete. Please try again below.
           </div>
         )}
         {error && (
-          <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', color: '#B91C1C', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', color: 'var(--text-error)', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '18px' }}>❌</span>
             {error}
           </div>
@@ -504,14 +528,14 @@ function VendorFormContent() {
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   padding: '18px 22px', borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #FFF8F0, #FFF4E8)',
-                  border: '1.5px solid #FFD4A0',
+                  background: 'var(--bg-input)',
+                  border: '1.5px solid var(--if-border)',
                 }}>
                   <div>
-                    <div style={{ fontSize: '12px', fontWeight: '700', color: '#B09070', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Grand Total</div>
-                    <div style={{ fontSize: '13px', color: '#907060', marginTop: '2px' }}>{form.quantity} spot{form.quantity > 1 ? 's' : ''} selected</div>
+                    <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--if-text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Grand Total</div>
+                    <div style={{ fontSize: '13px', color: 'var(--if-text-muted)', marginTop: '2px' }}>{form.quantity} spot{form.quantity > 1 ? 's' : ''} selected</div>
                   </div>
-                  <div style={{ fontSize: '34px', fontWeight: '900', color: '#FF9933' }}>${grandTotal.toLocaleString()}.00</div>
+                  <div style={{ fontSize: '34px', fontWeight: '900', color: 'var(--if-primary)' }}>${grandTotal.toLocaleString()}.00</div>
                 </div>
               )}
             </div>
@@ -521,11 +545,11 @@ function VendorFormContent() {
           <Section title="Vendor Agreement & Disclaimer" icon="📋" step={4} active={activeStep}>
             {/* Scrollable text */}
             <div style={{
-              background: '#FAFAF8', border: '1px solid #F0E8DC', borderRadius: '12px',
+              background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: '12px',
               padding: '20px 22px', height: '220px', overflowY: 'auto',
-              fontSize: '12.5px', lineHeight: '1.85', color: '#706050',
+              fontSize: '12.5px', lineHeight: '1.85', color: 'var(--if-text)',
               whiteSpace: 'pre-wrap', fontFamily: 'inherit', marginBottom: '20px',
-              scrollbarWidth: 'thin', scrollbarColor: '#FFD4A0 #F8F0E8',
+              scrollbarWidth: 'thin', scrollbarColor: 'var(--if-primary) var(--bg-input)',
             }}>
               {DISCLAIMER_TEXT}
             </div>
@@ -534,9 +558,9 @@ function VendorFormContent() {
             <label style={{
               display: 'flex', alignItems: 'flex-start', gap: '14px', cursor: 'pointer',
               padding: '16px 18px',
-              background: form.disclaimer_accepted ? '#FFF8F0' : '#FAFAF8',
+              background: form.disclaimer_accepted ? 'var(--accent-glow)' : 'var(--bg-input)',
               borderRadius: '12px',
-              border: `1.5px solid ${form.disclaimer_accepted ? '#FFD4A0' : '#EEE4D8'}`,
+              border: `1.5px solid ${form.disclaimer_accepted ? 'var(--if-primary)' : 'var(--border)'}`,
               transition: 'all 0.2s ease',
             }}>
               <div style={{ position: 'relative', flexShrink: 0, marginTop: '2px' }}>
@@ -545,11 +569,11 @@ function VendorFormContent() {
                   style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
                 <div style={{
                   width: '22px', height: '22px', borderRadius: '6px',
-                  border: `2px solid ${form.disclaimer_accepted ? '#FF9933' : '#C0A888'}`,
-                  background: form.disclaimer_accepted ? '#FF9933' : 'white',
+                  border: `2px solid ${form.disclaimer_accepted ? 'var(--if-primary)' : 'var(--border)'}`,
+                  background: form.disclaimer_accepted ? 'var(--if-primary)' : 'var(--bg-card)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 0.2s',
-                  boxShadow: form.disclaimer_accepted ? '0 0 0 3px rgba(255,153,51,0.18)' : 'none',
+                  boxShadow: form.disclaimer_accepted ? '0 0 0 3px var(--accent-glow)' : 'none',
                 }}>
                   {form.disclaimer_accepted && (
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
@@ -559,8 +583,8 @@ function VendorFormContent() {
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: '15px', fontWeight: '700', color: '#2D1A08' }}>I have read and agree to the Vendor Agreement</div>
-                <div style={{ fontSize: '12px', color: '#907060', marginTop: '4px' }}>By checking this box you accept all terms on behalf of your company.</div>
+                <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--if-text)' }}>I have read and agree to the Vendor Agreement</div>
+                <div style={{ fontSize: '12px', color: 'var(--if-text-muted)', marginTop: '4px' }}>By checking this box you accept all terms on behalf of your company.</div>
               </div>
             </label>
           </Section>
@@ -570,33 +594,33 @@ function VendorFormContent() {
             {/* Order card */}
             {selectedVendor && (
               <div style={{
-                background: '#FFFFFF', border: '1px solid #F0E0C8', borderRadius: '16px',
+                background: 'var(--if-card-bg)', border: '1px solid var(--border)', borderRadius: '16px',
                 padding: '22px 24px', marginBottom: '16px',
-                boxShadow: '0 4px 20px rgba(139,30,63,0.07)',
+                boxShadow: 'var(--shadow)',
               }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: '#C0A080', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Order Summary</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', paddingBottom: '14px', borderBottom: '1px solid #F5EDE5' }}>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--if-text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Order Summary</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', paddingBottom: '14px', borderBottom: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <div style={{
                       width: '48px', height: '48px', borderRadius: '12px',
-                      background: selectedVendor.bg,
-                      border: `1px solid ${selectedVendor.border}`,
+                      background: 'var(--bg-input)',
+                      border: `1px solid var(--border)`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px',
                     }}>{selectedVendor.emoji}</div>
                     <div>
-                      <div style={{ fontSize: '15px', fontWeight: '800', color: '#2D1A08' }}>{selectedVendor.label}</div>
-                      <div style={{ fontSize: '12px', color: '#907060', marginTop: '2px' }}>
+                      <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--if-text)' }}>{selectedVendor.label}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--if-text-muted)', marginTop: '2px' }}>
                         India Fest 2026 · Knoxville, TN · {form.quantity} spot{form.quantity > 1 ? 's' : ''}
                       </div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '13px', color: '#B09080' }}>${selectedVendor.price.toLocaleString()}.00 × {form.quantity}</div>
+                    <div style={{ fontSize: '13px', color: 'var(--if-text-muted)' }}>${selectedVendor.price.toLocaleString()}.00 × {form.quantity}</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#907060' }}>Total Due</div>
-                  <div style={{ fontSize: '32px', fontWeight: '900', color: '#FF9933' }}>${grandTotal.toLocaleString()}.00</div>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--if-text-muted)' }}>Total Due</div>
+                  <div style={{ fontSize: '32px', fontWeight: '900', color: 'var(--if-primary)' }}>${grandTotal.toLocaleString()}.00</div>
                 </div>
               </div>
             )}
@@ -609,9 +633,9 @@ function VendorFormContent() {
               style={{
                 width: '100%', padding: '20px 32px', borderRadius: '14px', border: 'none',
                 background: loading || !canSubmit
-                  ? '#F5E8D8'
+                  ? 'var(--bg-input)'
                   : 'linear-gradient(135deg, #FF9933 0%, #E07C1A 60%, #CC6600 100%)',
-                color: loading || !canSubmit ? '#C0A888' : '#FFFFFF',
+                color: loading || !canSubmit ? 'var(--text-muted)' : '#FFFFFF',
                 fontWeight: '800', fontSize: '17px', letterSpacing: '0.2px',
                 cursor: loading || !canSubmit ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
@@ -647,7 +671,7 @@ function VendorFormContent() {
                 { icon: '📧', text: 'Instant Confirmation' },
                 { icon: '🔐', text: 'SSL Encrypted' },
               ].map((b, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#A09080', fontWeight: '600' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--if-text-muted)', fontWeight: '600' }}>
                   <span>{b.icon}</span><span>{b.text}</span>
                 </div>
               ))}
@@ -656,13 +680,13 @@ function VendorFormContent() {
         </form>
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: '56px', paddingTop: '28px', borderTop: '1px solid #F0E6D8' }}>
+        <div style={{ textAlign: 'center', marginTop: '56px', paddingTop: '28px', borderTop: '1px solid var(--if-border)' }}>
           <div style={{ height: '4px', background: 'linear-gradient(90deg, #FF9933 33.33%, transparent 33.33%, transparent 66.66%, #138808 66.66%)', borderRadius: '99px', width: '80px', margin: '0 auto 20px' }}/>
-          <div style={{ fontSize: '13px', color: '#B09080', marginBottom: '6px' }}>Questions about vendor registration?</div>
-          <a href="mailto:knoxvillehcc@gmail.com" style={{ color: '#FF9933', textDecoration: 'none', fontWeight: '700', fontSize: '14px' }}>
+          <div style={{ fontSize: '13px', color: 'var(--if-text-muted)', marginBottom: '6px' }}>Questions about vendor registration?</div>
+          <a href="mailto:knoxvillehcc@gmail.com" style={{ color: 'var(--if-primary)', textDecoration: 'none', fontWeight: '700', fontSize: '14px' }}>
             knoxvillehcc@gmail.com
           </a>
-          <div style={{ marginTop: '16px', fontSize: '11px', color: '#C0B0A0' }}>
+          <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--if-text-muted)' }}>
             © 2026 Knoxville Hindu Community Center · India Fest 2026
           </div>
         </div>
@@ -673,10 +697,10 @@ function VendorFormContent() {
         * { box-sizing: border-box; }
         @keyframes spin { to { transform: rotate(360deg); } }
         ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #F8F0E8; }
-        ::-webkit-scrollbar-thumb { background: #FFD4A0; border-radius: 3px; }
-        input::placeholder { color: #C0A888; }
-        select option { background: #FFFFFF; color: #2D1A08; }
+        ::-webkit-scrollbar-track { background: var(--bg-input); }
+        ::-webkit-scrollbar-thumb { background: var(--if-primary); border-radius: 3px; }
+        input::placeholder { color: var(--text-muted); }
+        select option { background: var(--bg-card); color: var(--if-text); }
         #vendor-submit-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 12px 40px rgba(255,153,51,0.4), 0 2px 0 rgba(255,255,255,0.15) inset !important; }
         #vendor-submit-btn:active:not(:disabled) { transform: translateY(0); }
       `}</style>
@@ -688,10 +712,10 @@ function VendorFormContent() {
 export default function IndiafestVendorPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#FFF8F2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--if-bg-grad)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '48px', height: '48px', border: '4px solid #FFE0B8', borderTop: '4px solid #FF9933', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }}/>
-          <div style={{ color: '#FF9933', fontSize: '15px', fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>Loading…</div>
+          <div style={{ width: '48px', height: '48px', border: '4px solid var(--border)', borderTop: '4px solid var(--if-primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }}/>
+          <div style={{ color: 'var(--if-primary)', fontSize: '15px', fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>Loading…</div>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>

@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 
 // ── Design tokens — India Fest palette ────────────────────────────────────────
 const T = {
-  bg:      '#060A18',
-  bgMid:   '#0A0F22',
-  card:    'rgba(10,15,35,0.92)',
-  saffron: '#FF9933',
-  gold:    '#FFD700',
-  muted:   '#7A7090',
-  white:   '#FFFFFF',
-  light:   '#E8E0D0',
+  bg:      'var(--if-bg-grad)',
+  bgMid:   'var(--bg-secondary)',
+  card:    'var(--if-card-bg)',
+  saffron: 'var(--if-primary)',
+  gold:    'var(--if-primary)',
+  muted:   'var(--if-text-muted)',
+  white:   'var(--if-text)',
+  light:   'var(--if-text)',
 };
 
 export default function VendorSuccessClient() {
@@ -113,7 +113,7 @@ export default function VendorSuccessClient() {
             Event Details
           </div>
           {[
-            { icon: '📅', label: 'Event', value: 'India Fest 2026' },
+            { icon: '📅', label: 'Event Date & Time', value: 'Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM' },
             { icon: '📍', label: 'Location', value: 'HCC — 8580 Hickory Creek Rd, Lenoir City, TN 37771' },
             { icon: '🏪', label: 'Setup', value: 'Arrive 30 min before doors open for booth setup' },
             { icon: '📧', label: 'Details', value: 'Full event & setup instructions will be emailed separately' },

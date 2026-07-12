@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 
 // ── Design tokens — matches flyer palette ──────────────────────────────────────
 const T = {
-  navy:    '#04111F',
-  navyMid: '#071A2E',
-  navyCard:'rgba(7,26,50,0.9)',
+  navy:    'var(--bg-primary)',
+  navyMid: 'var(--bg-secondary)',
+  navyCard:'var(--bg-card)',
   lime:    '#A8D62E',
   teal:    '#0E9E8A',
-  muted:   '#6B8BAE',
-  white:   '#FFFFFF',
+  muted:   'var(--text-secondary)',
+  white:   'var(--text-primary)',
 };
 
 export default function SuccessClient() {

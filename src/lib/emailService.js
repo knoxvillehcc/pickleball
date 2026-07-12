@@ -572,6 +572,7 @@ export async function sendVendorConfirmationEmail(reg) {
       ${[
         ['Vendor Name',   fullName],
         ['Company',       reg.company_name],
+        ['Event Date/Time', 'Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM'],
         ['Email',         reg.email],
         ['Phone',         reg.phone || '—'],
         ['Address',       `${reg.address}, ${reg.city}, ${reg.state} ${reg.zip}`],

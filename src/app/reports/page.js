@@ -206,7 +206,7 @@ export default function ReportsPage() {
                     </tr>
                   ))}
                   {data.results.length === 0 && (
-                    <tr><td colSpan={5} style={{ padding: '80px 24px', textAlign: 'center', color: '#334155', fontWeight: '600' }}>No active subscriptions found.</td></tr>
+                    <tr><td colSpan={5} style={{ padding: '80px 24px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '600' }}>No active subscriptions found.</td></tr>
                   )}
                 </tbody>
               </table>

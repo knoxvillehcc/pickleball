@@ -99,7 +99,7 @@ function LoginContent() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: `linear-gradient(135deg, ${C.bg} 0%, #0A1120 100%)`,
+      background: `linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)`,
       fontFamily: "'Inter', -apple-system, sans-serif",
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '24px',
@@ -314,8 +314,8 @@ function LoginContent() {
 
 function ErrorBox({ msg }) {
   return (
-    <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
-      borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#FC8181',
+    <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)',
+      borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: 'var(--text-error)',
       marginBottom: '16px', display: 'flex', gap: '8px', alignItems: 'center' }}>
       ⚠️ {msg}
     </div>
@@ -335,8 +335,8 @@ function btnStyle(color) {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#060D1A', display: 'flex',
-        alignItems: 'center', justifyContent: 'center', color: '#F4A40B', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex',
+        alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontFamily: 'Inter, sans-serif' }}>
         Loading...
       </div>
     }>

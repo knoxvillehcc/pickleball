@@ -265,16 +265,16 @@ export default function ClientLayout({ children }) {
                 <Link key={href} href={href} style={{
                   display: 'flex', alignItems: 'center', gap: '12px',
                   padding: '11px 14px', borderRadius: '12px',
-                  color: active ? '#818CF8' : textMuted,
-                  backgroundColor: active ? (isDark ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.08)') : 'transparent',
-                  border: active ? `1px solid ${isDark ? 'rgba(99,102,241,0.2)' : 'rgba(99,102,241,0.15)'}` : '1px solid transparent',
+                  color: active ? 'var(--accent)' : 'var(--text-secondary)',
+                  backgroundColor: active ? 'var(--accent-glow)' : 'transparent',
+                  border: active ? '1px solid var(--border-hover)' : '1px solid transparent',
                   fontWeight: active ? '700' : '600', fontSize: '14px',
                   textDecoration: 'none', transition: 'all 0.2s',
                 }}
                 className="sidebar-link">
                   <span style={{ opacity: active ? 1 : 0.7 }}>{icon}</span>
                   {label}
-                  {active && <span style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: '#818CF8' }}/>}
+                  {active && <span style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)' }}/>}
                 </Link>
               );
             })}
@@ -351,8 +351,8 @@ export default function ClientLayout({ children }) {
               <button
                 onClick={handleLogout}
                 style={{
-                  width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.25)',
-                  background: 'rgba(239,68,68,0.08)', color: '#FC8181',
+                  width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--border-error)',
+                  background: 'var(--bg-error)', color: 'var(--text-error)',
                   fontSize: '12px', fontWeight: '700', cursor: 'pointer',
                   fontFamily: 'inherit', letterSpacing: '0.5px',
                   transition: 'all 0.2s',

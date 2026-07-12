@@ -39,7 +39,7 @@ function Toast({ toast }) {
       padding: '12px 18px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px',
       background: isErr ? 'rgba(127,29,29,0.95)' : 'var(--bg-modal)',
       border: `1px solid ${isErr ? 'rgba(239,68,68,0.4)' : 'var(--border-modal)'}`,
-      color: isErr ? '#FCA5A5' : '#6EE7B7', fontSize: '14px', fontWeight: '600',
+      color: isErr ? 'var(--text-error)' : 'var(--text-success)', fontSize: '14px', fontWeight: '600',
       boxShadow: '0 8px 32px var(--shadow)',
     }}>
       {isErr ? '⚠️' : '✅'} {toast.msg}
@@ -722,7 +722,7 @@ ALTER TABLE public.hcc_login_activity ENABLE ROW LEVEL SECURITY;`}
                             <span style={{
                               display: 'inline-block', padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '800',
                               backgroundColor: isSuccess ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
-                              color: isSuccess ? '#10B981' : '#F87171',
+                              color: isSuccess ? 'var(--text-success)' : 'var(--text-error)',
                               border: `1px solid ${isSuccess ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`
                             }}>
                               {isSuccess ? 'SUCCESS' : `FAILED (${row.reason || 'unknown'})`}

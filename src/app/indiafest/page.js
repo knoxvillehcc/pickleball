@@ -63,11 +63,11 @@ function StatCard({ label, value, accent, sub }) {
       borderRadius: '16px', padding: '24px', borderTop: `2px solid ${accent}`,
       width: '100%',
     }}>
-      <div style={{ fontSize: '11px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>
         {label}
       </div>
       <div style={{ fontSize: '40px', fontWeight: '900', color: accent, lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px' }}>{sub}</div>}
+      {sub && <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '6px' }}>{sub}</div>}
     </div>
   );
 }
@@ -77,9 +77,9 @@ function FilterBtn({ active, children, onClick }) {
   return (
     <button onClick={onClick} style={{
       padding: '8px 16px', borderRadius: '8px',
-      border: `1px solid ${active ? C.saffron : 'rgba(51,65,85,0.6)'}`,
-      backgroundColor: active ? 'rgba(255,153,51,0.12)' : 'transparent',
-      color: active ? C.saffron : '#64748B',
+      border: `1px solid ${active ? C.saffron : 'var(--border)'}`,
+      backgroundColor: active ? 'var(--accent-glow)' : 'transparent',
+      color: active ? C.saffron : 'var(--text-secondary)',
       fontWeight: '600', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s',
     }}>
       {children}

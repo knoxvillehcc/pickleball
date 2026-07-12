@@ -9,11 +9,11 @@ export default function PickleballSuccessPage() {
   return (
     <Suspense fallback={
       <div style={{
-        minHeight: '100vh', background: '#060D1A',
+        minHeight: '100vh', background: 'var(--bg-primary)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontFamily: 'Inter, sans-serif',
       }}>
-        <div style={{ color: '#10B981', fontSize: '18px' }}>Loading...</div>
+        <div style={{ color: 'var(--accent)', fontSize: '18px' }}>Loading...</div>
       </div>
     }>
       <SuccessClient />

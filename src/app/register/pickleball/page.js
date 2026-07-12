@@ -11,16 +11,16 @@ const LIABILITY_TEXT = `I, the undersigned, acknowledge that participation in pi
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const T = {
-  navy:    '#04111F',
-  navyMid: '#071A2E',
-  navyCard:'rgba(7,26,50,0.85)',
+  navy:    'var(--bg-primary)',
+  navyMid: 'var(--bg-secondary)',
+  navyCard:'var(--bg-card)',
   lime:    '#A8D62E',
   limeDark:'#85AB22',
   teal:    '#0E9E8A',
   tealDark:'#0A7B6B',
-  white:   '#FFFFFF',
-  light:   '#E2EAF4',
-  muted:   '#6B8BAE',
+  white:   'var(--text-primary)',
+  light:   'var(--text-primary)',
+  muted:   'var(--text-secondary)',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -28,8 +28,8 @@ function Field({ label, required, hint, type = 'text', value, onChange, placehol
   const [focused, setFocused] = useState(false);
   const base = {
     width: '100%', padding: '13px 16px', borderRadius: '10px',
-    background: 'rgba(255,255,255,0.04)',
-    border: `1.5px solid ${focused ? T.lime : 'rgba(255,255,255,0.1)'}`,
+    background: 'var(--bg-input)',
+    border: `1.5px solid ${focused ? T.lime : 'var(--border)'}`,
     color: T.white, fontSize: '14px', outline: 'none',
     boxSizing: 'border-box', fontFamily: 'inherit',
     boxShadow: focused ? `0 0 0 3px rgba(168,214,46,0.12)` : 'none',
@@ -192,10 +192,10 @@ function RegistrationForm() {
       </div>
 
       {/* Sticky nav */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid rgba(255,255,255,0.06)`, background: 'rgba(4,17,31,0.95)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', padding: '0 24px' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid var(--border)`, background: 'var(--bg-secondary)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', padding: '0 24px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', height: '62px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: `linear-gradient(135deg, ${T.lime}, ${T.teal})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.navy }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: `linear-gradient(135deg, ${T.lime}, ${T.teal})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--bg-primary)' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="10" cy="10" r="7" fill="currentColor" fillOpacity="0.1" />
                 <path d="m15 15 5 5" />
@@ -654,8 +654,8 @@ function RegistrationForm() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        input::placeholder, textarea::placeholder { color: rgba(107,139,174,0.6) !important; }
-        select option { background: #071A2E; color: #E2EAF4; }
+        input::placeholder, textarea::placeholder { color: var(--text-muted) !important; }
+        select option { background: var(--bg-card); color: var(--text-primary); }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(168,214,46,0.2); border-radius: 2px; }

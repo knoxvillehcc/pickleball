@@ -34,6 +34,24 @@
   /* Modals */
   --bg-modal: #0d1627;
   --border-modal: rgba(51,65,85,0.8);
+
+  /* IndiaFest Specific Theme Variables */
+  --if-bg-grad: linear-gradient(160deg, #08070F 0%, #110E1C 60%, #180D15 100%);
+  --if-text: #F1F5F9;
+  --if-text-secondary: #A78BFA;
+  --if-text-muted: #6B7280;
+  --if-border: rgba(255, 153, 51, 0.25);
+  --if-input-bg: rgba(15, 13, 25, 0.6);
+  --if-card-bg: rgba(21, 19, 36, 0.85);
+  --if-header-bg: rgba(11, 13, 25, 0.95);
+  --if-primary: #FF9933;
+  --if-secondary: #C084FC;
+
+  /* Errors & alerts */
+  --text-error: #FCA5A5;
+  --text-success: #34D399;
+  --bg-error: rgba(239, 68, 68, 0.1);
+  --border-error: rgba(239, 68, 68, 0.3);
 }
 
 [data-theme="light"] {
@@ -72,6 +90,24 @@
   /* Modals */
   --bg-modal: #FFFFFF;
   --border-modal: #CBD5E1;
+
+  /* IndiaFest Specific Theme Variables */
+  --if-bg-grad: linear-gradient(160deg, #FFF8F2 0%, #FFF4EC 60%, #FFFAF6 100%);
+  --if-text: #2D1A08;
+  --if-text-secondary: #8B1E3F;
+  --if-text-muted: #8B6040;
+  --if-border: #F0E6D3;
+  --if-input-bg: #FAFAF8;
+  --if-card-bg: #FFFFFF;
+  --if-header-bg: rgba(255, 255, 255, 0.95);
+  --if-primary: #FF9933;
+  --if-secondary: #8B1E3F;
+
+  /* Errors & alerts */
+  --text-error: #B91C1C;
+  --text-success: #15803D;
+  --bg-error: rgba(239, 68, 68, 0.05);
+  --border-error: rgba(239, 68, 68, 0.2);
 }
 
 @layer base {
@@ -85,6 +121,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s, color 0.3s;
+    /* Safe Area Inset Support */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
   ::selection {
     background-color: rgba(99,102,241,0.3);
@@ -170,5 +211,10 @@
   /* Make margins & paddings tighter on small viewports */
   .mobile-p-4 {
     padding: 16px !important;
+  }
+  
+  /* Standard 44px tap targets on mobile menu and links */
+  .sidebar-link, header button, footer button {
+    min-height: 44px;
   }
 }
