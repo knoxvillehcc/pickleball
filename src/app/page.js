@@ -182,11 +182,11 @@ function PublicLanding() {
             </svg>
           </div>
 
-          <h1 style={{ margin: '0 0 14px', fontSize: 'clamp(28px, 4.5vw, 44px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-1.5px', lineHeight: 1.15 }}>
-            Knoxville Hindu{' '}
-            <span style={{ background: 'linear-gradient(135deg, #818CF8 30%, #38BDF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+          <h1 style={{ margin: '0 0 14px', fontSize: 'clamp(28px, 4.5vw, 44px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-1.5px', lineHeight: 1.2 }}>
+            <div>Knoxville Hindu</div>
+            <div style={{ background: 'linear-gradient(135deg, #818CF8 30%, #38BDF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginTop: '6px' }}>
               Community Center
-            </span>
+            </div>
           </h1>
           <p style={{ margin: 0, fontSize: '15px', color: 'rgba(255,255,255,0.45)', fontWeight: '500', letterSpacing: '0.3px' }}>
             Select an option below to get started
