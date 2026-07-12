@@ -92,32 +92,32 @@ function PublicLanding() {
       title: 'Pickleball Registration',
       desc: 'Register for the HCC Pickleball Tournament. Secure your spot and pay online.',
       href: '/register/pickleball',
-      gradient: 'linear-gradient(135deg, #7B1C1C 0%, #A0522D 100%)',
       accentColor: '#F4A40B',
-      glowColor: 'rgba(244, 164, 11, 0.25)',
-      borderColor: 'rgba(244, 164, 11, 0.35)',
+      glowColor: 'rgba(244, 164, 11, 0.15)',
+      borderColor: 'rgba(244, 164, 11, 0.3)',
       icon: (
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10"/>
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          <path d="M2 12h20"/>
+          <path d="M6 12a6 6 0 0 1 12 0"/>
+          <path d="M12 6a6 6 0 0 1 0 12"/>
+          <circle cx="12" cy="12" r="1" fill="currentColor"/>
         </svg>
       ),
       badge: 'Sports Event',
       cta: 'Register Now',
     },
     {
-      title: 'India Fest Registration',
-      desc: 'Reserve your vendor booth at IndiaFest 2026 — East Tennessee\'s largest celebration of Indian culture.',
+      title: 'IndiaFest Registration',
+      desc: 'Reserve your vendor booth at IndiaFest 2026 — East Tennessee’s largest celebration of Indian culture.',
       href: '/register/indiafest/vendor',
-      gradient: 'linear-gradient(135deg, #8B1E3F 0%, #6B1530 100%)',
       accentColor: '#FF9933',
-      glowColor: 'rgba(255, 153, 51, 0.25)',
-      borderColor: 'rgba(255, 153, 51, 0.35)',
+      glowColor: 'rgba(255, 153, 51, 0.15)',
+      borderColor: 'rgba(255, 153, 51, 0.3)',
       icon: (
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
         </svg>
       ),
       badge: 'Cultural Festival',
@@ -127,10 +127,9 @@ function PublicLanding() {
       title: 'Admin Login',
       desc: 'Staff and administrator access to the HCC portal dashboard, reports, and settings.',
       href: '/login',
-      gradient: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
       accentColor: '#818CF8',
-      glowColor: 'rgba(129, 140, 248, 0.2)',
-      borderColor: 'rgba(129, 140, 248, 0.3)',
+      glowColor: 'rgba(129, 140, 248, 0.12)',
+      borderColor: 'rgba(129, 140, 248, 0.25)',
       icon: (
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -149,7 +148,7 @@ function PublicLanding() {
       position: 'fixed',
       inset: 0,
       overflowY: 'auto',
-      background: 'linear-gradient(160deg, #0A0F1E 0%, #0D1425 50%, #090D1A 100%)',
+      background: '#070B16', // Premium dark navy background
       fontFamily: "'Inter', -apple-system, sans-serif",
       display: 'flex',
       flexDirection: 'column',
@@ -160,36 +159,36 @@ function PublicLanding() {
 
       {/* Ambient background glows */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '60vw', height: '60vw', maxWidth: '700px', maxHeight: '700px', background: 'radial-gradient(circle, rgba(129,140,248,0.05), transparent 60%)', borderRadius: '50%' }}/>
-        <div style={{ position: 'absolute', bottom: '0', right: '-10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, rgba(255,153,51,0.04), transparent 60%)', borderRadius: '50%' }}/>
+        <div style={{ position: 'absolute', top: '-10%', left: '10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, rgba(129,140,248,0.06), transparent 70%)', borderRadius: '50%' }}/>
+        <div style={{ position: 'absolute', bottom: '-10%', right: '10%', width: '50vw', height: '50vw', maxWidth: '600px', background: 'radial-gradient(circle, rgba(244,164,11,0.03), transparent 70%)', borderRadius: '50%' }}/>
       </div>
 
       {/* Main content */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', position: 'relative', zIndex: 1 }}>
 
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '56px', maxWidth: '640px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '48px', maxWidth: '680px' }}>
           {/* HCC logo mark */}
           <div style={{
-            width: '72px', height: '72px', borderRadius: '20px', margin: '0 auto 24px',
-            background: 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(129,140,248,0.05))',
-            border: '1px solid rgba(129,140,248,0.2)',
+            width: '64px', height: '64px', borderRadius: '16px', margin: '0 auto 24px',
+            background: 'linear-gradient(135deg, rgba(129,140,248,0.12), rgba(129,140,248,0.03))',
+            border: '1px solid rgba(129,140,248,0.15)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 8px 32px rgba(129,140,248,0.12)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
           }}>
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
               <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
           </div>
 
-          <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+          <h1 style={{ margin: '0 0 14px', fontSize: 'clamp(28px, 4.5vw, 44px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-1.5px', lineHeight: 1.15 }}>
             Knoxville Hindu{' '}
-            <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            <span style={{ background: 'linear-gradient(135deg, #818CF8 30%, #38BDF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               Community Center
             </span>
           </h1>
-          <p style={{ margin: 0, fontSize: '16px', color: 'rgba(255,255,255,0.5)', fontWeight: '400', lineHeight: '1.6' }}>
+          <p style={{ margin: 0, fontSize: '15px', color: 'rgba(255,255,255,0.45)', fontWeight: '500', letterSpacing: '0.3px' }}>
             Select an option below to get started
           </p>
         </div>
@@ -197,10 +196,10 @@ function PublicLanding() {
         {/* Three option cards */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+          gap: '24px',
           width: '100%',
-          maxWidth: '960px',
+          maxWidth: '1020px',
         }}>
           {options.map((opt, i) => (
             <Link key={i} href={opt.href} style={{ textDecoration: 'none' }}>
@@ -208,21 +207,21 @@ function PublicLanding() {
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(null)}
                 style={{
-                  background: hovered === i
-                    ? opt.gradient
-                    : 'linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
-                  border: `1px solid ${hovered === i ? opt.borderColor : 'rgba(255,255,255,0.08)'}`,
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                  border: hovered === i
+                    ? `1px solid ${opt.accentColor}`
+                    : '1px solid rgba(255,255,255,0.07)',
                   borderRadius: '20px',
-                  padding: '36px 32px',
+                  padding: '40px 32px',
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '0',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  height: '100%',
+                  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
                   transform: hovered === i ? 'translateY(-6px)' : 'translateY(0)',
                   boxShadow: hovered === i
-                    ? `0 20px 60px ${opt.glowColor}, 0 4px 20px rgba(0,0,0,0.3)`
-                    : '0 2px 12px rgba(0,0,0,0.2)',
+                    ? `0 20px 40px ${opt.glowColor}, inset 0 1px 0 rgba(255,255,255,0.1)`
+                    : '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
                   position: 'relative',
                   overflow: 'hidden',
                 }}
@@ -230,7 +229,7 @@ function PublicLanding() {
                 {/* Glow overlay on hover */}
                 <div style={{
                   position: 'absolute', inset: 0, borderRadius: '20px',
-                  background: hovered === i ? `radial-gradient(circle at top right, ${opt.glowColor}, transparent 60%)` : 'none',
+                  background: hovered === i ? `radial-gradient(circle at 100% 0%, ${opt.glowColor}, transparent 70%)` : 'none',
                   pointerEvents: 'none',
                   transition: 'all 0.3s',
                 }}/>
@@ -238,46 +237,52 @@ function PublicLanding() {
                 {/* Badge */}
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  background: `${opt.accentColor}20`,
-                  border: `1px solid ${opt.accentColor}40`,
-                  borderRadius: '99px', padding: '4px 12px',
-                  marginBottom: '24px', alignSelf: 'flex-start',
+                  background: hovered === i ? `${opt.accentColor}25` : 'rgba(255,255,255,0.04)',
+                  border: hovered === i ? `1px solid ${opt.accentColor}40` : '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '99px', padding: '5px 12px',
+                  marginBottom: '28px', alignSelf: 'flex-start',
                   position: 'relative',
+                  transition: 'all 0.3s',
                 }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: opt.accentColor, display: 'inline-block', flexShrink: 0 }}/>
-                  <span style={{ fontSize: '11px', fontWeight: '700', color: opt.accentColor, letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                  <span style={{
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    background: opt.accentColor, display: 'inline-block', flexShrink: 0,
+                    boxShadow: hovered === i ? `0 0 8px ${opt.accentColor}` : 'none'
+                  }}/>
+                  <span style={{ fontSize: '10px', fontWeight: '800', color: hovered === i ? opt.accentColor : 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase' }}>
                     {opt.badge}
                   </span>
                 </div>
 
                 {/* Icon */}
                 <div style={{
-                  width: '64px', height: '64px', borderRadius: '16px',
-                  background: `${opt.accentColor}18`,
-                  border: `1px solid ${opt.accentColor}30`,
+                  width: '56px', height: '56px', borderRadius: '14px',
+                  background: hovered === i ? `${opt.accentColor}20` : 'rgba(255,255,255,0.03)',
+                  border: hovered === i ? `1px solid ${opt.accentColor}40` : '1px solid rgba(255,255,255,0.06)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: opt.accentColor, marginBottom: '20px',
+                  color: hovered === i ? opt.accentColor : 'rgba(255,255,255,0.6)', marginBottom: '24px',
                   position: 'relative',
-                  boxShadow: hovered === i ? `0 0 24px ${opt.accentColor}30` : 'none',
-                  transition: 'box-shadow 0.3s',
+                  boxShadow: hovered === i ? `0 0 20px ${opt.accentColor}25` : 'none',
+                  transition: 'all 0.3s',
                 }}>
                   {opt.icon}
                 </div>
 
                 {/* Text */}
                 <h2 style={{
-                  margin: '0 0 10px',
-                  fontSize: '22px', fontWeight: '800',
+                  margin: '0 0 12px',
+                  fontSize: '21px', fontWeight: '800',
                   color: '#FFFFFF',
                   letterSpacing: '-0.3px',
                   position: 'relative',
                 }}>
                   {opt.title}
                 </h2>
+                
                 <p style={{
-                  margin: '0 0 28px',
-                  fontSize: '14px', lineHeight: '1.65',
-                  color: 'rgba(255,255,255,0.55)',
+                  margin: '0 0 32px',
+                  fontSize: '14px', lineHeight: '1.6',
+                  color: 'rgba(255,255,255,0.45)',
                   flex: 1,
                   position: 'relative',
                 }}>
@@ -286,17 +291,18 @@ function PublicLanding() {
 
                 {/* CTA */}
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: '8px',
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
                   fontSize: '14px', fontWeight: '700',
                   color: opt.accentColor,
                   position: 'relative',
-                  transition: 'gap 0.2s',
+                  transition: 'all 0.3s',
                 }}>
-                  {opt.cta}
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                    style={{ transform: hovered === i ? 'translateX(4px)' : 'translateX(0)', transition: 'transform 0.2s' }}>
-                    <polyline points="9 18 15 12 9 6"/>
-                  </svg>
+                  <span>{opt.cta}</span>
+                  <span style={{
+                    transform: hovered === i ? 'translateX(4px)' : 'translateX(0)',
+                    transition: 'transform 0.2s',
+                    fontSize: '15px'
+                  }}>→</span>
                 </div>
               </div>
             </Link>
