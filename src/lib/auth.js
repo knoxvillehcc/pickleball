@@ -78,4 +78,35 @@ export async function getSessionAndPermissions(requiredSlug) {
   return { success: true, user: payload };
 }
 
+export async function logLoginActivity(email, name, status, reason = '', request) {
+  try {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return;
+
+    const ip = request.headers.get('x-forwarded-for') || request.ip || '127.0.0.1';
+    const userAgent = request.headers.get('user-agent') || 'Unknown';
+
+    await fetch(`${SUPABASE_URL}/rest/v1/hcc_login_activity`, {
+      method: 'POST',
+      headers: {
+        'apikey':         SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify({
+        email: email.toLowerCase().trim(),
+        name: name || '',
+        status,
+        reason,
+        ip_address: ip,
+        user_agent: userAgent,
+        created_at: new Date().toISOString(),
+      }),
+    });
+  } catch (err) {
+    console.warn('[logLoginActivity] Failed to write login activity to Supabase:', err.message);
+  }
+}
+
 export { COOKIE_NAME };

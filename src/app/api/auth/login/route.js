@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateToken, setAuthCookie, verifyPin } from '@/lib/auth';
+import { generateToken, setAuthCookie, verifyPin, logLoginActivity } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 
 export const dynamic = 'force-dynamic';
@@ -98,10 +98,12 @@ export async function POST(request) {
     const user = await getUserFromSupabase(emailLower);
 
     if (!user) {
+      await logLoginActivity(emailLower, 'Unknown', 'failed', 'invalid_user', request);
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
     if (!user.active) {
+      await logLoginActivity(emailLower, user.name, 'failed', 'deactivated', request);
       return NextResponse.json({ error: 'Account is deactivated. Contact admin.' }, { status: 403 });
     }
 
@@ -113,12 +115,14 @@ export async function POST(request) {
       if (attempts >= MAX_ATTEMPTS) {
         const lockedUntil = Date.now() + LOCKOUT_MS;
         await setLockoutState(emailLower, attempts, lockedUntil);
+        await logLoginActivity(emailLower, user.name, 'failed', 'locked_out', request);
         return NextResponse.json({
           error: 'Account locked for 15 minutes.',
           lockedUntil: new Date(lockedUntil).toISOString(),
         }, { status: 429 });
       }
       await setLockoutState(emailLower, attempts, null);
+      await logLoginActivity(emailLower, user.name, 'failed', `invalid_pin (attempt ${attempts})`, request);
       return NextResponse.json({
         error: `Invalid PIN. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`,
       }, { status: 401 });
@@ -141,6 +145,8 @@ export async function POST(request) {
       allowedPages,
     });
     await setAuthCookie(token);
+
+    await logLoginActivity(emailLower, user.name, 'success', '', request);
 
     return NextResponse.json({
       success: true,

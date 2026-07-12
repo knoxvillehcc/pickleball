@@ -415,11 +415,41 @@ export default function UsersPage() {
     if (res.ok) { const d = await res.json(); setUsers(d.users || []); }
     setLoading(false);
   }, []);
+  // Tabs: 'users' | 'activity'
+  const [activeTab,    setActiveTab]    = useState('users');
+  const [activity,     setActivity]     = useState([]);
+  const [actLoading,   setActLoading]   = useState(false);
+  const [actSearch,    setActSearch]    = useState('');
+  const [actLimit,     setActLimit]     = useState('100');
+  const [tableMissing, setTableMissing] = useState(false);
+
+  const fetchActivity = useCallback(async () => {
+    setActLoading(true);
+    try {
+      const params = new URLSearchParams({ limit: actLimit, search: actSearch });
+      const res = await fetch('/api/auth/activity?' + params.toString());
+      if (res.ok) {
+        const d = await res.json();
+        setActivity(d.activity || []);
+        setTableMissing(!!d.tableMissing);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setActLoading(false);
+    }
+  }, [actLimit, actSearch]);
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(d => setMe(d.user)).catch(() => {});
     fetchUsers();
   }, [fetchUsers]);
+
+  useEffect(() => {
+    if (activeTab === 'activity') {
+      fetchActivity();
+    }
+  }, [activeTab, fetchActivity]);
 
   const handleDelete = async (user) => {
     if (!confirm(`Delete ${user.email}? This cannot be undone.`)) return;
@@ -469,105 +499,256 @@ export default function UsersPage() {
         )}
       </div>
 
-      {/* Users Table */}
-      {loading ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px', color: C.muted }}>
-          <div style={{ width: '28px', height: '28px', border: '2px solid #6366F1', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
-        </div>
-      ) : (
-        <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden' }}>
-          <div className="table-responsive">
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-            <thead>
-              <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: `1px solid ${C.border}` }}>
-                {['User', 'Role', 'Page Access', 'Status', 'Joined', isSA ? 'Actions' : ''].map((h, i) => (
-                  <th key={i} style={{ padding: '16px 20px', textAlign: i >= 4 ? 'center' : 'left', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(u => {
-                const roleColor = ROLE_COLORS[u.role] || ROLE_COLORS.staff;
-                const pages = Array.isArray(u.allowed_pages) ? u.allowed_pages : (typeof u.allowed_pages === 'string' ? JSON.parse(u.allowed_pages) : []);
-                const isFullAccess = pages.includes('*');
-                return (
-                  <tr key={u.id} style={{ borderBottom: `1px solid var(--border-table)`, transition: 'background 0.15s' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-glow)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    {/* User */}
-                    <td style={{ padding: '16px 20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(99,102,241,0.15)', border: '1.5px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '800', color: C.indigo, flexShrink: 0 }}>
-                          {(u.name || u.email)[0].toUpperCase()}
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{u.name || '—'}</div>
-                          <div style={{ fontSize: '12px', color: C.muted }}>{u.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    {/* Role */}
-                    <td style={{ padding: '16px 20px' }}>
-                      <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', background: roleColor.bg, border: `1px solid ${roleColor.border}`, color: roleColor.text }}>
-                        {u.role === 'super_admin' ? '👑 Super Admin' : '👤 Staff'}
-                      </span>
-                    </td>
-                    {/* Pages */}
-                    <td style={{ padding: '16px 20px', maxWidth: '220px' }}>
-                      {isFullAccess ? (
-                        <span style={{ fontSize: '12px', fontWeight: '700', color: C.gold }}>All Pages ✦</span>
-                      ) : (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                          {pages.length === 0 ? (
-                            <span style={{ fontSize: '12px', color: C.muted }}>No access</span>
-                          ) : pages.map(pk => {
-                             const page = HCC_PAGES.find(p => p.key === pk);
-                             return (
-                               <span key={pk} style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '20px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo }}>
-                                 {page?.label || pk}
-                               </span>
-                             );
-                          })}
-                        </div>
-                      )}
-                    </td>
-                    {/* Status */}
-                    <td style={{ padding: '16px 20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: u.active ? C.green : 'var(--text-muted)', boxShadow: u.active ? `0 0 6px ${C.green}` : 'none' }}/>
-                        <span style={{ fontSize: '13px', color: u.active ? C.green : 'var(--text-muted)', fontWeight: '600' }}>{u.active ? 'Active' : 'Inactive'}</span>
-                      </div>
-                    </td>
-                    {/* Joined */}
-                    <td style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)' }}>
-                      {new Date(u.created_at).toLocaleDateString()}
-                    </td>
-                    {/* Actions */}
-                    {isSA && (
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border)', marginBottom: '24px' }}>
+        <button
+          onClick={() => setActiveTab('users')}
+          style={{
+            padding: '12px 20px',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'users' ? '2px solid var(--accent)' : '2px solid transparent',
+            color: activeTab === 'users' ? 'var(--text-primary)' : 'var(--text-secondary)',
+            fontWeight: '700',
+            fontSize: '14px',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+        >
+          👤 Active Users
+        </button>
+        <button
+          onClick={() => setActiveTab('activity')}
+          style={{
+            padding: '12px 20px',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'activity' ? '2px solid var(--accent)' : '2px solid transparent',
+            color: activeTab === 'activity' ? 'var(--text-primary)' : 'var(--text-secondary)',
+            fontWeight: '700',
+            fontSize: '14px',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+        >
+          📜 Login Activity Logs
+        </button>
+      </div>
+
+      {activeTab === 'users' ? (
+        /* Users Table */
+        loading ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px', color: C.muted }}>
+            <div style={{ width: '28px', height: '28px', border: '2px solid #6366F1', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
+          </div>
+        ) : (
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden' }}>
+            <div className="table-responsive">
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+              <thead>
+                <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: `1px solid ${C.border}` }}>
+                  {['User', 'Role', 'Page Access', 'Status', 'Joined', isSA ? 'Actions' : ''].map((h, i) => (
+                    <th key={i} style={{ padding: '16px 20px', textAlign: i >= 4 ? 'center' : 'left', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => {
+                  const roleColor = ROLE_COLORS[u.role] || ROLE_COLORS.staff;
+                  const pages = Array.isArray(u.allowed_pages) ? u.allowed_pages : (typeof u.allowed_pages === 'string' ? JSON.parse(u.allowed_pages) : []);
+                  const isFullAccess = pages.includes('*');
+                  return (
+                    <tr key={u.id} style={{ borderBottom: `1px solid var(--border-table)`, transition: 'background 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-glow)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                      {/* User */}
                       <td style={{ padding: '16px 20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                          <ActionBtn onClick={() => setEditingUser(u)} color="var(--text-primary)" bg="var(--bg-button-secondary)" label="✏️ Edit" />
-                          <ActionBtn onClick={() => setManagingUser(u)} color="var(--accent)" bg="rgba(129,140,248,0.08)" label="🔑 Access" />
-                          <ActionBtn onClick={() => setResetPinUser(u)} color="var(--text-secondary)" bg="var(--bg-button-secondary)" label="🔢 PIN" />
-                          {u.role !== 'super_admin' && (
-                            <ActionBtn onClick={() => handleToggleActive(u)} color={u.active ? '#D97706' : C.green} bg={u.active ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)'} label={u.active ? '⏸ Disable' : '▶ Enable'} />
-                          )}
-                          {String(u.id) !== String(me?.id) && u.role !== 'super_admin' && (
-                            <ActionBtn onClick={() => handleDelete(u)} color="#FC8181" bg="rgba(239,68,68,0.1)" label="🗑 Delete" />
-                          )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(99,102,241,0.15)', border: '1.5px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '800', color: C.indigo, flexShrink: 0 }}>
+                            {(u.name || u.email)[0].toUpperCase()}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{u.name || '—'}</div>
+                            <div style={{ fontSize: '12px', color: C.muted }}>{u.email}</div>
+                          </div>
                         </div>
                       </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      {/* Role */}
+                      <td style={{ padding: '16px 20px' }}>
+                        <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', background: roleColor.bg, border: `1px solid ${roleColor.border}`, color: roleColor.text }}>
+                          {u.role === 'super_admin' ? '👑 Super Admin' : '👤 Staff'}
+                        </span>
+                      </td>
+                      {/* Pages */}
+                      <td style={{ padding: '16px 20px', maxWidth: '220px' }}>
+                        {isFullAccess ? (
+                          <span style={{ fontSize: '12px', fontWeight: '700', color: C.gold }}>All Pages ✦</span>
+                        ) : (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                            {pages.length === 0 ? (
+                              <span style={{ fontSize: '12px', color: C.muted }}>No access</span>
+                            ) : pages.map(pk => {
+                               const page = HCC_PAGES.find(p => p.key === pk);
+                               return (
+                                 <span key={pk} style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '20px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo }}>
+                                   {page?.label || pk}
+                                 </span>
+                               );
+                            })}
+                          </div>
+                        )}
+                      </td>
+                      {/* Status */}
+                      <td style={{ padding: '16px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: u.active ? C.green : 'var(--text-muted)', boxShadow: u.active ? `0 0 6px ${C.green}` : 'none' }}/>
+                          <span style={{ fontSize: '13px', color: u.active ? C.green : 'var(--text-muted)', fontWeight: '600' }}>{u.active ? 'Active' : 'Inactive'}</span>
+                        </div>
+                      </td>
+                      {/* Joined */}
+                      <td style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)' }}>
+                        {new Date(u.created_at).toLocaleDateString()}
+                      </td>
+                      {/* Actions */}
+                      {isSA && (
+                        <td style={{ padding: '16px 20px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                            <ActionBtn onClick={() => setEditingUser(u)} color="var(--text-primary)" bg="var(--bg-button-secondary)" label="✏️ Edit" />
+                            <ActionBtn onClick={() => setManagingUser(u)} color="var(--accent)" bg="rgba(129,140,248,0.08)" label="🔑 Access" />
+                            <ActionBtn onClick={() => setResetPinUser(u)} color="var(--text-secondary)" bg="var(--bg-button-secondary)" label="🔢 PIN" />
+                            {u.role !== 'super_admin' && (
+                              <ActionBtn onClick={() => handleToggleActive(u)} color={u.active ? '#D97706' : C.green} bg={u.active ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)'} label={u.active ? '⏸ Disable' : '▶ Enable'} />
+                            )}
+                            {String(u.id) !== String(me?.id) && u.role !== 'super_admin' && (
+                              <ActionBtn onClick={() => handleDelete(u)} color="#FC8181" bg="rgba(239,68,68,0.1)" label="🗑 Delete" />
+                            )}
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            </div>
+            {users.length === 0 && (
+              <div style={{ padding: '60px', textAlign: 'center', color: C.muted }}>No users yet. Click + Add User to create one.</div>
+            )}
           </div>
-          {users.length === 0 && (
-            <div style={{ padding: '60px', textAlign: 'center', color: C.muted }}>No users yet. Click + Add User to create one.</div>
-          )}
-        </div>
+        )
+      ) : (
+        /* Activity Logs UI */
+        tableMissing ? (
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', padding: '40px 28px', textAlign: 'center' }}>
+            <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '18px' }}>⚠️ Setup Required</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '10px 0 20px', lineHeight: '1.6' }}>
+              The activity logging table `hcc_login_activity` does not exist in your database yet. Run this script in your Supabase SQL Editor:
+            </p>
+            <pre style={{
+              background: 'var(--bg-input)', padding: '16px', borderRadius: '10px',
+              border: '1px solid var(--border)', fontSize: '12px', fontFamily: 'monospace',
+              color: 'var(--text-muted)', textAlign: 'left', overflowX: 'auto', whiteSpace: 'pre',
+            }}>
+{`CREATE TABLE IF NOT EXISTS public.hcc_login_activity (
+  id          BIGSERIAL    PRIMARY KEY,
+  email       TEXT         NOT NULL,
+  name        TEXT         NOT NULL,
+  status      TEXT         NOT NULL CHECK (status IN ('success', 'failed')),
+  reason      TEXT         NOT NULL DEFAULT '',
+  ip_address  TEXT         NOT NULL,
+  user_agent  TEXT         NOT NULL,
+  created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_login_activity_email ON public.hcc_login_activity(email);
+CREATE INDEX IF NOT EXISTS idx_login_activity_status ON public.hcc_login_activity(status);
+CREATE INDEX IF NOT EXISTS idx_login_activity_created_at ON public.hcc_login_activity(created_at DESC);
+
+ALTER TABLE public.hcc_login_activity ENABLE ROW LEVEL SECURITY;`}
+            </pre>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Filters */}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="🔍 Search email, name, IP, status..."
+                value={actSearch}
+                onChange={e => setActSearch(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && fetchActivity()}
+                style={{ ...inputStyle, flex: 1, minWidth: '200px' }}
+              />
+              <select
+                value={actLimit}
+                onChange={e => setActLimit(e.target.value)}
+                style={{ ...inputStyle, width: '120px', cursor: 'pointer' }}
+              >
+                <option value="50">Last 50</option>
+                <option value="100">Last 100</option>
+                <option value="250">Last 250</option>
+                <option value="500">Last 500</option>
+              </select>
+              <button
+                onClick={fetchActivity}
+                disabled={actLoading}
+                style={{ ...btnStyle('var(--accent)', 'transparent', 'white', true) }}
+              >
+                {actLoading ? '⏳ Loading...' : '🔄 Refresh'}
+              </button>
+            </div>
+
+            {/* Table */}
+            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden' }}>
+              <div className="table-responsive">
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: `1px solid ${C.border}` }}>
+                      {['User / Email', 'Status', 'IP Address', 'Details', 'Time'].map((h, i) => (
+                        <th key={i} style={{ padding: '14px 20px', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activity.map((row) => {
+                      const isSuccess = row.status === 'success';
+                      return (
+                        <tr key={row.id} style={{ borderBottom: `1px solid var(--border-table)` }}>
+                          <td style={{ padding: '14px 20px' }}>
+                            <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{row.name || '—'}</div>
+                            <div style={{ fontSize: '12px', color: C.muted }}>{row.email}</div>
+                          </td>
+                          <td style={{ padding: '14px 20px' }}>
+                            <span style={{
+                              display: 'inline-block', padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '800',
+                              backgroundColor: isSuccess ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
+                              color: isSuccess ? '#10B981' : '#F87171',
+                              border: `1px solid ${isSuccess ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`
+                            }}>
+                              {isSuccess ? 'SUCCESS' : `FAILED (${row.reason || 'unknown'})`}
+                            </span>
+                          </td>
+                          <td style={{ padding: '14px 20px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+                            {row.ip_address}
+                          </td>
+                          <td style={{ padding: '14px 20px', color: C.muted, fontSize: '12px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={row.user_agent}>
+                            {row.user_agent}
+                          </td>
+                          <td style={{ padding: '14px 20px', color: 'var(--text-muted)' }}>
+                            {new Date(row.created_at).toLocaleString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {activity.length === 0 && !actLoading && (
+                      <tr><td colSpan={5} style={{ padding: '60px', textAlign: 'center', color: C.muted }}>No login activity records found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )
       )}
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');`}</style>
     </div>
