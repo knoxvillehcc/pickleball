@@ -74,7 +74,7 @@ export default function ClientLayout({ children }) {
   const isDark = theme === 'dark';
 
   // ── Public pages: no sidebar ───────────────────────────────────────────────
-  if (isPublicRoute(pathname)) {
+  if (isPublicRoute(pathname) || (pathname === '/' && !user)) {
     return (
       <ThemeContext.Provider value={{ theme, toggleTheme, isDark }}>
         {children}
