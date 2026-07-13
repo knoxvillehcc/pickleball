@@ -89,29 +89,28 @@ export default function ReportsPage() {
       {/* Hero */}
       <div style={{
         ...card,
-        background: 'var(--bg-banner-grad)',
-        borderColor: 'var(--border-hover)',
-        padding: 'clamp(20px, 4vw, 48px)', position: 'relative', overflow: 'hidden',
-        boxShadow: '0 0 80px -20px var(--accent-glow)',
+        background: 'var(--bg-card)',
+        borderColor: 'var(--border)',
+        padding: '32px', position: 'relative', overflow: 'hidden',
+        boxShadow: 'var(--shadow)',
         display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
       }}>
-        <div style={{ position:'absolute', top:'-60px', right:'-60px', width:'300px', height:'300px', background:'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius:'50%', pointerEvents:'none' }}></div>
         <div style={{ position: 'relative' }}>
-          <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 42px)', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
+          <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
             Membership{' '}
-            <span style={{ background: 'linear-gradient(135deg, #818CF8, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Reports</span>
+            <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Reports</span>
           </h1>
-          <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.6, maxWidth: '480px' }}>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-secondary)', fontSize: '13.5px', fontWeight: '500', lineHeight: 1.6, maxWidth: '480px' }}>
             Complete overview of all active memberships, revenue, and subscription details.
           </p>
         </div>
         {!loading && data.results.length > 0 && (
           <button onClick={downloadPDF} style={{
-            background: 'linear-gradient(135deg, #6366F1, #22D3EE)',
-            color: 'white', fontWeight: '700', fontSize: '15px',
-            padding: '14px 32px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+            background: 'var(--accent)',
+            color: 'white', fontWeight: '800', fontSize: '14px',
+            padding: '12px 28px', borderRadius: '12px', border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: '10px',
-            boxShadow: '0 0 40px -10px rgba(99,102,241,0.5)',
+            boxShadow: '0 4px 12px var(--accent-glow)',
             position: 'relative', zIndex: 1,
           }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -123,30 +122,30 @@ export default function ReportsPage() {
       {/* Loading */}
       {loading ? (
         <div style={{ ...card, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '100px 24px', gap: '16px' }}>
-          <div style={{ width: '48px', height: '48px', border: '3px solid rgba(99,102,241,0.2)', borderTop: '3px solid #6366F1', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+          <div style={{ width: '48px', height: '48px', border: '3px solid var(--accent-glow)', borderTop: '3px solid var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
           <div style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '16px' }}>Loading Membership Data...</div>
         </div>
       ) : (
         <>
           {/* Global Totals */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
-            <div style={{ ...card, padding: '28px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '2px solid #6366F1' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div style={{ ...card, padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Active Members</div>
-                <div style={{ fontSize: '40px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Active Members</div>
+                <div style={{ fontSize: '36px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
               </div>
             </div>
 
-            <div style={{ ...card, padding: '28px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '2px solid #10B981' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <div style={{ ...card, padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '3.5px solid var(--text-success)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(16,185,129,0.08)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-success)" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Revenue Collected</div>
-                <div style={{ fontSize: '36px', fontWeight: '900', color: '#10B981', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Revenue Collected</div>
+                <div style={{ fontSize: '32px', fontWeight: '950', color: 'var(--text-success)', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
               </div>
             </div>
           </div>
@@ -154,17 +153,16 @@ export default function ReportsPage() {
           {/* Summary Cards per Type */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
             {Object.entries(data.summary).map(([type, stats]) => (
-              <div key={type} style={{ ...card, padding: '28px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', inset: 'auto 0 auto 0', top: 0, height: '2px', background: 'linear-gradient(90deg, #6366F1, #38BDF8 60%, transparent)' }}></div>
+              <div key={type} style={{ ...card, padding: '24px', position: 'relative', overflow: 'hidden', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
                 <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '24px', lineHeight: 1.4 }}>{type}</div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Active Members</div>
-                    <div style={{ fontSize: '44px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>{stats.count}</div>
+                    <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Active Members</div>
+                    <div style={{ fontSize: '36px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{stats.count}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Revenue</div>
-                    <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--accent)' }}>${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Revenue</div>
+                    <div style={{ fontSize: '20px', fontWeight: '900', color: 'var(--accent)' }}>${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                   </div>
                 </div>
               </div>
@@ -172,7 +170,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Detail Table */}
-          <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
+          <div style={{ ...card, padding: 0, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
             <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border-table)', backgroundColor: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>Member Detail</h2>
@@ -202,7 +200,7 @@ export default function ReportsPage() {
                       <td style={{ padding: '14px 24px', color: 'var(--accent)', fontWeight: '600' }}>{row.type}</td>
                       <td style={{ padding: '14px 24px', fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-muted)' }}>{row.order}</td>
                       <td style={{ padding: '14px 24px', color: 'var(--text-secondary)' }}>{row.date}</td>
-                      <td style={{ padding: '14px 24px', textAlign: 'right', fontWeight: '800', color: '#10B981' }}>${(row.amount||0).toFixed(2)}</td>
+                      <td style={{ padding: '14px 24px', textAlign: 'right', fontWeight: '800', color: 'var(--text-success)' }}>${(row.amount||0).toFixed(2)}</td>
                     </tr>
                   ))}
                   {data.results.length === 0 && (

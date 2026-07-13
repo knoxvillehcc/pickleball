@@ -22,9 +22,9 @@ const labelStyle = {
   color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px',
 };
 const STATUS_STYLES = {
-  green:  { bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.3)',  color: '#10B981' },
-  yellow: { bg: 'rgba(217,119,6,0.12)', border: 'rgba(217,119,6,0.3)', color: '#D97706' },
-  red:    { bg: 'rgba(244,63,94,0.1)',   border: 'rgba(244,63,94,0.3)',  color: '#F43F5E' },
+  green:  { bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.3)',  color: 'var(--text-success)' },
+  yellow: { bg: 'rgba(217,119,6,0.12)', border: 'rgba(217,119,6,0.3)', color: 'var(--accent)' },
+  red:    { bg: 'rgba(244,63,94,0.1)',   border: 'rgba(244,63,94,0.3)',  color: 'var(--text-error)' },
 };
 
 export default function BannerPage() {
@@ -125,12 +125,12 @@ export default function BannerPage() {
   };
 
   const statCards = stats ? [
-    { label: 'Total Invoices',    value: stats.total,           color: '#6366F1' },
-    { label: 'Unique Customers',  value: stats.uniqueCustomers, color: '#38BDF8' },
-    { label: 'Revenue Collected', value: '$' + (stats.totalRevenue||0).toLocaleString('en-US', { minimumFractionDigits: 2 }), color: '#10B981' },
-    { label: 'Outstanding',       value: '$' + (stats.totalOutstanding||0).toLocaleString('en-US', { minimumFractionDigits: 2 }), color: '#F43F5E' },
-    { label: 'Paid',              value: stats.paidCount,   color: '#10B981' },
-    { label: 'Unpaid',            value: stats.unpaidCount, color: '#F43F5E' },
+    { label: 'Total Invoices',    value: stats.total,           color: 'var(--accent)' },
+    { label: 'Unique Customers',  value: stats.uniqueCustomers, color: 'var(--accent)' },
+    { label: 'Revenue Collected', value: '$' + (stats.totalRevenue||0).toLocaleString('en-US', { minimumFractionDigits: 2 }), color: 'var(--text-success)' },
+    { label: 'Outstanding',       value: '$' + (stats.totalOutstanding||0).toLocaleString('en-US', { minimumFractionDigits: 2 }), color: 'var(--text-error)' },
+    { label: 'Paid',              value: stats.paidCount,   color: 'var(--text-success)' },
+    { label: 'Unpaid',            value: stats.unpaidCount, color: 'var(--text-error)' },
   ] : [];
 
   return (
@@ -139,19 +139,18 @@ export default function BannerPage() {
       {/* Hero */}
       <div style={{
         ...card,
-        background: 'var(--bg-banner-grad)',
-        borderColor: 'var(--border-hover)',
-        padding: 'clamp(20px, 4vw, 48px)', position: 'relative', overflow: 'hidden',
-        boxShadow: '0 0 80px -20px var(--accent-glow)',
+        background: 'var(--bg-card)',
+        borderColor: 'var(--border)',
+        padding: '32px', position: 'relative', overflow: 'hidden',
+        boxShadow: 'var(--shadow)',
         display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
       }}>
-        <div style={{ position:'absolute', top:'-60px', right:'-60px', width:'300px', height:'300px', background:'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius:'50%', pointerEvents:'none' }}></div>
         <div style={{ position:'relative' }}>
-          <h1 style={{ margin:0, fontSize:'clamp(24px, 4vw, 42px)', fontWeight:'900', color:'var(--text-primary)', lineHeight:1.1, letterSpacing:'-1px' }}>
+          <h1 style={{ margin:0, fontSize:'28px', fontWeight:'950', color:'var(--text-primary)', lineHeight:1.1, letterSpacing:'-0.5px' }}>
             Banner{' '}
-            <span style={{ background:'linear-gradient(135deg, #38BDF8, #818CF8)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>Check-In</span>
+            <span style={{ background:'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip: 'text' }}>Check-In</span>
           </h1>
-          <p style={{ margin:'12px 0 0', color:'var(--text-secondary)', fontSize:'15px', lineHeight:1.6, maxWidth:'500px' }}>
+          <p style={{ margin:'8px 0 0', color:'var(--text-secondary)', fontSize:'13.5px', fontWeight:'500', lineHeight:1.6, maxWidth:'500px' }}>
             Customer invoices for <strong style={{ color:'var(--accent)' }}>Yearly Banner 2026</strong> and <strong style={{ color:'var(--accent)' }}>Yearly Banner 2026 (Any$)</strong> with payment status.
           </p>
         </div>
@@ -159,19 +158,19 @@ export default function BannerPage() {
         {results && results.length > 0 && (
           <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', position:'relative', zIndex:1 }}>
             <button onClick={downloadPDF} style={{
-              background: 'linear-gradient(135deg, #6366F1, #22D3EE)',
-              color:'white', fontWeight:'700', fontSize:'14px',
-              padding:'13px 26px', borderRadius:'12px', border:'none', cursor:'pointer',
+              background: 'var(--accent)',
+              color:'white', fontWeight:'800', fontSize:'14px',
+              padding:'12px 26px', borderRadius:'12px', border:'none', cursor:'pointer',
               display:'flex', alignItems:'center', gap:'8px',
-              boxShadow:'0 0 30px -8px rgba(99,102,241,0.5)',
+              boxShadow:'0 4px 12px var(--accent-glow)',
             }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
               Download PDF
             </button>
             <button onClick={downloadCSV} style={{
-              background:'rgba(16,185,129,0.1)', border:'1px solid rgba(16,185,129,0.3)',
-              color:'#10B981', fontWeight:'700', fontSize:'14px',
-              padding:'13px 26px', borderRadius:'12px', cursor:'pointer',
+              background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.25)',
+              color:'var(--text-success)', fontWeight:'800', fontSize:'14px',
+              padding:'12px 26px', borderRadius:'12px', cursor:'pointer',
               display:'flex', alignItems:'center', gap:'8px',
             }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -201,12 +200,12 @@ export default function BannerPage() {
         </div>
         <div style={{ display:'flex', gap:'12px', flexWrap:'wrap' }}>
           <button onClick={fetchData} disabled={loading} style={{
-            background: loading ? 'rgba(56,189,248,0.3)' : 'linear-gradient(135deg, #0EA5E9, #6366F1)',
-            color:'white', fontWeight:'700', fontSize:'14px',
+            background: loading ? 'var(--accent-glow)' : 'var(--accent)',
+            color:'white', fontWeight:'800', fontSize:'14px',
             padding:'12px 28px', borderRadius:'10px', border:'none',
             cursor: loading ? 'not-allowed' : 'pointer',
             display:'flex', alignItems:'center', gap:'8px',
-            boxShadow:'0 0 30px -8px rgba(56,189,248,0.4)', transition:'all 0.3s',
+            boxShadow:'0 4px 12px var(--accent-glow)', transition:'all 0.3s',
           }}>
             {loading
               ? <><span style={{ display:'inline-block', width:'16px', height:'16px', border:'2px solid rgba(255,255,255,0.3)', borderTop:'2px solid white', borderRadius:'50%', animation:'spin 0.8s linear infinite' }}></span> Loading...</>
@@ -276,18 +275,18 @@ export default function BannerPage() {
                         <td style={{ padding:'14px 20px', color:'var(--text-secondary)' }}>{r.date}</td>
                         <td style={{ padding:'14px 20px' }}>
                           <span style={{
-                            display:'inline-block', padding:'3px 10px', borderRadius:'9999px', fontSize:'12px', fontWeight:'700',
-                            backgroundColor: r.product.includes('Any') ? 'rgba(129,140,248,0.12)' : 'rgba(56,189,248,0.12)',
-                            color:           r.product.includes('Any') ? '#818CF8' : '#38BDF8',
-                            border:          '1px solid ' + (r.product.includes('Any') ? 'rgba(129,140,248,0.25)' : 'rgba(56,189,248,0.25)'),
+                            display:'inline-block', padding:'3px 10px', borderRadius:'9999px', fontSize:'12px', fontWeight:'800',
+                            backgroundColor: r.product.includes('Any') ? 'var(--accent-glow)' : 'rgba(139,30,63,0.08)',
+                            color:           r.product.includes('Any') ? 'var(--accent)' : '#8B1E3F',
+                            border:          '1px solid ' + (r.product.includes('Any') ? 'rgba(255,153,51,0.25)' : 'rgba(139,30,63,0.25)'),
                           }}>{r.product}</span>
                         </td>
-                        <td style={{ padding:'14px 20px', textAlign:'right', fontWeight:'800', color:'#10B981', fontSize:'15px' }}>
+                        <td style={{ padding:'14px 20px', textAlign:'right', fontWeight:'800', color:'var(--text-success)', fontSize:'15px' }}>
                           ${(r.amount||0).toLocaleString('en-US',{minimumFractionDigits:2})}
                         </td>
                         <td style={{ padding:'14px 20px', color:'var(--text-secondary)', fontWeight:'600' }}>
                           <span style={{ display:'inline-flex', alignItems:'center', gap:'6px' }}>
-                            <span style={{ width:'26px', height:'26px', borderRadius:'50%', backgroundColor:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'10px', fontWeight:'800', color:'#818CF8', flexShrink:0 }}>
+                            <span style={{ width:'26px', height:'26px', borderRadius:'50%', backgroundColor:'var(--accent-glow)', border:'1px solid var(--border)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'10px', fontWeight:'800', color:'var(--accent)', flexShrink:0 }}>
                               {(r.takenBy||'?').charAt(0).toUpperCase()}
                             </span>
                             {r.takenBy}
@@ -307,7 +306,7 @@ export default function BannerPage() {
                 <tfoot>
                   <tr style={{ borderTop:'2px solid var(--border)', backgroundColor:'var(--bg-table-header)' }}>
                     <td colSpan={3} style={{ padding:'15px 20px', fontWeight:'800', color:'var(--text-primary)', fontSize:'13px', textTransform:'uppercase', letterSpacing:'1px' }}>GRAND TOTAL</td>
-                    <td style={{ padding:'15px 20px', textAlign:'right', fontWeight:'900', color:'#10B981', fontSize:'18px' }}>
+                    <td style={{ padding:'15px 20px', textAlign:'right', fontWeight:'900', color:'var(--text-success)', fontSize:'18px' }}>
                       ${results.reduce((s,r) => s+(r.amount||0), 0).toLocaleString('en-US',{minimumFractionDigits:2})}
                     </td>
                     <td colSpan={3}></td>

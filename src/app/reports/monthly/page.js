@@ -11,18 +11,11 @@ const card = {
 };
 
 const MONTH_COLORS = [
-  ['#6366F1', '#818CF8'],
-  ['#10B981', '#34D399'],
-  ['#F59E0B', '#FCD34D'],
-  ['#EF4444', '#F87171'],
-  ['#8B5CF6', '#A78BFA'],
-  ['#0EA5E9', '#38BDF8'],
-  ['#EC4899', '#F472B6'],
-  ['#14B8A6', '#2DD4BF'],
+  ['#FF9933', '#FF9933'],
 ];
 
 function getColor(idx) {
-  return MONTH_COLORS[idx % MONTH_COLORS.length];
+  return MONTH_COLORS[0];
 }
 
 export default function MonthlyReportPage() {
@@ -138,29 +131,28 @@ export default function MonthlyReportPage() {
       {/* Hero */}
       <div style={{
         ...card,
-        background: 'var(--bg-banner-grad)',
-        borderColor: 'var(--border-hover)',
-        padding: 'clamp(20px, 4vw, 48px)', position: 'relative', overflow: 'hidden',
-        boxShadow: '0 0 80px -20px var(--accent-glow)',
+        background: 'var(--bg-card)',
+        borderColor: 'var(--border)',
+        padding: '32px', position: 'relative', overflow: 'hidden',
+        boxShadow: 'var(--shadow)',
         display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
       }}>
-        <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '300px', height: '300px', background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
         <div style={{ position: 'relative' }}>
-          <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 42px)', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-1px' }}>
+          <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
             Monthly{' '}
-            <span style={{ background: 'linear-gradient(135deg, #10B981, #38BDF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Report</span>
+            <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Report</span>
           </h1>
-          <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.6, maxWidth: '480px' }}>
+          <p style={{ margin: '8px 0 0', color: 'var(--text-secondary)', fontSize: '13.5px', fontWeight: '500', lineHeight: 1.6, maxWidth: '480px' }}>
             Members grouped by the month they subscribed — track growth over time.
           </p>
         </div>
         {!loading && data.results.length > 0 && (
           <button onClick={downloadPDF} style={{
-            background: 'linear-gradient(135deg, #10B981, #0EA5E9)',
-            color: 'white', fontWeight: '700', fontSize: '15px',
-            padding: '14px 32px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+            background: 'var(--accent)',
+            color: 'white', fontWeight: '800', fontSize: '14px',
+            padding: '12px 28px', borderRadius: '12px', border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: '10px',
-            boxShadow: '0 0 40px -10px rgba(16,185,129,0.5)',
+            boxShadow: '0 4px 12px var(--accent-glow)',
             position: 'relative', zIndex: 1,
           }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -172,7 +164,7 @@ export default function MonthlyReportPage() {
       {/* Loading */}
       {loading ? (
         <div style={{ ...card, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '100px 24px', gap: '16px' }}>
-          <div style={{ width: '48px', height: '48px', border: '3px solid rgba(16,185,129,0.2)', borderTop: '3px solid #10B981', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <div style={{ width: '48px', height: '48px', border: '3px solid var(--accent-glow)', borderTop: '3px solid var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
           <div style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '16px' }}>Loading Monthly Data...</div>
         </div>
       ) : (
@@ -180,46 +172,46 @@ export default function MonthlyReportPage() {
           {/* KPI Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
             {/* Total Members */}
-            <div style={{ ...card, padding: '28px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '2px solid #6366F1' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div style={{ ...card, padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Members</div>
-                <div style={{ fontSize: '40px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Members</div>
+                <div style={{ fontSize: '36px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
               </div>
             </div>
 
             {/* Total Revenue */}
-            <div style={{ ...card, padding: '28px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '2px solid #10B981' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <div style={{ ...card, padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '3.5px solid var(--text-success)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(16,185,129,0.08)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-success)" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Revenue</div>
-                <div style={{ fontSize: '32px', fontWeight: '900', color: '#10B981', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Revenue</div>
+                <div style={{ fontSize: '32px', fontWeight: '950', color: 'var(--text-success)', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
               </div>
             </div>
 
             {/* Active Months */}
-            <div style={{ ...card, padding: '28px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '2px solid #F59E0B' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <div style={{ ...card, padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Months Active</div>
-                <div style={{ fontSize: '40px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>{monthCount}</div>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Months Active</div>
+                <div style={{ fontSize: '36px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{monthCount}</div>
               </div>
             </div>
 
             {/* Avg per Month */}
-            <div style={{ ...card, padding: '28px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '2px solid #8B5CF6' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <div style={{ ...card, padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Avg / Month</div>
-                <div style={{ fontSize: '36px', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Avg / Month</div>
+                <div style={{ fontSize: '32px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>
                   {monthCount > 0 ? (totalMembers / monthCount).toFixed(1) : '0'}
                 </div>
               </div>
@@ -289,7 +281,7 @@ export default function MonthlyReportPage() {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Revenue</div>
-                        <div style={{ fontSize: '20px', fontWeight: '800', color: c2, lineHeight: 1.1 }}>${month.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                        <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-success)', lineHeight: 1.1 }}>${month.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                       </div>
                       <div style={{ display: 'none', textAlign: 'right' }} className="desktop-avg">
                         <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Avg / Member</div>
@@ -334,7 +326,7 @@ export default function MonthlyReportPage() {
                               </td>
                               <td style={{ padding: '12px 20px', fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-muted)' }}>{row.order}</td>
                               <td style={{ padding: '12px 20px', color: 'var(--text-secondary)' }}>{row.date}</td>
-                              <td style={{ padding: '12px 20px', textAlign: 'right', fontWeight: '800', color: '#10B981' }}>${(row.amount || 0).toFixed(2)}</td>
+                              <td style={{ padding: '12px 20px', textAlign: 'right', fontWeight: '800', color: 'var(--text-success)' }}>${(row.amount || 0).toFixed(2)}</td>
                             </tr>
                           ))}
                           {/* Month total row */}
