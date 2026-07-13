@@ -17,7 +17,7 @@ export async function GET(request) {
     // ── CSV ────────────────────────────────────────────────────────────────
     if (format === 'csv') {
       const headers = [
-        'Registration #', 'Full Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Skill Level',
+        'Registration #', 'Full Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Player Category',
         'Registration Date', 'Payment Status', 'Amount Paid ($)',
         'Stripe Reference', 'Event Name', 'Event Date',
         'Gender', 'City', 'State',
@@ -30,7 +30,7 @@ export async function GET(request) {
         r.partner_name         || '',
         r.email                || '',
         r.phone                || '',
-        r.skill_level          || '',
+        r.player_type === 'middle_high_school' ? 'Middle School & High School' : 'Adults (18+)',
         r.registration_date ? r.registration_date.split('T')[0] : '',
         r.payment_status       || '',
         (r.amount_paid         || 0).toFixed(2),
@@ -56,7 +56,7 @@ export async function GET(request) {
     // ── Excel (XLSX via simple XML-based format) ────────────────────────
     if (format === 'excel') {
       const headers = [
-        'Registration #', 'Full Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Skill Level',
+        'Registration #', 'Full Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Player Category',
         'Registration Date', 'Payment Status', 'Amount Paid ($)',
         'Stripe Reference', 'Event Name', 'Event Date', 'Gender', 'City',
         'State',
@@ -75,7 +75,7 @@ export async function GET(request) {
           r.partner_name         || '',
           r.email                || '',
           r.phone                || '',
-          r.skill_level          || '',
+          r.player_type === 'middle_high_school' ? 'Middle School & High School' : 'Adults (18+)',
           r.registration_date ? r.registration_date.split('T')[0] : '',
           r.payment_status       || '',
           (r.amount_paid || 0).toFixed(2),
@@ -132,7 +132,7 @@ export async function GET(request) {
           <td>${r.partner_name || ''}</td>
           <td>${r.email || ''}</td>
           <td>${r.phone || ''}</td>
-          <td style="text-transform:capitalize">${r.skill_level || ''}</td>
+          <td>${r.player_type === 'middle_high_school' ? 'Middle School & High School' : 'Adults (18+)'}</td>
           <td>${r.registration_date ? r.registration_date.split('T')[0] : ''}</td>
           <td>
             <span style="padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;
@@ -185,7 +185,7 @@ export async function GET(request) {
     <thead>
       <tr>
         <th>Reg #</th><th>Name</th><th>Team Name</th><th>Partner Name</th><th>Email</th><th>Phone</th>
-        <th>Skill</th><th>Date</th><th>Status</th><th>Amount</th>
+        <th>Category</th><th>Date</th><th>Status</th><th>Amount</th>
       </tr>
     </thead>
     <tbody>${tableRows}</tbody>

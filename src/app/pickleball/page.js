@@ -37,17 +37,16 @@ function Badge({ status }) {
   );
 }
 
-// ── Skill badge ───────────────────────────────────────────────────────────────
-function SkillBadge({ level }) {
+// ── Category badge ───────────────────────────────────────────────────────────────
+function CategoryBadge({ category }) {
   const map = {
-    beginner:     { emoji: '🌱', color: '#10B981' },
-    intermediate: { emoji: '⭐', color: '#F59E0B' },
-    advanced:     { emoji: '🏆', color: '#818CF8' },
+    middle_high_school: { label: 'Middle School & High School', emoji: '🎓', color: 'var(--accent)' },
+    adult:              { label: 'Adults (18+)', emoji: '👤', color: 'var(--text-success)' },
   };
-  const s = map[level] || {};
+  const s = map[category] || { label: 'Adults (18+)', emoji: '👤', color: 'var(--text-success)' };
   return (
     <span style={{ color: s.color, fontWeight: '700', fontSize: '13px' }}>
-      {s.emoji} {level ? level.charAt(0).toUpperCase() + level.slice(1) : '–'}
+      {s.emoji} {s.label}
     </span>
   );
 }
@@ -207,7 +206,7 @@ export default function PickleballDashboard() {
   const [error,        setError]        = useState('');
   const [search,       setSearch]       = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [filter,       setFilter]       = useState({ payment: '', skill: '' });
+  const [filter,       setFilter]       = useState({ payment: '', category: '' });
   const [sortField,    setSortField]    = useState('registration_date');
   const [sortDir,      setSortDir]      = useState('desc');
   const [exporting,    setExporting]    = useState('');
@@ -269,7 +268,7 @@ export default function PickleballDashboard() {
     try {
       const params = new URLSearchParams();
       if (filter.payment)     params.set('payment_status', filter.payment);
-      if (filter.skill)       params.set('skill_level', filter.skill);
+      if (filter.category)    params.set('player_type', filter.category);
       if (debouncedSearch)    params.set('search', debouncedSearch);
 
       const res  = await fetch(`/api/pickleball/registrations?${params}`);
@@ -360,7 +359,7 @@ export default function PickleballDashboard() {
         r.partner_name || '',
         r.email || '',
         r.phone || '',
-        r.skill_level ? r.skill_level.charAt(0).toUpperCase() + r.skill_level.slice(1) : '',
+        r.player_type === 'middle_high_school' ? 'Middle School & High School' : 'Adults (18+)',
         r.registration_date ? r.registration_date.split('T')[0] : '',
         r.payment_status ? r.payment_status.toUpperCase() : '',
         '$' + (r.amount_paid || 0).toFixed(2)
@@ -368,7 +367,7 @@ export default function PickleballDashboard() {
 
       autoTable(doc, {
         startY: 30,
-        head: [['Reg #', 'Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Skill', 'Date', 'Status', 'Amount']],
+        head: [['Reg #', 'Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Category', 'Date', 'Status', 'Amount']],
         body: tableBody,
         theme: 'striped',
         headStyles: { fillColor: [123, 28, 28] }, // Maroon (#7B1C1C)
@@ -382,9 +381,9 @@ export default function PickleballDashboard() {
     }
   };
 
-  const setPaymentFilter = (v) => setFilter(f => ({ ...f, payment: f.payment === v ? '' : v }));
-  const setSkillFilter   = (v) => setFilter(f => ({ ...f, skill:   f.skill   === v ? '' : v }));
-  const clearFilters     = () => { setFilter({ payment: '', skill: '' }); setSearch(''); };
+  const setPaymentFilter  = (v) => setFilter(f => ({ ...f, payment: f.payment === v ? '' : v }));
+  const setCategoryFilter = (v) => setFilter(f => ({ ...f, category: f.category === v ? '' : v }));
+  const clearFilters      = () => { setFilter({ payment: '', category: '' }); setSearch(''); };
 
   const handleResendEmail = async (reg) => {
     setResendingId(reg.registration_number);
@@ -560,13 +559,12 @@ export default function PickleballDashboard() {
 
       {/* ── Stats Cards ─────────────────────────────────────────────────── */}
       {stats && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
           <StatCard label="Total Registered" value={stats.total}     accent="var(--accent)"/>
           <StatCard label="Paid"              value={stats.paid}      accent="var(--text-success)"  sub={`$${(stats.totalRevenue || 0).toFixed(2)} collected`}/>
           <StatCard label="Pending Payment"   value={stats.pending}   accent="var(--accent)"/>
-          <StatCard label="Beginners"         value={stats.beginner}  accent="var(--text-success)"/>
-          <StatCard label="Intermediate"      value={stats.intermediate} accent="var(--accent)"/>
-          <StatCard label="Advanced"          value={stats.advanced}  accent="var(--accent)"/>
+          <StatCard label="Middle/High School" value={stats.youth}    accent="var(--accent)"/>
+          <StatCard label="Adults (18+)"      value={stats.adult}    accent="var(--text-success)"/>
         </div>
       )}
 
@@ -598,14 +596,13 @@ export default function PickleballDashboard() {
             <FilterBtn active={filter.payment === 'pending'}  onClick={() => setPaymentFilter('pending')}>⏳ Unpaid</FilterBtn>
           </div>
 
-          {/* Skill filters */}
+          {/* Category filters */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <FilterBtn active={filter.skill === 'beginner'}     onClick={() => setSkillFilter('beginner')}>🌱 Beginner</FilterBtn>
-            <FilterBtn active={filter.skill === 'intermediate'} onClick={() => setSkillFilter('intermediate')}>⭐ Intermediate</FilterBtn>
-            <FilterBtn active={filter.skill === 'advanced'}     onClick={() => setSkillFilter('advanced')}>🏆 Advanced</FilterBtn>
+            <FilterBtn active={filter.category === 'middle_high_school'} onClick={() => setCategoryFilter('middle_high_school')}>🎓 Middle/High School</FilterBtn>
+            <FilterBtn active={filter.category === 'adult'}              onClick={() => setCategoryFilter('adult')}>👤 Adults (18+)</FilterBtn>
           </div>
 
-          {(filter.payment || filter.skill || search) && (
+          {(filter.payment || filter.category || search) && (
             <button onClick={clearFilters} style={{
               padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.4)',
               background: 'transparent', color: '#EF4444', fontWeight: '600', fontSize: '13px', cursor: 'pointer',
@@ -661,7 +658,7 @@ export default function PickleballDashboard() {
                     ['partner_name',        'Partner Name'],
                     ['email',               'Email'],
                     ['phone',               'Phone'],
-                    ['skill_level',         'Skill'],
+                    ['player_type',         'Category'],
                     ['registration_date',   'Date'],
                     ['payment_status',      'Payment'],
                     ['amount_paid',         'Amount'],
@@ -674,7 +671,7 @@ export default function PickleballDashboard() {
                         textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: 'left',
                         cursor: 'pointer', userSelect: 'none',
                       }}>
-                      {label}<SortIndicator field={field}/>
+                        {label}<SortIndicator field={field}/>
                     </th>
                   ))}
                 </tr>
@@ -698,12 +695,12 @@ export default function PickleballDashboard() {
                     <td style={{ padding: '13px 16px', color: 'var(--text-secondary)' }}>{r.partner_name || '–'}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-secondary)' }}>{r.email}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-secondary)' }}>{r.phone}</td>
-                    <td style={{ padding: '13px 16px' }}><SkillBadge level={r.skill_level}/></td>
+                    <td style={{ padding: '13px 16px' }}><CategoryBadge category={r.player_type}/></td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-muted)', fontSize: '12px' }}>
                       {r.registration_date ? r.registration_date.split(' ')[0] : '–'}
                     </td>
                     <td style={{ padding: '13px 16px' }}><Badge status={r.payment_status}/></td>
-                    <td style={{ padding: '13px 16px', color: '#10B981', fontWeight: '700' }}>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-success)', fontWeight: '700' }}>
                       ${(r.amount_paid || 0).toFixed(2)}
                     </td>
                     <td style={{ padding: '13px 16px' }}>
@@ -786,7 +783,7 @@ function EditRegistrationModal({ reg, onClose, onSave }) {
     last_name: reg.last_name || '',
     email: reg.email || '',
     phone: reg.phone || '',
-    skill_level: reg.skill_level || 'beginner',
+    player_type: reg.player_type || 'adult',
     payment_status: reg.payment_status || 'pending',
     amount_paid: reg.amount_paid || 0,
     team_name: reg.team_name || '',
@@ -898,14 +895,13 @@ function EditRegistrationModal({ reg, onClose, onSave }) {
             </div>
           </div>
 
-          {/* Row 4: Skill & Gender */}
+          {/* Row 4: Category & Gender */}
           <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Skill Level</label>
-              <select value={form.skill_level} onChange={e => handleChange('skill_level', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
+              <label style={labelStyle}>Player Category</label>
+              <select value={form.player_type} onChange={e => handleChange('player_type', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="middle_high_school">Middle School & High School</option>
+                <option value="adult">Adults (18+)</option>
               </select>
             </div>
             <div style={{ flex: 1 }}>

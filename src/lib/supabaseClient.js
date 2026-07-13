@@ -40,12 +40,12 @@ function getServiceHeaders() {
  * Query registrations with optional filters.
  * @param {object} opts
  * @param {string} [opts.paymentStatus]  - 'paid' | 'pending' | 'failed' | 'refunded'
- * @param {string} [opts.skillLevel]     - 'beginner' | 'intermediate' | 'advanced'
+ * @param {string} [opts.playerType]     - 'middle_high_school' | 'adult'
  * @param {string} [opts.search]         - free-text search across name/email/phone/reg#
  * @param {number} [opts.limit]          - max records (default 200)
  * @returns {Promise<Array>}
  */
-export async function queryRegistrations({ paymentStatus, skillLevel, search, limit = 200 } = {}) {
+export async function queryRegistrations({ paymentStatus, playerType, search, limit = 200 } = {}) {
   const params = new URLSearchParams();
 
   // Fields to select
@@ -54,12 +54,12 @@ export async function queryRegistrations({ paymentStatus, skillLevel, search, li
     'email', 'phone', 'skill_level', 'registration_date',
     'payment_status', 'amount_paid', 'stripe_payment_ref',
     'event_name', 'event_date', 'partner_name', 'gender',
-    'city', 'state', 'liability_accepted', 'team_name',
+    'city', 'state', 'liability_accepted', 'team_name', 'player_type',
   ].join(','));
 
   // Exact-match filters
   if (paymentStatus) params.append('payment_status', `eq.${paymentStatus}`);
-  if (skillLevel)    params.append('skill_level',    `eq.${skillLevel}`);
+  if (playerType)    params.append('player_type',    `eq.${playerType}`);
 
   // Full-text search via PostgREST OR filter
   if (search) {
@@ -95,7 +95,7 @@ export async function getAllRegistrations(limit = 5000) {
       'id', 'registration_number', 'full_name', 'email', 'phone',
       'skill_level', 'registration_date', 'payment_status',
       'amount_paid', 'stripe_payment_ref', 'event_name', 'event_date',
-      'gender', 'city', 'state', 'partner_name', 'team_name',
+      'gender', 'city', 'state', 'partner_name', 'team_name', 'player_type',
     ].join(','),
     order: 'registration_date.desc',
     limit: String(limit),

@@ -9,13 +9,13 @@ export async function GET(request) {
   }
   const { searchParams } = new URL(request.url);
   const paymentStatus = searchParams.get('payment_status');
-  const skillLevel    = searchParams.get('skill_level');
+  const playerType    = searchParams.get('player_type');
   const search        = searchParams.get('search');
   const limit         = parseInt(searchParams.get('limit') || '200');
 
   try {
     // Filtered records for the table view
-    const records = await queryRegistrations({ paymentStatus, skillLevel, search, limit });
+    const records = await queryRegistrations({ paymentStatus, playerType, search, limit });
 
     // All records for stats (unfiltered)
     const allRecords = await getAllRegistrations(1000);
@@ -25,9 +25,8 @@ export async function GET(request) {
       paid:         allRecords.filter(r => r.payment_status === 'paid').length,
       pending:      allRecords.filter(r => r.payment_status === 'pending').length,
       failed:       allRecords.filter(r => r.payment_status === 'failed').length,
-      beginner:     allRecords.filter(r => r.skill_level === 'beginner').length,
-      intermediate: allRecords.filter(r => r.skill_level === 'intermediate').length,
-      advanced:     allRecords.filter(r => r.skill_level === 'advanced').length,
+      youth:        allRecords.filter(r => r.player_type === 'middle_high_school').length,
+      adult:        allRecords.filter(r => !r.player_type || r.player_type === 'adult').length,
       totalRevenue: allRecords
         .filter(r => r.payment_status === 'paid')
         .reduce((sum, r) => sum + (r.amount_paid || 0), 0),
@@ -50,7 +49,7 @@ export async function PUT(request) {
 
   try {
     const body = await request.json();
-    const { id, first_name, last_name, email, phone, skill_level, payment_status, amount_paid, team_name, partner_name, gender, city, state } = body;
+    const { id, first_name, last_name, email, phone, skill_level, player_type, payment_status, amount_paid, team_name, partner_name, gender, city, state } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, error: 'Registration ID is required' }, { status: 400 });
@@ -64,6 +63,7 @@ export async function PUT(request) {
     if (email !== undefined)      updates.email = email;
     if (phone !== undefined)      updates.phone = phone;
     if (skill_level !== undefined) updates.skill_level = skill_level;
+    if (player_type !== undefined) updates.player_type = player_type;
 
     if (payment_status !== undefined) {
       const SUPABASE_URL = process.env.SUPABASE_URL;
