@@ -203,10 +203,6 @@ function PublicLanding() {
         
         {/* Welcome Hero */}
         <div style={{ textAlign: 'center', marginBottom: '44px', maxWidth: '640px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--accent-glow)', border: '1px solid var(--border)', padding: '6px 16px', borderRadius: '20px', marginBottom: '20px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--if-primary)' }}/>
-            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--if-primary)', letterSpacing: '2px', textTransform: 'uppercase' }}>Jay Shri Krishna</span>
-          </div>
           <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(32px, 5.5vw, 56px)', fontWeight: '950', color: 'var(--text-primary)', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
             HCC Registrations & Portal
           </h1>
