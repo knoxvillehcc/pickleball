@@ -504,9 +504,17 @@ const SPACE_LABELS = {
   small:  'Small — 10×10 ft',
   medium: 'Medium — 10×20 ft',
   large:  'Large — 20×20 ft',
+  home_business:        'Small Business from Home',
+  established_business: 'Established Business/Stores',
 };
 
-const SPACE_AMOUNTS = { small: '$100', medium: '$150', large: '$200' };
+const SPACE_AMOUNTS = {
+  small: '$100',
+  medium: '$150',
+  large: '$200',
+  home_business: '$351',
+  established_business: '$1,001',
+};
 
 function buildVendorEmail(htmlBody) {
   return `<!DOCTYPE html>

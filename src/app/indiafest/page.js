@@ -100,6 +100,9 @@ export default function IndiafestVendorDashboard() {
   const [urlCopied,     setUrlCopied]     = useState(false);
   const [currentUser,   setCurrentUser]   = useState(null);
   const [exporting,     setExporting]     = useState('');
+  const [editingReg,    setEditingReg]    = useState(null);
+  const [resendingId,   setResendingId]   = useState(null);
+  const [resendDone,    setResendDone]    = useState({});
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/indiafest/vendor`
@@ -149,6 +152,50 @@ export default function IndiafestVendorDashboard() {
     navigator.clipboard.writeText(PUBLIC_URL);
     setUrlCopied(true);
     setTimeout(() => setUrlCopied(false), 2000);
+  };
+
+  const handleResendEmail = async (reg) => {
+    setResendingId(reg.registration_number);
+    try {
+      const res = await fetch('/api/indiafest/resend-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registration_number: reg.registration_number }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setResendDone(prev => ({ ...prev, [reg.registration_number]: true }));
+        setTimeout(() => setResendDone(prev => ({ ...prev, [reg.registration_number]: false })), 3000);
+      } else {
+        alert('Resend failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert('Resend failed: ' + e.message);
+    } finally {
+      setResendingId(null);
+    }
+  };
+
+  const handleDeleteReg = async (reg) => {
+    if (!confirm(`Are you sure you want to delete vendor registration ${reg.registration_number} for ${reg.first_name} ${reg.last_name} (${reg.company_name})? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/indiafest/registrations?id=${reg.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to delete registration');
+      
+      setRegistrations(prev => prev.filter(r => r.id !== reg.id));
+      setExpanded(null);
+    } catch (e) {
+      alert('Delete failed: ' + e.message);
+    }
+  };
+
+  const handleSaveRegistration = (updatedRecord) => {
+    setRegistrations(prev => prev.map(r => r.id === updatedRecord.id ? updatedRecord : r));
   };
 
   // ── Stats ──────────────────────────────────────────────────────────────────
@@ -432,6 +479,48 @@ export default function IndiafestVendorDashboard() {
                               </div>
                             ))}
                           </div>
+
+                          {/* Row Actions */}
+                          <div style={{ background: 'rgba(255,153,51,0.04)', padding: '0 24px 20px 24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                            <button
+                              onClick={() => setEditingReg(r)}
+                              style={{
+                                padding: '8px 16px', borderRadius: '8px', border: '1px solid var(--border)',
+                                backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)',
+                                fontWeight: '700', fontSize: '12.5px', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+                              }}
+                            >
+                              ✏️ Edit Details
+                            </button>
+                            <button
+                              onClick={() => handleResendEmail(r)}
+                              disabled={resendingId === r.registration_number}
+                              style={{
+                                padding: '8px 16px', borderRadius: '8px', border: '1px solid var(--border)',
+                                backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)',
+                                fontWeight: '700', fontSize: '12.5px', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+                              }}
+                            >
+                              {resendingId === r.registration_number
+                                ? '⏳ Resending...'
+                                : resendDone[r.registration_number]
+                                ? '✅ Confirmation Sent!'
+                                : '✉️ Resend Confirmation'}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteReg(r)}
+                              style={{
+                                padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.3)',
+                                backgroundColor: 'rgba(239,68,68,0.05)', color: '#F87171',
+                                fontWeight: '700', fontSize: '12.5px', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+                              }}
+                            >
+                              🗑️ Delete Registration
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )}
@@ -443,9 +532,217 @@ export default function IndiafestVendorDashboard() {
         )}
       </div>
 
+      {editingReg && (
+        <EditVendorModal
+          reg={editingReg}
+          onClose={() => setEditingReg(null)}
+          onSave={handleSaveRegistration}
+        />
+      )}
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
       `}</style>
+    </div>
+  );
+}
+
+// ── Edit Vendor Modal ──────────────────────────────────────────────────────────
+function EditVendorModal({ reg, onClose, onSave }) {
+  const [form, setForm] = useState({
+    first_name: reg.first_name || '',
+    last_name: reg.last_name || '',
+    company_name: reg.company_name || '',
+    email: reg.email || '',
+    phone: reg.phone || '',
+    address: reg.address || '',
+    city: reg.city || '',
+    state: reg.state || '',
+    zip: reg.zip || '',
+    space_type: reg.space_type || 'home_business',
+    quantity: reg.quantity || 1,
+    payment_status: reg.payment_status || 'pending',
+    amount_paid: ((reg.amount_paid || 0) / 100).toFixed(2),
+    amount_due: ((reg.amount_due || 0) / 100).toFixed(2),
+    stripe_payment_ref: reg.stripe_payment_ref || '',
+  });
+
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      const res = await fetch('/api/indiafest/registrations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: reg.id, ...form }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to update registration');
+      }
+      onSave(data.record);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (field, val) => {
+    setForm(prev => ({ ...prev, [field]: val }));
+  };
+
+  const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' };
+  const inputStyle = { width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input, #0A0A1A)', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 9999, padding: '20px', backdropFilter: 'blur(4px)',
+    }} onClick={onClose}>
+      <div style={{
+        background: 'var(--bg-card)', border: '1px solid var(--border)',
+        borderRadius: '20px', padding: '32px', maxWidth: '640px', width: '100%',
+        maxHeight: '90vh', overflowY: 'auto',
+        boxShadow: 'var(--shadow)',
+      }} onClick={e => e.stopPropagation()}>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
+            ✏️ Edit Vendor Registration
+          </h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
+        </div>
+
+        {error && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', marginBottom: '20px', color: '#FCA5A5', fontSize: '13px' }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Row 1: Name */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>First Name</label>
+              <input value={form.first_name} onChange={e => handleChange('first_name', e.target.value)} required style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Last Name</label>
+              <input value={form.last_name} onChange={e => handleChange('last_name', e.target.value)} required style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Row 2: Company Name */}
+          <div>
+            <label style={labelStyle}>Company / Business Name</label>
+            <input value={form.company_name} onChange={e => handleChange('company_name', e.target.value)} required style={inputStyle} />
+          </div>
+
+          {/* Row 3: Email & Phone */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Email</label>
+              <input type="email" value={form.email} onChange={e => handleChange('email', e.target.value)} required style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Phone</label>
+              <input value={form.phone} onChange={e => handleChange('phone', e.target.value)} required style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Row 4: Address */}
+          <div>
+            <label style={labelStyle}>Address</label>
+            <input value={form.address} onChange={e => handleChange('address', e.target.value)} required style={inputStyle} />
+          </div>
+
+          {/* Row 5: City, State, ZIP */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 2 }}>
+              <label style={labelStyle}>City</label>
+              <input value={form.city} onChange={e => handleChange('city', e.target.value)} required style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>State</label>
+              <input value={form.state} onChange={e => handleChange('state', e.target.value)} required style={inputStyle} />
+            </div>
+            <div style={{ flex: 1.5 }}>
+              <label style={labelStyle}>ZIP Code</label>
+              <input value={form.zip} onChange={e => handleChange('zip', e.target.value)} required style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Row 6: Space Type & Quantity */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 2 }}>
+              <label style={labelStyle}>Vendor Space Type</label>
+              <select value={form.space_type} onChange={e => handleChange('space_type', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="home_business">Vendor – Small Business from Home ($351)</option>
+                <option value="established_business">Vendor – Established Business/Stores ($1,001)</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Quantity</label>
+              <input type="number" min="1" max="10" value={form.quantity} onChange={e => handleChange('quantity', e.target.value)} required style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Row 7: Payment Status & Stripe Ref */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Payment Status</label>
+              <select value={form.payment_status} onChange={e => handleChange('payment_status', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="pending">⏳ Pending</option>
+                <option value="paid">✓ Paid</option>
+                <option value="failed">✗ Failed</option>
+                <option value="refunded">↩ Refunded</option>
+              </select>
+            </div>
+            <div style={{ flex: 1.5 }}>
+              <label style={labelStyle}>Stripe Payment Ref</label>
+              <input value={form.stripe_payment_ref} onChange={e => handleChange('stripe_payment_ref', e.target.value)} style={inputStyle} placeholder="ch_... or pi_..." />
+            </div>
+          </div>
+
+          {/* Row 8: Amounts Paid & Due */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Amount Paid ($)</label>
+              <input type="number" step="0.01" value={form.amount_paid} onChange={e => handleChange('amount_paid', e.target.value)} required style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Amount Due ($)</label>
+              <input type="number" step="0.01" value={form.amount_due} onChange={e => handleChange('amount_due', e.target.value)} required style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid var(--border)',
+              backgroundColor: 'transparent', color: 'var(--text-secondary)', fontWeight: '750',
+              fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit',
+            }}>
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} style={{
+              flex: 1.5, padding: '12px', borderRadius: '10px', border: 'none',
+              backgroundColor: 'var(--accent)', color: '#FFFFFF', fontWeight: '850',
+              fontSize: '13px', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1,
+              transition: 'all 0.2s', fontFamily: 'inherit',
+            }}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
