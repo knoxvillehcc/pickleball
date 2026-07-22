@@ -760,7 +760,7 @@ export async function sendSponsorConfirmationEmail(reg) {
     <div style="background:rgba(212,175,55,0.04);border:1px solid rgba(212,175,55,0.12);border-radius:14px;padding:20px;">
       <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:14px;">What Happens Next</div>
       <div style="display:flex;gap:12px;margin-bottom:10px;"><span style="font-size:18px;">&#127912;</span><span style="font-size:13px;color:#CCC;line-height:1.5;">Our team will reach out for your logo &amp; branding materials.</span></div>
-      <div style="display:flex;gap:12px;margin-bottom:10px;"><span style="font-size:18px;">&#128203;</span><span style="font-size:13px;color:#CCC;line-height:1.5;">You will receive event-day logistics and VIP access details closer to the event.</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;"><span style="font-size:18px;">&#128203;</span><span style="font-size:13px;color:#CCC;line-height:1.5;">You will receive event-day logistics and setup details closer to the event.</span></div>
       <div style="display:flex;gap:12px;"><span style="font-size:18px;">&#127882;</span><span style="font-size:13px;color:#CCC;line-height:1.5;">India Fest 2026 &mdash; We look forward to celebrating with you!</span></div>
     </div>
   `;

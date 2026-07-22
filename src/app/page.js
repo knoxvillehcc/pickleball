@@ -147,7 +147,7 @@ function PublicLanding() {
     },
     {
       title: 'Grand Sponsor — India Fest 2026',
-      desc: 'Become a Grand Sponsor of IndiaFest 2026. Premier visibility, stage recognition, VIP seating & 10 passes. $5,000 flat.',
+      desc: 'Become a Grand Sponsor of IndiaFest 2026. Premier visibility, stage recognition & branding. $5,000 flat.',
       href: '/register/indiafest/sponsor',
       accentColor: '#D4AF37',
       glowColor: 'rgba(212, 175, 55, 0.12)',
