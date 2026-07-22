@@ -23,11 +23,6 @@ const SPONSOR_PACKAGE = {
   benefits: [
     '🎤 Stage recognition & live announcement',
     '🎨 Logo on all event banners & signage',
-    '📱 Featured on HCC social media & website',
-    '🪑 Reserved VIP table seating for 4 guests',
-    '🎟️ 10 complimentary event admission passes',
-    '📰 Logo in printed program & digital materials',
-    '🤝 Dedicated sponsor liaison from HCC team',
   ],
 };
 

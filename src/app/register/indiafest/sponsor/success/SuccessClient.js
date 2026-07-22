@@ -101,12 +101,10 @@ export default function SponsorSuccessClient() {
           {[
             { icon: '🎤', label: 'Stage Recognition', value: 'Live announcement & recognition at India Fest 2026' },
             { icon: '🎨', label: 'Branding',          value: 'Logo on all event banners, signage & digital materials' },
-            { icon: '🪑', label: 'VIP Access',         value: 'Reserved VIP table seating for 4 guests' },
-            { icon: '🎟️', label: 'Passes',             value: '10 complimentary event admission passes' },
             { icon: '📅', label: 'Event Date',         value: 'Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM' },
             { icon: '📍', label: 'Location',           value: 'HCC — 8580 Hickory Creek Rd, Lenoir City, TN 37771' },
           ].map((item, i) => (
-            <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 5 ? '14px' : 0 }}>
+            <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 4 ? '14px' : 0 }}>
               <span style={{ fontSize: '20px', flexShrink: 0, marginTop: '1px' }}>{item.icon}</span>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>{item.label}</div>

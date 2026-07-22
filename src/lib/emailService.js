@@ -735,10 +735,6 @@ export async function sendSponsorConfirmationEmail(reg) {
   const benefits_html = [
     ['&#127908;', 'Stage recognition &amp; live announcement at India Fest 2026'],
     ['&#127912;', 'Logo on all event banners, signage &amp; digital materials'],
-    ['&#128241;', 'Featured on HCC social media &amp; website'],
-    ['&#129681;', 'Reserved VIP table seating for 4 guests'],
-    ['&#127903;&#65039;', '10 complimentary event admission passes'],
-    ['&#128240;', 'Logo in printed program &amp; digital materials'],
   ].map(([icon, text]) => `
   <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;">
     <span style="font-size:18px;flex-shrink:0;">${icon}</span>
