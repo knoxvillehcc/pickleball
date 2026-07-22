@@ -674,3 +674,153 @@ export async function sendVendorConfirmationEmail(reg) {
     }
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// India Fest 2026 — Grand Sponsor Confirmation Email
+// ─────────────────────────────────────────────────────────────────────────────
+
+function buildSponsorEmail(htmlBody) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>India Fest 2026 Grand Sponsor Confirmation</title>
+</head>
+<body style="margin:0;padding:0;background:#0A0800;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <div style="max-width:620px;margin:40px auto;background:#100E00;border-radius:20px;overflow:hidden;border:1px solid rgba(212,175,55,0.3);box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="background:linear-gradient(135deg,#1A1400 0%,#2A2000 40%,#1A1400 100%);padding:40px 36px;text-align:center;border-bottom:2px solid rgba(212,175,55,0.4);">
+      <div style="font-size:13px;font-weight:800;letter-spacing:3px;color:#D4AF37;text-transform:uppercase;margin-bottom:12px;">&#127470;&#127475; Knoxville Hindu Community Center Presents</div>
+      <div style="font-size:42px;font-weight:900;letter-spacing:-1px;color:#FFFFFF;line-height:1.1;">India Fest</div>
+      <div style="font-size:28px;font-weight:900;color:#D4AF37;letter-spacing:2px;margin-top:4px;">2026</div>
+      <div style="margin-top:18px;display:inline-block;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.4);border-radius:20px;padding:6px 20px;">
+        <span style="font-size:13px;font-weight:700;color:#F5D060;letter-spacing:1px;">&#127942; GRAND SPONSOR CONFIRMED &#9989;</span>
+      </div>
+    </div>
+    <div style="padding:36px;">${htmlBody}</div>
+    <div style="background:rgba(212,175,55,0.05);border-top:1px solid rgba(212,175,55,0.15);padding:24px 36px;text-align:center;">
+      <div style="font-size:12px;color:#888;margin-bottom:8px;">Questions? Contact us at</div>
+      <a href="mailto:knoxvillehcc@gmail.com" style="color:#D4AF37;font-weight:700;font-size:14px;text-decoration:none;">knoxvillehcc@gmail.com</a>
+      <div style="font-size:11px;color:#555;margin-top:16px;">Knoxville Hindu Community Center &middot; 8580 Hickory Creek Rd, Lenoir City, TN 37771</div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Send a Grand Sponsor confirmation email after successful India Fest payment.
+ * @param {object} reg - vendor_registrations record (space_type = 'grand_sponsor')
+ */
+export async function sendSponsorConfirmationEmail(reg) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+  const fullName = `${reg.first_name} ${reg.last_name}`;
+
+  const rows_html = [
+    ['Sponsor Name',    fullName],
+    ['Organization',    reg.company_name],
+    ['Event Date/Time', 'Sunday, Aug 23, 2026 &middot; 11:00 AM &ndash; 5:00 PM'],
+    ['Email',           reg.email],
+    ['Phone',           reg.phone || '&mdash;'],
+    ['Address',         `${reg.address}, ${reg.city}, ${reg.state} ${reg.zip}`],
+    ['Sponsorship',     'Grand Sponsor'],
+    ['Amount Paid',     '$5,000.00'],
+  ].map(([label, value], i) => `
+  <tr style="background:${i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'};">
+    <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.8px;width:40%;border-bottom:1px solid rgba(255,255,255,0.05);">${label}</td>
+    <td style="padding:10px 14px;font-size:14px;color:#EEE;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);">${value}</td>
+  </tr>`).join('');
+
+  const benefits_html = [
+    ['&#127908;', 'Stage recognition &amp; live announcement at India Fest 2026'],
+    ['&#127912;', 'Logo on all event banners, signage &amp; digital materials'],
+    ['&#128241;', 'Featured on HCC social media &amp; website'],
+    ['&#129681;', 'Reserved VIP table seating for 4 guests'],
+    ['&#127903;&#65039;', '10 complimentary event admission passes'],
+    ['&#128240;', 'Logo in printed program &amp; digital materials'],
+  ].map(([icon, text]) => `
+  <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;">
+    <span style="font-size:18px;flex-shrink:0;">${icon}</span>
+    <span style="font-size:13px;color:#CCC;line-height:1.5;">${text}</span>
+  </div>`).join('');
+
+  const htmlBody = `
+    <h2 style="margin:0 0 6px;font-size:24px;color:#FFFFFF;">Thank you, ${reg.first_name}! &#127942;</h2>
+    <p style="color:#AAA;font-size:15px;margin:0 0 28px;line-height:1.6;">
+      Your Grand Sponsorship is confirmed. We&rsquo;re honored to have
+      <strong style="color:#D4AF37;">${reg.company_name}</strong> as a Grand Sponsor of India Fest 2026!
+    </p>
+    <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">Sponsor Reference Number</div>
+      <div style="font-family:monospace;font-size:28px;font-weight:900;color:#D4AF37;letter-spacing:4px;">${reg.registration_number}</div>
+      <div style="font-size:12px;color:#666;margin-top:8px;">Save this for any correspondence with the HCC team</div>
+    </div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px;">${rows_html}</table>
+    <div style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.2);border-radius:14px;padding:20px;margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:14px;">Your Grand Sponsor Benefits</div>
+      ${benefits_html}
+    </div>
+    <div style="background:rgba(212,175,55,0.04);border:1px solid rgba(212,175,55,0.12);border-radius:14px;padding:20px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:14px;">What Happens Next</div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;"><span style="font-size:18px;">&#127912;</span><span style="font-size:13px;color:#CCC;line-height:1.5;">Our team will reach out for your logo &amp; branding materials.</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;"><span style="font-size:18px;">&#128203;</span><span style="font-size:13px;color:#CCC;line-height:1.5;">You will receive event-day logistics and VIP access details closer to the event.</span></div>
+      <div style="display:flex;gap:12px;"><span style="font-size:18px;">&#127882;</span><span style="font-size:13px;color:#CCC;line-height:1.5;">India Fest 2026 &mdash; We look forward to celebrating with you!</span></div>
+    </div>
+  `;
+
+  const subject = `\u{1F3C6} Grand Sponsor Confirmed \u2014 India Fest 2026 \u00B7 ${reg.registration_number}`;
+
+  const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/email_queue`, {
+    method: 'POST',
+    headers: {
+      'apikey':         KEY,
+      'Authorization': `Bearer ${KEY}`,
+      'Content-Type':  'application/json',
+      'Prefer':         'return=representation',
+    },
+    body: JSON.stringify({
+      registration_id: reg.id || null,
+      to_email:        reg.email,
+      subject,
+      body_html:       htmlBody,
+      status:          'pending',
+      attempts:        0,
+    }),
+  });
+
+  if (!insertRes.ok) {
+    console.error('[Sponsor Email] Failed to queue email:', await insertRes.text());
+    return;
+  }
+
+  const queueRows = await insertRes.json();
+  const queueItem = queueRows[0];
+
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from:    `"India Fest 2026" <${process.env.GMAIL_USER}>`,
+      to:      reg.email,
+      subject,
+      html:    buildSponsorEmail(htmlBody),
+    });
+    if (queueItem?.id) {
+      await fetch(`${SUPABASE_URL}/rest/v1/email_queue?id=eq.${queueItem.id}`, {
+        method: 'PATCH',
+        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'sent', sent_at: new Date().toISOString() }),
+      });
+    }
+    console.log(`[Sponsor Email] ✅ Sent to ${reg.email}`);
+  } catch (err) {
+    console.error(`[Sponsor Email] ❌ Failed to send to ${reg.email}:`, err.message);
+    if (queueItem?.id) {
+      await fetch(`${SUPABASE_URL}/rest/v1/email_queue?id=eq.${queueItem.id}`, {
+        method: 'PATCH',
+        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'failed', error_message: err.message }),
+      });
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
-import { sendAllConfirmationEmails, sendVendorConfirmationEmail } from '@/lib/emailService';
+import { sendAllConfirmationEmails, sendVendorConfirmationEmail, sendSponsorConfirmationEmail } from '@/lib/emailService';
 
 
 export const dynamic = 'force-dynamic';
@@ -237,6 +237,28 @@ export async function POST(request) {
         await logWebhook(event.id, regNumber, 'processed: vendor paid + email sent');
       } else {
         await logWebhook(event.id, regNumber, 'failed: vendor registration not found');
+      }
+
+      return NextResponse.json({ received: true });
+    }
+
+    // ── Route: India Fest Grand Sponsor ───────────────────────────────────────
+    if (meta.source === 'indiafest_grand_sponsor') {
+      console.log(`[Webhook] Grand Sponsor payment for ${regNumber} — $${amountPaid}`);
+
+      const sponsorReg = await vendorMarkAsPaid(regNumber, stripeRef, amountPaid);
+
+      if (sponsorReg === 'already_paid') {
+        console.log(`[Webhook] Sponsor ${regNumber} already paid. Skipping.`);
+        await logWebhook(event.id, regNumber, 'ignored: sponsor already paid');
+        return NextResponse.json({ received: true, ignored: true, reason: 'Sponsor already paid' });
+      }
+
+      if (sponsorReg) {
+        await sendSponsorConfirmationEmail(sponsorReg);
+        await logWebhook(event.id, regNumber, 'processed: sponsor paid + email sent');
+      } else {
+        await logWebhook(event.id, regNumber, 'failed: sponsor registration not found');
       }
 
       return NextResponse.json({ received: true });

@@ -75,6 +75,16 @@ const moduleConfigs = [
     href: '/indiafest',
   },
   {
+    slug: 'sponsors',
+    title: 'India Fest 2026 Sponsors',
+    desc: 'Manage Grand Sponsor registrations, track $5,000 payments, publish/unpublish the sponsor form, and export sponsor lists.',
+    icon: '🏆',
+    color: 'linear-gradient(135deg, #D4AF37, #B8960C)',
+    borderColor: 'rgba(212, 175, 55, 0.3)',
+    hoverGlow: 'rgba(212, 175, 55, 0.08)',
+    href: '/indiafest/sponsors',
+  },
+  {
     slug: 'settings',
     title: 'App Settings',
     desc: 'Adjust portal configuration settings, check health endpoints, and toggle registration availability.',
@@ -89,17 +99,20 @@ const moduleConfigs = [
 // ── Public landing page (shown to logged-out visitors) ─────────────────────────
 function PublicLanding() {
   const { theme, toggleTheme, isDark } = useTheme();
-  const [pbOpen, setPbOpen] = useState(false);
-  const [ifOpen, setIfOpen] = useState(false);
+  const [pbOpen,   setPbOpen]   = useState(false);
+  const [ifOpen,   setIfOpen]   = useState(false);
+  const [gspOpen,  setGspOpen]  = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch('/api/pickleball/settings?key=is_published').then(r => r.json()).catch(() => ({})),
-      fetch('/api/indiafest/settings?key=is_published').then(r => r.json()).catch(() => ({}))
-    ]).then(([pb, ifest]) => {
+      fetch('/api/indiafest/settings?key=is_published').then(r => r.json()).catch(() => ({})),
+      fetch('/api/indiafest/sponsor/settings?key=is_published').then(r => r.json()).catch(() => ({}))
+    ]).then(([pb, ifest, gsp]) => {
       setPbOpen(pb.is_published === true || pb.value === 'true');
       setIfOpen(ifest.is_published === true || ifest.value === 'true');
+      setGspOpen(gsp.is_published === true || gsp.value === 'true');
     }).finally(() => {
       setLoadingStatus(false);
     });
@@ -131,6 +144,18 @@ function PublicLanding() {
       badge: 'Cultural Festival',
       cta: ifOpen ? 'Book Space' : 'Registration Closed',
       isOpen: ifOpen,
+    },
+    {
+      title: 'Grand Sponsor — India Fest 2026',
+      desc: 'Become a Grand Sponsor of IndiaFest 2026. Premier visibility, stage recognition, VIP seating & 10 passes. $5,000 flat.',
+      href: '/register/indiafest/sponsor',
+      accentColor: '#D4AF37',
+      glowColor: 'rgba(212, 175, 55, 0.12)',
+      borderColor: 'var(--border)',
+      icon: '🏆',
+      badge: 'Sponsorship',
+      cta: gspOpen ? 'Become a Sponsor' : 'Registration Closed',
+      isOpen: gspOpen,
     },
     {
       title: 'Admin & Staff Portal',
