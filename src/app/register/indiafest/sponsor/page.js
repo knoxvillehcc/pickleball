@@ -21,8 +21,10 @@ const SPONSOR_PACKAGE = {
   color: '#D4AF37',
   border:'#C09B2C',
   benefits: [
-    '🎤 Stage recognition & live announcement',
-    '🎨 Logo on all event banners & signage',
+    '📢 Logo Advertising on Marketing Materials (Flyers, Web, Social)',
+    '🏠 Dedicated Booth Space (10×10) to showcase your brand',
+    '🎤 On-Stage Announcement (Recognition & Shout-out)',
+    '🏳️ Banner Display',
   ],
 };
 
@@ -391,7 +393,7 @@ function SponsorFormContent() {
           </Section>
 
           {/* Step 3: Sponsorship Package */}
-          <Section title="Grand Sponsor Package — $5,000" icon="🏆" step={3} active={activeStep}>
+          <Section title="Grand Sponsor Package — $5,001+" icon="🏆" step={3} active={activeStep}>
             <div style={{
               border: '2px solid #D4AF37',
               borderRadius: '16px',
@@ -408,10 +410,10 @@ function SponsorFormContent() {
                 <div style={{ fontSize: '40px' }}>🏆</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '20px', fontWeight: '900', color: '#D4AF37', marginBottom: '2px' }}>Grand Sponsor</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: '500' }}>Premier sponsorship — highest visibility at India Fest 2026</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: '500' }}>Max Visibility & Community Impact at India Fest 2026</div>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ fontSize: '36px', fontWeight: '900', color: '#D4AF37' }}>$5,000</div>
+                  <div style={{ fontSize: '36px', fontWeight: '900', color: '#D4AF37' }}>$5,001+</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>one-time sponsorship</div>
                 </div>
               </div>

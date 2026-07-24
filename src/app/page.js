@@ -147,14 +147,14 @@ function PublicLanding() {
     },
     {
       title: 'Grand Sponsor — India Fest 2026',
-      desc: 'Become a Grand Sponsor of IndiaFest 2026. Premier visibility, stage recognition & branding. $5,000 flat.',
+      desc: 'Become a Grand Sponsor of IndiaFest 2026 ($5,001+). Includes Logo on Marketing Materials, Dedicated 10×10 Booth, On-Stage Announcement & Banner Display.',
       href: '/register/indiafest/sponsor',
       accentColor: '#D4AF37',
       glowColor: 'rgba(212, 175, 55, 0.12)',
       borderColor: 'var(--border)',
       icon: '🏆',
-      badge: 'Sponsorship',
-      cta: gspOpen ? 'Become a Sponsor' : 'Registration Closed',
+      badge: 'Grand Sponsorship',
+      cta: gspOpen ? 'Become a Grand Sponsor' : 'Registration Closed',
       isOpen: gspOpen,
     },
     {

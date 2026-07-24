@@ -733,8 +733,10 @@ export async function sendSponsorConfirmationEmail(reg) {
   </tr>`).join('');
 
   const benefits_html = [
-    ['&#127908;', 'Stage recognition &amp; live announcement at India Fest 2026'],
-    ['&#127912;', 'Logo on all event banners, signage &amp; digital materials'],
+    ['&#128226;', 'Logo Advertising on Marketing Materials (Flyers, Web, Social)'],
+    ['&#127968;', 'Dedicated Booth Space (10&times;10) to showcase your brand'],
+    ['&#127908;', 'On-Stage Announcement (Recognition &amp; Shout-out)'],
+    ['&#127987;&#65039;', 'Banner Display at the event'],
   ].map(([icon, text]) => `
   <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;">
     <span style="font-size:18px;flex-shrink:0;">${icon}</span>
