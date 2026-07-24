@@ -102,17 +102,20 @@ function PublicLanding() {
   const [pbOpen,   setPbOpen]   = useState(false);
   const [ifOpen,   setIfOpen]   = useState(false);
   const [gspOpen,  setGspOpen]  = useState(false);
+  const [bspOpen,  setBspOpen]  = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch('/api/pickleball/settings?key=is_published').then(r => r.json()).catch(() => ({})),
       fetch('/api/indiafest/settings?key=is_published').then(r => r.json()).catch(() => ({})),
-      fetch('/api/indiafest/sponsor/settings?key=is_published').then(r => r.json()).catch(() => ({}))
-    ]).then(([pb, ifest, gsp]) => {
+      fetch('/api/indiafest/sponsor/settings?key=is_published').then(r => r.json()).catch(() => ({})),
+      fetch('/api/indiafest/sponsor/settings?key=basic_is_published').then(r => r.json()).catch(() => ({})),
+    ]).then(([pb, ifest, gsp, bsp]) => {
       setPbOpen(pb.is_published === true || pb.value === 'true');
       setIfOpen(ifest.is_published === true || ifest.value === 'true');
       setGspOpen(gsp.is_published === true || gsp.value === 'true');
+      setBspOpen(bsp.is_published === true || bsp.value === 'true');
     }).finally(() => {
       setLoadingStatus(false);
     });
@@ -146,16 +149,17 @@ function PublicLanding() {
       isOpen: ifOpen,
     },
     {
-      title: 'Grand Sponsor — India Fest 2026',
-      desc: 'Become a Grand Sponsor of IndiaFest 2026 ($5,001+). Includes Logo on Marketing Materials, Dedicated 10×10 Booth, On-Stage Announcement & Banner Display.',
+      title: 'India Fest 2026 — Sponsorship',
       href: '/register/indiafest/sponsor',
       accentColor: '#D4AF37',
-      glowColor: 'rgba(212, 175, 55, 0.12)',
+      glowColor: 'rgba(212, 175, 55, 0.14)',
       borderColor: 'var(--border)',
-      icon: '🏆',
-      badge: 'Grand Sponsorship',
-      cta: gspOpen ? 'Become a Grand Sponsor' : 'Registration Closed',
-      isOpen: gspOpen,
+      icon: null,  // custom render
+      badge: 'Sponsorship Opportunities',
+      isOpen: gspOpen || bspOpen,
+      isSponsorCard: true,
+      gspOpen,
+      bspOpen,
     },
     {
       title: 'Admin & Staff Portal',
@@ -246,6 +250,122 @@ function PublicLanding() {
         }}>
           {options.map((opt, i) => {
             const active = hovered === i;
+
+            // ── Custom dual-tier Sponsor card ──────────────────────────────────
+            if (opt.isSponsorCard) {
+              return (
+                <Link key={i} href={opt.href} style={{ textDecoration: 'none', cursor: opt.isOpen ? 'pointer' : 'default' }}>
+                  <div
+                    onMouseEnter={() => setHovered(i)}
+                    onMouseLeave={() => setHovered(null)}
+                    style={{
+                      background: 'var(--bg-card)',
+                      border: active && opt.isOpen ? `2px solid #D4AF37` : '2px solid var(--border)',
+                      borderRadius: '20px',
+                      padding: '28px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '100%',
+                      transition: 'all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
+                      transform: active && opt.isOpen ? 'translateY(-6px)' : 'translateY(0)',
+                      boxShadow: active && opt.isOpen ? `0 12px 30px rgba(212,175,55,0.16), var(--shadow)` : 'var(--shadow)',
+                      position: 'relative', overflow: 'hidden',
+                    }}
+                  >
+                    {/* Badge row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <div style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                        background: active && opt.isOpen ? 'rgba(212,175,55,0.18)' : 'var(--bg-input)',
+                        borderRadius: '99px', padding: '4px 10px', border: '1px solid var(--border)',
+                      }}>
+                        <span style={{ fontSize: '10px', fontWeight: '850', color: active && opt.isOpen ? '#D4AF37' : 'var(--text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                          {opt.badge}
+                        </span>
+                      </div>
+                      {/* Show overall open/closed */}
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: opt.isOpen ? 'var(--text-success)' : 'var(--text-error)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: opt.isOpen ? 'var(--text-success)' : 'var(--text-error)' }}/>
+                        {opt.isOpen ? 'Open' : 'Closed'}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+                    <h2 style={{ margin: '0 0 16px', fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
+                      🤝 India Fest 2026 — Sponsorship
+                    </h2>
+
+                    {/* Two tier cards side by side */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', flex: 1, marginBottom: '20px' }}>
+                      {/* Grand Sponsor tier */}
+                      <div style={{
+                        background: opt.gspOpen ? 'rgba(212,175,55,0.07)' : 'var(--bg-input)',
+                        border: `1.5px solid ${opt.gspOpen ? 'rgba(212,175,55,0.35)' : 'var(--border)'}`,
+                        borderRadius: '12px', padding: '14px 12px',
+                        opacity: opt.gspOpen ? 1 : 0.55,
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '16px' }}>🏆</span>
+                          <div>
+                            <div style={{ fontSize: '12px', fontWeight: '900', color: '#D4AF37', lineHeight: 1 }}>Grand</div>
+                            <div style={{ fontSize: '11px', fontWeight: '800', color: '#D4AF37' }}>$5,001+</div>
+                          </div>
+                          <span style={{ marginLeft: 'auto', fontSize: '9px', fontWeight: '800', padding: '2px 7px', borderRadius: '99px', background: opt.gspOpen ? 'rgba(16,185,129,0.12)' : 'rgba(100,100,100,0.12)', color: opt.gspOpen ? 'var(--text-success)' : 'var(--text-muted)', border: `1px solid ${opt.gspOpen ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
+                            {opt.gspOpen ? '● OPEN' : '● CLOSED'}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {['📢 Logo Ads', '🏠 10×10 Booth', '🎤 On-Stage', '🏳️ Banner'].map((b, j) => (
+                            <div key={j} style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              {b}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Basic Sponsor tier */}
+                      <div style={{
+                        background: opt.bspOpen ? 'rgba(45,122,58,0.07)' : 'var(--bg-input)',
+                        border: `1.5px solid ${opt.bspOpen ? 'rgba(45,122,58,0.35)' : 'var(--border)'}`,
+                        borderRadius: '12px', padding: '14px 12px',
+                        opacity: opt.bspOpen ? 1 : 0.55,
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '16px' }}>🌟</span>
+                          <div>
+                            <div style={{ fontSize: '12px', fontWeight: '900', color: '#2D7A3A', lineHeight: 1 }}>Basic</div>
+                            <div style={{ fontSize: '11px', fontWeight: '800', color: '#2D7A3A' }}>$1,001+</div>
+                          </div>
+                          <span style={{ marginLeft: 'auto', fontSize: '9px', fontWeight: '800', padding: '2px 7px', borderRadius: '99px', background: opt.bspOpen ? 'rgba(16,185,129,0.12)' : 'rgba(100,100,100,0.12)', color: opt.bspOpen ? 'var(--text-success)' : 'var(--text-muted)', border: `1px solid ${opt.bspOpen ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
+                            {opt.bspOpen ? '● OPEN' : '● CLOSED'}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {['🏳️ Banner Under Stage', '🌐 Website Credit'].map((b, j) => (
+                            <div key={j} style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              {b}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CTA */}
+                    <div style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '6px',
+                      fontSize: '13.5px', fontWeight: '800',
+                      color: opt.isOpen ? '#D4AF37' : 'var(--text-muted)',
+                      transition: 'all 0.25s',
+                    }}>
+                      <span>{opt.isOpen ? 'View Sponsorship Options' : 'Registration Closed'}</span>
+                      {opt.isOpen && <span style={{ transition: 'transform 0.2s', transform: active ? 'translateX(4px)' : 'translateX(0)' }}>→</span>}
+                    </div>
+                  </div>
+                </Link>
+              );
+            }
+
+            // ── Default card render ────────────────────────────────────────────
             return (
               <Link key={i} href={opt.isOpen ? opt.href : '#'} style={{ textDecoration: 'none', cursor: opt.isOpen ? 'pointer' : 'not-allowed' }}>
                 <div
@@ -328,6 +448,7 @@ function PublicLanding() {
               </Link>
             );
           })}
+
         </div>
 
         {/* Footer info and address */}
