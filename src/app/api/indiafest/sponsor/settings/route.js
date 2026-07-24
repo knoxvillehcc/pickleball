@@ -52,7 +52,10 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   // Sponsor settings use 'sponsor_is_published' key in the shared indiafest_settings table
   const rawKey = searchParams.get('key') || 'is_published';
-  const key    = rawKey === 'is_published' ? 'sponsor_is_published' : rawKey;
+  // Key mappings: is_published → sponsor_is_published, basic_is_published → basic_sponsor_is_published
+  const key = rawKey === 'is_published' ? 'sponsor_is_published'
+             : rawKey === 'basic_is_published' ? 'basic_sponsor_is_published'
+             : rawKey;
 
   // 1. Try Supabase indiafest_settings table
   try {
@@ -94,7 +97,9 @@ export async function POST(request) {
   try {
     const body  = await request.json();
     const rawKey = body.key ?? 'is_published';
-    const key   = rawKey === 'is_published' ? 'sponsor_is_published' : rawKey;
+    const key   = rawKey === 'is_published' ? 'sponsor_is_published'
+                : rawKey === 'basic_is_published' ? 'basic_sponsor_is_published'
+                : rawKey;
     const value = String(body.value ?? 'false');
 
     // Always update memory store and local file immediately

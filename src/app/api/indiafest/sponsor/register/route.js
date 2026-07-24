@@ -13,19 +13,32 @@ const US_STATES = new Set([
 export const dynamic = 'force-dynamic';
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const GRAND_SPONSOR = {
-  key:     'grand_sponsor',
-  label:   'India Fest 2026 — Grand Sponsor',
-  cents:   500000,  // $5,000.00
-  dollars: 5000,
+// ── Sponsor tiers ──────────────────────────────────────────────────────────────
+const SPONSOR_TIERS = {
+  grand_sponsor: {
+    key:     'grand_sponsor',
+    label:   'India Fest 2026 — Grand Sponsor',
+    cents:   500100,   // $5,001.00
+    dollars: 5001,
+    source:  'indiafest_grand_sponsor',
+    prefix:  'GSP',
+  },
+  basic_sponsor: {
+    key:     'basic_sponsor',
+    label:   'India Fest 2026 — Basic Sponsor',
+    cents:   100100,   // $1,001.00
+    dollars: 1001,
+    source:  'indiafest_basic_sponsor',
+    prefix:  'BSP',
+  },
 };
 
-function generateSponsorRegNumber() {
+function generateRegNumber(prefix) {
   const d    = new Date();
   const yy   = String(d.getFullYear()).slice(-2);
   const mm   = String(d.getMonth() + 1).padStart(2, '0');
   const rand = Math.floor(1000 + Math.random() * 9000);
-  return `GSP-${yy}${mm}-${rand}`;
+  return `${prefix}-${yy}${mm}-${rand}`;
 }
 
 export async function POST(request) {
@@ -57,12 +70,15 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'You must accept the sponsor agreement.' }, { status: 400 });
     }
 
-    const regNumber = generateSponsorRegNumber();
+    // ── Resolve tier ───────────────────────────────────────────────────────────
+    const tierKey = body.sponsor_type === 'basic_sponsor' ? 'basic_sponsor' : 'grand_sponsor';
+    const tier    = SPONSOR_TIERS[tierKey];
+
+    const regNumber = generateRegNumber(tier.prefix);
     const fullName  = `${body.first_name.trim()} ${body.last_name.trim()}`;
     const baseUrl   = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-    // ── Save PENDING record to Supabase (vendor_registrations table) ──────────
-    // Uses space_type = 'grand_sponsor' to distinguish from vendor registrations
+    // ── Save PENDING record to Supabase ────────────────────────────────────────
     const regData = {
       registration_number: regNumber,
       first_name:          body.first_name.trim(),
@@ -74,9 +90,9 @@ export async function POST(request) {
       city:                body.city.trim(),
       state:               stateUpper,
       zip:                 body.zip.trim(),
-      space_type:          'grand_sponsor',
+      space_type:          tier.key,
       quantity:            1,
-      amount_due:          GRAND_SPONSOR.cents,
+      amount_due:          tier.cents,
       payment_status:      'pending',
       amount_paid:         0,
       stripe_payment_ref:  '',
@@ -86,7 +102,7 @@ export async function POST(request) {
 
     const saved = await insertVendorRegistration(regData);
 
-    // ── Create Stripe Checkout Session ────────────────────────────────────────
+    // ── Create Stripe Checkout Session ─────────────────────────────────────────
     const stripe  = getStripe();
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -96,25 +112,25 @@ export async function POST(request) {
         quantity:   1,
         price_data: {
           currency:     'usd',
-          unit_amount:  GRAND_SPONSOR.cents,
+          unit_amount:  tier.cents,
           product_data: {
-            name:        GRAND_SPONSOR.label,
-            description: `Reg #${regNumber} · ${fullName} · ${body.company_name.trim()} · Grand Sponsorship`,
+            name:        tier.label,
+            description: `Reg #${regNumber} · ${fullName} · ${body.company_name.trim()} · ${tier.key === 'grand_sponsor' ? 'Grand' : 'Basic'} Sponsorship`,
           },
         },
       }],
       metadata: {
-        source:              'indiafest_grand_sponsor',
+        source:              tier.source,
         registration_number: regNumber,
         registration_id:     String(saved?.id || ''),
         full_name:           fullName,
         email:               regData.email,
         company_name:        body.company_name.trim(),
-        vendor_type:         'grand_sponsor',
-        vendor_label:        GRAND_SPONSOR.label,
+        vendor_type:         tier.key,
+        vendor_label:        tier.label,
         quantity:            '1',
       },
-      success_url: `${baseUrl}/register/indiafest/sponsor/success?session_id={CHECKOUT_SESSION_ID}&reg=${regNumber}`,
+      success_url: `${baseUrl}/register/indiafest/sponsor/success?session_id={CHECKOUT_SESSION_ID}&reg=${regNumber}&tier=${tier.key}`,
       cancel_url:  `${baseUrl}/register/indiafest/sponsor?cancelled=1`,
     });
 
@@ -123,11 +139,12 @@ export async function POST(request) {
       checkoutUrl: session.url,
       sessionId:   session.id,
       reg_number:  regNumber,
-      amount:      GRAND_SPONSOR.dollars,
+      amount:      tier.dollars,
+      tier:        tier.key,
     });
 
   } catch (err) {
-    console.error('[GrandSponsor Register] Error:', err.message);
+    console.error('[Sponsor Register] Error:', err.message);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

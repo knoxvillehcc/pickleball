@@ -22,7 +22,7 @@ export async function GET(request) {
         'payment_status', 'stripe_payment_ref',
         'disclaimer_accepted', 'registration_date',
       ].join(','),
-      space_type: 'eq.grand_sponsor',
+      'space_type': 'in.(grand_sponsor,basic_sponsor)',
       order:      'registration_date.desc',
       limit:      '500',
     });

@@ -11,35 +11,54 @@ const US_STATES = [
   'VA','WA','WV','WI','WY','DC',
 ];
 
-// ── Sponsor package ────────────────────────────────────────────────────────────
-const SPONSOR_PACKAGE = {
-  key:   'grand_sponsor',
-  label: 'Grand Sponsor',
-  price: 5000,
-  cents: 500000,
-  emoji: '🏆',
-  color: '#D4AF37',
-  border:'#C09B2C',
-  benefits: [
-    '📢 Logo Advertising on Marketing Materials (Flyers, Web, Social)',
-    '🏠 Dedicated Booth Space (10×10) to showcase your brand',
-    '🎤 On-Stage Announcement (Recognition & Shout-out)',
-    '🏳️ Banner Display',
-  ],
+// ── Sponsor packages ───────────────────────────────────────────────────────────
+const PACKAGES = {
+  grand_sponsor: {
+    key:      'grand_sponsor',
+    label:    'Grand Sponsor',
+    tagline:  'MAX VISIBILITY & COMMUNITY IMPACT',
+    price:    5001,
+    cents:    500100,
+    emoji:    '🏆',
+    color:    '#D4AF37',
+    border:   '#C09B2C',
+    glow:     'rgba(212,175,55,0.15)',
+    benefits: [
+      { icon: '📢', text: 'Logo Advertising on Marketing Materials (Flyers, Web, Social)' },
+      { icon: '🏠', text: 'Dedicated Booth Space (10×10) to showcase your brand' },
+      { icon: '🎤', text: 'On-Stage Announcement (Recognition & Shout-out)' },
+      { icon: '🏳️', text: 'Banner Display' },
+    ],
+  },
+  basic_sponsor: {
+    key:      'basic_sponsor',
+    label:    'Basic Sponsor',
+    tagline:  'SUPPORT OUR COMMUNITY!',
+    price:    1001,
+    cents:    100100,
+    emoji:    '🌟',
+    color:    '#2D7A3A',
+    border:   '#1E5C2A',
+    glow:     'rgba(45,122,58,0.15)',
+    benefits: [
+      { icon: '🏳️', text: 'Banner Display (Placement Under the Main Stage)' },
+      { icon: '🌐', text: 'Recognition on Event Website' },
+    ],
+  },
 };
 
 // ── Disclaimer ─────────────────────────────────────────────────────────────────
-const DISCLAIMER_TEXT = `GRAND SPONSOR AGREEMENT — INDIA FEST 2026
+const DISCLAIMER_TEXT = `SPONSOR AGREEMENT — INDIA FEST 2026
 
-1. SPONSORSHIP COMMITMENT: By completing this registration, your organization agrees to a Grand Sponsorship of India Fest 2026 hosted by the Knoxville Hindu Community Center (HCC). The sponsorship fee of $5,000 is due in full at time of registration.
+1. SPONSORSHIP COMMITMENT: By completing this registration, your organization agrees to a Sponsorship of India Fest 2026 hosted by the Knoxville Hindu Community Center (HCC). The sponsorship fee is due in full at time of registration.
 
 2. PAYMENT & REFUND POLICY: All sponsorship fees are non-refundable once payment is processed. In the event of cancellation by HCC due to circumstances beyond its control (weather, venue issues, force majeure, etc.), HCC will issue a credit toward a future event. No cash refunds will be issued.
 
 3. LOGO & BRANDING: Sponsor must provide high-resolution logo and branding assets to HCC no later than 30 days before the event. HCC reserves the right to exclude materials not submitted in time. HCC may modify the placement of branding if required by venue or layout constraints.
 
-4. RIGHTS GRANTED: Sponsor grants HCC the right to display the sponsor's name, logo, and trademark on event materials strictly in connection with India Fest 2026. HCC grants sponsor the right to reference their Grand Sponsorship in their own promotional materials for India Fest 2026.
+4. RIGHTS GRANTED: Sponsor grants HCC the right to display the sponsor's name, logo, and trademark on event materials strictly in connection with India Fest 2026. HCC grants sponsor the right to reference their Sponsorship in their own promotional materials for India Fest 2026.
 
-5. ACKNOWLEDGMENT: HCC reserves the right to accept or decline any sponsorship. Grand Sponsor designation is subject to HCC board approval. Acceptance is confirmed upon payment processing.
+5. ACKNOWLEDGMENT: HCC reserves the right to accept or decline any sponsorship. Sponsor designation is subject to HCC board approval. Acceptance is confirmed upon payment processing.
 
 6. CONDUCT: Sponsor and their guests agree to comply with all HCC event rules and local laws. HCC reserves the right to revoke sponsorship benefits if conduct is deemed inappropriate, without refund.
 
@@ -49,13 +68,13 @@ const DISCLAIMER_TEXT = `GRAND SPONSOR AGREEMENT — INDIA FEST 2026
 
 9. INDEMNIFICATION: Sponsor agrees to indemnify, defend, and hold harmless the Knoxville Hindu Community Center, its board members, volunteers, employees, and agents from any claims, damages, liabilities, or expenses arising out of or related to the sponsorship.
 
-By checking the box below, you acknowledge that you have read, understood, and agree to all terms and conditions set forth in this Grand Sponsor Agreement.`;
+By checking the box below, you acknowledge that you have read, understood, and agree to all terms and conditions set forth in this Sponsor Agreement.`;
 
 // ── Steps ──────────────────────────────────────────────────────────────────────
 const STEPS = [
   { id: 1, label: 'Organization', icon: '🏢' },
   { id: 2, label: 'Contact',      icon: '📞' },
-  { id: 3, label: 'Sponsorship',  icon: '🏆' },
+  { id: 3, label: 'Tier',         icon: '🎯' },
   { id: 4, label: 'Agreement',    icon: '📋' },
 ];
 
@@ -202,7 +221,84 @@ function Section({ title, icon, step, children, active }) {
 function getActiveStep(form) {
   if (!form.first_name && !form.last_name && !form.company_name) return 1;
   if (!form.email && !form.phone && !form.address) return 2;
-  return 4; // step 3 is always visible (single package, no selection needed)
+  return 4;
+}
+
+// ── Package Card (tier selector) ───────────────────────────────────────────────
+function PackageCard({ pkg, selected, onSelect, disabled }) {
+  return (
+    <div
+      onClick={() => !disabled && onSelect(pkg.key)}
+      style={{
+        border: `2px solid ${selected ? pkg.color : disabled ? 'var(--border)' : 'rgba(100,100,100,0.3)'}`,
+        borderRadius: '16px', overflow: 'hidden', cursor: disabled ? 'not-allowed' : 'pointer',
+        boxShadow: selected ? `0 0 0 3px ${pkg.glow}, var(--shadow)` : 'var(--shadow)',
+        transition: 'all 0.25s ease',
+        opacity: disabled ? 0.5 : 1,
+        position: 'relative',
+      }}
+    >
+      {/* Selected checkmark */}
+      {selected && (
+        <div style={{
+          position: 'absolute', top: '12px', right: '12px',
+          width: '26px', height: '26px', borderRadius: '50%',
+          background: pkg.color, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: `0 2px 8px ${pkg.glow}`,
+        }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1A1200" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+      )}
+
+      {/* Header */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '14px',
+        padding: '18px 20px',
+        background: selected
+          ? `linear-gradient(135deg, ${pkg.glow}, transparent)`
+          : 'linear-gradient(135deg, rgba(255,255,255,0.02), transparent)',
+        borderBottom: `1px solid ${selected ? pkg.glow : 'var(--border)'}`,
+      }}>
+        <div style={{ fontSize: '32px' }}>{pkg.emoji}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '17px', fontWeight: '900', color: pkg.color, marginBottom: '2px' }}>{pkg.label}</div>
+          <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{pkg.tagline}</div>
+        </div>
+        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+          <div style={{ fontSize: '28px', fontWeight: '900', color: pkg.color }}>${pkg.price.toLocaleString()}</div>
+          <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>one-time</div>
+        </div>
+      </div>
+
+      {/* Benefits */}
+      <div style={{ padding: '16px 20px' }}>
+        {pkg.benefits.map((b, i) => (
+          <div key={i} style={{
+            display: 'flex', alignItems: 'flex-start', gap: '10px',
+            padding: '8px 10px', borderRadius: '8px', marginBottom: i < pkg.benefits.length - 1 ? '6px' : 0,
+            background: selected ? `rgba(${pkg.color === '#D4AF37' ? '212,175,55' : '45,122,58'},0.06)` : 'transparent',
+            transition: 'background 0.2s',
+          }}>
+            <span style={{ fontSize: '15px', flexShrink: 0 }}>{b.icon}</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: '600', lineHeight: '1.4' }}>{b.text}</span>
+          </div>
+        ))}
+      </div>
+
+      {disabled && (
+        <div style={{
+          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.4)', borderRadius: '14px',
+        }}>
+          <div style={{ background: 'rgba(0,0,0,0.7)', padding: '8px 18px', borderRadius: '20px', fontSize: '13px', fontWeight: '800', color: '#fff' }}>
+            🔒 Closed
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ── Main form ──────────────────────────────────────────────────────────────────
@@ -214,22 +310,32 @@ function SponsorFormContent() {
     first_name: '', last_name: '', company_name: '',
     email: '', phone: '',
     address: '', city: '', state: '', zip: '',
+    sponsor_type: 'grand_sponsor',  // default selection
     disclaimer_accepted: false,
   });
-  const [loading,       setLoading]       = useState(false);
-  const [error,         setError]         = useState('');
-  const [mounted,       setMounted]       = useState(false);
-  const [publishStatus, setPublishStatus] = useState('loading');
+  const [loading,         setLoading]         = useState(false);
+  const [error,           setError]           = useState('');
+  const [mounted,         setMounted]         = useState(false);
+  const [grandStatus,     setGrandStatus]     = useState('loading');
+  const [basicStatus,     setBasicStatus]     = useState('loading');
 
   useEffect(() => {
     setTimeout(() => setMounted(true), 100);
-    fetch('/api/indiafest/sponsor/settings?key=is_published', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => setPublishStatus((d.is_published === true || d.value === 'true') ? 'open' : 'closed'))
-      .catch(() => setPublishStatus('closed'));
+    // Fetch both settings independently
+    Promise.all([
+      fetch('/api/indiafest/sponsor/settings?key=is_published',       { cache: 'no-store' }).then(r => r.json()).catch(() => ({})),
+      fetch('/api/indiafest/sponsor/settings?key=basic_is_published',  { cache: 'no-store' }).then(r => r.json()).catch(() => ({})),
+    ]).then(([grand, basic]) => {
+      setGrandStatus((grand.is_published === true || grand.value === 'true') ? 'open' : 'closed');
+      setBasicStatus((basic.is_published === true || basic.value === 'true') ? 'open' : 'closed');
+    });
   }, []);
 
-  if (publishStatus === 'loading') {
+  const pageLoading = grandStatus === 'loading' && basicStatus === 'loading';
+  const bothClosed  = grandStatus !== 'loading' && basicStatus !== 'loading'
+                      && grandStatus === 'closed' && basicStatus === 'closed';
+
+  if (pageLoading) {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
@@ -241,7 +347,7 @@ function SponsorFormContent() {
     );
   }
 
-  if (publishStatus === 'closed') {
+  if (bothClosed) {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', padding: '40px 20px' }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
@@ -252,12 +358,12 @@ function SponsorFormContent() {
             <span style={{ fontSize: '11px', fontWeight: '800', color: '#D4AF37', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
           </div>
           <h1 style={{ margin: '0 0 6px', fontSize: '40px', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-1px' }}>India Fest 2026</h1>
-          <h2 style={{ margin: '0 0 10px', fontSize: '18px', fontWeight: '700', color: '#D4AF37' }}>Grand Sponsor Registration Closed</h2>
+          <h2 style={{ margin: '0 0 10px', fontSize: '18px', fontWeight: '700', color: '#D4AF37' }}>Sponsorship Registration Closed</h2>
           <div style={{ display: 'inline-block', background: 'rgba(212,175,55,0.08)', border: '1.5px solid rgba(212,175,55,0.25)', padding: '8px 16px', borderRadius: '10px', marginBottom: '20px', fontSize: '14px', fontWeight: '700', color: '#D4AF37' }}>
             📅 Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: '1.8', margin: '0' }}>
-            Grand Sponsor registration is not currently open.<br/>
+            Sponsor registration is not currently open.<br/>
             Please check back soon or contact us at<br/>
             <a href="mailto:knoxvillehcc@gmail.com" style={{ color: '#D4AF37', textDecoration: 'none', fontWeight: '700' }}>knoxvillehcc@gmail.com</a>
           </p>
@@ -269,6 +375,7 @@ function SponsorFormContent() {
 
   const setField = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }));
   const activeStep = getActiveStep(form);
+  const selectedPkg = PACKAGES[form.sponsor_type] || PACKAGES.grand_sponsor;
   const canSubmit  = form.first_name && form.last_name && form.company_name &&
                      form.email && form.phone && form.address && form.city && form.state && form.zip &&
                      form.disclaimer_accepted;
@@ -302,37 +409,32 @@ function SponsorFormContent() {
         textAlign: 'center', position: 'relative', overflow: 'hidden',
         opacity: mounted ? 1 : 0, transition: 'opacity 0.5s ease',
       }}>
-        {/* Glow overlay */}
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(212,175,55,0.10) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,215,0,0.07) 0%, transparent 40%)', pointerEvents: 'none' }}/>
 
-        {/* HCC badge */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.3)', padding: '6px 18px', borderRadius: '99px', marginBottom: '24px', position: 'relative' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D4AF37', display: 'inline-block', flexShrink: 0, boxShadow: '0 0 8px rgba(212,175,55,0.6)' }}/>
           <span style={{ fontSize: '11px', fontWeight: '800', color: 'rgba(212,175,55,0.9)', letterSpacing: '2px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
         </div>
 
-        {/* Title */}
         <h1 style={{ margin: '0 0 10px', lineHeight: '1', position: 'relative' }}>
           <div style={{ fontSize: 'clamp(44px, 9vw, 80px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-2px' }}>IndiaFest</div>
           <div style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: '900', color: '#D4AF37', letterSpacing: '8px', marginTop: '4px' }}>2026</div>
         </h1>
 
-        {/* Badge */}
         <div style={{ display: 'inline-block', background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.4)', borderRadius: '10px', padding: '10px 24px', margin: '20px 0 18px', position: 'relative' }}>
-          <span style={{ fontSize: '14px', fontWeight: '700', color: '#D4AF37', letterSpacing: '1px', textTransform: 'uppercase' }}>🏆 Grand Sponsor Registration</span>
+          <span style={{ fontSize: '14px', fontWeight: '700', color: '#D4AF37', letterSpacing: '1px', textTransform: 'uppercase' }}>🤝 Sponsorship Registration</span>
         </div>
 
         <p style={{ color: 'rgba(255,255,255,0.72)', fontSize: '15px', maxWidth: '520px', margin: '0 auto', lineHeight: '1.75', fontWeight: '400', position: 'relative' }}>
           Partner with HCC and join East Tennessee's largest celebration of Indian culture, food, art, and community.
         </p>
 
-        {/* Stats row */}
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '32px', flexWrap: 'wrap', position: 'relative' }}>
           {[
             { icon: '📅', val: 'Aug 23, 2026', label: '11am to 5pm' },
             { icon: '👥', val: '2,000+', label: 'Expected Guests' },
-            { icon: '💰', val: '$5,000', label: 'Sponsorship Fee' },
-            { icon: '📍', val: 'Knoxville, TN', label: 'Location' },
+            { icon: '🏆', val: '$5,001+', label: 'Grand Sponsorship' },
+            { icon: '🌟', val: '$1,001+', label: 'Basic Sponsorship' },
           ].map((s, i) => (
             <div key={i} style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: '12px', padding: '12px 18px', minWidth: '120px' }}>
               <div style={{ fontSize: '18px', marginBottom: '4px' }}>{s.icon}</div>
@@ -392,51 +494,24 @@ function SponsorFormContent() {
             </div>
           </Section>
 
-          {/* Step 3: Sponsorship Package */}
-          <Section title="Grand Sponsor Package — $5,001+" icon="🏆" step={3} active={activeStep}>
-            <div style={{
-              border: '2px solid #D4AF37',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              boxShadow: '0 0 0 1px rgba(212,175,55,0.2), var(--shadow)',
-            }}>
-              {/* Package header */}
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '16px',
-                padding: '22px 24px',
-                background: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(184,150,12,0.06))',
-                borderBottom: '1px solid rgba(212,175,55,0.2)',
-              }}>
-                <div style={{ fontSize: '40px' }}>🏆</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '20px', fontWeight: '900', color: '#D4AF37', marginBottom: '2px' }}>Grand Sponsor</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: '500' }}>Max Visibility & Community Impact at India Fest 2026</div>
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ fontSize: '36px', fontWeight: '900', color: '#D4AF37' }}>$5,001+</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>one-time sponsorship</div>
-                </div>
+          {/* Step 3: Sponsorship Tier */}
+          <Section title="Choose Your Sponsorship Tier" icon="🎯" step={3} active={activeStep}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '4px', lineHeight: '1.6' }}>
+                Select the sponsorship package that best fits your organization. Both tiers include recognition at India Fest 2026.
               </div>
-
-              {/* Benefits */}
-              <div style={{ padding: '22px 24px' }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px' }}>
-                  What's Included
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
-                  {SPONSOR_PACKAGE.benefits.map((b, i) => (
-                    <div key={i} style={{
-                      display: 'flex', alignItems: 'flex-start', gap: '10px',
-                      padding: '10px 14px', borderRadius: '10px',
-                      background: 'rgba(212,175,55,0.06)',
-                      border: '1px solid rgba(212,175,55,0.12)',
-                    }}>
-                      <span style={{ fontSize: '16px', flexShrink: 0 }}>{b.split(' ')[0]}</span>
-                      <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: '600', lineHeight: '1.4' }}>{b.substring(b.indexOf(' ') + 1)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <PackageCard
+                pkg={PACKAGES.grand_sponsor}
+                selected={form.sponsor_type === 'grand_sponsor'}
+                onSelect={(key) => setForm(f => ({ ...f, sponsor_type: key }))}
+                disabled={grandStatus === 'closed'}
+              />
+              <PackageCard
+                pkg={PACKAGES.basic_sponsor}
+                selected={form.sponsor_type === 'basic_sponsor'}
+                onSelect={(key) => setForm(f => ({ ...f, sponsor_type: key }))}
+                disabled={basicStatus === 'closed'}
+              />
             </div>
           </Section>
 
@@ -480,7 +555,7 @@ function SponsorFormContent() {
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>I have read and agree to the Grand Sponsor Agreement</div>
+                <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>I have read and agree to the Sponsor Agreement</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>By checking this box you accept all terms on behalf of your organization.</div>
               </div>
             </label>
@@ -490,26 +565,26 @@ function SponsorFormContent() {
           <div style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.5s ease 0.3s' }}>
             {/* Summary card */}
             <div style={{
-              background: 'var(--bg-card)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '16px',
+              background: 'var(--bg-card)', border: `1px solid ${selectedPkg.glow}`, borderRadius: '16px',
               padding: '22px 24px', marginBottom: '16px',
-              boxShadow: '0 0 0 1px rgba(212,175,55,0.05), var(--shadow)',
+              boxShadow: `0 0 0 1px ${selectedPkg.glow}, var(--shadow)`,
             }}>
               <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Order Summary</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', paddingBottom: '14px', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🏆</div>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: selectedPkg.glow, border: `1px solid ${selectedPkg.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>{selectedPkg.emoji}</div>
                   <div>
-                    <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)' }}>Grand Sponsor</div>
+                    <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)' }}>{selectedPkg.label}</div>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>India Fest 2026 · Knoxville, TN · 1 sponsorship</div>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>$5,000.00 × 1</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>${selectedPkg.price.toLocaleString()}.00 × 1</div>
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px' }}>
                 <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-muted)' }}>Total Due</div>
-                <div style={{ fontSize: '32px', fontWeight: '900', color: '#D4AF37' }}>$5,000.00</div>
+                <div style={{ fontSize: '32px', fontWeight: '900', color: selectedPkg.color }}>${selectedPkg.price.toLocaleString()}.00</div>
               </div>
             </div>
 
@@ -522,20 +597,20 @@ function SponsorFormContent() {
                 width: '100%', padding: '20px 32px', borderRadius: '14px', border: 'none',
                 background: loading || !canSubmit
                   ? 'var(--bg-input)'
-                  : 'linear-gradient(135deg, #D4AF37 0%, #B8960C 60%, #9A7A00 100%)',
-                color: loading || !canSubmit ? 'var(--text-muted)' : '#1A1200',
+                  : selectedPkg.key === 'grand_sponsor'
+                    ? 'linear-gradient(135deg, #D4AF37 0%, #B8960C 60%, #9A7A00 100%)'
+                    : 'linear-gradient(135deg, #2D7A3A 0%, #1E5C2A 60%, #154D21 100%)',
+                color: loading || !canSubmit ? 'var(--text-muted)' : '#FFFFFF',
                 fontWeight: '800', fontSize: '17px', letterSpacing: '0.2px',
                 cursor: loading || !canSubmit ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
-                boxShadow: loading || !canSubmit
-                  ? 'none'
-                  : '0 8px 32px rgba(212,175,55,0.35), 0 2px 0 rgba(255,255,255,0.15) inset',
+                boxShadow: loading || !canSubmit ? 'none' : `0 8px 32px ${selectedPkg.glow}`,
                 transition: 'all 0.25s ease', fontFamily: 'inherit',
               }}
             >
               {loading ? (
                 <>
-                  <div style={{ width: '20px', height: '20px', border: '2.5px solid rgba(26,18,0,0.3)', borderTop: '2.5px solid #1A1200', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
+                  <div style={{ width: '20px', height: '20px', border: '2.5px solid rgba(255,255,255,0.3)', borderTop: '2.5px solid #fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
                   Redirecting to Secure Payment…
                 </>
               ) : (
@@ -543,7 +618,7 @@ function SponsorFormContent() {
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
                   </svg>
-                  Submit Sponsorship — $5,000.00
+                  Submit {selectedPkg.label} — ${selectedPkg.price.toLocaleString()}.00
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="9 18 15 12 9 6"/>
                   </svg>
@@ -589,7 +664,7 @@ function SponsorFormContent() {
         ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 3px; }
         input::placeholder { color: var(--text-muted); }
         select option { background: var(--bg-card); color: var(--text-primary); }
-        #sponsor-submit-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 12px 40px rgba(212,175,55,0.45), 0 2px 0 rgba(255,255,255,0.15) inset !important; }
+        #sponsor-submit-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
         #sponsor-submit-btn:active:not(:disabled) { transform: translateY(0); }
       `}</style>
     </div>

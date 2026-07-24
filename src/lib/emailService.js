@@ -724,30 +724,46 @@ export async function sendSponsorConfirmationEmail(reg) {
     ['Email',           reg.email],
     ['Phone',           reg.phone || '&mdash;'],
     ['Address',         `${reg.address}, ${reg.city}, ${reg.state} ${reg.zip}`],
-    ['Sponsorship',     'Grand Sponsor'],
-    ['Amount Paid',     '$5,000.00'],
+    ['Sponsorship',     tierLabel],
+    ['Amount Paid',     tierAmount],
   ].map(([label, value], i) => `
   <tr style="background:${i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'};">
     <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.8px;width:40%;border-bottom:1px solid rgba(255,255,255,0.05);">${label}</td>
     <td style="padding:10px 14px;font-size:14px;color:#EEE;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);">${value}</td>
   </tr>`).join('');
 
-  const benefits_html = [
+  // ── Determine tier ───────────────────────────────────────────────────────────
+  const isBasic = reg.space_type === 'basic_sponsor';
+  const tierLabel = isBasic ? 'Basic Sponsor' : 'Grand Sponsor';
+  const tierAmount = isBasic ? '$1,001.00' : '$5,001.00';
+  const tierEmoji  = isBasic ? '&#127775;' : '&#127942;';
+  const tierColor  = isBasic ? '#2D7A3A' : '#D4AF37';
+  const tierBadge  = isBasic ? 'BASIC SPONSOR CONFIRMED &#9989;' : 'GRAND SPONSOR CONFIRMED &#9989;';
+
+  const GRAND_BENEFITS = [
     ['&#128226;', 'Logo Advertising on Marketing Materials (Flyers, Web, Social)'],
     ['&#127968;', 'Dedicated Booth Space (10&times;10) to showcase your brand'],
     ['&#127908;', 'On-Stage Announcement (Recognition &amp; Shout-out)'],
     ['&#127987;&#65039;', 'Banner Display at the event'],
-  ].map(([icon, text]) => `
+  ];
+
+  const BASIC_BENEFITS = [
+    ['&#127987;&#65039;', 'Banner Display (Placement Under the Main Stage)'],
+    ['&#127760;', 'Recognition on Event Website'],
+  ];
+
+  const benefits_html = (isBasic ? BASIC_BENEFITS : GRAND_BENEFITS)
+    .map(([icon, text]) => `
   <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;">
     <span style="font-size:18px;flex-shrink:0;">${icon}</span>
     <span style="font-size:13px;color:#CCC;line-height:1.5;">${text}</span>
   </div>`).join('');
 
   const htmlBody = `
-    <h2 style="margin:0 0 6px;font-size:24px;color:#FFFFFF;">Thank you, ${reg.first_name}! &#127942;</h2>
+    <h2 style="margin:0 0 6px;font-size:24px;color:#FFFFFF;">Thank you, ${reg.first_name}! ${tierEmoji}</h2>
     <p style="color:#AAA;font-size:15px;margin:0 0 28px;line-height:1.6;">
-      Your Grand Sponsorship is confirmed. We&rsquo;re honored to have
-      <strong style="color:#D4AF37;">${reg.company_name}</strong> as a Grand Sponsor of India Fest 2026!
+      Your ${tierLabel} Sponsorship is confirmed. We&rsquo;re honored to have
+      <strong style="color:${tierColor};">${reg.company_name}</strong> as a ${tierLabel} of India Fest 2026!
     </p>
     <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
       <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">Sponsor Reference Number</div>
@@ -756,7 +772,7 @@ export async function sendSponsorConfirmationEmail(reg) {
     </div>
     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px;">${rows_html}</table>
     <div style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.2);border-radius:14px;padding:20px;margin-bottom:24px;">
-      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:14px;">Your Grand Sponsor Benefits</div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:14px;">Your ${tierLabel} Benefits</div>
       ${benefits_html}
     </div>
     <div style="background:rgba(212,175,55,0.04);border:1px solid rgba(212,175,55,0.12);border-radius:14px;padding:20px;">
@@ -767,7 +783,9 @@ export async function sendSponsorConfirmationEmail(reg) {
     </div>
   `;
 
-  const subject = `\u{1F3C6} Grand Sponsor Confirmed \u2014 India Fest 2026 \u00B7 ${reg.registration_number}`;
+  const subject = isBasic
+    ? `\u{1F31F} Basic Sponsor Confirmed \u2014 India Fest 2026 \u00B7 ${reg.registration_number}`
+    : `\u{1F3C6} Grand Sponsor Confirmed \u2014 India Fest 2026 \u00B7 ${reg.registration_number}`;
 
   const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/email_queue`, {
     method: 'POST',

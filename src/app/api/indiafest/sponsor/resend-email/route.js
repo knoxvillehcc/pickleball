@@ -21,7 +21,7 @@ export async function POST(request) {
     const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/vendor_registrations?registration_number=eq.${encodeURIComponent(registration_number)}&space_type=eq.grand_sponsor&select=*`,
+      `${SUPABASE_URL}/rest/v1/vendor_registrations?registration_number=eq.${encodeURIComponent(registration_number)}&space_type=in.(grand_sponsor,basic_sponsor)&select=*`,
       {
         headers: {
           'apikey':        SUPABASE_ANON_KEY,

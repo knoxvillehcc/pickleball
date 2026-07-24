@@ -256,9 +256,31 @@ export async function POST(request) {
 
       if (sponsorReg) {
         await sendSponsorConfirmationEmail(sponsorReg);
-        await logWebhook(event.id, regNumber, 'processed: sponsor paid + email sent');
+        await logWebhook(event.id, regNumber, 'processed: grand sponsor paid + email sent');
       } else {
-        await logWebhook(event.id, regNumber, 'failed: sponsor registration not found');
+        await logWebhook(event.id, regNumber, 'failed: grand sponsor registration not found');
+      }
+
+      return NextResponse.json({ received: true });
+    }
+
+    // ── Route: India Fest Basic Sponsor ───────────────────────────────────────
+    if (meta.source === 'indiafest_basic_sponsor') {
+      console.log(`[Webhook] Basic Sponsor payment for ${regNumber} — $${amountPaid}`);
+
+      const sponsorReg = await vendorMarkAsPaid(regNumber, stripeRef, amountPaid);
+
+      if (sponsorReg === 'already_paid') {
+        console.log(`[Webhook] Basic Sponsor ${regNumber} already paid. Skipping.`);
+        await logWebhook(event.id, regNumber, 'ignored: basic sponsor already paid');
+        return NextResponse.json({ received: true, ignored: true, reason: 'Basic Sponsor already paid' });
+      }
+
+      if (sponsorReg) {
+        await sendSponsorConfirmationEmail(sponsorReg);
+        await logWebhook(event.id, regNumber, 'processed: basic sponsor paid + email sent');
+      } else {
+        await logWebhook(event.id, regNumber, 'failed: basic sponsor registration not found');
       }
 
       return NextResponse.json({ received: true });

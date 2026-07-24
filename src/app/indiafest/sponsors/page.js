@@ -57,20 +57,22 @@ function FilterBtn({ active, children, onClick }) {
 }
 
 // ── Main dashboard ─────────────────────────────────────────────────────────────
-export default function GrandSponsorDashboard() {
-  const [registrations, setRegistrations] = useState([]);
-  const [loading,       setLoading]       = useState(true);
-  const [error,         setError]         = useState('');
-  const [search,        setSearch]        = useState('');
-  const [filter,        setFilter]        = useState('all');
-  const [expanded,      setExpanded]      = useState(null);
-  const [isPublished,   setIsPublished]   = useState(false);
-  const [publishing,    setPublishing]    = useState(false);
-  const [urlCopied,     setUrlCopied]     = useState(false);
-  const [currentUser,   setCurrentUser]   = useState(null);
-  const [editingReg,    setEditingReg]    = useState(null);
-  const [resendingId,   setResendingId]   = useState(null);
-  const [resendDone,    setResendDone]    = useState({});
+export default function SponsorDashboard() {
+  const [registrations,   setRegistrations]   = useState([]);
+  const [loading,         setLoading]         = useState(true);
+  const [error,           setError]           = useState('');
+  const [search,          setSearch]          = useState('');
+  const [filter,          setFilter]          = useState('all');
+  const [tierFilter,      setTierFilter]      = useState('all');
+  const [expanded,        setExpanded]        = useState(null);
+  const [isGrandPublished,setIsGrandPublished]= useState(false);
+  const [isBasicPublished,setIsBasicPublished]= useState(false);
+  const [publishing,      setPublishing]      = useState(null); // 'grand' | 'basic' | null
+  const [urlCopied,       setUrlCopied]       = useState(false);
+  const [currentUser,     setCurrentUser]     = useState(null);
+  const [editingReg,      setEditingReg]      = useState(null);
+  const [resendingId,     setResendingId]     = useState(null);
+  const [resendDone,      setResendDone]      = useState({});
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/indiafest/sponsor`
@@ -94,7 +96,11 @@ export default function GrandSponsorDashboard() {
     load();
     fetch('/api/indiafest/sponsor/settings?key=is_published')
       .then(r => r.json())
-      .then(d => setIsPublished(d.is_published === true || d.value === 'true'))
+      .then(d => setIsGrandPublished(d.is_published === true || d.value === 'true'))
+      .catch(() => {});
+    fetch('/api/indiafest/sponsor/settings?key=basic_is_published')
+      .then(r => r.json())
+      .then(d => setIsBasicPublished(d.is_published === true || d.value === 'true'))
       .catch(() => {});
     fetch('/api/auth/me')
       .then(r => r.json())
@@ -102,18 +108,24 @@ export default function GrandSponsorDashboard() {
       .catch(() => {});
   }, [load]);
 
-  const handlePublishToggle = async () => {
-    setPublishing(true);
-    const next = !isPublished;
+  const handlePublishToggle = async (tierKey) => {
+    setPublishing(tierKey);
+    const isGrand = tierKey === 'grand';
+    const current = isGrand ? isGrandPublished : isBasicPublished;
+    const next    = !current;
+    const settingKey = isGrand ? 'is_published' : 'basic_is_published';
     try {
       const res  = await fetch('/api/indiafest/sponsor/settings', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'is_published', value: String(next) }),
+        body: JSON.stringify({ key: settingKey, value: String(next) }),
       });
       const data = await res.json();
-      if (data.success) setIsPublished(next);
+      if (data.success) {
+        if (isGrand) setIsGrandPublished(next);
+        else         setIsBasicPublished(next);
+      }
     } catch (e) { console.error(e); }
-    finally { setPublishing(false); }
+    finally { setPublishing(null); }
   };
 
   const copyPublicUrl = () => {
@@ -163,20 +175,22 @@ export default function GrandSponsorDashboard() {
     setRegistrations(prev => prev.map(r => r.id === updatedRecord.id ? updatedRecord : r));
   };
 
-  // ── Stats ───────────────────────────────────────────────────────────────────
-  const paid    = registrations.filter(r => r.payment_status === 'paid');
-  const pending = registrations.filter(r => r.payment_status === 'pending');
-  const revenue = paid.reduce((sum, r) => sum + (r.amount_paid || 0), 0);
+  const grandRegs  = registrations.filter(r => r.space_type === 'grand_sponsor');
+  const basicRegs  = registrations.filter(r => r.space_type === 'basic_sponsor');
+  const paid       = registrations.filter(r => r.payment_status === 'paid');
+  const pending    = registrations.filter(r => r.payment_status === 'pending');
+  const revenue    = paid.reduce((sum, r) => sum + (r.amount_paid || 0), 0);
 
   // ── Filter + search ─────────────────────────────────────────────────────────
   const filtered = registrations.filter(r => {
     const matchStatus = filter === 'all' || r.payment_status === filter;
+    const matchTier   = tierFilter === 'all' || r.space_type === tierFilter;
     const q = search.toLowerCase();
     const matchSearch = !q || [
       r.first_name, r.last_name, r.company_name, r.email,
       r.registration_number, r.city,
     ].some(f => f?.toLowerCase().includes(q));
-    return matchStatus && matchSearch;
+    return matchStatus && matchTier && matchSearch;
   });
 
   // ── CSV export ──────────────────────────────────────────────────────────────
@@ -205,54 +219,53 @@ export default function GrandSponsorDashboard() {
       {currentUser?.role === 'super_admin' && (
         <div style={{
           borderRadius: '16px', padding: '18px 24px', marginBottom: '24px',
-          background: isPublished ? 'rgba(16,185,129,0.08)' : 'rgba(212,175,55,0.08)',
-          border: `1px solid ${isPublished ? 'var(--text-success)' : GOLD}`,
-          display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap',
+          background: 'var(--bg-card)', border: '1px solid var(--border)',
           boxShadow: 'var(--shadow)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '0 0 auto' }}>
-            <span style={{
-              width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0, display: 'inline-block',
-              backgroundColor: isPublished ? 'var(--text-success)' : GOLD,
-              boxShadow: isPublished ? '0 0 8px var(--text-success)' : `0 0 8px ${GOLD}`,
-            }}/>
-            <span style={{ fontWeight: '800', fontSize: '15px', color: isPublished ? 'var(--text-success)' : GOLD }}>
-              Sponsor Registration Page: {isPublished ? '🌐 LIVE' : '🔒 CLOSED'}
-            </span>
-          </div>
-
-          {isPublished && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
-              <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'monospace', background: 'var(--bg-input)', padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--border)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {PUBLIC_URL}
-              </span>
-              <button onClick={copyPublicUrl} style={{
-                padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)',
-                background: urlCopied ? 'rgba(16,185,129,0.15)' : 'transparent',
-                color: 'var(--text-success)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap',
+          <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Registration Controls</div>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            {/* Grand Sponsor toggle */}
+            <div style={{ flex: 1, minWidth: '260px', background: isGrandPublished ? 'rgba(16,185,129,0.08)' : 'rgba(212,175,55,0.08)', border: `1px solid ${isGrandPublished ? 'var(--text-success)' : GOLD}`, borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '20px' }}>🏆</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: '800', fontSize: '14px', color: isGrandPublished ? 'var(--text-success)' : GOLD }}>Grand Sponsor: {isGrandPublished ? '🌐 LIVE' : '🔒 CLOSED'}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>$5,001 · {grandRegs.length} registered</div>
+              </div>
+              <button onClick={() => handlePublishToggle('grand')} disabled={publishing === 'grand'} style={{
+                padding: '8px 16px', borderRadius: '8px', border: 'none',
+                background: publishing === 'grand' ? 'rgba(51,65,85,0.5)' : isGrandPublished ? 'linear-gradient(135deg, #EF4444, #DC2626)' : `linear-gradient(135deg, ${GOLD}, #B8960C)`,
+                color: publishing === 'grand' ? '#475569' : isGrandPublished ? 'white' : '#1A1200',
+                fontWeight: '800', fontSize: '13px', cursor: publishing === 'grand' ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s', fontFamily: 'inherit', whiteSpace: 'nowrap',
               }}>
-                {urlCopied ? '✅ Copied!' : '📋 Copy URL'}
+                {publishing === 'grand' ? '⏳ Saving...' : isGrandPublished ? '🔒 Unpublish' : '🌐 Publish'}
               </button>
-              <a href={PUBLIC_URL} target="_blank" rel="noreferrer" style={{
-                padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)',
-                background: 'transparent', color: 'var(--text-success)', fontSize: '12px',
-                fontWeight: '700', textDecoration: 'none', whiteSpace: 'nowrap',
-              }}>↗ Preview</a>
+            </div>
+            {/* Basic Sponsor toggle */}
+            <div style={{ flex: 1, minWidth: '260px', background: isBasicPublished ? 'rgba(16,185,129,0.08)' : 'rgba(45,122,58,0.08)', border: `1px solid ${isBasicPublished ? 'var(--text-success)' : '#2D7A3A'}`, borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '20px' }}>🌟</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: '800', fontSize: '14px', color: isBasicPublished ? 'var(--text-success)' : '#2D7A3A' }}>Basic Sponsor: {isBasicPublished ? '🌐 LIVE' : '🔒 CLOSED'}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>$1,001 · {basicRegs.length} registered</div>
+              </div>
+              <button onClick={() => handlePublishToggle('basic')} disabled={publishing === 'basic'} style={{
+                padding: '8px 16px', borderRadius: '8px', border: 'none',
+                background: publishing === 'basic' ? 'rgba(51,65,85,0.5)' : isBasicPublished ? 'linear-gradient(135deg, #EF4444, #DC2626)' : 'linear-gradient(135deg, #2D7A3A, #1E5C2A)',
+                color: publishing === 'basic' ? '#475569' : 'white',
+                fontWeight: '800', fontSize: '13px', cursor: publishing === 'basic' ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s', fontFamily: 'inherit', whiteSpace: 'nowrap',
+              }}>
+                {publishing === 'basic' ? '⏳ Saving...' : isBasicPublished ? '🔒 Unpublish' : '🌐 Publish'}
+              </button>
+            </div>
+          </div>
+          {(isGrandPublished || isBasicPublished) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'monospace', background: 'var(--bg-input)', padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--border)' }}>{PUBLIC_URL}</span>
+              <button onClick={copyPublicUrl} style={{ padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: urlCopied ? 'rgba(16,185,129,0.15)' : 'transparent', color: 'var(--text-success)', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}>{urlCopied ? '✅ Copied!' : '📋 Copy URL'}</button>
+              <a href={PUBLIC_URL} target="_blank" rel="noreferrer" style={{ padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-success)', fontSize: '12px', fontWeight: '700', textDecoration: 'none' }}>↗ Preview</a>
             </div>
           )}
-
-          <button onClick={handlePublishToggle} disabled={publishing} style={{
-            marginLeft: 'auto', padding: '10px 20px', borderRadius: '10px', border: 'none',
-            background: publishing ? 'rgba(51,65,85,0.5)' : isPublished
-              ? 'linear-gradient(135deg, #EF4444, #DC2626)'
-              : `linear-gradient(135deg, ${GOLD}, #B8960C)`,
-            color: publishing ? '#475569' : isPublished ? 'white' : '#1A1200',
-            fontWeight: '800', fontSize: '14px', cursor: publishing ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap',
-            transition: 'all 0.3s', fontFamily: 'inherit',
-          }}>
-            {publishing ? '⏳ Saving...' : isPublished ? '🔒 Unpublish Page' : '🌐 Publish Page'}
-          </button>
         </div>
       )}
 
@@ -295,11 +308,12 @@ export default function GrandSponsorDashboard() {
       </div>
 
       {/* ── Stats ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-        <StatCard label="Total Sponsors"     value={registrations.length} accent={GOLD}      sub="all registrations" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+        <StatCard label="Total Sponsors"     value={registrations.length} accent={GOLD}      sub={`${grandRegs.length} grand · ${basicRegs.length} basic`} />
         <StatCard label="Confirmed (Paid)"   value={paid.length}          accent="#10B981"   sub={`${pending.length} pending`} />
         <StatCard label="Revenue Collected"  value={`$${(revenue / 100).toFixed(0)}`}        accent={GOLD}  sub="from confirmed sponsors" />
-        <StatCard label="Sponsorship Value"  value={`$${(registrations.length * 5000).toLocaleString()}`} accent="#B8960C" sub="at $5,000 each" />
+        <StatCard label="Grand Revenue"  value={`$${(grandRegs.filter(r=>r.payment_status==='paid').reduce((s,r)=>s+(r.amount_paid||0),0)/100).toFixed(0)}`} accent="#B8960C" sub="grand sponsors" />
+        <StatCard label="Basic Revenue"  value={`$${(basicRegs.filter(r=>r.payment_status==='paid').reduce((s,r)=>s+(r.amount_paid||0),0)/100).toFixed(0)}`} accent="#2D7A3A" sub="basic sponsors" />
       </div>
 
       {error && (
@@ -313,16 +327,16 @@ export default function GrandSponsorDashboard() {
         <input
           type="text" placeholder="🔍  Search name, company, email, reg #..."
           value={search} onChange={e => setSearch(e.target.value)}
-          style={{
-            flex: '1 1 260px', padding: '9px 14px', borderRadius: '10px',
-            border: '1px solid var(--border)', background: 'var(--bg-card)',
-            color: 'var(--text-primary)', fontSize: '13px', outline: 'none',
-          }}
+          style={{ flex: '1 1 260px', padding: '9px 14px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }}
         />
         {['all','paid','pending','failed'].map(s => (
           <FilterBtn key={s} active={filter === s} onClick={() => setFilter(s)}>
             {s === 'all' ? 'All Status' : s === 'paid' ? 'Paid' : s === 'pending' ? 'Pending' : 'Failed'}
           </FilterBtn>
+        ))}
+        <div style={{ width: '1px', height: '28px', background: 'var(--border)', margin: '0 4px' }}/>
+        {[{ k:'all', label:'All Tiers' }, { k:'grand_sponsor', label:'🏆 Grand' }, { k:'basic_sponsor', label:'🌟 Basic' }].map(({ k, label }) => (
+          <FilterBtn key={k} active={tierFilter === k} onClick={() => setTierFilter(k)}>{label}</FilterBtn>
         ))}
         <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginLeft: '4px', fontWeight: '750' }}>
           {filtered.length} of {registrations.length}
@@ -342,7 +356,7 @@ export default function GrandSponsorDashboard() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ backgroundColor: `rgba(212,175,55,0.06)` }}>
-                  {['Reg #', 'Sponsor', 'Company', 'Amount', 'Status', 'Date', ''].map(h => (
+                  {['Reg #', 'Tier', 'Sponsor', 'Company', 'Amount', 'Status', 'Date', ''].map(h => (
                     <th key={h} style={{ ...tdStyle, fontSize: '11px', fontWeight: '700', color: '#64748B', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '2px solid var(--border)' }}>
                       {h}
                     </th>
@@ -354,9 +368,14 @@ export default function GrandSponsorDashboard() {
                   <>
                     <tr key={r.id} style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === r.id ? null : r.id)}>
                       <td style={tdStyle}>
-                        <code style={{ fontSize: '12px', color: GOLD, fontWeight: '700', background: 'rgba(212,175,55,0.08)', padding: '3px 8px', borderRadius: '6px' }}>
+                        <code style={{ fontSize: '12px', color: r.space_type === 'basic_sponsor' ? '#2D7A3A' : GOLD, fontWeight: '700', background: r.space_type === 'basic_sponsor' ? 'rgba(45,122,58,0.1)' : 'rgba(212,175,55,0.08)', padding: '3px 8px', borderRadius: '6px' }}>
                           {r.registration_number}
                         </code>
+                      </td>
+                      <td style={tdStyle}>
+                        <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '800', background: r.space_type === 'basic_sponsor' ? 'rgba(45,122,58,0.12)' : 'rgba(212,175,55,0.12)', color: r.space_type === 'basic_sponsor' ? '#2D7A3A' : GOLD, border: `1px solid ${r.space_type === 'basic_sponsor' ? '#2D7A3A40' : GOLD + '40'}` }}>
+                          {r.space_type === 'basic_sponsor' ? '🌟 Basic' : '🏆 Grand'}
+                        </span>
                       </td>
                       <td style={tdStyle}>
                         <div style={{ fontWeight: '700', fontSize: '14px' }}>{r.first_name} {r.last_name}</div>
@@ -380,7 +399,7 @@ export default function GrandSponsorDashboard() {
                     {/* Expanded detail row */}
                     {expanded === r.id && (
                       <tr key={`${r.id}-detail`}>
-                        <td colSpan={7} style={{ padding: '0', borderBottom: '1px solid var(--border)' }}>
+                        <td colSpan={8} style={{ padding: '0', borderBottom: '1px solid var(--border)' }}>
                           <div style={{ background: `rgba(212,175,55,0.04)`, padding: '20px 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
                             {[
                               { label: 'Full Address', value: `${r.address}, ${r.city}, ${r.state} ${r.zip}` },
