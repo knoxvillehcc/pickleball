@@ -195,9 +195,11 @@ export default function SponsorDashboard() {
 
   // ── CSV export ──────────────────────────────────────────────────────────────
   function exportCSV() {
-    const headers = ['Reg #', 'First Name', 'Last Name', 'Company', 'Email', 'Phone', 'Address', 'City', 'State', 'ZIP', 'Amount', 'Status', 'Date'];
+    const headers = ['Reg #', 'Tier', 'First Name', 'Last Name', 'Company', 'Email', 'Phone', 'Address', 'City', 'State', 'ZIP', 'Amount', 'Status', 'Date'];
     const rows = filtered.map(r => [
-      r.registration_number, r.first_name, r.last_name, r.company_name,
+      r.registration_number,
+      r.space_type === 'basic_sponsor' ? 'Basic Sponsor' : 'Grand Sponsor',
+      r.first_name, r.last_name, r.company_name,
       r.email, r.phone, r.address, r.city, r.state, r.zip,
       `$${((r.amount_paid || 0) / 100).toFixed(2)}`,
       r.payment_status,
@@ -206,8 +208,137 @@ export default function SponsorDashboard() {
     const csv = [headers, ...rows].map(row => row.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    a.download = `grand-sponsors-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `sponsors-${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
+  }
+
+  // ── PDF / Print report ────────────────────────────────────────────────────
+  function printReport() {
+    const grandPaid = grandRegs.filter(r => r.payment_status === 'paid');
+    const basicPaid = basicRegs.filter(r => r.payment_status === 'paid');
+    const grandRevenue = grandPaid.reduce((s, r) => s + (r.amount_paid || 0), 0);
+    const basicRevenue = basicPaid.reduce((s, r) => s + (r.amount_paid || 0), 0);
+
+    const rows = filtered.map(r => {
+      const isBasic = r.space_type === 'basic_sponsor';
+      const tierColor = isBasic ? '#2D7A3A' : '#B8960C';
+      const tierLabel = isBasic ? '🌟 Basic' : '🏆 Grand';
+      const statusColor = r.payment_status === 'paid' ? '#059669' : r.payment_status === 'failed' ? '#DC2626' : '#D97706';
+      const statusLabel = r.payment_status === 'paid' ? '✓ Paid' : r.payment_status === 'failed' ? '✗ Failed' : '⏳ Pending';
+      return `
+        <tr>
+          <td>${r.registration_number || '—'}</td>
+          <td><span style="color:${tierColor};font-weight:700;font-size:11px;">${tierLabel}</span></td>
+          <td>${r.first_name || ''} ${r.last_name || ''}</td>
+          <td>${r.company_name || '—'}</td>
+          <td>${r.email || '—'}</td>
+          <td>${r.phone || '—'}</td>
+          <td>$${((r.amount_paid || 0) / 100).toFixed(2)}</td>
+          <td><span style="color:${statusColor};font-weight:700;">${statusLabel}</span></td>
+          <td>${r.registration_date ? new Date(r.registration_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
+        </tr>`;
+    }).join('');
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>India Fest 2026 — Sponsor Report</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body { font-family: 'Inter', sans-serif; color: #0F172A; background: #fff; padding: 32px; font-size: 13px; }
+          .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid #D4AF37; }
+          .header-left h1 { font-size: 22px; font-weight: 900; color: #0F172A; letter-spacing: -0.5px; }
+          .header-left p  { font-size: 12px; color: #64748B; margin-top: 3px; }
+          .header-right   { text-align: right; font-size: 11px; color: #64748B; }
+          .flag { height: 4px; background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); margin-bottom: 24px; border-radius: 2px; }
+          .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+          .stat { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 12px 14px; border-top: 3px solid #D4AF37; }
+          .stat.green { border-top-color: #10B981; }
+          .stat.dark-gold { border-top-color: #B8960C; }
+          .stat.sponsor-green { border-top-color: #2D7A3A; }
+          .stat-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #94A3B8; margin-bottom: 4px; }
+          .stat-value { font-size: 22px; font-weight: 900; color: #0F172A; }
+          .stat-sub { font-size: 10px; color: #94A3B8; margin-top: 3px; font-weight: 600; }
+          table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+          thead tr { background: #FEF9EC; }
+          th { padding: 10px 10px; text-align: left; font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.8px; color: #64748B; border-bottom: 2px solid #D4AF37; white-space: nowrap; }
+          td { padding: 9px 10px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; color: #0F172A; }
+          tr:nth-child(even) td { background: #FAFCFF; }
+          tr:hover td { background: #FEF9EC; }
+          .footer { margin-top: 24px; padding-top: 14px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; font-size: 10px; color: #94A3B8; }
+          @media print {
+            body { padding: 16px; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="flag"></div>
+        <div class="header">
+          <div class="header-left">
+            <h1>🏆 India Fest 2026 — Sponsor Report</h1>
+            <p>Knoxville Hindu Community Center · 8580 Hickory Creek Rd, Lenoir City, TN 37771</p>
+          </div>
+          <div class="header-right">
+            <div style="font-weight:700;font-size:12px;color:#0F172A;">Generated</div>
+            <div>${new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}</div>
+            <div style="margin-top:4px;">${new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">Total Sponsors</div>
+            <div class="stat-value">${registrations.length}</div>
+            <div class="stat-sub">${grandRegs.length} grand · ${basicRegs.length} basic</div>
+          </div>
+          <div class="stat green">
+            <div class="stat-label">Confirmed (Paid)</div>
+            <div class="stat-value">${paid.length}</div>
+            <div class="stat-sub">${pending.length} pending</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Revenue Collected</div>
+            <div class="stat-value">$${(revenue / 100).toLocaleString()}</div>
+            <div class="stat-sub">from confirmed sponsors</div>
+          </div>
+          <div class="stat dark-gold">
+            <div class="stat-label">Grand Revenue</div>
+            <div class="stat-value">$${(grandRevenue / 100).toLocaleString()}</div>
+            <div class="stat-sub">${grandPaid.length} paid grand</div>
+          </div>
+          <div class="stat sponsor-green">
+            <div class="stat-label">Basic Revenue</div>
+            <div class="stat-value">$${(basicRevenue / 100).toLocaleString()}</div>
+            <div class="stat-sub">${basicPaid.length} paid basic</div>
+          </div>
+        </div>
+
+        <div style="font-size:10px;color:#94A3B8;font-weight:600;margin-bottom:8px;">SHOWING ${filtered.length} OF ${registrations.length} REGISTRATIONS${tierFilter !== 'all' ? ` · FILTERED: ${tierFilter === 'grand_sponsor' ? 'GRAND ONLY' : 'BASIC ONLY'}` : ''}${filter !== 'all' ? ` · STATUS: ${filter.toUpperCase()}` : ''}</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Reg #</th><th>Tier</th><th>Sponsor Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Amount</th><th>Status</th><th>Date</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        <div class="footer">
+          <span>India Fest 2026 Sponsor Report · HCC Portal</span>
+          <span>knoxvillehcc@gmail.com · +1 865-988-3820</span>
+        </div>
+      </body>
+      </html>`;
+
+    const win = window.open('', '_blank', 'width=1100,height=800');
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 600);
   }
 
   const tdStyle = { padding: '14px 16px', fontSize: '13px', borderBottom: '1px solid var(--border)', verticalAlign: 'middle' };
@@ -303,6 +434,15 @@ export default function SponsorDashboard() {
             fontFamily: 'inherit',
           }}>
             📄 Export CSV
+          </button>
+          <button onClick={printReport} style={{
+            background: 'transparent', border: `1px solid rgba(99,102,241,0.4)`,
+            color: '#6366F1', fontWeight: '600', fontSize: '13px',
+            padding: '12px 18px', borderRadius: '10px', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+            fontFamily: 'inherit',
+          }}>
+            🖨️ Print Report
           </button>
         </div>
       </div>

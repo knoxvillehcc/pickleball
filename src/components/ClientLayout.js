@@ -20,14 +20,15 @@ const SunIcon      = () => <svg width="16" height="16" viewBox="0 0 24 24" fill=
 const MoonIcon     = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
 
 const navLinks = [
-  { href: '/',                 label: 'Dashboard',       icon: <HomeIcon />,      slug: 'dashboard' },
-  { href: '/reports',         label: 'Membership',      icon: <ReportsIcon />,   slug: 'reports' },
-  { href: '/reports/monthly', label: 'Monthly Report',  icon: <CalIcon />,       slug: 'monthly' },
-  { href: '/banner',          label: 'Banner In',       icon: <BannerIcon />,    slug: 'banner' },
-  { href: '/pickleball',      label: 'Pickleball',      icon: <PBIcon />,        slug: 'pickleball' },
-  { href: '/indiafest',       label: 'India Fest 2026', icon: <IndiafestIcon />, slug: 'indiafest' },
-  { href: '/settings',        label: 'Settings',        icon: <SettingsIcon />,  slug: 'settings' },
-  { href: '/settings/users',  label: 'User Management', icon: <UsersIcon />,     slug: 'users', adminOnly: true },
+  { href: '/',                   label: 'Dashboard',         icon: <HomeIcon />,       slug: 'dashboard' },
+  { href: '/reports',           label: 'Membership',        icon: <ReportsIcon />,    slug: 'reports' },
+  { href: '/reports/monthly',   label: 'Monthly Report',    icon: <CalIcon />,        slug: 'monthly' },
+  { href: '/banner',            label: 'Banner In',         icon: <BannerIcon />,     slug: 'banner' },
+  { href: '/pickleball',        label: 'Pickleball',        icon: <PBIcon />,         slug: 'pickleball' },
+  { href: '/indiafest',         label: 'India Fest 2026',   icon: <IndiafestIcon />,  slug: 'indiafest' },
+  { href: '/indiafest/sponsors',label: 'Sponsors Dashboard',icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🏆</span>, slug: 'sponsors' },
+  { href: '/settings',          label: 'Settings',          icon: <SettingsIcon />,   slug: 'settings' },
+  { href: '/settings/users',    label: 'User Management',   icon: <UsersIcon />,      slug: 'users', adminOnly: true },
 ];
 
 // ── Public routes — no sidebar ─────────────────────────────────────────────────────
