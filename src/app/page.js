@@ -269,7 +269,7 @@ function PublicLanding() {
                       transition: 'all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
                       transform: active && opt.isOpen ? 'translateY(-6px)' : 'translateY(0)',
                       boxShadow: active && opt.isOpen ? `0 12px 30px rgba(212,175,55,0.16), var(--shadow)` : 'var(--shadow)',
-                      position: 'relative', overflow: 'hidden',
+                      position: 'relative',
                     }}
                   >
                     {/* Badge row */}
@@ -295,30 +295,31 @@ function PublicLanding() {
                       🤝 India Fest 2026 — Sponsorship
                     </h2>
 
-                    {/* Two tier cards side by side */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', flex: 1, marginBottom: '20px' }}>
+                    {/* Two tier rows stacked */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, marginBottom: '20px' }}>
+
                       {/* Grand Sponsor tier */}
                       <div style={{
                         background: opt.gspOpen ? 'rgba(212,175,55,0.07)' : 'var(--bg-input)',
                         border: `1.5px solid ${opt.gspOpen ? 'rgba(212,175,55,0.35)' : 'var(--border)'}`,
-                        borderRadius: '12px', padding: '14px 12px',
-                        opacity: opt.gspOpen ? 1 : 0.55,
+                        borderRadius: '12px', padding: '12px 14px',
+                        opacity: opt.gspOpen ? 1 : 0.6,
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '16px' }}>🏆</span>
-                          <div>
-                            <div style={{ fontSize: '12px', fontWeight: '900', color: '#D4AF37', lineHeight: 1 }}>Grand</div>
-                            <div style={{ fontSize: '11px', fontWeight: '800', color: '#D4AF37' }}>$5,001+</div>
+                        {/* Header row */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '18px' }}>🏆</span>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: '13px', fontWeight: '900', color: '#D4AF37' }}>Grand Sponsor</span>
+                            <span style={{ fontSize: '12px', fontWeight: '800', color: '#D4AF37', marginLeft: '6px' }}>$5,001+</span>
                           </div>
-                          <span style={{ marginLeft: 'auto', fontSize: '9px', fontWeight: '800', padding: '2px 7px', borderRadius: '99px', background: opt.gspOpen ? 'rgba(16,185,129,0.12)' : 'rgba(100,100,100,0.12)', color: opt.gspOpen ? 'var(--text-success)' : 'var(--text-muted)', border: `1px solid ${opt.gspOpen ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
+                          <span style={{ fontSize: '9px', fontWeight: '800', padding: '2px 8px', borderRadius: '99px', whiteSpace: 'nowrap', background: opt.gspOpen ? 'rgba(16,185,129,0.12)' : 'rgba(100,100,100,0.1)', color: opt.gspOpen ? 'var(--text-success)' : 'var(--text-muted)', border: `1px solid ${opt.gspOpen ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
                             {opt.gspOpen ? '● OPEN' : '● CLOSED'}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {/* Benefits row */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px' }}>
                           {['📢 Logo Ads', '🏠 10×10 Booth', '🎤 On-Stage', '🏳️ Banner'].map((b, j) => (
-                            <div key={j} style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              {b}
-                            </div>
+                            <span key={j} style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>{b}</span>
                           ))}
                         </div>
                       </div>
@@ -327,27 +328,28 @@ function PublicLanding() {
                       <div style={{
                         background: opt.bspOpen ? 'rgba(45,122,58,0.07)' : 'var(--bg-input)',
                         border: `1.5px solid ${opt.bspOpen ? 'rgba(45,122,58,0.35)' : 'var(--border)'}`,
-                        borderRadius: '12px', padding: '14px 12px',
-                        opacity: opt.bspOpen ? 1 : 0.55,
+                        borderRadius: '12px', padding: '12px 14px',
+                        opacity: opt.bspOpen ? 1 : 0.6,
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '16px' }}>🌟</span>
-                          <div>
-                            <div style={{ fontSize: '12px', fontWeight: '900', color: '#2D7A3A', lineHeight: 1 }}>Basic</div>
-                            <div style={{ fontSize: '11px', fontWeight: '800', color: '#2D7A3A' }}>$1,001+</div>
+                        {/* Header row */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '18px' }}>🌟</span>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: '13px', fontWeight: '900', color: '#2D7A3A' }}>Basic Sponsor</span>
+                            <span style={{ fontSize: '12px', fontWeight: '800', color: '#2D7A3A', marginLeft: '6px' }}>$1,001+</span>
                           </div>
-                          <span style={{ marginLeft: 'auto', fontSize: '9px', fontWeight: '800', padding: '2px 7px', borderRadius: '99px', background: opt.bspOpen ? 'rgba(16,185,129,0.12)' : 'rgba(100,100,100,0.12)', color: opt.bspOpen ? 'var(--text-success)' : 'var(--text-muted)', border: `1px solid ${opt.bspOpen ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
+                          <span style={{ fontSize: '9px', fontWeight: '800', padding: '2px 8px', borderRadius: '99px', whiteSpace: 'nowrap', background: opt.bspOpen ? 'rgba(16,185,129,0.12)' : 'rgba(100,100,100,0.1)', color: opt.bspOpen ? 'var(--text-success)' : 'var(--text-muted)', border: `1px solid ${opt.bspOpen ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
                             {opt.bspOpen ? '● OPEN' : '● CLOSED'}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {/* Benefits row */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px' }}>
                           {['🏳️ Banner Under Stage', '🌐 Website Credit'].map((b, j) => (
-                            <div key={j} style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              {b}
-                            </div>
+                            <span key={j} style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>{b}</span>
                           ))}
                         </div>
                       </div>
+
                     </div>
 
                     {/* CTA */}

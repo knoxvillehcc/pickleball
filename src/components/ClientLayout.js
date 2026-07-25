@@ -38,7 +38,7 @@ const isPublicRoute = (path) => PUBLIC_PREFIXES.some(p => path.startsWith(p));
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
   const router   = useRouter();
-  const [theme,   setTheme]   = useState('dark');
+  const [theme,   setTheme]   = useState('light');
   const [mounted, setMounted] = useState(false);
   const [user,    setUser]    = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -51,7 +51,7 @@ export default function ClientLayout({ children }) {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem('hcc-theme') || 'dark';
+    const saved = localStorage.getItem('hcc-theme') || 'light';
     applyTheme(saved);
     setMounted(true);
   }, []);
