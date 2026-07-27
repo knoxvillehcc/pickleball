@@ -99,7 +99,6 @@ const moduleConfigs = [
 // ── Public landing page (shown to logged-out visitors) ─────────────────────────
 function PublicLanding() {
   const { theme, toggleTheme, isDark } = useTheme();
-  const [pbOpen,   setPbOpen]   = useState(false);
   const [ifOpen,   setIfOpen]   = useState(false);
   const [gspOpen,  setGspOpen]  = useState(false);
   const [bspOpen,  setBspOpen]  = useState(false);
@@ -107,12 +106,10 @@ function PublicLanding() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/pickleball/settings?key=is_published').then(r => r.json()).catch(() => ({})),
       fetch('/api/indiafest/settings?key=is_published').then(r => r.json()).catch(() => ({})),
       fetch('/api/indiafest/sponsor/settings?key=is_published').then(r => r.json()).catch(() => ({})),
       fetch('/api/indiafest/sponsor/settings?key=basic_is_published').then(r => r.json()).catch(() => ({})),
-    ]).then(([pb, ifest, gsp, bsp]) => {
-      setPbOpen(pb.is_published === true || pb.value === 'true');
+    ]).then(([ifest, gsp, bsp]) => {
       setIfOpen(ifest.is_published === true || ifest.value === 'true');
       setGspOpen(gsp.is_published === true || gsp.value === 'true');
       setBspOpen(bsp.is_published === true || bsp.value === 'true');
@@ -124,18 +121,6 @@ function PublicLanding() {
   const [hovered, setHovered] = useState(null);
 
   const options = [
-    {
-      title: 'Pickleball Registration',
-      desc: 'Register your doubles team for the HCC Pickleball Tournament. Flat entry fee of $50 per team.',
-      href: '/register/pickleball',
-      accentColor: 'var(--accent)',
-      glowColor: 'var(--accent-glow)',
-      borderColor: 'var(--border)',
-      icon: '🏸',
-      badge: 'Sports Event',
-      cta: pbOpen ? 'Register Online' : 'Registration Closed',
-      isOpen: pbOpen,
-    },
     {
       title: 'IndiaFest Vendor Registration',
       desc: 'Reserve your booth for IndiaFest 2026 (Aug 23, 11am-5pm). Home Business ($351) or Established Store ($1001).',
