@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getAllRegistrations } from '@/lib/supabaseClient';
 import { getSessionAndPermissions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   const auth = await getSessionAndPermissions('pickleball');
   if (!auth.success) {

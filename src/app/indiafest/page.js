@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const C = {
@@ -235,11 +237,75 @@ export default function IndiafestVendorDashboard() {
     a.click();
   }
 
-  // ── Export handler ────────────────────────────────────────────────────────
+  // ── PDF export (client-side) ──────────────────────────────────────────────
+  const downloadPDF = () => {
+    try {
+      const doc = new jsPDF('landscape');
+      const dateStr = new Date().toLocaleDateString();
+      const timeStr = new Date().toLocaleTimeString();
+      const userName = currentUser?.name || currentUser?.email || 'Admin';
+
+      doc.setFontSize(18);
+      doc.setTextColor(224, 124, 26); // Saffron (#E07C1A)
+      doc.text('India Fest 2026 — Vendor Space Registrations', 14, 15);
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(`Printed by: ${userName}  |  Date: ${dateStr}  |  Time: ${timeStr}  |  Total Vendors: ${filtered.length}`, 14, 22);
+
+      const tableBody = filtered.map(r => {
+        const vendorLabel = r.space_type === 'home_business'
+          ? 'Home Business'
+          : r.space_type === 'established_business'
+          ? 'Established Store'
+          : r.space_type || '';
+
+        return [
+          r.registration_number || '',
+          `${r.first_name || ''} ${r.last_name || ''}`.trim(),
+          r.company_name || '',
+          r.email || '',
+          r.phone || '',
+          vendorLabel,
+          r.quantity || 1,
+          r.registration_date ? r.registration_date.split('T')[0] : '',
+          (r.payment_status || '').toUpperCase(),
+          '$' + ((r.amount_paid || 0) / 100).toFixed(2),
+        ];
+      });
+
+      autoTable(doc, {
+        startY: 28,
+        head: [['Reg #', 'Name', 'Company', 'Email', 'Phone', 'Vendor Type', 'Qty', 'Date', 'Status', 'Amount Paid']],
+        body: tableBody,
+        theme: 'striped',
+        headStyles: { fillColor: [224, 124, 26] },
+        styles: { fontSize: 8, cellPadding: 2.5 },
+        margin: { top: 10, bottom: 10, left: 14, right: 14 },
+      });
+
+      doc.save(`IndiaFest_Vendors_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (err) {
+      alert('PDF generation error: ' + err.message);
+    }
+  };
+
+  // ── Export handler (API fallback for CSV / Excel) ──────────────────────────
   const handleExport = async (format) => {
     setExporting(format);
     try {
       const res = await fetch(`/api/indiafest/export?format=${format}`);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        const msg = errData.error || `Export failed (${res.status})`;
+        if (res.status === 401) {
+          alert('Session expired or unauthorized. Please log in again.');
+          window.location.href = '/login?redirect=/indiafest';
+          return;
+        }
+        alert(msg);
+        return;
+      }
       const blob = await res.blob();
       const ext = { csv: 'csv', excel: 'xls', pdf: 'html' }[format];
       const url = URL.createObjectURL(blob);
@@ -350,7 +416,7 @@ export default function IndiafestVendorDashboard() {
 
           {/* Export buttons */}
           {['csv', 'excel', 'pdf'].map(fmt => (
-            <button key={fmt} onClick={() => handleExport(fmt)} disabled={!!exporting} style={{
+            <button key={fmt} onClick={() => fmt === 'pdf' ? downloadPDF() : handleExport(fmt)} disabled={!!exporting} style={{
               background: 'transparent',
               border: `1px solid rgba(255,153,51,0.4)`,
               color: C.saffron, fontWeight: '600', fontSize: '13px',

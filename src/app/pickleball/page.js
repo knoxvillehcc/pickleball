@@ -218,12 +218,17 @@ export default function PickleballDashboard() {
   const [currentUser,  setCurrentUser]  = useState(null);
   const [resendingId,  setResendingId]  = useState(null);
   const [resendDone,   setResendDone]   = useState({});
+  const [syncStatus,   setSyncStatus]   = useState(null);
+  const [odooModalOpen,setOdooModalOpen]= useState(false);
+  const [syncingOdoo,  setSyncingOdoo]  = useState(false);
+  const [syncMsg,      setSyncMsg]      = useState('');
+  const [forceSync,    setForceSync]    = useState(false);
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/pickleball`
     : '/register/pickleball';
 
-  // Load publish status + current user role on mount
+  // Load publish status + current user role + Odoo sync info on mount
   useEffect(() => {
     fetch('/api/pickleball/settings?key=is_published')
       .then(r => r.json())
@@ -233,7 +238,37 @@ export default function PickleballDashboard() {
       .then(r => r.json())
       .then(d => setCurrentUser(d.user || null))
       .catch(() => {});
+    fetch('/api/pickleball/sync-odoo')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.syncInfo) setSyncStatus(d.syncInfo);
+      })
+      .catch(() => {});
   }, []);
+
+  const handleSyncToOdoo = async (isForced = false) => {
+    setSyncingOdoo(true);
+    setSyncMsg('');
+    try {
+      const res = await fetch('/api/pickleball/sync-odoo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ force: isForced }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSyncStatus(data.syncInfo);
+        setSyncMsg(`✅ Success! Invoice ${data.syncInfo.invoiceName} posted to Odoo and marked as Paid.`);
+        setForceSync(false);
+      } else {
+        setSyncMsg(`❌ ${data.error || data.message || 'Failed to sync to Odoo'}`);
+      }
+    } catch (err) {
+      setSyncMsg(`❌ Error: ${err.message}`);
+    } finally {
+      setSyncingOdoo(false);
+    }
+  };
 
   const handlePublishToggle = async () => {
     setPublishing(true);
@@ -324,6 +359,17 @@ export default function PickleballDashboard() {
     setExporting(format);
     try {
       const res = await fetch(`/api/pickleball/export?format=${format}`);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        const msg = errData.error || `Export failed (${res.status})`;
+        if (res.status === 401) {
+          alert('Session expired or unauthorized. Please log in again.');
+          window.location.href = '/login?redirect=/pickleball';
+          return;
+        }
+        alert(msg);
+        return;
+      }
       const blob = await res.blob();
       const ext = { csv: 'csv', excel: 'xls', pdf: 'html' }[format];
       const url = URL.createObjectURL(blob);
@@ -541,6 +587,30 @@ export default function PickleballDashboard() {
               }
             </button>
           ))}
+
+          {/* Sync to Odoo button */}
+          <button onClick={() => { setSyncMsg(''); setForceSync(false); setOdooModalOpen(true); }} style={{
+            background: 'linear-gradient(135deg, #10B981, #059669)',
+            border: 'none', color: '#FFFFFF', fontWeight: '700', fontSize: '13.5px',
+            padding: '12px 20px', borderRadius: '10px', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+          }}>
+            <span>💼 Sync Revenue to Odoo</span>
+          </button>
+
+          {syncStatus && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '8px 14px', borderRadius: '99px',
+              background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)',
+              color: 'var(--text-success)', fontSize: '12.5px', fontWeight: '700'
+            }}>
+              <span>✓ Synced to Odoo:</span>
+              <span style={{ fontFamily: 'monospace', fontWeight: '800' }}>{syncStatus.invoiceName}</span>
+              <span>(${syncStatus.totalAmount?.toFixed(2)})</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -763,6 +833,137 @@ export default function PickleballDashboard() {
           </div>
         )}
       </div>
+
+      {/* ── Odoo Revenue Sync Modal ────────────────────────────────────── */}
+      {odooModalOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(0, 0, 0, 0.65)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+        }}>
+          <div style={{
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
+            borderRadius: '20px', padding: '28px', maxWidth: '520px', width: '100%',
+            boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '20px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '24px' }}>💼</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '19px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                    Odoo Revenue Sync
+                  </h3>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500' }}>
+                    HCC Pickleball Tournament 2026
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => setOdooModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '20px', cursor: 'pointer' }}>×</button>
+            </div>
+
+            {/* Warning if already synced AND not forced */}
+            {syncStatus && !forceSync ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{
+                  background: 'rgba(244, 164, 11, 0.12)', border: '1px solid rgba(244, 164, 11, 0.4)',
+                  borderRadius: '14px', padding: '16px', color: 'var(--text-primary)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#F4A40B', fontWeight: '800', fontSize: '15px', marginBottom: '8px' }}>
+                    <span>⚠️ Warning: Already Synced to Odoo</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
+                    Tournament revenue was already posted to Odoo on <strong>{new Date(syncStatus.syncedAt).toLocaleDateString()}</strong> under invoice reference:
+                  </p>
+                  <div style={{
+                    marginTop: '12px', padding: '10px 14px', background: 'var(--bg-input)',
+                    borderRadius: '8px', border: '1px solid var(--border)',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    fontFamily: 'monospace', fontWeight: '800', fontSize: '14px', color: 'var(--accent)'
+                  }}>
+                    <span>{syncStatus.invoiceName}</span>
+                    <span>${syncStatus.totalAmount?.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                  Posting again will generate an additional invoice in Odoo. If you are certain you want to create a secondary invoice, click below.
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button onClick={() => setOdooModalOpen(false)} style={{
+                    flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid var(--border)',
+                    background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer'
+                  }}>
+                    Close
+                  </button>
+                  <button onClick={() => setForceSync(true)} style={{
+                    flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
+                    background: 'rgba(244, 164, 11, 0.2)', border: '1px solid #F4A40B', color: '#F4A40B', fontWeight: '800', cursor: 'pointer'
+                  }}>
+                    Force Re-sync
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Confirmation Screen for first time or forced sync */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {forceSync && (
+                  <div style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(244, 164, 11, 0.1)', border: '1px solid #F4A40B', color: '#F4A40B', fontSize: '12px', fontWeight: '700' }}>
+                    ⚡ Force Re-sync mode active. A new invoice will be generated.
+                  </div>
+                )}
+
+                <div style={{ background: 'var(--bg-input)', borderRadius: '14px', padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13.5px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Event Name:</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>HCC Pickleball Tournament 2026</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13.5px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Paid Teams/Registrations:</span>
+                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>{stats?.paid || 0}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Total Collection (Stripe):</span>
+                    <span style={{ fontWeight: '950', color: 'var(--accent)' }}>${stats?.totalRevenue?.toFixed(2) || '0.00'}</span>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  This will create a Customer Invoice in Odoo for partner <strong>HCC ADMIN</strong>, line item <strong>Pickleball Tournament Fee</strong> (credited to P&L Income Account), and automatically register a <strong>Credit Card payment</strong> marking it as Paid.
+                </div>
+
+                {syncMsg && (
+                  <div style={{
+                    padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: '700',
+                    background: syncMsg.startsWith('✅') ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                    color: syncMsg.startsWith('✅') ? '#10B981' : '#EF4444',
+                    border: `1px solid ${syncMsg.startsWith('✅') ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`
+                  }}>
+                    {syncMsg}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button onClick={() => setOdooModalOpen(false)} style={{
+                    flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid var(--border)',
+                    background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer'
+                  }}>
+                    Cancel
+                  </button>
+                  <button onClick={() => handleSyncToOdoo(forceSync)} disabled={syncingOdoo} style={{
+                    flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
+                    background: syncingOdoo ? 'rgba(16,185,129,0.5)' : 'linear-gradient(135deg, #10B981, #059669)',
+                    color: '#FFFFFF', fontWeight: '800', fontSize: '14px', cursor: syncingOdoo ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                  }}>
+                    {syncingOdoo ? 'Posting to Odoo...' : 'Confirm & Post to Odoo'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }

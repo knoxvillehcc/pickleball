@@ -44,6 +44,8 @@ function getPageSlug(pathname) {
   if (pathname.startsWith('/reports'))          return 'reports';
   if (pathname.startsWith('/banner'))           return 'banner';
   if (pathname.startsWith('/pickleball'))       return 'pickleball';
+  if (pathname.startsWith('/indiafest/sponsors'))return 'sponsors';
+  if (pathname.startsWith('/indiafest'))        return 'indiafest';
   if (pathname.startsWith('/settings/users'))   return 'users';
   if (pathname.startsWith('/settings'))         return 'settings';
   if (pathname.startsWith('/api/auth/users'))   return 'users';
