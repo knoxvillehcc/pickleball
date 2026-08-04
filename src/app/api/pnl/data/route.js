@@ -113,9 +113,8 @@ export async function GET(request) {
     // ── 5. Fetch invoice lines ─────────────────────────────────────────────────
     let lineDomain = [
       ['move_id', 'in', moveIds],
-      ['display_type', '=', false],        // exclude section/note lines
-      ['product_id', '!=', false],         // only product lines
-      ['exclude_from_invoice_tab', '=', false],
+      ['display_type', 'in', ['product', false]], // include product lines across Odoo versions
+      ['product_id', '!=', false],               // only product lines
     ];
     if (productIds.length)  lineDomain.push(['product_id', 'in', productIds]);
 

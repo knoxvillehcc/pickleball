@@ -64,7 +64,7 @@ export async function GET() {
         ['move_id.move_type', 'in', ['out_invoice', 'out_refund']],
         ['move_id.state', '=', 'posted'],
         ['product_id', '!=', false],
-        ['display_type', '=', false],
+        ['display_type', 'in', ['product', false]],
       ]
     ], {
       fields: ['product_id'],
