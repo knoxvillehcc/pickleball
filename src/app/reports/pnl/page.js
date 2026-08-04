@@ -460,7 +460,7 @@ export default function PnLPage() {
     return p.toString();
   }
 
-  // ── PDF Export ────────────────────────────────────────────────────────────────
+  // ── PDF Export (Apple Design System) ───────────────────────────────────────
   const handleExportPdf = async () => {
     setPdfGenerating(true);
     try {
@@ -480,8 +480,8 @@ export default function PnLPage() {
       const canViewCosts = hasPerm(user, PERMISSIONS.COSTS);
       const orient = pdfOptions.orientation || 'landscape';
       const doc    = new jsPDF(orient);
-      const pW     = doc.internal.pageSize.getWidth();
-      const pH     = doc.internal.pageSize.getHeight();
+      const pW     = doc.internal.pageSize.getWidth();  // 297mm for A4 landscape
+      const pH     = doc.internal.pageSize.getHeight(); // 210mm for A4 landscape
 
       // Pre-load logo helper
       const logoObj = await (async function() {
@@ -504,115 +504,126 @@ export default function PnLPage() {
         });
       })();
 
-      // ── Page Header Renderer ───────────────────────────────────────────────────
-      const drawHeader = (doc, isFirstPage = true) => {
+      // ── Apple Header Renderer ────────────────────────────────────────────────
+      const drawAppleHeader = (doc, pageNum = 1) => {
+        const leftMargin = 14;
+        const rightMargin = pW - 14;
+
         // Logo
         if (logoObj) {
           const aspect = logoObj.width / logoObj.height;
-          const logoH  = 12;
+          const logoH  = 13;
           const logoW  = Math.min(32, logoH * aspect);
-          doc.addImage(logoObj.dataUrl, 'PNG', 14, 10, logoW, logoH);
+          doc.addImage(logoObj.dataUrl, 'PNG', leftMargin, 9, logoW, logoH);
         }
 
-        // Top Right Organization Title
+        // Title Block (Left Aligned next to logo)
+        const titleX = logoObj ? 48 : leftMargin;
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.setTextColor(139, 30, 63);
-        doc.text('HINDU COMMUNITY CENTER', pW - 14, 14, { align: 'right' });
+        doc.setFontSize(16);
+        doc.setTextColor(15, 23, 42); // Slate 900
+        doc.text('Product Category Profit & Loss', titleX, 16);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(100, 116, 139); // Slate 500
+        doc.text('HINDU COMMUNITY CENTER  ·  FINANCIAL REPORT', titleX, 22);
+
+        // Metadata Block (Right Aligned Card style)
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(51, 65, 85); // Slate 700
+        doc.text(`Period: ${startDate} to ${endDate}`, rightMargin, 13, { align: 'right' });
+
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
-        doc.setTextColor(120, 120, 120);
-        doc.text('Financial Report', pW - 14, 19, { align: 'right' });
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Basis: ${basis === 'accrual' ? 'Accrual Basis' : 'Cash Basis'}`, rightMargin, 18, { align: 'right' });
+        doc.text(`Generated: ${new Date().toLocaleDateString()} by ${user?.name || user?.email || 'Admin'}`, rightMargin, 23, { align: 'right' });
 
-        // Center Title & Period
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(15);
-        doc.setTextColor(30, 30, 30);
-        doc.text('HCC Product Category Profit & Loss', pW / 2, 16, { align: 'center' });
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(70, 70, 70);
-        doc.text(`Period: ${startDate} to ${endDate}  |  Basis: ${basis === 'accrual' ? 'Accrual' : 'Cash'}`, pW / 2, 22, { align: 'center' });
-
-        if (isFirstPage) {
-          doc.setFontSize(7.5);
-          doc.setTextColor(110, 110, 110);
-          const genStr = `Generated: ${new Date().toLocaleString()} | By: ${user?.name || user?.email || 'Admin'}`;
-          const syncStr = lastSync ? ` | Refreshed: ${new Date(lastSync).toLocaleTimeString()}` : '';
-          doc.text(genStr + syncStr, pW / 2, 27, { align: 'center' });
-        }
-
-        // Header Divider Line
-        doc.setDrawColor(220, 220, 220);
+        // Divider Rule (Apple minimalist line)
+        doc.setDrawColor(226, 232, 240); // Slate 200
         doc.setLineWidth(0.4);
-        doc.line(14, 30, pW - 14, 30);
+        doc.line(leftMargin, 27, rightMargin, 27);
       };
 
-      // ── Page 1 Content ────────────────────────────────────────────────────────
-      drawHeader(doc, true);
-      let curY = 36;
+      // ── Page 1 Header ────────────────────────────────────────────────────────
+      drawAppleHeader(doc, 1);
+      let curY = 32;
 
-      // Active Filters Line
+      // Filter callout line if filters applied
       const filterLines = [];
       if (activeFilters.categoryIds.length) filterLines.push(`Categories: ${activeFilters.categoryIds.join(', ')}`);
       if (activeFilters.customerIds.length) filterLines.push(`Customers: ${activeFilters.customerIds.join(', ')}`);
       if (activeFilters.paymentStatus.length) filterLines.push(`Payment Status: ${activeFilters.paymentStatus.join(', ')}`);
 
       if (filterLines.length) {
-        doc.setFontSize(7.5); doc.setTextColor(120);
-        doc.text('Filters: ' + filterLines.join(' | '), 14, curY);
-        curY += 6;
+        doc.setFontSize(7.5); doc.setTextColor(100, 116, 139);
+        doc.text('Active Filters: ' + filterLines.join(' | '), 14, curY);
+        curY += 5;
       }
 
-      // Executive Summary Header
-      doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(139, 30, 63);
-      doc.text('EXECUTIVE SUMMARY', 14, curY + 4);
-      curY += 7;
+      // ── Executive Summary: Apple KPI Card Grid ──────────────────────────────
+      doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(71, 85, 105);
+      doc.text('EXECUTIVE SUMMARY', 14, curY + 3);
+      curY += 6;
 
-      const sumCols = ['Metric', 'Value'];
-      const sumBody = [
-        ['Gross Sales',   fmtCur(data.summary.grossSales)],
-        ['Discounts',     fmtCur(data.summary.discounts)],
-        ['Refunds',       fmtCur(data.summary.refunds)],
-        ['Net Sales',     fmtCur(data.summary.netSales)],
+      const cardsData = [
+        { label: 'GROSS SALES',   val: fmtCur(data.summary.grossSales),  color: [15, 23, 42] },
+        { label: 'DISCOUNTS',     val: fmtCur(-data.summary.discounts),  color: data.summary.discounts > 0 ? [220, 38, 38] : [100, 116, 139] },
+        { label: 'REFUNDS',       val: fmtCur(-data.summary.refunds),    color: data.summary.refunds > 0 ? [220, 38, 38] : [100, 116, 139] },
+        { label: 'NET SALES',     val: fmtCur(data.summary.netSales),    color: [16, 185, 129] },
         ...(canViewCosts ? [
-          ['COGS',         fmtCur(data.summary.cogs)],
-          ['Gross Profit', fmtCur(data.summary.grossProfit)],
-          ['Gross Margin', fmtPct(data.summary.grossMargin)],
+          { label: 'COGS',         val: fmtCur(data.summary.cogs),        color: [109, 40, 217] },
+          { label: 'GROSS PROFIT', val: fmtCur(data.summary.grossProfit), color: data.summary.grossProfit >= 0 ? [16, 185, 129] : [220, 38, 38] },
+          { label: 'GROSS MARGIN', val: fmtPct(data.summary.grossMargin), color: data.summary.grossMargin >= 0 ? [16, 185, 129] : [220, 38, 38] },
         ] : []),
-        ['Taxes',        fmtCur(data.summary.taxes)],
-        ['Net Qty Sold', fmtInt(data.summary.netQty)],
-        ['Invoice Count', String(data.summary.invoiceCount)],
+        { label: 'TAXES',         val: fmtCur(data.summary.taxes),       color: [217, 119, 6] },
+        { label: 'NET QTY SOLD',  val: `${fmtInt(data.summary.netQty)} units`, color: [51, 65, 85] },
+        { label: 'INVOICES',      val: `${fmtInt(data.summary.invoiceCount)} orders`, color: [51, 65, 85] },
       ];
 
-      autoTable(doc, {
-        startY: curY,
-        head: [sumCols],
-        body: sumBody,
-        theme: 'grid',
-        headStyles: { fillColor: [139, 30, 63], textColor: 255, fontStyle: 'bold', fontSize: 8 },
-        bodyStyles: { fontSize: 8, textColor: [40, 40, 40], cellPadding: 3 },
-        columnStyles: { 0: { cellWidth: 55, fontStyle: 'bold' }, 1: { cellWidth: 45, halign: 'right' } },
-        margin: { left: 14, right: 14 },
-        didParseCell: d => {
-          if (d.section === 'body') {
-            const val = String(d.cell.raw || '');
-            if (val.startsWith('-')) d.cell.styles.textColor = [180, 0, 0];
-            if (['COGS', 'Gross Profit', 'Gross Margin'].includes(d.row.raw?.[0])) {
-              d.cell.styles.fillColor = [255, 250, 240];
-            }
-          }
-        },
+      // Draw horizontal cards (4 per row)
+      const gridCols  = 4;
+      const cardGap   = 3.5;
+      const marginX   = 14;
+      const totalW    = pW - (marginX * 2);
+      const cardW     = (totalW - (cardGap * (gridCols - 1))) / gridCols;
+      const cardH     = 12.5;
+
+      cardsData.forEach((card, idx) => {
+        const row = Math.floor(idx / gridCols);
+        const col = idx % gridCols;
+        const x   = marginX + col * (cardW + cardGap);
+        const y   = curY + row * (cardH + cardGap);
+
+        // Card background box with subtle border
+        doc.setFillColor(248, 250, 252); // Slate 50
+        doc.setDrawColor(226, 232, 240); // Slate 200
+        doc.setLineWidth(0.3);
+        doc.roundedRect(x, y, cardW, cardH, 2, 2, 'FD');
+
+        // Card label
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(100, 116, 139);
+        doc.text(card.label, x + 4, y + 4.5);
+
+        // Card value
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(card.color[0], card.color[1], card.color[2]);
+        doc.text(String(card.val), x + 4, y + 10);
       });
 
-      curY = doc.lastAutoTable.finalY + 10;
+      const cardRowsCount = Math.ceil(cardsData.length / gridCols);
+      curY += cardRowsCount * (cardH + cardGap) + 6;
 
       // ── Category P&L Table ────────────────────────────────────────────────────
       if (pdfOptions.detailLevel !== 'summary') {
-        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(139, 30, 63);
-        doc.text('PRODUCT CATEGORY PROFIT & LOSS', 14, curY);
-        curY += 5;
+        doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(71, 85, 105);
+        doc.text('PRODUCT CATEGORY BREAKDOWN', 14, curY);
+        curY += 4;
 
         const catCols = ['Category', 'Parent', 'Net Qty', 'Gross Sales', 'Discounts', 'Refunds', 'Net Sales'];
         if (canViewCosts) catCols.push('COGS', 'Gross Profit', 'Margin %');
@@ -644,54 +655,77 @@ export default function PnLPage() {
           startY: curY,
           head: [catCols],
           body: catBody,
-          theme: 'striped',
-          headStyles: { fillColor: [139, 30, 63], textColor: 255, fontStyle: 'bold', fontSize: 8 },
-          bodyStyles: { fontSize: 7.5, cellPadding: 3.5 },
-          alternateRowStyles: { fillColor: [250, 250, 250] },
+          theme: 'plain',
+          headStyles: {
+            fillColor: [139, 30, 63], // HCC Burgundy Header
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            fontSize: 7.5,
+            cellPadding: 3,
+          },
+          bodyStyles: {
+            fontSize: 7.5,
+            textColor: [30, 41, 59], // Slate 800
+            cellPadding: 3,
+          },
+          alternateRowStyles: { fillColor: [248, 250, 252] }, // Slate 50
           margin: { left: 14, right: 14 },
           didParseCell: d => {
             if (d.section === 'body') {
               const val = String(d.cell.raw || '');
-              if (val.startsWith('-')) d.cell.styles.textColor = [180, 0, 0];
+              if (val.startsWith('-')) d.cell.styles.textColor = [220, 38, 38]; // Modern Red
+              // Column alignment
+              if (d.column.index >= 2) d.cell.styles.halign = 'right';
             }
             if (d.section === 'body' && d.row.index === catBody.length - 1) {
-              d.cell.styles.fillColor  = [235, 235, 235];
+              d.cell.styles.fillColor  = [241, 245, 249]; // Slate 100
               d.cell.styles.fontStyle  = 'bold';
-              d.cell.styles.textColor  = [20, 20, 20];
+              d.cell.styles.textColor  = [15, 23, 42]; // Slate 900
             }
           },
           showHead: 'everyPage',
           rowPageBreak: 'avoid',
         });
-        curY = doc.lastAutoTable.finalY + 10;
+
+        curY = doc.lastAutoTable.finalY + 8;
       }
 
-      // ── Data Quality Warnings Section ─────────────────────────────────────────
+      // ── Data Quality Warnings Box (Apple Alert Callout Style) ─────────────────
       if (data.warnings && data.warnings.length > 0) {
-        if (curY > pH - 45) { doc.addPage(); drawHeader(doc, false); curY = 36; }
-        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 119, 6);
-        doc.text('DATA QUALITY WARNINGS', 14, curY);
-        curY += 5;
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(80, 80, 80);
-        for (const w of data.warnings.slice(0, 10)) {
-          doc.text(`• ${w.message}`, 18, curY); curY += 4.5;
-        }
+        if (curY > pH - 38) { doc.addPage(); drawAppleHeader(doc, 2); curY = 34; }
+
+        const warningItems = data.warnings.slice(0, 10);
+        const boxH = 8 + (warningItems.length * 4);
+
+        // Soft Amber Callout Box
+        doc.setFillColor(255, 251, 235); // Amber 50
+        doc.setDrawColor(253, 230, 138); // Amber 200
+        doc.setLineWidth(0.4);
+        doc.roundedRect(14, curY, pW - 28, boxH, 2, 2, 'FD');
+
+        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(180, 83, 9); // Amber 700
+        doc.text('NOTICE — DATA QUALITY & COST FALLBACK WARNINGS', 18, curY + 5);
+
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(120, 53, 15);
+        warningItems.forEach((w, wi) => {
+          doc.text(`• ${w.message}`, 18, curY + 9.5 + (wi * 4));
+        });
       }
 
-      // ── Final Page Footers Loop (ONLY DRAW FOOTERS HERE ONCE) ───────────────────
+      // ── Final Page Footers Loop (Clean Single Pass) ─────────────────────────
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         const footerY = pH - 8;
 
         // Thin separator line
-        doc.setDrawColor(220, 220, 220);
+        doc.setDrawColor(226, 232, 240); // Slate 200
         doc.setLineWidth(0.3);
         doc.line(14, footerY - 4, pW - 14, footerY - 4);
 
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.5);
-        doc.setTextColor(120, 120, 120);
+        doc.setTextColor(148, 163, 184); // Slate 400
 
         // Left
         doc.text('Hindu Community Center', 14, footerY);
