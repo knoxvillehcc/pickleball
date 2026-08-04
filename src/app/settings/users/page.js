@@ -12,6 +12,17 @@ const HCC_PAGES = [
   { key: 'settings',   label: 'Settings',             desc: 'App settings' },
 ];
 
+// ── HCC P&L granular permissions ─────────────────────────────────────────────
+const PNL_PERMISSIONS = [
+  { key: 'pnl',                label: 'View HCC P&L',                desc: 'Access P&L page — category-level summary and totals' },
+  { key: 'pnl-product-detail', label: 'View Product-Level Details',  desc: 'Expand categories to see individual product rows' },
+  { key: 'pnl-invoice-detail', label: 'View Invoice-Level Details',  desc: 'Expand products to see individual invoice lines' },
+  { key: 'pnl-export',         label: 'Export HCC P&L',              desc: 'Download Excel, CSV, and PDF reports' },
+  { key: 'pnl-costs',          label: 'View Costs & Profit',         desc: 'See COGS, unit cost, gross profit, and margin (sensitive)' },
+  { key: 'pnl-refresh',        label: 'Refresh Odoo Data',           desc: 'Trigger live sync from Odoo' },
+  { key: 'pnl-settings',       label: 'Manage P&L Settings',         desc: 'Change defaults, exclusions, cache, and comparison settings' },
+];
+
 const ROLE_COLORS = {
   super_admin: { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.25)', text: '#FF9933' },
   staff:       { bg: 'rgba(139,30,63,0.12)', border: 'rgba(139,30,63,0.25)',  text: '#8B1E3F' },
@@ -156,6 +167,48 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
           })}
         </div>
 
+        {/* HCC P&L Permissions */}
+        <div style={{ padding: '0 28px 16px', opacity: allAccess ? 0.5 : 1 }}>
+          <div style={{
+            fontSize: '11px', fontWeight: '700', color: 'var(--accent)',
+            textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px',
+            display: 'flex', alignItems: 'center', gap: '8px',
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/><rect x="2" y="2" width="20" height="20" rx="2"/></svg>
+            HCC P&L Permissions
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {PNL_PERMISSIONS.map(perm => {
+              const on = selected.includes(perm.key);
+              const isSensitive = perm.key === 'pnl-costs' || perm.key === 'pnl-settings';
+              return (
+                <label key={perm.key} style={{
+                  display: 'flex', alignItems: 'center', gap: '12px', cursor: allAccess ? 'default' : 'pointer',
+                  background: on ? (isSensitive ? 'rgba(245,158,11,0.08)' : 'rgba(129,140,248,0.08)') : 'var(--bg-input)',
+                  border: `1px solid ${on ? (isSensitive ? 'rgba(245,158,11,0.3)' : 'rgba(129,140,248,0.25)') : 'var(--border)'}`,
+                  borderRadius: '10px', padding: '10px 14px', transition: 'all 0.15s',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={on}
+                    disabled={allAccess}
+                    onChange={() => toggle(perm.key)}
+                    style={{ width: '16px', height: '16px', accentColor: isSensitive ? '#F59E0B' : C.indigo, cursor: allAccess ? 'default' : 'pointer' }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: on ? C.text : C.muted, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      {perm.label}
+                      {isSensitive && <span style={{ fontSize: '10px', background: 'rgba(245,158,11,0.15)', color: '#D97706', padding: '1px 6px', borderRadius: '9999px', fontWeight: 700 }}>SENSITIVE</span>}
+                    </div>
+                    <div style={{ fontSize: '11px', color: C.muted }}>{perm.desc}</div>
+                  </div>
+                  {on && <span style={{ fontSize: '11px', fontWeight: '700', color: isSensitive ? '#D97706' : C.indigo, background: isSensitive ? 'rgba(245,158,11,0.12)' : 'rgba(129,140,248,0.15)', padding: '2px 8px', borderRadius: '20px' }}>✓ On</span>}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Footer */}
         <div style={{ padding: '16px 28px 24px', borderTop: `1px solid var(--border)`, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <button onClick={onClose} style={btnStyle('var(--bg-button-secondary)', 'var(--border-button-secondary)', 'var(--text-button-secondary)')}>Cancel</button>
@@ -167,6 +220,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
     </div>
   );
 }
+
 
 // ── Reset PIN Modal ───────────────────────────────────────────────────────────
 function ResetPinModal({ targetUser, onClose, onToast }) {
