@@ -481,51 +481,94 @@ export default function PnLPage() {
       const orient = pdfOptions.orientation || 'landscape';
       const doc    = new jsPDF(orient);
       const pW     = doc.internal.pageSize.getWidth();
+      const pH     = doc.internal.pageSize.getHeight();
 
-      // ── Page header helper ────────────────────────────────────────────────────
-      const addPageHeader = () => {
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text('CONFIDENTIAL — Financial Report', pW / 2, 8, { align: 'center' });
-        try {
-          const img = document.querySelector('img[alt="HCC Logo"]');
-          if (img) doc.addImage(img, 'PNG', 10, 10, 20, 10);
-        } catch { /* logo optional */ }
-        doc.setTextColor(40);
-        doc.setFontSize(18);
+      // Pre-load logo helper
+      const logoObj = await (async function() {
+        return new Promise((resolve) => {
+          if (typeof window === 'undefined') return resolve(null);
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            try {
+              const canvas = document.createElement('canvas');
+              canvas.width = img.naturalWidth || img.width;
+              canvas.height = img.naturalHeight || img.height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0);
+              resolve({ dataUrl: canvas.toDataURL('image/png'), width: canvas.width, height: canvas.height });
+            } catch { resolve(null); }
+          };
+          img.onerror = () => resolve(null);
+          img.src = '/hcc_logo.png';
+        });
+      })();
+
+      // ── Page Header Renderer ───────────────────────────────────────────────────
+      const drawHeader = (doc, isFirstPage = true) => {
+        // Logo
+        if (logoObj) {
+          const aspect = logoObj.width / logoObj.height;
+          const logoH  = 12;
+          const logoW  = Math.min(32, logoH * aspect);
+          doc.addImage(logoObj.dataUrl, 'PNG', 14, 10, logoW, logoH);
+        }
+
+        // Top Right Organization Title
         doc.setFont('helvetica', 'bold');
-        doc.text('HCC Product Category Profit & Loss', pW / 2, 22, { align: 'center' });
         doc.setFontSize(10);
+        doc.setTextColor(139, 30, 63);
+        doc.text('HINDU COMMUNITY CENTER', pW - 14, 14, { align: 'right' });
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(100);
-        doc.text(`Period: ${startDate}  to  ${endDate}`, pW / 2, 29, { align: 'center' });
-        doc.text(`Accounting Basis: ${basis === 'accrual' ? 'Accrual' : 'Cash'}`, pW / 2, 34, { align: 'center' });
-        doc.text(
-          `Generated: ${new Date().toLocaleString()}  |  By: ${user?.name || user?.email || 'Admin'}`,
-          pW / 2, 39, { align: 'center' }
-        );
-        if (lastSync) doc.text(`Data Last Refreshed: ${new Date(lastSync).toLocaleString()}`, pW / 2, 44, { align: 'center' });
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text('Financial Report', pW - 14, 19, { align: 'right' });
+
+        // Center Title & Period
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.setTextColor(30, 30, 30);
+        doc.text('HCC Product Category Profit & Loss', pW / 2, 16, { align: 'center' });
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(70, 70, 70);
+        doc.text(`Period: ${startDate} to ${endDate}  |  Basis: ${basis === 'accrual' ? 'Accrual' : 'Cash'}`, pW / 2, 22, { align: 'center' });
+
+        if (isFirstPage) {
+          doc.setFontSize(7.5);
+          doc.setTextColor(110, 110, 110);
+          const genStr = `Generated: ${new Date().toLocaleString()} | By: ${user?.name || user?.email || 'Admin'}`;
+          const syncStr = lastSync ? ` | Refreshed: ${new Date(lastSync).toLocaleTimeString()}` : '';
+          doc.text(genStr + syncStr, pW / 2, 27, { align: 'center' });
+        }
+
+        // Header Divider Line
+        doc.setDrawColor(220, 220, 220);
+        doc.setLineWidth(0.4);
+        doc.line(14, 30, pW - 14, 30);
       };
 
-      // ── Active filters summary ────────────────────────────────────────────────
+      // ── Page 1 Content ────────────────────────────────────────────────────────
+      drawHeader(doc, true);
+      let curY = 36;
+
+      // Active Filters Line
       const filterLines = [];
       if (activeFilters.categoryIds.length) filterLines.push(`Categories: ${activeFilters.categoryIds.join(', ')}`);
       if (activeFilters.customerIds.length) filterLines.push(`Customers: ${activeFilters.customerIds.join(', ')}`);
       if (activeFilters.paymentStatus.length) filterLines.push(`Payment Status: ${activeFilters.paymentStatus.join(', ')}`);
 
-      // ── Page 1: Header + Summary ──────────────────────────────────────────────
-      addPageHeader();
-      let curY = 52;
-
       if (filterLines.length) {
-        doc.setFontSize(8); doc.setTextColor(120);
-        doc.text('Applied Filters: ' + filterLines.join(' | '), 10, curY);
+        doc.setFontSize(7.5); doc.setTextColor(120);
+        doc.text('Filters: ' + filterLines.join(' | '), 14, curY);
         curY += 6;
       }
 
-      doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(40);
-      doc.text('Executive Summary', 10, curY + 6);
-      curY += 10;
+      // Executive Summary Header
+      doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(139, 30, 63);
+      doc.text('EXECUTIVE SUMMARY', 14, curY + 4);
+      curY += 7;
 
       const sumCols = ['Metric', 'Value'];
       const sumBody = [
@@ -548,10 +591,10 @@ export default function PnLPage() {
         head: [sumCols],
         body: sumBody,
         theme: 'grid',
-        headStyles: { fillColor: [139, 30, 63], textColor: 255, fontStyle: 'bold', fontSize: 9 },
-        bodyStyles: { fontSize: 9, textColor: [40, 40, 40] },
-        columnStyles: { 0: { cellWidth: 60, fontStyle: 'bold' }, 1: { cellWidth: 60, halign: 'right' } },
-        margin: { left: 10, right: 10 },
+        headStyles: { fillColor: [139, 30, 63], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+        bodyStyles: { fontSize: 8, textColor: [40, 40, 40], cellPadding: 3 },
+        columnStyles: { 0: { cellWidth: 55, fontStyle: 'bold' }, 1: { cellWidth: 45, halign: 'right' } },
+        margin: { left: 14, right: 14 },
         didParseCell: d => {
           if (d.section === 'body') {
             const val = String(d.cell.raw || '');
@@ -563,13 +606,13 @@ export default function PnLPage() {
         },
       });
 
-      curY = doc.lastAutoTable.finalY + 14;
+      curY = doc.lastAutoTable.finalY + 10;
 
       // ── Category P&L Table ────────────────────────────────────────────────────
       if (pdfOptions.detailLevel !== 'summary') {
-        doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(40);
-        doc.text('Product Category Profit & Loss', 10, curY);
-        curY += 6;
+        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(139, 30, 63);
+        doc.text('PRODUCT CATEGORY PROFIT & LOSS', 14, curY);
+        curY += 5;
 
         const catCols = ['Category', 'Parent', 'Net Qty', 'Gross Sales', 'Discounts', 'Refunds', 'Net Sales'];
         if (canViewCosts) catCols.push('COGS', 'Gross Profit', 'Margin %');
@@ -603,56 +646,59 @@ export default function PnLPage() {
           body: catBody,
           theme: 'striped',
           headStyles: { fillColor: [139, 30, 63], textColor: 255, fontStyle: 'bold', fontSize: 8 },
-          bodyStyles: { fontSize: 7.5 },
-          alternateRowStyles: { fillColor: [253, 248, 240] },
-          margin: { left: 10, right: 10 },
+          bodyStyles: { fontSize: 7.5, cellPadding: 3.5 },
+          alternateRowStyles: { fillColor: [250, 250, 250] },
+          margin: { left: 14, right: 14 },
           didParseCell: d => {
             if (d.section === 'body') {
               const val = String(d.cell.raw || '');
               if (val.startsWith('-')) d.cell.styles.textColor = [180, 0, 0];
             }
             if (d.section === 'body' && d.row.index === catBody.length - 1) {
-              d.cell.styles.fillColor  = [240, 240, 240];
+              d.cell.styles.fillColor  = [235, 235, 235];
               d.cell.styles.fontStyle  = 'bold';
               d.cell.styles.textColor  = [20, 20, 20];
             }
           },
           showHead: 'everyPage',
           rowPageBreak: 'avoid',
-          didDrawPage: (d) => {
-            // Page number
-            doc.setFontSize(7); doc.setTextColor(150);
-            doc.text(
-              `Page ${doc.internal.getNumberOfPages()}`,
-              pW / 2,
-              doc.internal.pageSize.getHeight() - 6,
-              { align: 'center' }
-            );
-            doc.text('CONFIDENTIAL — Financial Report', pW - 10, doc.internal.pageSize.getHeight() - 6, { align: 'right' });
-          },
         });
-        curY = doc.lastAutoTable.finalY + 14;
+        curY = doc.lastAutoTable.finalY + 10;
       }
 
-      // ── Data quality warnings ─────────────────────────────────────────────────
+      // ── Data Quality Warnings Section ─────────────────────────────────────────
       if (data.warnings && data.warnings.length > 0) {
-        if (curY > doc.internal.pageSize.getHeight() - 40) { doc.addPage(); curY = 15; }
-        doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(200, 100, 0);
-        doc.text('⚠  Data Quality Warnings', 10, curY);
-        curY += 6;
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(80);
+        if (curY > pH - 45) { doc.addPage(); drawHeader(doc, false); curY = 36; }
+        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 119, 6);
+        doc.text('DATA QUALITY WARNINGS', 14, curY);
+        curY += 5;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(80, 80, 80);
         for (const w of data.warnings.slice(0, 10)) {
-          doc.text(`• ${w.message}`, 14, curY); curY += 5;
+          doc.text(`• ${w.message}`, 18, curY); curY += 4.5;
         }
       }
 
-      // Page numbers on all pages
+      // ── Final Page Footers Loop (ONLY DRAW FOOTERS HERE ONCE) ───────────────────
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        doc.setFontSize(7); doc.setTextColor(150);
-        doc.text(`Page ${i} of ${totalPages}`, pW / 2, doc.internal.pageSize.getHeight() - 6, { align: 'center' });
-        doc.text('CONFIDENTIAL — Financial Report', pW - 10, doc.internal.pageSize.getHeight() - 6, { align: 'right' });
+        const footerY = pH - 8;
+
+        // Thin separator line
+        doc.setDrawColor(220, 220, 220);
+        doc.setLineWidth(0.3);
+        doc.line(14, footerY - 4, pW - 14, footerY - 4);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(120, 120, 120);
+
+        // Left
+        doc.text('Hindu Community Center', 14, footerY);
+        // Center
+        doc.text(`Page ${i} of ${totalPages}`, pW / 2, footerY, { align: 'center' });
+        // Right
+        doc.text('CONFIDENTIAL — Financial Report', pW - 14, footerY, { align: 'right' });
       }
 
       // Build filename
