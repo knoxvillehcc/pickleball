@@ -105,6 +105,7 @@ export default function IndiafestVendorDashboard() {
   const [editingReg,    setEditingReg]    = useState(null);
   const [resendingId,   setResendingId]   = useState(null);
   const [resendDone,    setResendDone]    = useState({});
+  const [refundingId,   setRefundingId]   = useState(null);
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/indiafest/vendor`
@@ -575,6 +576,51 @@ export default function IndiafestVendorDashboard() {
                                 ? '✅ Confirmation Sent!'
                                 : '✉️ Resend Confirmation'}
                             </button>
+                            {r.payment_status === 'paid' && r.stripe_payment_ref && (
+                              <button
+                                onClick={async () => {
+                                  const amt = ((r.amount_paid || 0) / 100).toFixed(2);
+                                  const ok = window.confirm(
+                                    `⚠️ REFUND CONFIRMATION\n\nYou are about to issue a FULL REFUND of $${amt} to:\n\n` +
+                                    `${r.first_name} ${r.last_name}\n${r.email}\nReg #${r.registration_number}\n\n` +
+                                    `This will refund the full amount back to their card via Stripe and update the status to "Refunded".\n\n` +
+                                    `This action CANNOT be undone. Continue?`
+                                  );
+                                  if (!ok) return;
+                                  setRefundingId(r.id);
+                                  try {
+                                    const res = await fetch('/api/indiafest/refund', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ id: r.id }),
+                                    });
+                                    const data = await res.json();
+                                    if (data.success) {
+                                      alert(`✅ Refund successful!\n\n$${data.amount_refunded.toFixed(2)} refunded to ${r.first_name} ${r.last_name}.\nStripe Refund ID: ${data.refund_id}`);
+                                      load();
+                                    } else {
+                                      alert('❌ Refund failed: ' + data.error);
+                                    }
+                                  } catch (err) {
+                                    alert('❌ Refund error: ' + err.message);
+                                  } finally {
+                                    setRefundingId(null);
+                                  }
+                                }}
+                                disabled={refundingId === r.id}
+                                style={{
+                                  padding: '8px 16px', borderRadius: '8px',
+                                  border: '1px solid rgba(148,163,184,0.4)',
+                                  backgroundColor: refundingId === r.id ? 'rgba(148,163,184,0.2)' : 'rgba(148,163,184,0.08)',
+                                  color: '#94A3B8',
+                                  fontWeight: '700', fontSize: '12.5px',
+                                  cursor: refundingId === r.id ? 'not-allowed' : 'pointer',
+                                  display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+                                }}
+                              >
+                                {refundingId === r.id ? '⏳ Processing Refund...' : '↩ Refund via Stripe'}
+                              </button>
+                            )}
                             <button
                               onClick={() => handleDeleteReg(r)}
                               style={{
