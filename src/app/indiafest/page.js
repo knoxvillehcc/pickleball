@@ -106,6 +106,9 @@ export default function IndiafestVendorDashboard() {
   const [resendingId,   setResendingId]   = useState(null);
   const [resendDone,    setResendDone]    = useState({});
   const [refundingId,   setRefundingId]   = useState(null);
+  const [syncingId,     setSyncingId]     = useState(null);
+  const [syncingAll,    setSyncingAll]    = useState(false);
+  const [syncResults,   setSyncResults]   = useState({});
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/indiafest/vendor`
@@ -431,6 +434,43 @@ export default function IndiafestVendorDashboard() {
               }
             </button>
           ))}
+
+          {/* Sync All to Odoo */}
+          <button onClick={async () => {
+            const paid = registrations.filter(r => r.payment_status === 'paid');
+            if (!paid.length) return alert('No paid registrations to sync');
+            if (!confirm(`Sync ${paid.length} paid registrations to Odoo?\n\nThis will create invoices and register payments.`)) return;
+            setSyncingAll(true);
+            try {
+              const res = await fetch('/api/indiafest/sync-to-odoo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ registrationIds: paid.map(r => r.id) }),
+              });
+              const data = await res.json();
+              if (data.success) {
+                const newResults = {};
+                for (const r of (data.results || [])) newResults[r.id] = r.status;
+                setSyncResults(prev => ({ ...prev, ...newResults }));
+                alert(`✅ Sync complete!\n\nCreated: ${data.summary.created}\nAlready exists: ${data.summary.existing}\nErrors: ${data.summary.errors}${data.feeResults?.length ? `\nFees tracked: ${data.feeResults.filter(f => f.status === 'created').length}` : ''}`);
+              } else {
+                alert('❌ Sync failed: ' + data.error);
+              }
+            } catch (err) {
+              alert('❌ Sync error: ' + err.message);
+            } finally {
+              setSyncingAll(false);
+            }
+          }} disabled={syncingAll} style={{
+            background: syncingAll ? 'rgba(99,102,241,0.3)' : 'linear-gradient(135deg, #6366F1, #4F46E5)',
+            color: 'white', fontWeight: '800', fontSize: '13px',
+            padding: '12px 20px', borderRadius: '10px', border: 'none',
+            cursor: syncingAll ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s',
+            boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
+          }}>
+            {syncingAll ? '⏳ Syncing All...' : '📤 Sync All to Odoo'}
+          </button>
         </div>
       </div>
 
@@ -576,6 +616,49 @@ export default function IndiafestVendorDashboard() {
                                 ? '✅ Confirmation Sent!'
                                 : '✉️ Resend Confirmation'}
                             </button>
+                            {r.payment_status === 'paid' && (
+                              <button
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  setSyncingId(r.id);
+                                  try {
+                                    const res = await fetch('/api/indiafest/sync-to-odoo', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ registrationIds: [r.id] }),
+                                    });
+                                    const data = await res.json();
+                                    if (data.success && data.results?.length) {
+                                      const result = data.results[0];
+                                      setSyncResults(prev => ({ ...prev, [r.id]: result.status }));
+                                      alert(result.status === 'created'
+                                        ? `✅ Invoice created in Odoo!\nInvoice ID: ${result.invoiceId}\nAmount: $${result.amount}`
+                                        : result.status === 'already_exists'
+                                        ? `ℹ️ Invoice already exists in Odoo (ID: ${result.invoiceId})`
+                                        : `❌ Error: ${result.error}`);
+                                    } else {
+                                      alert('❌ Sync failed: ' + (data.error || 'Unknown error'));
+                                    }
+                                  } catch (err) {
+                                    alert('❌ Sync error: ' + err.message);
+                                  } finally {
+                                    setSyncingId(null);
+                                  }
+                                }}
+                                disabled={syncingId === r.id}
+                                style={{
+                                  padding: '8px 16px', borderRadius: '8px',
+                                  border: `1px solid ${syncResults[r.id] === 'created' || syncResults[r.id] === 'already_exists' ? 'rgba(16,185,129,0.4)' : 'rgba(99,102,241,0.4)'}`,
+                                  backgroundColor: syncResults[r.id] === 'created' || syncResults[r.id] === 'already_exists' ? 'rgba(16,185,129,0.08)' : 'rgba(99,102,241,0.08)',
+                                  color: syncResults[r.id] === 'created' || syncResults[r.id] === 'already_exists' ? '#10B981' : '#818CF8',
+                                  fontWeight: '700', fontSize: '12.5px',
+                                  cursor: syncingId === r.id ? 'not-allowed' : 'pointer',
+                                  display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+                                }}
+                              >
+                                {syncingId === r.id ? '⏳ Syncing...' : syncResults[r.id] === 'created' ? '✅ Synced to Odoo' : syncResults[r.id] === 'already_exists' ? '✅ Already in Odoo' : '📤 Sync to Odoo'}
+                              </button>
+                            )}
                             {r.payment_status === 'paid' && r.stripe_payment_ref && (
                               <button
                                 onClick={async () => {
