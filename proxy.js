@@ -25,6 +25,7 @@ const PUBLIC_PREFIXES = [
   '/api/auth/login', '/api/auth/logout',
   '/api/pickleball/register', '/api/pickleball/webhook',
   '/api/pickleball/settings', '/api/health',
+  '/api/stripe/webhook',
   '/_next', '/favicon',
 ];
 
