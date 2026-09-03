@@ -45,3 +45,12 @@ credentials.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ── Local utility scripts (contain API keys) ──────────────────────────────────
+stripe_*.js
+check_*.js
+pos_*.js
+fix_*.js
+rollback_*.js
+discovery_*.js
+*_snapshot.json
