@@ -25,6 +25,7 @@ const navLinks = [
   { href: '/reports',           label: 'Membership',        icon: <ReportsIcon />,    slug: 'reports' },
   { href: '/reports/monthly',   label: 'Monthly Report',    icon: <CalIcon />,        slug: 'monthly' },
   { href: '/reports/pnl',       label: 'HCC P&L',           icon: <PnLIcon />,        slug: 'pnl' },
+  { href: '/reports/stripe',    label: 'Stripe Statement',  icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>💳</span>, slug: 'stripe' },
   { href: '/banner',            label: 'Banner In',         icon: <BannerIcon />,     slug: 'banner' },
   { href: '/pickleball',        label: 'Pickleball',        icon: <PBIcon />,         slug: 'pickleball' },
   { href: '/indiafest',         label: 'India Fest 2026',   icon: <IndiafestIcon />,  slug: 'indiafest' },

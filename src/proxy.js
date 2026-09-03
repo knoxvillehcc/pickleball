@@ -41,6 +41,7 @@ function getPageSlug(pathname) {
   if (pathname.startsWith('/api/dry-run'))       return 'dashboard';
   if (pathname.startsWith('/api/execute'))       return 'dashboard';
   if (pathname.startsWith('/reports/monthly'))  return 'monthly';
+  if (pathname.startsWith('/reports/stripe'))   return 'stripe';
   if (pathname.startsWith('/reports'))          return 'reports';
   if (pathname.startsWith('/banner'))           return 'banner';
   if (pathname.startsWith('/pickleball'))       return 'pickleball';
