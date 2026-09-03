@@ -64,10 +64,10 @@ export default function StripeStatementPage() {
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState('daily'); // 'daily' | 'transactions'
 
-  const fetchStatement = async () => {
+  const fetchStatement = async (refresh = false) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/stripe/statement?start=${startDate}&end=${endDate}`);
+      const res = await fetch(`/api/stripe/statement?start=${startDate}&end=${endDate}${refresh ? '&refresh=true' : ''}`);
       const json = await res.json();
       if (json.success) setData(json);
     } catch (err) {
@@ -77,18 +77,24 @@ export default function StripeStatementPage() {
     }
   };
 
+  const fmtDate = (d) => {
+    if (!d) return '';
+    const [y, m, dd] = d.split('-');
+    return `${m}-${dd}-${y.slice(2)}`;
+  };
+
   const fmt = (n) => '$' + (n || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
   const downloadPDF = () => {
     if (!data) return;
     const doc = new jsPDF('landscape');
-    const dateStr = new Date().toLocaleDateString();
+    const dateStr = fmtDate(new Date().toISOString().split('T')[0]);
 
     doc.setFontSize(20);
     doc.text('Stripe CC Payment Statement', 10, 15);
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text(`Period: ${startDate} to ${endDate}  |  Generated: ${dateStr}`, 10, 22);
+    doc.text(`Period: ${fmtDate(startDate)} to ${fmtDate(endDate)}  |  Generated: ${dateStr}`, 10, 22);
 
     // Summary
     autoTable(doc, {
@@ -109,7 +115,7 @@ export default function StripeStatementPage() {
       startY: doc.lastAutoTable.finalY + 10,
       head: [['Date', 'Charges', 'Gross', 'Fees', 'Net']],
       body: data.dailySummary.map(d => [
-        d.date,
+        fmtDate(d.date),
         d.count.toString(),
         fmt(d.gross),
         fmt(d.fee),
@@ -166,13 +172,19 @@ export default function StripeStatementPage() {
             </label>
             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={inputStyle} />
           </div>
-          <button onClick={fetchStatement} disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1, minWidth: '140px' }}>
+          <button onClick={() => fetchStatement(false)} disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1, minWidth: '140px' }}>
             {loading ? '⏳ Loading...' : '🔍 Generate'}
           </button>
           {data && (
             <>
               <button onClick={downloadPDF} style={btnSecondary}>📄 PDF</button>
               <button onClick={downloadCSV} style={btnSecondary}>📊 CSV</button>
+              <button onClick={() => fetchStatement(true)} disabled={loading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
+                🔄 Refresh from Stripe
+              </button>
+              <span style={{ fontSize: '11px', color: data.source === 'cache' ? '#10B981' : '#818CF8', alignSelf: 'center', fontWeight: '600' }}>
+                {data.source === 'cache' ? '⚡ Cached (instant)' : '☁️ Live from Stripe'}
+              </span>
             </>
           )}
         </div>
