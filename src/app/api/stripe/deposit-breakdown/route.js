@@ -229,8 +229,8 @@ async function resolveViaOdooWebsite(creds, uid, charge) {
       }
     }
 
-    // 3. Fallback: if we found the transaction but no product info, label it
-    return { category: 'Website Payment', orderName: refName };
+    // 3. Fallback: no sale order linked = donation (website donations don't create sale orders)
+    return { category: 'Donation', orderName: refName };
 
   } catch (err) {
     console.warn(`[deposit-breakdown] Odoo website lookup failed for ${charge.id}: ${err.message}`);
