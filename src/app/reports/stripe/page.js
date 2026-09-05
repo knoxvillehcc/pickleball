@@ -63,6 +63,9 @@ export default function StripeStatementPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState('daily'); // 'daily' | 'transactions'
+  const [topTab, setTopTab] = useState('statement'); // 'statement' | 'deposits'
+  const [depositData, setDepositData] = useState(null);
+  const [depositLoading, setDepositLoading] = useState(false);
 
   const fetchStatement = async (refresh = false) => {
     setLoading(true);
@@ -85,7 +88,22 @@ export default function StripeStatementPage() {
 
   const fmt = (n) => '$' + (n || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+  // ── Deposit Breakdown fetch ───────────────────────────────────────────────
+  const fetchDeposits = async (refresh = false) => {
+    setDepositLoading(true);
+    try {
+      const res = await fetch(`/api/stripe/deposit-breakdown?start=${startDate}&end=${endDate}${refresh ? '&refresh=true' : ''}`);
+      const json = await res.json();
+      if (json.success) setDepositData(json);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDepositLoading(false);
+    }
+  };
+
   const downloadPDF = () => {
+    if (topTab === 'deposits' && depositData) return downloadDepositPDF();
     if (!data) return;
     const doc = new jsPDF('landscape');
     const dateStr = fmtDate(new Date().toISOString().split('T')[0]);
@@ -128,6 +146,97 @@ export default function StripeStatementPage() {
     doc.save(`stripe-statement-${startDate}-to-${endDate}.pdf`);
   };
 
+  // ── Deposit Breakdown PDF ─────────────────────────────────────────────────
+  const downloadDepositPDF = () => {
+    if (!depositData) return;
+    const doc = new jsPDF('landscape');
+    const dateStr = fmtDate(new Date().toISOString().split('T')[0]);
+
+    doc.setFontSize(20);
+    doc.text('Stripe Deposit Breakdown', 10, 15);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Period: ${fmtDate(startDate)} to ${fmtDate(endDate)}  |  Generated: ${dateStr}`, 10, 22);
+
+    // Overall category summary
+    autoTable(doc, {
+      startY: 30,
+      head: [['Category', 'Charges', 'Gross', 'Fees', 'Net']],
+      body: depositData.summary.map(s => [
+        s.category,
+        s.charges.toString(),
+        fmt(s.gross),
+        fmt(s.fees),
+        fmt(s.net),
+      ]),
+      theme: 'grid',
+      headStyles: { fillColor: [255, 153, 51] },
+      foot: [['TOTAL', depositData.totals.charges.toString(), fmt(depositData.totals.gross), fmt(depositData.totals.fees), fmt(depositData.totals.deposited)]],
+      footStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold' },
+    });
+
+    // Per-payout breakdown
+    for (const po of depositData.payouts) {
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 12,
+        head: [[
+          { content: `Payout ${fmtDate(po.date)} — Deposited ${fmt(po.net)}`, colSpan: 5, styles: { fillColor: [30, 41, 59] } },
+        ]],
+        body: po.categories.map(c => [
+          c.category + (c.source === 'unmatched' ? ' ⚠️' : ''),
+          c.charges.toString(),
+          fmt(c.gross),
+          fmt(c.fees),
+          fmt(c.net),
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [30, 41, 59] },
+      });
+    }
+
+    doc.save(`stripe-deposits-${startDate}-to-${endDate}.pdf`);
+  };
+
+  // ── Deposit Breakdown CSV ─────────────────────────────────────────────────
+  const downloadDepositCSV = () => {
+    if (!depositData) return;
+    const rows = [
+      ['Payout Date', 'Payout Amount', 'Category', 'Charges', 'Gross', 'Fees', 'Net'],
+      ...depositData.payouts.flatMap(po =>
+        po.categories.map(c => [
+          po.date, po.net.toFixed(2), c.category, c.charges,
+          c.gross.toFixed(2), c.fees.toFixed(2), c.net.toFixed(2),
+        ])
+      ),
+    ];
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `stripe-deposits-${startDate}-to-${endDate}.csv`;
+    a.click();
+  };
+
+  // ── Unmatched Charges CSV ─────────────────────────────────────────────────
+  const downloadUnmatchedCSV = () => {
+    if (!depositData?.unmatchedCharges?.length) return;
+    const rows = [
+      ['Charge ID', 'Payout ID', 'Date', 'Amount', 'Fee', 'Customer', 'Description', 'Payment Intent'],
+      ...depositData.unmatchedCharges.map(u => [
+        u.chargeId, u.payoutId, u.date, u.amount.toFixed(2),
+        u.fee.toFixed(2), u.customer, u.description, u.paymentIntent,
+      ]),
+    ];
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `stripe-unmatched-charges-${startDate}-to-${endDate}.csv`;
+    a.click();
+  };
+
   const downloadCSV = () => {
     if (!data) return;
     const rows = view === 'daily'
@@ -148,13 +257,29 @@ export default function StripeStatementPage() {
   return (
     <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ marginBottom: '32px' }}>
+      <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
-          💳 Stripe Statement
+          💳 Stripe Reports
         </h1>
         <p style={{ color: 'var(--text-muted)', marginTop: '8px', fontSize: '14px' }}>
-          View charges, fees, and daily breakdown by date range
+          View charges, deposits, fees, and category breakdown
         </p>
+      </div>
+
+      {/* Top-level Tab Bar */}
+      <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', ...card, padding: '4px', width: 'fit-content' }}>
+        <button onClick={() => setTopTab('statement')}
+          style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
+            backgroundColor: topTab === 'statement' ? 'var(--accent)' : 'transparent',
+            color: topTab === 'statement' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
+          📊 Statement
+        </button>
+        <button onClick={() => setTopTab('deposits')}
+          style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
+            backgroundColor: topTab === 'deposits' ? 'var(--accent)' : 'transparent',
+            color: topTab === 'deposits' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
+          🏦 Deposit Breakdown
+        </button>
       </div>
 
       {/* Date Range Picker */}
@@ -172,19 +297,43 @@ export default function StripeStatementPage() {
             </label>
             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={inputStyle} />
           </div>
-          <button onClick={() => fetchStatement(false)} disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1, minWidth: '140px' }}>
-            {loading ? '⏳ Loading...' : '🔍 Generate'}
-          </button>
-          {data && (
+          {topTab === 'statement' ? (
             <>
-              <button onClick={downloadPDF} style={btnSecondary}>📄 PDF</button>
-              <button onClick={downloadCSV} style={btnSecondary}>📊 CSV</button>
-              <button onClick={() => fetchStatement(true)} disabled={loading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
-                🔄 Refresh from Stripe
+              <button onClick={() => fetchStatement(false)} disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1, minWidth: '140px' }}>
+                {loading ? '⏳ Loading...' : '🔍 Generate'}
               </button>
-              <span style={{ fontSize: '11px', color: data.source === 'cache' ? '#10B981' : '#818CF8', alignSelf: 'center', fontWeight: '600' }}>
-                {data.source === 'cache' ? '⚡ Cached (instant)' : '☁️ Live from Stripe'}
-              </span>
+              {data && (
+                <>
+                  <button onClick={downloadPDF} style={btnSecondary}>📄 PDF</button>
+                  <button onClick={downloadCSV} style={btnSecondary}>📊 CSV</button>
+                  <button onClick={() => fetchStatement(true)} disabled={loading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
+                    🔄 Refresh
+                  </button>
+                  <span style={{ fontSize: '11px', color: data.source === 'cache' ? '#10B981' : '#818CF8', alignSelf: 'center', fontWeight: '600' }}>
+                    {data.source === 'cache' ? '⚡ Cached' : '☁️ Live'}
+                  </span>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <button onClick={() => fetchDeposits(false)} disabled={depositLoading} style={{ ...btnPrimary, opacity: depositLoading ? 0.6 : 1, minWidth: '160px' }}>
+                {depositLoading ? '⏳ Resolving...' : '🏦 Load Deposits'}
+              </button>
+              {depositData && (
+                <>
+                  <button onClick={downloadDepositPDF} style={btnSecondary}>📄 PDF</button>
+                  <button onClick={downloadDepositCSV} style={btnSecondary}>📊 CSV</button>
+                  {depositData.unmatchedCharges?.length > 0 && (
+                    <button onClick={downloadUnmatchedCSV} style={{ ...btnSecondary, borderColor: 'rgba(251,191,36,0.4)', color: '#FBBF24' }}>
+                      ⚠️ Unmatched ({depositData.unmatchedCharges.length})
+                    </button>
+                  )}
+                  <button onClick={() => fetchDeposits(true)} disabled={depositLoading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
+                    🔄 Refresh
+                  </button>
+                </>
+              )}
             </>
           )}
         </div>
@@ -206,147 +355,305 @@ export default function StripeStatementPage() {
         </div>
       </div>
 
-      {/* Loading */}
-      {loading && (
-        <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
-          <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>💳</div>
-          <p style={{ color: 'var(--text-muted)' }}>Fetching charges from Stripe...</p>
-        </div>
-      )}
-
-      {/* Results */}
-      {data && !loading && (
+      {/* ═══ STATEMENT TAB ═══ */}
+      {topTab === 'statement' && (
         <>
-          {/* KPI Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-            <div style={kpiCard}>
-              <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Charges</span>
-              <span style={{ color: 'var(--text-primary)', fontSize: '28px', fontWeight: '700' }}>{data.totals.count}</span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{data.dailySummary.length} days</span>
-            </div>
-            <div style={kpiCard}>
-              <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gross Amount</span>
-              <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.gross)}</span>
-            </div>
-            <div style={kpiCard}>
-              <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Processing Fees</span>
-              <span style={{ color: '#f87171', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.fee)}</span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
-                {data.totals.gross > 0 ? ((data.totals.fee / data.totals.gross) * 100).toFixed(2) : '0'}% effective rate
-              </span>
-            </div>
-            <div style={kpiCard}>
-              <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Net Deposited</span>
-              <span style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.net)}</span>
-            </div>
-          </div>
-
-          {/* View Toggle */}
-          <div style={{ display: 'flex', gap: '4px', marginBottom: '16px', ...card, padding: '4px', width: 'fit-content' }}>
-            <button onClick={() => setView('daily')}
-              style={{ ...btnSecondary, padding: '8px 20px', fontSize: '13px', borderRadius: '10px',
-                backgroundColor: view === 'daily' ? 'var(--accent)' : 'transparent',
-                color: view === 'daily' ? '#fff' : 'var(--text-muted)', border: 'none' }}>
-              📅 Daily Summary
-            </button>
-            <button onClick={() => setView('transactions')}
-              style={{ ...btnSecondary, padding: '8px 20px', fontSize: '13px', borderRadius: '10px',
-                backgroundColor: view === 'transactions' ? 'var(--accent)' : 'transparent',
-                color: view === 'transactions' ? '#fff' : 'var(--text-muted)', border: 'none' }}>
-              💳 All Transactions
-            </button>
-          </div>
-
-          {/* Daily Summary Table */}
-          {view === 'daily' && (
-            <div style={{ ...card, overflow: 'hidden' }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
-                      {['Date', 'Charges', 'Gross', 'Fees', 'Net'].map(h => (
-                        <th key={h} style={{ padding: '14px 16px', textAlign: h === 'Date' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.dailySummary.map((d, i) => (
-                      <tr key={d.date} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
-                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
-                        onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>
-                          {new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                        </td>
-                        <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{d.count}</td>
-                        <td style={{ padding: '12px 16px', textAlign: 'right', color: '#4ade80', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(d.gross)}</td>
-                        <td style={{ padding: '12px 16px', textAlign: 'right', color: '#f87171', fontSize: '14px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(d.fee)}</td>
-                        <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(d.net)}</td>
-                      </tr>
-                    ))}
-                    {/* Totals row */}
-                    <tr style={{ backgroundColor: 'rgba(255, 153, 51, 0.08)' }}>
-                      <td style={{ padding: '14px 16px', color: 'var(--accent)', fontSize: '14px', fontWeight: '700' }}>TOTAL</td>
-                      <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px' }}>{data.totals.count}</td>
-                      <td style={{ padding: '14px 16px', textAlign: 'right', color: '#4ade80', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(data.totals.gross)}</td>
-                      <td style={{ padding: '14px 16px', textAlign: 'right', color: '#f87171', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(data.totals.fee)}</td>
-                      <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(data.totals.net)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+          {/* Loading */}
+          {loading && (
+            <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>💳</div>
+              <p style={{ color: 'var(--text-muted)' }}>Fetching charges from Stripe...</p>
             </div>
           )}
 
-          {/* All Transactions Table */}
-          {view === 'transactions' && (
-            <div style={{ ...card, overflow: 'hidden' }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
-                      {['Date', 'Time', 'Customer', 'Card', 'Amount', 'Fee', 'Net', 'Description'].map(h => (
-                        <th key={h} style={{ padding: '14px 16px', textAlign: ['Amount', 'Fee', 'Net'].includes(h) ? 'right' : 'left', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.charges.map((c, i) => (
-                      <tr key={c.id} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
-                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
-                        onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
-                        <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
-                          {new Date(c.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </td>
-                        <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.time}</td>
-                        <td style={{ padding: '10px 16px', color: 'var(--text-secondary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.customer || '—'}</td>
-                        <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
-                          {c.card_brand ? `${c.card_brand.toUpperCase()} ••${c.card_last4}` : '—'}
-                        </td>
-                        <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.amount)}</td>
-                        <td style={{ padding: '10px 16px', textAlign: 'right', color: '#f87171', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.fee)}</td>
-                        <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.net)}</td>
-                        <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '12px', borderBottom: '1px solid var(--border-table)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.description || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {/* Results */}
+          {data && !loading && (
+            <>
+              {/* KPI Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Charges</span>
+                  <span style={{ color: 'var(--text-primary)', fontSize: '28px', fontWeight: '700' }}>{data.totals.count}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{data.dailySummary.length} days</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gross Amount</span>
+                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.gross)}</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Processing Fees</span>
+                  <span style={{ color: '#f87171', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.fee)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
+                    {data.totals.gross > 0 ? ((data.totals.fee / data.totals.gross) * 100).toFixed(2) : '0'}% effective rate
+                  </span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Net Deposited</span>
+                  <span style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.net)}</span>
+                </div>
               </div>
+
+              {/* View Toggle */}
+              <div style={{ display: 'flex', gap: '4px', marginBottom: '16px', ...card, padding: '4px', width: 'fit-content' }}>
+                <button onClick={() => setView('daily')}
+                  style={{ ...btnSecondary, padding: '8px 20px', fontSize: '13px', borderRadius: '10px',
+                    backgroundColor: view === 'daily' ? 'var(--accent)' : 'transparent',
+                    color: view === 'daily' ? '#fff' : 'var(--text-muted)', border: 'none' }}>
+                  📅 Daily Summary
+                </button>
+                <button onClick={() => setView('transactions')}
+                  style={{ ...btnSecondary, padding: '8px 20px', fontSize: '13px', borderRadius: '10px',
+                    backgroundColor: view === 'transactions' ? 'var(--accent)' : 'transparent',
+                    color: view === 'transactions' ? '#fff' : 'var(--text-muted)', border: 'none' }}>
+                  💳 All Transactions
+                </button>
+              </div>
+
+              {/* Daily Summary Table */}
+              {view === 'daily' && (
+                <div style={{ ...card, overflow: 'hidden' }}>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                          {['Date', 'Charges', 'Gross', 'Fees', 'Net'].map(h => (
+                            <th key={h} style={{ padding: '14px 16px', textAlign: h === 'Date' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.dailySummary.map((d, i) => (
+                          <tr key={d.date} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                            <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>
+                              {new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            </td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{d.count}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: '#4ade80', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(d.gross)}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: '#f87171', fontSize: '14px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(d.fee)}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(d.net)}</td>
+                          </tr>
+                        ))}
+                        {/* Totals row */}
+                        <tr style={{ backgroundColor: 'rgba(255, 153, 51, 0.08)' }}>
+                          <td style={{ padding: '14px 16px', color: 'var(--accent)', fontSize: '14px', fontWeight: '700' }}>TOTAL</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px' }}>{data.totals.count}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: '#4ade80', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(data.totals.gross)}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: '#f87171', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(data.totals.fee)}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(data.totals.net)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* All Transactions Table */}
+              {view === 'transactions' && (
+                <div style={{ ...card, overflow: 'hidden' }}>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                          {['Date', 'Time', 'Customer', 'Card', 'Amount', 'Fee', 'Net', 'Description'].map(h => (
+                            <th key={h} style={{ padding: '14px 16px', textAlign: ['Amount', 'Fee', 'Net'].includes(h) ? 'right' : 'left', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.charges.map((c, i) => (
+                          <tr key={c.id} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
+                              {new Date(c.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </td>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.time}</td>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-secondary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.customer || '—'}</td>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
+                              {c.card_brand ? `${c.card_brand.toUpperCase()} ••${c.card_last4}` : '—'}
+                            </td>
+                            <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.amount)}</td>
+                            <td style={{ padding: '10px 16px', textAlign: 'right', color: '#f87171', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.fee)}</td>
+                            <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.net)}</td>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '12px', borderBottom: '1px solid var(--border-table)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.description || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Empty State */}
+          {!data && !loading && (
+            <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>💳</div>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Select a date range</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Choose start and end dates, then click Generate to view your Stripe statement</p>
             </div>
           )}
         </>
       )}
 
-      {/* Empty State */}
-      {!data && !loading && (
-        <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>💳</div>
-          <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Select a date range</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Choose start and end dates, then click Generate to view your Stripe statement</p>
-        </div>
+      {/* ═══ DEPOSIT BREAKDOWN TAB ═══ */}
+      {topTab === 'deposits' && (
+        <>
+          {/* Loading */}
+          {depositLoading && (
+            <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>🏦</div>
+              <p style={{ color: 'var(--text-muted)' }}>Resolving deposits and product categories...</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '8px' }}>First load may take 30-60s while querying Stripe + Odoo POS</p>
+            </div>
+          )}
+
+          {/* Deposit Results */}
+          {depositData && !depositLoading && (
+            <>
+              {/* KPI Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payouts</span>
+                  <span style={{ color: 'var(--text-primary)', fontSize: '28px', fontWeight: '700' }}>{depositData.totals.payouts}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{depositData.totals.charges} charges</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gross</span>
+                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(depositData.totals.gross)}</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Fees</span>
+                  <span style={{ color: '#f87171', fontSize: '28px', fontWeight: '700' }}>{fmt(depositData.totals.fees)}</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Deposited</span>
+                  <span style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: '700' }}>{fmt(depositData.totals.deposited)}</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Resolved</span>
+                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{depositData.totals.resolved}</span>
+                  <span style={{ color: depositData.totals.unmatched > 0 ? '#FBBF24' : 'var(--text-muted)', fontSize: '12px' }}>
+                    {depositData.totals.unmatched > 0 ? `${depositData.totals.unmatched} unmatched` : 'All matched ✓'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Overall Category Summary */}
+              <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Category Summary</h3>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{depositData.summary.length} categories</span>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                        {['Category', 'Source', 'Charges', 'Gross', 'Fees', 'Net'].map(h => (
+                          <th key={h} style={{ padding: '14px 16px', textAlign: ['Charges', 'Gross', 'Fees', 'Net'].includes(h) ? 'right' : 'left', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {depositData.summary.map((s, i) => (
+                        <tr key={s.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                          onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                          <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>
+                            {s.category === 'Unmatched' ? '⚠️ ' : ''}{s.category}
+                          </td>
+                          <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-table)' }}>
+                            <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', fontWeight: '600',
+                              backgroundColor: s.source === 'pos' ? 'rgba(16,185,129,0.15)' : s.source === 'checkout' ? 'rgba(99,102,241,0.15)' : 'rgba(251,191,36,0.15)',
+                              color: s.source === 'pos' ? '#10B981' : s.source === 'checkout' ? '#818CF8' : '#FBBF24' }}>
+                              {s.source === 'pos' ? 'POS' : s.source === 'checkout' ? 'Online' : 'Unknown'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{s.charges}</td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', color: '#4ade80', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(s.gross)}</td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', color: '#f87171', fontSize: '14px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(s.fees)}</td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(s.net)}</td>
+                        </tr>
+                      ))}
+                      <tr style={{ backgroundColor: 'rgba(255, 153, 51, 0.08)' }}>
+                        <td colSpan="2" style={{ padding: '14px 16px', color: 'var(--accent)', fontSize: '14px', fontWeight: '700' }}>TOTAL</td>
+                        <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px' }}>{depositData.totals.charges}</td>
+                        <td style={{ padding: '14px 16px', textAlign: 'right', color: '#4ade80', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(depositData.totals.gross)}</td>
+                        <td style={{ padding: '14px 16px', textAlign: 'right', color: '#f87171', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(depositData.totals.fees)}</td>
+                        <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(depositData.totals.deposited)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Per-Payout Cards */}
+              {depositData.payouts.map(po => (
+                <div key={po.payoutId} style={{ ...card, overflow: 'hidden', marginBottom: '16px' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                        🏦 {new Date(po.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '12px' }}>
+                        {po.chargeCount} charges
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '13px', color: '#4ade80', fontFamily: 'monospace', fontWeight: '500' }}>Gross: {fmt(po.gross)}</span>
+                      <span style={{ fontSize: '13px', color: '#f87171', fontFamily: 'monospace' }}>Fees: {fmt(po.fees)}</span>
+                      <span style={{ fontSize: '15px', color: 'var(--accent)', fontFamily: 'monospace', fontWeight: '700' }}>Deposited: {fmt(po.net)}</span>
+                    </div>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                          {['Category', 'Charges', 'Gross', 'Fees', 'Net'].map(h => (
+                            <th key={h} style={{ padding: '10px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {po.categories.map((c, i) => (
+                          <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent' }}>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>
+                              {c.source === 'unmatched' ? '⚠️ ' : c.source === 'pos' ? '🏪 ' : '🌐 '}{c.category}
+                            </td>
+                            <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.charges}</td>
+                            <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.gross)}</td>
+                            <td style={{ padding: '10px 16px', textAlign: 'right', color: '#f87171', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.fees)}</td>
+                            <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.net)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Empty State */}
+          {!depositData && !depositLoading && (
+            <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏦</div>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Deposit Breakdown</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Select a date range and click "Load Deposits" to see how each bank deposit breaks down by product category</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
