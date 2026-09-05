@@ -169,6 +169,75 @@ async function resolveViaPOS(creds, uid, paymentIntentId) {
   }
 }
 
+// ── Resolve category via Odoo Website Payment (payment.transaction) ───────────
+// Handles charges made through Odoo's website (knoxvillemandir.org) which use
+// payment.transaction with a "tx-" reference instead of POS or Checkout Sessions.
+async function resolveViaOdooWebsite(creds, uid, charge) {
+  // These charges have description like "tx-20260828104800" or metadata with webhook_url
+  const desc = charge.description || '';
+  const hasWebhook = charge.metadata?.webhook_url?.includes('knoxvillemandir');
+  if (!desc.startsWith('tx-') && !hasWebhook) return null;
+
+  try {
+    // 1. Look up payment.transaction by provider_reference (payment_intent)
+    const txns = await odooCall(creds, uid, 'payment.transaction', 'search_read', [
+      [['provider_reference', 'ilike', charge.payment_intent]]
+    ], { fields: ['id', 'reference', 'sale_order_ids', 'invoice_ids'], limit: 1 });
+
+    if (!txns.length) {
+      // Fallback: search by the tx- reference in the description
+      const txnsByRef = await odooCall(creds, uid, 'payment.transaction', 'search_read', [
+        [['reference', 'ilike', desc]]
+      ], { fields: ['id', 'reference', 'sale_order_ids', 'invoice_ids'], limit: 1 });
+      if (!txnsByRef.length) return null;
+      txns.push(txnsByRef[0]);
+    }
+
+    const txn = txns[0];
+    const refName = txn.reference || desc;
+
+    // 2. Get sale order lines → products → categories
+    if (txn.sale_order_ids?.length) {
+      const orderLines = await odooCall(creds, uid, 'sale.order.line', 'search_read', [
+        [['order_id', 'in', txn.sale_order_ids]]
+      ], { fields: ['product_id', 'price_subtotal'] });
+
+      if (orderLines.length) {
+        const productIds = [...new Set(orderLines.map(l => l.product_id?.[0]).filter(Boolean))];
+        if (productIds.length) {
+          const products = await odooCall(creds, uid, 'product.product', 'search_read', [
+            [['id', 'in', productIds]]
+          ], { fields: ['id', 'categ_id'] });
+
+          const categoryNames = new Set();
+          for (const prod of products) {
+            if (prod.categ_id) categoryNames.add(prod.categ_id[1]);
+          }
+          if (categoryNames.size === 1) return { category: [...categoryNames][0], orderName: refName };
+          if (categoryNames.size > 1) {
+            // Pick highest-value category
+            const catTotals = {};
+            for (const line of orderLines) {
+              const prod = products.find(p => p.id === line.product_id?.[0]);
+              const cat = prod?.categ_id?.[1] || 'Uncategorized';
+              catTotals[cat] = (catTotals[cat] || 0) + (line.price_subtotal || 0);
+            }
+            const top = Object.entries(catTotals).sort((a, b) => b[1] - a[1])[0][0];
+            return { category: top, orderName: refName };
+          }
+        }
+      }
+    }
+
+    // 3. Fallback: if we found the transaction but no product info, label it
+    return { category: 'Website Payment', orderName: refName };
+
+  } catch (err) {
+    console.warn(`[deposit-breakdown] Odoo website lookup failed for ${charge.id}: ${err.message}`);
+    return null;
+  }
+}
+
 // ── Batch resolve categories for charges ──────────────────────────────────────
 async function resolveCategories(stripe, charges, creds, uid) {
   const results = {};
@@ -226,6 +295,25 @@ async function resolveCategories(stripe, charges, creds, uid) {
           charge_date: new Date(ch.created * 1000).toISOString().split('T')[0],
           customer: ch.billing_details?.name || '',
           pos_order: posResult.orderName || null,
+        });
+        continue;
+      }
+
+      // Try Odoo Website Payment (payment.transaction with tx- reference)
+      const webResult = await resolveViaOdooWebsite(creds, uid, ch);
+      if (webResult) {
+        results[ch.id] = { category: webResult.category, source: 'pos', posOrder: webResult.orderName };
+        toCache.push({
+          charge_id: ch.id,
+          payout_id: ch._payoutId || null,
+          category: webResult.category,
+          source: 'pos',
+          amount: ch.amount / 100,
+          fee: ch._fee || 0,
+          net: (ch.amount / 100) - (ch._fee || 0),
+          charge_date: new Date(ch.created * 1000).toISOString().split('T')[0],
+          customer: ch.billing_details?.name || ch.receipt_email || '',
+          pos_order: webResult.orderName || null,
         });
         continue;
       }
@@ -371,6 +459,20 @@ export async function GET(request) {
               net: (ch.amount / 100) - (ch._fee || 0),
               charge_date: new Date(ch.created * 1000).toISOString().split('T')[0],
               customer: ch.billing_details?.name || '', pos_order: posResult.orderName || null,
+            });
+            continue;
+          }
+
+          // Try Odoo Website Payment (payment.transaction with tx- reference)
+          const webResult = await resolveViaOdooWebsite(creds, uid, ch);
+          if (webResult) {
+            categoryMap[ch.id] = { category: webResult.category, source: 'pos', posOrder: webResult.orderName };
+            toCache.push({
+              charge_id: ch.id, payout_id: ch._payoutId, category: webResult.category,
+              source: 'pos', amount: ch.amount / 100, fee: ch._fee || 0,
+              net: (ch.amount / 100) - (ch._fee || 0),
+              charge_date: new Date(ch.created * 1000).toISOString().split('T')[0],
+              customer: ch.billing_details?.name || ch.receipt_email || '', pos_order: webResult.orderName || null,
             });
             continue;
           }
