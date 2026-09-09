@@ -99,6 +99,11 @@ async function discoverPaymentMethods(creds, uid) {
     const name = (pm.name || '').toLowerCase();
     const jName = pm.journal_id ? pm.journal_id[1].toLowerCase() : '';
 
+    // Skip Stripe / card terminal methods — these are captured by Stripe Statement tab
+    if (name.includes('stripe') || name.includes('credit card') || name.includes('square')) {
+      continue;
+    }
+
     if (name.includes('check') || jName.includes('check')) {
       checkMethodIds.push(pm.id);
       methodNameMap[pm.id] = 'Check';

@@ -63,12 +63,14 @@ export default function StripeStatementPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState('daily'); // 'daily' | 'transactions'
-  const [topTab, setTopTab] = useState('statement'); // 'statement' | 'deposits' | 'cashcheck'
+  const [topTab, setTopTab] = useState('statement'); // 'statement' | 'deposits' | 'cashcheck' | 'invoices'
   const [depositData, setDepositData] = useState(null);
   const [depositLoading, setDepositLoading] = useState(false);
   const [cashCheckData, setCashCheckData] = useState(null);
   const [cashCheckLoading, setCashCheckLoading] = useState(false);
   const [cashCheckView, setCashCheckView] = useState('monthly'); // 'monthly' | 'daily' | 'transactions'
+  const [invoiceData, setInvoiceData] = useState(null);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
 
   const fetchStatement = async (refresh = false) => {
     setLoading(true);
@@ -119,9 +121,115 @@ export default function StripeStatementPage() {
     }
   };
 
+  // ── Invoices fetch ────────────────────────────────────────────────────────
+  const fetchInvoices = async () => {
+    setInvoiceLoading(true);
+    try {
+      const res = await fetch(`/api/reports/invoices?start=${startDate}&end=${endDate}`);
+      const json = await res.json();
+      if (json.success) setInvoiceData(json);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setInvoiceLoading(false);
+    }
+  };
+
+  // ── Invoice PDF ───────────────────────────────────────────────────────────
+  const downloadInvoicePDF = () => {
+    if (!invoiceData) return;
+    const doc = new jsPDF('landscape');
+
+    const pdfDate = (d) => {
+      if (!d) return '';
+      const dt = new Date(d + 'T12:00:00');
+      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    doc.setFontSize(20);
+    doc.setTextColor(30, 41, 59);
+    doc.text('Non-POS Invoice Report', 10, 15);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Period: ${pdfDate(startDate)} to ${pdfDate(endDate)}  |  Generated: ${pdfDate(new Date().toISOString().split('T')[0])}`, 10, 22);
+
+    // Summary
+    autoTable(doc, {
+      startY: 30,
+      head: [['Status', '# Invoices', 'Amount']],
+      body: [
+        ['Paid', invoiceData.totals.countPaid.toString(), fmt(invoiceData.totals.paid)],
+        ['Unpaid', invoiceData.totals.countUnpaid.toString(), fmt(invoiceData.totals.unpaid)],
+      ],
+      foot: [['TOTAL', invoiceData.totals.countAll.toString(), fmt(invoiceData.totals.all)]],
+      theme: 'grid',
+      headStyles: { fillColor: [99, 102, 241], textColor: [255, 255, 255] },
+      footStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold' },
+    });
+
+    // Category summary
+    if (invoiceData.categorySummary.length > 0) {
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 10,
+        head: [['Category', '# Invoices', 'Paid', 'Unpaid', 'Total']],
+        body: invoiceData.categorySummary.map(c => [
+          c.category, c.count.toString(), fmt(c.paid), c.unpaid > 0 ? fmt(c.unpaid) : '-', fmt(c.total),
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [30, 41, 59] },
+      });
+    }
+
+    // Invoice list
+    doc.addPage();
+    doc.setFontSize(16);
+    doc.setTextColor(30, 41, 59);
+    doc.text(`All Invoices (${invoiceData.invoices.length})`, 10, 15);
+
+    autoTable(doc, {
+      startY: 22,
+      head: [['Date', 'Invoice #', 'Customer', 'Amount', 'Balance', 'Status', 'Category']],
+      body: invoiceData.invoices.map(inv => [
+        pdfDate(inv.date),
+        inv.number,
+        inv.customer || '-',
+        fmt(inv.amount),
+        inv.residual > 0 ? fmt(inv.residual) : '-',
+        inv.status === 'paid' ? 'Paid' : inv.status === 'partial' ? 'Partial' : 'Unpaid',
+        inv.category,
+      ]),
+      theme: 'striped',
+      headStyles: { fillColor: [30, 41, 59] },
+      styles: { fontSize: 7 },
+      columnStyles: { 2: { cellWidth: 50 } },
+    });
+
+    doc.save(`invoices-${startDate}-to-${endDate}.pdf`);
+  };
+
+  // ── Invoice CSV ───────────────────────────────────────────────────────────
+  const downloadInvoiceCSV = () => {
+    if (!invoiceData) return;
+    const rows = [
+      ['Date', 'Invoice #', 'Customer', 'Amount', 'Balance', 'Status', 'Category', 'Origin'],
+      ...invoiceData.invoices.map(inv => [
+        inv.date, inv.number, inv.customer, inv.amount.toFixed(2),
+        inv.residual.toFixed(2), inv.status, inv.category, inv.origin,
+      ]),
+    ];
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoices-${startDate}-to-${endDate}.csv`;
+    a.click();
+  };
+
   const downloadPDF = () => {
     if (topTab === 'cashcheck' && cashCheckData) return downloadCashCheckPDF();
     if (topTab === 'deposits' && depositData) return downloadDepositPDF();
+    if (topTab === 'invoices' && invoiceData) return downloadInvoicePDF();
     if (!data) return;
     const doc = new jsPDF('landscape');
     const dateStr = fmtDate(new Date().toISOString().split('T')[0]);
@@ -257,6 +365,7 @@ export default function StripeStatementPage() {
 
   const downloadCSV = () => {
     if (topTab === 'cashcheck' && cashCheckData) return downloadCashCheckCSV();
+    if (topTab === 'invoices' && invoiceData) return downloadInvoiceCSV();
     if (!data) return;
     const rows = view === 'daily'
       ? [['Date', 'Charges', 'Gross', 'Fees', 'Net'],
@@ -492,6 +601,12 @@ export default function StripeStatementPage() {
             color: topTab === 'cashcheck' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
           💵 Cash/Check
         </button>
+        <button onClick={() => setTopTab('invoices')}
+          style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
+            backgroundColor: topTab === 'invoices' ? 'var(--accent)' : 'transparent',
+            color: topTab === 'invoices' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
+          📋 Invoices
+        </button>
       </div>
 
       {/* Date Range Picker */}
@@ -544,6 +659,18 @@ export default function StripeStatementPage() {
                   <button onClick={() => fetchDeposits(true)} disabled={depositLoading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
                     🔄 Refresh
                   </button>
+                </>
+              )}
+            </>
+          ) : topTab === 'invoices' ? (
+            <>
+              <button onClick={fetchInvoices} disabled={invoiceLoading} style={{ ...btnPrimary, opacity: invoiceLoading ? 0.6 : 1, minWidth: '160px' }}>
+                {invoiceLoading ? '⏳ Loading...' : '📋 Load Invoices'}
+              </button>
+              {invoiceData && (
+                <>
+                  <button onClick={downloadInvoicePDF} style={btnSecondary}>📄 PDF</button>
+                  <button onClick={downloadInvoiceCSV} style={btnSecondary}>📊 CSV</button>
                 </>
               )}
             </>
@@ -1164,6 +1291,123 @@ export default function StripeStatementPage() {
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>💵</div>
               <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Cash & Check Report</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Select a date range and click &quot;Generate Report&quot; to see cash and check payments grouped by month and product category</p>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ═══ INVOICES TAB ═══ */}
+      {topTab === 'invoices' && (
+        <>
+          {invoiceLoading && (
+            <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>📋</div>
+              <p style={{ color: 'var(--text-muted)' }}>Loading non-POS invoices from Odoo...</p>
+            </div>
+          )}
+
+          {invoiceData && !invoiceLoading && (
+            <>
+              {/* KPI Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>✅ Paid</span>
+                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(invoiceData.totals.paid)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{invoiceData.totals.countPaid} invoices</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏳ Unpaid</span>
+                  <span style={{ color: '#f87171', fontSize: '28px', fontWeight: '700' }}>{fmt(invoiceData.totals.unpaid)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{invoiceData.totals.countUnpaid} invoices</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Invoiced</span>
+                  <span style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: '700' }}>{fmt(invoiceData.totals.all)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{invoiceData.totals.countAll} invoices (excl. {invoiceData.excluded?.posInvoices || 0} POS)</span>
+                </div>
+              </div>
+
+              {/* Category Summary */}
+              {invoiceData.categorySummary && invoiceData.categorySummary.length > 0 && (
+                <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Category Summary</h3>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{invoiceData.categorySummary.length} categories</span>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                          {['Category', '# Invoices', 'Paid', 'Unpaid', 'Total'].map(h => (
+                            <th key={h} style={{ padding: '14px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {invoiceData.categorySummary.map((c, i) => (
+                          <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                            <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>{c.category}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{c.count}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: '#4ade80', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.paid)}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: '#f87171', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{c.unpaid > 0 ? fmt(c.unpaid) : '—'}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.total)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Invoice List */}
+              <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📋 All Invoices</h3>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{invoiceData.invoices.length} invoices</span>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                        {['Date', 'Invoice #', 'Customer', 'Amount', 'Balance', 'Status', 'Category'].map(h => (
+                          <th key={h} style={{ padding: '14px 16px', textAlign: ['Amount', 'Balance'].includes(h) ? 'right' : 'left', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {invoiceData.invoices.map((inv, i) => (
+                        <tr key={inv.id} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                          onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                          <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{fmtDate(inv.date)}</td>
+                          <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '12px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{inv.number}</td>
+                          <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.customer || '—'}</td>
+                          <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{fmt(inv.amount)}</td>
+                          <td style={{ padding: '10px 16px', textAlign: 'right', color: inv.residual > 0 ? '#f87171' : '#4ade80', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{inv.residual > 0 ? fmt(inv.residual) : '—'}</td>
+                          <td style={{ padding: '10px 16px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
+                            <span style={{ fontSize: '11px', fontWeight: '600', padding: '3px 10px', borderRadius: '6px',
+                              backgroundColor: ['paid', 'in_payment'].includes(inv.status) ? 'rgba(74, 222, 128, 0.12)' : inv.status === 'partial' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(248, 113, 113, 0.12)',
+                              color: ['paid', 'in_payment'].includes(inv.status) ? '#4ade80' : inv.status === 'partial' ? '#FBBF24' : '#f87171' }}>
+                              {inv.status === 'paid' ? 'Paid' : inv.status === 'in_payment' ? 'In Payment' : inv.status === 'partial' ? 'Partial' : 'Unpaid'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{inv.category}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
+          {!invoiceData && !invoiceLoading && (
+            <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Non-POS Invoices</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Shows invoices not captured by POS or Stripe — sale orders, facility rentals, manual invoices</p>
             </div>
           )}
         </>
