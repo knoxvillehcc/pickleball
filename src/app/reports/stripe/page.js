@@ -446,7 +446,7 @@ export default function StripeStatementPage() {
     const dateStr = fmtDate(new Date().toISOString().split('T')[0]);
 
     doc.setFontSize(20);
-    doc.text('Stripe CC Payment Statement', 10, 15);
+    doc.text('HCC Bank Statement — Stripe CC Payments', 10, 15);
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Period: ${fmtDate(startDate)} to ${fmtDate(endDate)}  |  Generated: ${dateStr}`, 10, 22);
@@ -480,7 +480,7 @@ export default function StripeStatementPage() {
       headStyles: { fillColor: [15, 23, 42] },
     });
 
-    doc.save(`stripe-statement-${startDate}-to-${endDate}.pdf`);
+    doc.save(`bank-statement-${startDate}-to-${endDate}.pdf`);
   };
 
   // ── Deposit Breakdown PDF ─────────────────────────────────────────────────
@@ -798,7 +798,7 @@ export default function StripeStatementPage() {
           style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
             backgroundColor: topTab === 'statement' ? 'var(--accent)' : 'transparent',
             color: topTab === 'statement' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
-          📊 Statement
+          🏦 Bank Statement
         </button>
         <button onClick={() => setTopTab('deposits')}
           style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
@@ -1080,7 +1080,7 @@ export default function StripeStatementPage() {
             <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>💳</div>
               <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Select a date range</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Choose start and end dates, then click Generate to view your Stripe statement</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Choose start and end dates, then click Generate to view your bank statement</p>
             </div>
           )}
         </>
