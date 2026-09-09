@@ -277,40 +277,61 @@ export default function StripeStatementPage() {
   const downloadCashCheckPDF = () => {
     if (!cashCheckData) return;
     const doc = new jsPDF('landscape');
-    const dateStr = fmtDate(new Date().toISOString().split('T')[0]);
 
+    // Readable date formatter for PDF
+    const pdfDate = (d) => {
+      if (!d) return '';
+      const dt = new Date(d + 'T12:00:00');
+      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    const generatedDate = pdfDate(new Date().toISOString().split('T')[0]);
+
+    // Title
     doc.setFontSize(20);
+    doc.setTextColor(30, 41, 59);
     doc.text('Cash & Check Transaction Report', 10, 15);
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text(`Period: ${fmtDate(startDate)} to ${fmtDate(endDate)}  |  Generated: ${dateStr}`, 10, 22);
+    doc.text(`Period: ${pdfDate(startDate)} to ${pdfDate(endDate)}  |  Generated: ${generatedDate}  |  Source: ${cashCheckData.source || 'live'}`, 10, 22);
 
     // Overall summary
     autoTable(doc, {
       startY: 30,
-      head: [['Type', '# Payments', 'Amount']],
+      head: [['Payment Type', '# Payments', 'Amount']],
       body: [
-        ['💵 Cash', cashCheckData.totals.cashCount.toString(), fmt(cashCheckData.totals.cash)],
-        ['📝 Check', cashCheckData.totals.checkCount.toString(), fmt(cashCheckData.totals.check)],
+        ['Cash', cashCheckData.totals.cashCount.toString(), fmt(cashCheckData.totals.cash)],
+        ['Check', cashCheckData.totals.checkCount.toString(), fmt(cashCheckData.totals.check)],
       ],
       foot: [['TOTAL', cashCheckData.totals.totalCount.toString(), fmt(cashCheckData.totals.total)]],
       theme: 'grid',
-      headStyles: { fillColor: [255, 153, 51] },
+      headStyles: { fillColor: [255, 153, 51], textColor: [255, 255, 255] },
       footStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold' },
     });
 
     // Category summary
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 10,
-      head: [['Category', 'Cash #', 'Cash $', 'Check #', 'Check $', 'Total']],
-      body: cashCheckData.summary.map(s => [
-        s.category,
-        s.cashCount.toString(),
-        fmt(s.cashAmount),
-        s.checkCount.toString(),
-        fmt(s.checkAmount),
-        fmt(s.totalAmount),
-      ]),
+      head: [['Category', 'Cash #', 'Cash Amount', 'Check #', 'Check Amount', 'Total']],
+      body: [
+        ...cashCheckData.summary.map(s => [
+          s.category,
+          s.cashCount.toString(),
+          fmt(s.cashAmount),
+          s.checkCount.toString(),
+          fmt(s.checkAmount),
+          fmt(s.totalAmount),
+        ]),
+        // Totals row
+        [
+          { content: 'TOTAL', styles: { fontStyle: 'bold' } },
+          { content: cashCheckData.totals.cashCount.toString(), styles: { fontStyle: 'bold' } },
+          { content: fmt(cashCheckData.totals.cash), styles: { fontStyle: 'bold' } },
+          { content: cashCheckData.totals.checkCount.toString(), styles: { fontStyle: 'bold' } },
+          { content: fmt(cashCheckData.totals.check), styles: { fontStyle: 'bold' } },
+          { content: fmt(cashCheckData.totals.total), styles: { fontStyle: 'bold' } },
+        ],
+      ],
       theme: 'striped',
       headStyles: { fillColor: [30, 41, 59] },
     });
@@ -325,19 +346,93 @@ export default function StripeStatementPage() {
 
       if (allCats.length === 0) continue;
 
+      // Check if we need a new page (if close to bottom)
+      if (doc.lastAutoTable && doc.lastAutoTable.finalY > 160) {
+        doc.addPage();
+      }
+
       autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 12,
+        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 30,
         head: [[
-          { content: `${mo.label} — ${mo.totalCount} payments = ${fmt(mo.total)}`, colSpan: 4, styles: { fillColor: [30, 41, 59] } },
+          { content: `${mo.label} - ${mo.totalCount} payments = ${fmt(mo.total)}`, colSpan: 4, styles: { fillColor: [30, 41, 59] } },
         ]],
         body: allCats.map(c => [
-          c.type === 'Cash' ? '💵' : '📝',
+          c.type,
           c.category,
           c.count.toString(),
           fmt(c.amount),
         ]),
         theme: 'striped',
         headStyles: { fillColor: [30, 41, 59] },
+        columnStyles: {
+          0: { cellWidth: 30 },
+        },
+      });
+    }
+
+    // Daily Summary page
+    if (cashCheckData.dailySummary && cashCheckData.dailySummary.length > 0) {
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.setTextColor(30, 41, 59);
+      doc.text('Daily Summary', 10, 15);
+
+      autoTable(doc, {
+        startY: 22,
+        head: [['Date', 'Cash #', 'Cash Amount', 'Check #', 'Check Amount', 'Total #', 'Total Amount']],
+        body: [
+          ...cashCheckData.dailySummary.map(d => [
+            pdfDate(d.date),
+            d.cashCount.toString(),
+            d.cashAmount > 0 ? fmt(d.cashAmount) : '-',
+            d.checkCount.toString(),
+            d.checkAmount > 0 ? fmt(d.checkAmount) : '-',
+            d.totalCount.toString(),
+            fmt(d.total),
+          ]),
+          // Totals row
+          [
+            { content: 'TOTAL', styles: { fontStyle: 'bold' } },
+            { content: cashCheckData.totals.cashCount.toString(), styles: { fontStyle: 'bold' } },
+            { content: fmt(cashCheckData.totals.cash), styles: { fontStyle: 'bold' } },
+            { content: cashCheckData.totals.checkCount.toString(), styles: { fontStyle: 'bold' } },
+            { content: fmt(cashCheckData.totals.check), styles: { fontStyle: 'bold' } },
+            { content: cashCheckData.totals.totalCount.toString(), styles: { fontStyle: 'bold' } },
+            { content: fmt(cashCheckData.totals.total), styles: { fontStyle: 'bold' } },
+          ],
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: [255, 153, 51], textColor: [255, 255, 255] },
+        styles: { fontSize: 8 },
+      });
+    }
+
+    // All Transactions pages
+    if (cashCheckData.transactions && cashCheckData.transactions.length > 0) {
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.setTextColor(30, 41, 59);
+      doc.text(`All Transactions (${cashCheckData.transactions.length} payments)`, 10, 15);
+
+      autoTable(doc, {
+        startY: 22,
+        head: [['Date', 'Time', 'Customer', 'Method', 'Amount', 'Category', 'Order Ref']],
+        body: cashCheckData.transactions.map(tx => [
+          pdfDate(tx.date),
+          tx.time ? tx.time.substring(0, 5) : '-',
+          tx.customer || '-',
+          tx.method,
+          fmt(tx.amount),
+          tx.category,
+          tx.orderRef || '-',
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [30, 41, 59] },
+        styles: { fontSize: 7 },
+        columnStyles: {
+          2: { cellWidth: 50 },  // Customer
+          5: { cellWidth: 40 },  // Category
+        },
       });
     }
 
