@@ -1794,6 +1794,75 @@ export default function StripeStatementPage() {
                     </div>
                   );
                 })}
+
+                {/* POS Cash/Check Category Summary */}
+                {fullReport.cashCheckCategories && fullReport.cashCheckCategories.length > 0 && (
+                  <div style={{ ...card, overflow: 'hidden', marginBottom: '16px' }}>
+                    <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(74,222,128,0.08), rgba(251,191,36,0.04))' }}>
+                      <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>POS Categories (Cash/Check)</h3>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{fullReport.cashCheckCategories.length} categories</span>
+                    </div>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                            {['Category', 'Cash #', 'Cash Amount', 'Check #', 'Check Amount', 'Total'].map(h => (
+                              <th key={h} style={{ padding: '12px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {fullReport.cashCheckCategories.map((c, i) => (
+                            <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                              onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>{c.category}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.cashCount}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.cashAmount)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.checkCount}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#FBBF24', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{c.checkAmount > 0 ? fmt(c.checkAmount) : '\u2014'}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.totalAmount)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Invoice Category Summary */}
+                {fullReport.invoiceCategories && fullReport.invoiceCategories.length > 0 && (
+                  <div style={{ ...card, overflow: 'hidden', marginBottom: '16px' }}>
+                    <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(56,189,248,0.08), rgba(99,102,241,0.04))' }}>
+                      <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>Invoice Categories (Non-POS)</h3>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{fullReport.invoiceCategories.length} categories</span>
+                    </div>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                            {['Category', '# Invoices', 'Paid', 'Unpaid', 'Total'].map(h => (
+                              <th key={h} style={{ padding: '12px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {fullReport.invoiceCategories.map((c, i) => (
+                            <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                              onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>{c.category}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.count}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.paid)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#f87171', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{c.unpaid > 0 ? fmt(c.unpaid) : '\u2014'}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.total)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </>
             );
           })()}
