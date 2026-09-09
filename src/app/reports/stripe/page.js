@@ -68,6 +68,7 @@ export default function StripeStatementPage() {
   const [depositLoading, setDepositLoading] = useState(false);
   const [cashCheckData, setCashCheckData] = useState(null);
   const [cashCheckLoading, setCashCheckLoading] = useState(false);
+  const [cashCheckView, setCashCheckView] = useState('monthly'); // 'monthly' | 'daily' | 'transactions'
 
   const fetchStatement = async (refresh = false) => {
     setLoading(true);
@@ -105,10 +106,10 @@ export default function StripeStatementPage() {
   };
 
   // ── Cash/Check fetch ───────────────────────────────────────────────────────
-  const fetchCashCheck = async () => {
+  const fetchCashCheck = async (refresh = false) => {
     setCashCheckLoading(true);
     try {
-      const res = await fetch(`/api/reports/cash-check?start=${startDate}&end=${endDate}`);
+      const res = await fetch(`/api/reports/cash-check?start=${startDate}&end=${endDate}${refresh ? '&refresh=true' : ''}`);
       const json = await res.json();
       if (json.success) setCashCheckData(json);
     } catch (err) {
@@ -453,13 +454,19 @@ export default function StripeStatementPage() {
             </>
           ) : (
             <>
-              <button onClick={() => fetchCashCheck()} disabled={cashCheckLoading} style={{ ...btnPrimary, opacity: cashCheckLoading ? 0.6 : 1, minWidth: '160px' }}>
+              <button onClick={() => fetchCashCheck(false)} disabled={cashCheckLoading} style={{ ...btnPrimary, opacity: cashCheckLoading ? 0.6 : 1, minWidth: '160px' }}>
                 {cashCheckLoading ? '⏳ Loading...' : '💵 Generate Report'}
               </button>
               {cashCheckData && (
                 <>
                   <button onClick={downloadCashCheckPDF} style={btnSecondary}>📄 PDF</button>
                   <button onClick={downloadCashCheckCSV} style={btnSecondary}>📊 CSV</button>
+                  <button onClick={() => fetchCashCheck(true)} disabled={cashCheckLoading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
+                    🔄 Refresh
+                  </button>
+                  <span style={{ fontSize: '11px', color: cashCheckData.source === 'cache' ? '#10B981' : '#818CF8', alignSelf: 'center', fontWeight: '600' }}>
+                    {cashCheckData.source === 'cache' ? '⚡ Cached' : '☁️ Live'}
+                  </span>
                 </>
               )}
             </>
@@ -818,135 +825,241 @@ export default function StripeStatementPage() {
                 </div>
               </div>
 
-              {/* Category Summary Table */}
-              <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Category Summary</h3>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cashCheckData.summary.length} categories</span>
-                </div>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
-                        {['Category', 'Cash #', 'Cash $', 'Check #', 'Check $', 'Total'].map(h => (
-                          <th key={h} style={{ padding: '14px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {cashCheckData.summary.map((s, i) => (
-                        <tr key={s.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
-                          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
-                          onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
-                          <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>
-                            {s.category}
-                          </td>
-                          <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{s.cashCount || '—'}</td>
-                          <td style={{ padding: '12px 16px', textAlign: 'right', color: '#4ade80', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{s.cashAmount > 0 ? fmt(s.cashAmount) : '—'}</td>
-                          <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{s.checkCount || '—'}</td>
-                          <td style={{ padding: '12px 16px', textAlign: 'right', color: '#818CF8', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{s.checkAmount > 0 ? fmt(s.checkAmount) : '—'}</td>
-                          <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(s.totalAmount)}</td>
-                        </tr>
-                      ))}
-                      <tr style={{ backgroundColor: 'rgba(255, 153, 51, 0.08)' }}>
-                        <td style={{ padding: '14px 16px', color: 'var(--accent)', fontSize: '14px', fontWeight: '700' }}>TOTAL</td>
-                        <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '700', fontSize: '14px' }}>{cashCheckData.totals.cashCount}</td>
-                        <td style={{ padding: '14px 16px', textAlign: 'right', color: '#4ade80', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.cash)}</td>
-                        <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '700', fontSize: '14px' }}>{cashCheckData.totals.checkCount}</td>
-                        <td style={{ padding: '14px 16px', textAlign: 'right', color: '#818CF8', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.check)}</td>
-                        <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.total)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              {/* Sub-tab toggle: Monthly / Daily / Transactions */}
+              <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', ...card, padding: '4px', width: 'fit-content' }}>
+                {[['monthly', '📅 Monthly'], ['daily', '📆 Daily Summary'], ['transactions', '💳 All Transactions']].map(([key, label]) => (
+                  <button key={key} onClick={() => setCashCheckView(key)}
+                    style={{ ...btnSecondary, padding: '8px 18px', fontSize: '13px', borderRadius: '10px',
+                      backgroundColor: cashCheckView === key ? 'var(--accent)' : 'transparent',
+                      color: cashCheckView === key ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
+                    {label}
+                  </button>
+                ))}
               </div>
 
-              {/* Per-Month Breakdown */}
-              {Object.entries(cashCheckData.months)
-                .sort(([a], [b]) => b.localeCompare(a))
-                .map(([monthKey, mo]) => (
-                <div key={monthKey} style={{ ...card, overflow: 'hidden', marginBottom: '16px' }}>
-                  <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                        📅 {mo.label}
-                      </span>
-                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '12px' }}>
-                        {mo.totalCount} payments
-                      </span>
+              {/* ── MONTHLY VIEW ── */}
+              {cashCheckView === 'monthly' && (
+                <>
+                  {/* Category Summary Table */}
+                  <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Category Summary</h3>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cashCheckData.summary.length} categories</span>
                     </div>
-                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                      <span style={{ fontSize: '13px', color: '#4ade80', fontFamily: 'monospace', fontWeight: '500' }}>💵 {fmt(mo.cashTotal)}</span>
-                      <span style={{ fontSize: '13px', color: '#818CF8', fontFamily: 'monospace' }}>📝 {fmt(mo.checkTotal)}</span>
-                      <span style={{ fontSize: '15px', color: 'var(--accent)', fontFamily: 'monospace', fontWeight: '700' }}>Total: {fmt(mo.total)}</span>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                            {['Category', 'Cash #', 'Cash $', 'Check #', 'Check $', 'Total'].map(h => (
+                              <th key={h} style={{ padding: '14px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
+                                {h}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {cashCheckData.summary.map((s, i) => (
+                            <tr key={s.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                              onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                              <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>
+                                {s.category}
+                              </td>
+                              <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{s.cashCount || '—'}</td>
+                              <td style={{ padding: '12px 16px', textAlign: 'right', color: '#4ade80', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{s.cashAmount > 0 ? fmt(s.cashAmount) : '—'}</td>
+                              <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{s.checkCount || '—'}</td>
+                              <td style={{ padding: '12px 16px', textAlign: 'right', color: '#818CF8', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{s.checkAmount > 0 ? fmt(s.checkAmount) : '—'}</td>
+                              <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(s.totalAmount)}</td>
+                            </tr>
+                          ))}
+                          <tr style={{ backgroundColor: 'rgba(255, 153, 51, 0.08)' }}>
+                            <td style={{ padding: '14px 16px', color: 'var(--accent)', fontSize: '14px', fontWeight: '700' }}>TOTAL</td>
+                            <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '700', fontSize: '14px' }}>{cashCheckData.totals.cashCount}</td>
+                            <td style={{ padding: '14px 16px', textAlign: 'right', color: '#4ade80', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.cash)}</td>
+                            <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '700', fontSize: '14px' }}>{cashCheckData.totals.checkCount}</td>
+                            <td style={{ padding: '14px 16px', textAlign: 'right', color: '#818CF8', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.check)}</td>
+                            <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.total)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
 
-                  {/* Cash categories */}
-                  {mo.cashCategories.length > 0 && (
-                    <div style={{ padding: '12px 20px 0' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ade80', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💵 Cash — {mo.cashCount} payments</span>
-                    </div>
-                  )}
-                  {mo.cashCategories.length > 0 && (
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                          <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
-                            {['Category', 'Payments', 'Amount'].map(h => (
-                              <th key={h} style={{ padding: '10px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
-                                {h}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {mo.cashCategories.map((c, i) => (
-                            <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent' }}>
-                              <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>{c.category}</td>
-                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.count}</td>
-                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.amount)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                  {/* Per-Month Breakdown */}
+                  {Object.entries(cashCheckData.months)
+                    .sort(([a], [b]) => b.localeCompare(a))
+                    .map(([monthKey, mo]) => (
+                    <div key={monthKey} style={{ ...card, overflow: 'hidden', marginBottom: '16px' }}>
+                      <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                        <div>
+                          <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                            📅 {mo.label}
+                          </span>
+                          <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '12px' }}>
+                            {mo.totalCount} payments
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                          <span style={{ fontSize: '13px', color: '#4ade80', fontFamily: 'monospace', fontWeight: '500' }}>💵 {fmt(mo.cashTotal)}</span>
+                          <span style={{ fontSize: '13px', color: '#818CF8', fontFamily: 'monospace' }}>📝 {fmt(mo.checkTotal)}</span>
+                          <span style={{ fontSize: '15px', color: 'var(--accent)', fontFamily: 'monospace', fontWeight: '700' }}>Total: {fmt(mo.total)}</span>
+                        </div>
+                      </div>
 
-                  {/* Check categories */}
-                  {mo.checkCategories.length > 0 && (
-                    <div style={{ padding: '12px 20px 0' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#818CF8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📝 Check — {mo.checkCount} payments</span>
+                      {mo.cashCategories.length > 0 && (
+                        <div style={{ padding: '12px 20px 0' }}>
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ade80', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💵 Cash — {mo.cashCount} payments</span>
+                        </div>
+                      )}
+                      {mo.cashCategories.length > 0 && (
+                        <div style={{ overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                              <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                                {['Category', 'Payments', 'Amount'].map(h => (
+                                  <th key={h} style={{ padding: '10px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
+                                    {h}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {mo.cashCategories.map((c, i) => (
+                                <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent' }}>
+                                  <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>{c.category}</td>
+                                  <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.count}</td>
+                                  <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.amount)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {mo.checkCategories.length > 0 && (
+                        <div style={{ padding: '12px 20px 0' }}>
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#818CF8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📝 Check — {mo.checkCount} payments</span>
+                        </div>
+                      )}
+                      {mo.checkCategories.length > 0 && (
+                        <div style={{ overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                              <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                                {['Category', 'Payments', 'Amount'].map(h => (
+                                  <th key={h} style={{ padding: '10px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
+                                    {h}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {mo.checkCategories.map((c, i) => (
+                                <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent' }}>
+                                  <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>{c.category}</td>
+                                  <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.count}</td>
+                                  <td style={{ padding: '10px 16px', textAlign: 'right', color: '#818CF8', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.amount)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {mo.checkCategories.length > 0 && (
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                          <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
-                            {['Category', 'Payments', 'Amount'].map(h => (
-                              <th key={h} style={{ padding: '10px 16px', textAlign: h === 'Category' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
-                                {h}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {mo.checkCategories.map((c, i) => (
-                            <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent' }}>
-                              <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>{c.category}</td>
-                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.count}</td>
-                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#818CF8', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.amount)}</td>
-                            </tr>
+                  ))}
+                </>
+              )}
+
+              {/* ── DAILY SUMMARY VIEW ── */}
+              {cashCheckView === 'daily' && cashCheckData.dailySummary && (
+                <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📆 Daily Summary</h3>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cashCheckData.dailySummary.length} days</span>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                          {['Date', 'Cash #', 'Cash $', 'Check #', 'Check $', 'Total #', 'Total $'].map(h => (
+                            <th key={h} style={{ padding: '14px 16px', textAlign: h === 'Date' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>
+                              {h}
+                            </th>
                           ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cashCheckData.dailySummary.map((d, i) => (
+                          <tr key={d.date} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                            <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>{fmtDate(d.date)}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{d.cashCount || '—'}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: '#4ade80', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{d.cashAmount > 0 ? fmt(d.cashAmount) : '—'}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{d.checkCount || '—'}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: '#818CF8', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{d.checkAmount > 0 ? fmt(d.checkAmount) : '—'}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', fontWeight: '600', borderBottom: '1px solid var(--border-table)' }}>{d.totalCount}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(d.total)}</td>
+                          </tr>
+                        ))}
+                        <tr style={{ backgroundColor: 'rgba(255, 153, 51, 0.08)' }}>
+                          <td style={{ padding: '14px 16px', color: 'var(--accent)', fontSize: '14px', fontWeight: '700' }}>TOTAL</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '700', fontSize: '14px' }}>{cashCheckData.totals.cashCount}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: '#4ade80', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.cash)}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '700', fontSize: '14px' }}>{cashCheckData.totals.checkCount}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: '#818CF8', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.check)}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '700', fontSize: '14px' }}>{cashCheckData.totals.totalCount}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontWeight: '700', fontSize: '14px', fontFamily: 'monospace' }}>{fmt(cashCheckData.totals.total)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              ))}
+              )}
+
+              {/* ── ALL TRANSACTIONS VIEW ── */}
+              {cashCheckView === 'transactions' && cashCheckData.transactions && (
+                <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>💳 All Transactions</h3>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cashCheckData.transactions.length} payments</span>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                          {['Date', 'Time', 'Customer', 'Method', 'Amount', 'Category', 'Order Ref'].map(h => (
+                            <th key={h} style={{ padding: '14px 16px', textAlign: h === 'Amount' ? 'right' : 'left', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cashCheckData.transactions.map((tx, i) => (
+                          <tr key={tx.id} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{fmtDate(tx.date)}</td>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{tx.time ? tx.time.substring(0, 5) : '—'}</td>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.customer || '—'}</td>
+                            <td style={{ padding: '10px 16px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
+                              <span style={{ fontSize: '11px', fontWeight: '600', padding: '3px 10px', borderRadius: '6px',
+                                backgroundColor: tx.method === 'Cash' ? 'rgba(74, 222, 128, 0.12)' : 'rgba(129, 140, 248, 0.12)',
+                                color: tx.method === 'Cash' ? '#4ade80' : '#818CF8' }}>
+                                {tx.method === 'Cash' ? '💵' : '📝'} {tx.method}
+                              </span>
+                            </td>
+                            <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{fmt(tx.amount)}</td>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{tx.category}</td>
+                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '12px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{tx.orderRef || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </>
           )}
 
