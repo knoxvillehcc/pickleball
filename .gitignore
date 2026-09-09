@@ -54,3 +54,14 @@ fix_*.js
 rollback_*.js
 discovery_*.js
 *_snapshot.json
+investigate_unmatched.js
+check_partners.js
+stripe_fix_partners.js
+stripe_historical_sync.js
+stripe_sync_batch.js
+stripe_sync_dryrun.js
+stripe_sync_single_test.js
+compare_revenue.js
+investigate_invoices.js
+cash_check_discovery.js
+cash_check_dryrun.js

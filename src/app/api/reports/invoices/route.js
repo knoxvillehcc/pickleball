@@ -18,14 +18,69 @@ import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
+// ── Supabase helpers ──────────────────────────────────────────────────────────
+function supabaseHeaders() {
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+  return {
+    'apikey': key,
+    'Authorization': `Bearer ${key}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation',
+  };
+}
+
+async function getCachedReport(startDate, endDate) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  if (!SUPABASE_URL) return null;
+  try {
+    const cacheKey = `invoices_${startDate}_${endDate}`;
+    const url = `${SUPABASE_URL}/rest/v1/report_cache?cache_key=eq.${cacheKey}&select=*&limit=1`;
+    const res = await fetch(url, { headers: supabaseHeaders(), cache: 'no-store' });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows.length > 0) return rows[0];
+    }
+  } catch (err) {
+    console.warn('[invoices] Cache read error:', err.message);
+  }
+  return null;
+}
+
+async function setCachedReport(startDate, endDate, data) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  if (!SUPABASE_URL) return;
+  try {
+    const cacheKey = `invoices_${startDate}_${endDate}`;
+    const url = `${SUPABASE_URL}/rest/v1/report_cache`;
+    // Upsert
+    await fetch(url, {
+      method: 'POST',
+      headers: { ...supabaseHeaders(), 'Prefer': 'resolution=merge-duplicates,return=representation' },
+      body: JSON.stringify({ cache_key: cacheKey, report_data: data, updated_at: new Date().toISOString() }),
+    });
+  } catch (err) {
+    console.warn('[invoices] Cache write error:', err.message);
+  }
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('start');
     const endDate = searchParams.get('end');
+    const refresh = searchParams.get('refresh') === 'true';
 
     if (!startDate || !endDate) {
       return NextResponse.json({ error: 'start and end dates required' }, { status: 400 });
+    }
+
+    // Check cache first (unless refresh requested)
+    if (!refresh) {
+      const cached = await getCachedReport(startDate, endDate);
+      if (cached && cached.report_data) {
+        console.log(`[invoices] Returning cached data for ${startDate} to ${endDate}`);
+        return NextResponse.json({ ...cached.report_data, source: 'cache', cachedAt: cached.updated_at });
+      }
     }
 
     // ── 1. Authenticate ─────────────────────────────────────────────────────
@@ -101,6 +156,36 @@ export async function GET(request) {
       }
     }
 
+    // ── 5b. Get payment journal info for each invoice ───────────────────────
+    const invoiceIds = nonPosInvoices.map(inv => inv.id);
+    const paymentsByInvoice = {};
+
+    // Fetch account.payment records that reconcile with these invoices
+    // We look at account.move.line entries on the invoices that are reconciled
+    for (let i = 0; i < invoiceIds.length; i += 200) {
+      const batch = invoiceIds.slice(i, i + 200);
+      try {
+        const payments = await odooCall(creds, uid, 'account.payment', 'search_read', [
+          [['reconciled_invoice_ids', 'in', batch]]
+        ], {
+          fields: ['id', 'amount', 'journal_id', 'payment_method_line_id', 'reconciled_invoice_ids'],
+          limit: 5000,
+        });
+
+        for (const pay of payments) {
+          const jName = pay.journal_id ? pay.journal_id[1] : '';
+          for (const invId of (pay.reconciled_invoice_ids || [])) {
+            if (batch.includes(invId)) {
+              if (!paymentsByInvoice[invId]) paymentsByInvoice[invId] = [];
+              paymentsByInvoice[invId].push(jName);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[invoices] payment lookup batch failed:', err.message);
+      }
+    }
+
     // ── 6. Build response ───────────────────────────────────────────────────
     let totalPaid = 0, totalUnpaid = 0, totalPartial = 0, totalAll = 0;
     let countPaid = 0, countUnpaid = 0, countPartial = 0;
@@ -171,6 +256,7 @@ export async function GET(request) {
         origin,
         category,
         isRefund,
+        paymentJournal: paymentsByInvoice[inv.id] ? [...new Set(paymentsByInvoice[inv.id])].join(', ') : '',
       });
     }
 
@@ -197,7 +283,7 @@ export async function GET(request) {
       }))
       .sort((a, b) => b.month.localeCompare(a.month));
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       dateRange: { start: startDate, end: endDate },
       totals: {
@@ -215,7 +301,12 @@ export async function GET(request) {
       categorySummary,
       monthlySummary,
       invoices,
-    });
+    };
+
+    // Cache to Supabase for instant next load
+    await setCachedReport(startDate, endDate, responseData);
+
+    return NextResponse.json({ ...responseData, source: 'live' });
 
   } catch (error) {
     console.error('[invoices] Error:', error);

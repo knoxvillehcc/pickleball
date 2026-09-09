@@ -63,7 +63,7 @@ export default function StripeStatementPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState('daily'); // 'daily' | 'transactions'
-  const [topTab, setTopTab] = useState('statement'); // 'statement' | 'deposits' | 'cashcheck' | 'invoices'
+  const [topTab, setTopTab] = useState('statement'); // 'statement' | 'deposits' | 'cashcheck' | 'invoices' | 'fullreport'
   const [depositData, setDepositData] = useState(null);
   const [depositLoading, setDepositLoading] = useState(false);
   const [cashCheckData, setCashCheckData] = useState(null);
@@ -71,6 +71,8 @@ export default function StripeStatementPage() {
   const [cashCheckView, setCashCheckView] = useState('monthly'); // 'monthly' | 'daily' | 'transactions'
   const [invoiceData, setInvoiceData] = useState(null);
   const [invoiceLoading, setInvoiceLoading] = useState(false);
+  const [fullReport, setFullReport] = useState(null);
+  const [fullReportLoading, setFullReportLoading] = useState(false);
 
   const fetchStatement = async (refresh = false) => {
     setLoading(true);
@@ -224,6 +226,215 @@ export default function StripeStatementPage() {
     a.href = url;
     a.download = `invoices-${startDate}-to-${endDate}.csv`;
     a.click();
+  };
+
+  // ── Full Monthly Report ───────────────────────────────────────────────────
+  const fetchFullReport = async () => {
+    setFullReportLoading(true);
+    try {
+      const [stripeRes, cashCheckRes, invoiceRes] = await Promise.all([
+        fetch(`/api/stripe/statement?start=${startDate}&end=${endDate}`).then(r => r.json()),
+        fetch(`/api/reports/cash-check?start=${startDate}&end=${endDate}`).then(r => r.json()),
+        fetch(`/api/reports/invoices?start=${startDate}&end=${endDate}`).then(r => r.json()),
+      ]);
+
+      // Build monthly combined data
+      const months = {};
+
+      // Stripe data by month
+      let stripeGross = 0, stripeFees = 0, stripeNet = 0, stripeCount = 0;
+      if (stripeRes?.charges) {
+        for (const ch of stripeRes.charges) {
+          const mk = ch.date?.substring(0, 7) || '';
+          if (!months[mk]) months[mk] = { stripe: { gross: 0, fees: 0, net: 0, count: 0 }, cash: 0, check: 0, invoices: { paid: 0, unpaid: 0, count: 0 }, cashCount: 0, checkCount: 0 };
+          months[mk].stripe.gross += ch.amount || 0;
+          months[mk].stripe.fees += ch.fee || 0;
+          months[mk].stripe.net += ch.net || 0;
+          months[mk].stripe.count++;
+          stripeGross += ch.amount || 0;
+          stripeFees += ch.fee || 0;
+          stripeNet += ch.net || 0;
+          stripeCount++;
+        }
+      }
+
+      // Cash/Check data by month
+      let totalCash = 0, totalCheck = 0, cashCount = 0, checkCount = 0;
+      let cashCheckCategories = [];
+      if (cashCheckRes?.success) {
+        totalCash = cashCheckRes.totals?.cash || 0;
+        totalCheck = cashCheckRes.totals?.check || 0;
+        cashCount = cashCheckRes.totals?.cashCount || 0;
+        checkCount = cashCheckRes.totals?.checkCount || 0;
+        cashCheckCategories = cashCheckRes.summary || [];
+
+        if (cashCheckRes.months) {
+          for (const [mk, mo] of Object.entries(cashCheckRes.months)) {
+            if (!months[mk]) months[mk] = { stripe: { gross: 0, fees: 0, net: 0, count: 0 }, cash: 0, check: 0, invoices: { paid: 0, unpaid: 0, count: 0 }, cashCount: 0, checkCount: 0 };
+            months[mk].cash = mo.cashTotal || 0;
+            months[mk].check = mo.checkTotal || 0;
+            months[mk].cashCount = mo.cashCount || 0;
+            months[mk].checkCount = mo.checkCount || 0;
+          }
+        }
+      }
+
+      // Invoice data by month
+      let invPaid = 0, invUnpaid = 0, invCount = 0;
+      let invoiceCategories = [];
+      let invoiceList = [];
+      if (invoiceRes?.success) {
+        invPaid = invoiceRes.totals?.paid || 0;
+        invUnpaid = invoiceRes.totals?.unpaid || 0;
+        invCount = invoiceRes.totals?.countAll || 0;
+        invoiceCategories = invoiceRes.categorySummary || [];
+        invoiceList = invoiceRes.invoices || [];
+
+        if (invoiceRes.monthlySummary) {
+          for (const mo of invoiceRes.monthlySummary) {
+            const mk = mo.month;
+            if (!months[mk]) months[mk] = { stripe: { gross: 0, fees: 0, net: 0, count: 0 }, cash: 0, check: 0, invoices: { paid: 0, unpaid: 0, count: 0 }, cashCount: 0, checkCount: 0 };
+            months[mk].invoices.paid = mo.paid || 0;
+            months[mk].invoices.unpaid = mo.unpaid || 0;
+            months[mk].invoices.count = mo.count || 0;
+          }
+        }
+      }
+
+      const grandTotal = stripeGross + totalCash + totalCheck + invPaid + invUnpaid;
+
+      setFullReport({
+        months,
+        totals: { stripeGross, stripeFees, stripeNet, stripeCount, totalCash, totalCheck, cashCount, checkCount, invPaid, invUnpaid, invCount, grandTotal },
+        cashCheckCategories,
+        invoiceCategories,
+        invoiceList,
+      });
+    } catch (err) {
+      console.error('Full report error:', err);
+    } finally {
+      setFullReportLoading(false);
+    }
+  };
+
+  const downloadFullReportPDF = () => {
+    if (!fullReport) return;
+    const doc = new jsPDF('landscape');
+    const t = fullReport.totals;
+
+    const pdfDate = (d) => {
+      if (!d) return '';
+      const dt = new Date(d + 'T12:00:00');
+      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    // Title
+    doc.setFontSize(22);
+    doc.setTextColor(30, 41, 59);
+    doc.text('HCC Full Monthly Revenue Report', 10, 15);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Period: ${pdfDate(startDate)} to ${pdfDate(endDate)}  |  Generated: ${pdfDate(new Date().toISOString().split('T')[0])}`, 10, 22);
+
+    // Grand Summary
+    autoTable(doc, {
+      startY: 30,
+      head: [['Revenue Source', 'Count', 'Gross', 'Fees', 'Net / Amount']],
+      body: [
+        ['Stripe (Card)', t.stripeCount.toString(), fmt(t.stripeGross), fmt(t.stripeFees), fmt(t.stripeNet)],
+        ['Cash (POS)', t.cashCount.toString(), fmt(t.totalCash), '-', fmt(t.totalCash)],
+        ['Check (POS)', t.checkCount.toString(), fmt(t.totalCheck), '-', fmt(t.totalCheck)],
+        ['Invoices (Paid)', '', fmt(t.invPaid), '-', fmt(t.invPaid)],
+        ['Invoices (Unpaid)', '', fmt(t.invUnpaid), '-', fmt(t.invUnpaid)],
+      ],
+      foot: [['GRAND TOTAL', '', fmt(t.grandTotal), fmt(t.stripeFees), fmt(t.grandTotal - t.stripeFees)]],
+      theme: 'grid',
+      headStyles: { fillColor: [99, 102, 241], textColor: [255, 255, 255] },
+      footStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold' },
+    });
+
+    // Monthly breakdown
+    const sortedMonths = Object.entries(fullReport.months).sort(([a], [b]) => b.localeCompare(a));
+    for (const [mk, mo] of sortedMonths) {
+      const dt = new Date(mk + '-15');
+      const label = dt.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+      const moTotal = mo.stripe.gross + mo.cash + mo.check + mo.invoices.paid + mo.invoices.unpaid;
+
+      if (doc.lastAutoTable && doc.lastAutoTable.finalY > 155) doc.addPage();
+
+      autoTable(doc, {
+        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 30,
+        head: [[{ content: `${label} - Total: ${fmt(moTotal)}`, colSpan: 5, styles: { fillColor: [30, 41, 59] } }]],
+        body: [
+          ['Stripe', mo.stripe.count.toString(), fmt(mo.stripe.gross), fmt(mo.stripe.fees), fmt(mo.stripe.net)],
+          ['Cash', mo.cashCount.toString(), fmt(mo.cash), '-', fmt(mo.cash)],
+          ['Check', mo.checkCount.toString(), fmt(mo.check), '-', fmt(mo.check)],
+          ['Invoices (Paid)', '', fmt(mo.invoices.paid), '-', fmt(mo.invoices.paid)],
+          ['Invoices (Unpaid)', '', fmt(mo.invoices.unpaid), '-', fmt(mo.invoices.unpaid)],
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: [30, 41, 59] },
+      });
+    }
+
+    // Cash/Check Categories
+    if (fullReport.cashCheckCategories.length > 0) {
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.setTextColor(30, 41, 59);
+      doc.text('POS Categories (Cash/Check)', 10, 15);
+
+      autoTable(doc, {
+        startY: 22,
+        head: [['Category', 'Cash #', 'Cash Amount', 'Check #', 'Check Amount', 'Total']],
+        body: fullReport.cashCheckCategories.map(c => [
+          c.category, c.cashCount.toString(), fmt(c.cashAmount), c.checkCount.toString(), fmt(c.checkAmount), fmt(c.totalAmount),
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [255, 153, 51], textColor: [255, 255, 255] },
+        styles: { fontSize: 8 },
+      });
+    }
+
+    // Invoice Categories
+    if (fullReport.invoiceCategories.length > 0) {
+      if (doc.lastAutoTable && doc.lastAutoTable.finalY > 155) doc.addPage();
+
+      autoTable(doc, {
+        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 12 : 22,
+        head: [['Invoice Category', '# Invoices', 'Paid', 'Unpaid', 'Total']],
+        body: fullReport.invoiceCategories.map(c => [
+          c.category, c.count.toString(), fmt(c.paid), c.unpaid > 0 ? fmt(c.unpaid) : '-', fmt(c.total),
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [99, 102, 241], textColor: [255, 255, 255] },
+        styles: { fontSize: 8 },
+      });
+    }
+
+    // Invoice List
+    if (fullReport.invoiceList.length > 0) {
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.setTextColor(30, 41, 59);
+      doc.text(`Non-POS Invoices (${fullReport.invoiceList.length})`, 10, 15);
+
+      autoTable(doc, {
+        startY: 22,
+        head: [['Date', 'Invoice #', 'Customer', 'Amount', 'Status', 'Paid Via', 'Category']],
+        body: fullReport.invoiceList.map(inv => [
+          pdfDate(inv.date), inv.number, inv.customer || '-', fmt(inv.amount),
+          inv.status === 'paid' ? 'Paid' : inv.status === 'partial' ? 'Partial' : 'Unpaid',
+          inv.paymentJournal || '-', inv.category,
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [30, 41, 59] },
+        styles: { fontSize: 7 },
+        columnStyles: { 2: { cellWidth: 45 } },
+      });
+    }
+
+    doc.save(`full-monthly-report-${startDate}-to-${endDate}.pdf`);
   };
 
   const downloadPDF = () => {
@@ -607,6 +818,12 @@ export default function StripeStatementPage() {
             color: topTab === 'invoices' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
           📋 Invoices
         </button>
+        <button onClick={() => setTopTab('fullreport')}
+          style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
+            backgroundColor: topTab === 'fullreport' ? 'var(--accent)' : 'transparent',
+            color: topTab === 'fullreport' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
+          📈 Full Report
+        </button>
       </div>
 
       {/* Date Range Picker */}
@@ -672,6 +889,15 @@ export default function StripeStatementPage() {
                   <button onClick={downloadInvoicePDF} style={btnSecondary}>📄 PDF</button>
                   <button onClick={downloadInvoiceCSV} style={btnSecondary}>📊 CSV</button>
                 </>
+              )}
+            </>
+          ) : topTab === 'fullreport' ? (
+            <>
+              <button onClick={fetchFullReport} disabled={fullReportLoading} style={{ ...btnPrimary, opacity: fullReportLoading ? 0.6 : 1, minWidth: '200px' }}>
+                {fullReportLoading ? '⏳ Loading all sources...' : '📈 Generate Full Report'}
+              </button>
+              {fullReport && (
+                <button onClick={downloadFullReportPDF} style={btnSecondary}>📄 Full PDF</button>
               )}
             </>
           ) : (
@@ -1371,7 +1597,7 @@ export default function StripeStatementPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
-                        {['Date', 'Invoice #', 'Customer', 'Amount', 'Balance', 'Status', 'Category'].map(h => (
+                        {['Date', 'Invoice #', 'Customer', 'Amount', 'Balance', 'Status', 'Paid Via', 'Category'].map(h => (
                           <th key={h} style={{ padding: '14px 16px', textAlign: ['Amount', 'Balance'].includes(h) ? 'right' : 'left', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{h}</th>
                         ))}
                       </tr>
@@ -1393,6 +1619,7 @@ export default function StripeStatementPage() {
                               {inv.status === 'paid' ? 'Paid' : inv.status === 'in_payment' ? 'In Payment' : inv.status === 'partial' ? 'Partial' : 'Unpaid'}
                             </span>
                           </td>
+                          <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{inv.paymentJournal || '—'}</td>
                           <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{inv.category}</td>
                         </tr>
                       ))}
@@ -1408,6 +1635,174 @@ export default function StripeStatementPage() {
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
               <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Non-POS Invoices</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Shows invoices not captured by POS or Stripe — sale orders, facility rentals, manual invoices</p>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ═══ FULL MONTHLY REPORT TAB ═══ */}
+      {topTab === 'fullreport' && (
+        <>
+          {fullReportLoading && (
+            <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>📈</div>
+              <p style={{ color: 'var(--text-muted)' }}>Loading Stripe + Cash/Check + Invoices...</p>
+            </div>
+          )}
+
+          {fullReport && !fullReportLoading && (() => {
+            const t = fullReport.totals;
+            const sortedMonths = Object.entries(fullReport.months).sort(([a], [b]) => b.localeCompare(a));
+            return (
+              <>
+                {/* Grand Summary KPI */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+                  <div style={kpiCard}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💳 Stripe Gross</span>
+                    <span style={{ color: '#818CF8', fontSize: '24px', fontWeight: '700' }}>{fmt(t.stripeGross)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.stripeCount} charges</span>
+                  </div>
+                  <div style={kpiCard}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Stripe Fees</span>
+                    <span style={{ color: '#f87171', fontSize: '24px', fontWeight: '700' }}>-{fmt(t.stripeFees)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.stripeGross > 0 ? ((t.stripeFees / t.stripeGross) * 100).toFixed(2) : 0}% rate</span>
+                  </div>
+                  <div style={kpiCard}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💵 Cash</span>
+                    <span style={{ color: '#4ade80', fontSize: '24px', fontWeight: '700' }}>{fmt(t.totalCash)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.cashCount} payments</span>
+                  </div>
+                  <div style={kpiCard}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📝 Check</span>
+                    <span style={{ color: '#FBBF24', fontSize: '24px', fontWeight: '700' }}>{fmt(t.totalCheck)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.checkCount} payments</span>
+                  </div>
+                  <div style={kpiCard}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📋 Invoices</span>
+                    <span style={{ color: '#38BDF8', fontSize: '24px', fontWeight: '700' }}>{fmt(t.invPaid + t.invUnpaid)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.invCount} invoices ({t.invUnpaid > 0 ? fmt(t.invUnpaid) + ' unpaid' : 'all paid'})</span>
+                  </div>
+                  <div style={{ ...kpiCard, borderColor: 'var(--accent)', borderWidth: '2px' }}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Grand Total</span>
+                    <span style={{ color: 'var(--accent)', fontSize: '24px', fontWeight: '700' }}>{fmt(t.grandTotal)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Net: {fmt(t.grandTotal - t.stripeFees)}</span>
+                  </div>
+                </div>
+
+                {/* Revenue Source Breakdown Table */}
+                <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Revenue by Source</h3>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                          {['Source', 'Count', 'Gross', 'Fees', 'Net / Amount'].map(h => (
+                            <th key={h} style={{ padding: '14px 16px', textAlign: h === 'Source' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { src: '💳 Stripe (Card)', count: t.stripeCount, gross: t.stripeGross, fees: t.stripeFees, net: t.stripeNet, color: '#818CF8' },
+                          { src: '💵 Cash (POS)', count: t.cashCount, gross: t.totalCash, fees: 0, net: t.totalCash, color: '#4ade80' },
+                          { src: '📝 Check (POS)', count: t.checkCount, gross: t.totalCheck, fees: 0, net: t.totalCheck, color: '#FBBF24' },
+                          { src: '📋 Invoices (Paid)', count: '', gross: t.invPaid, fees: 0, net: t.invPaid, color: '#38BDF8' },
+                          { src: '📋 Invoices (Unpaid)', count: '', gross: t.invUnpaid, fees: 0, net: t.invUnpaid, color: '#f87171' },
+                        ].map((r, i) => (
+                          <tr key={r.src} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent' }}>
+                            <td style={{ padding: '12px 16px', color: r.color, fontSize: '14px', fontWeight: '600', borderBottom: '1px solid var(--border-table)' }}>{r.src}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '14px', borderBottom: '1px solid var(--border-table)' }}>{r.count}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(r.gross)}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: r.fees > 0 ? '#f87171' : 'var(--text-muted)', fontSize: '14px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{r.fees > 0 ? '-' + fmt(r.fees) : '—'}</td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(r.net)}</td>
+                          </tr>
+                        ))}
+                        <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                          <td style={{ padding: '14px 16px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '700', borderBottom: '1px solid var(--border-table)' }}>GRAND TOTAL</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', borderBottom: '1px solid var(--border-table)' }}></td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontSize: '14px', fontWeight: '700', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(t.grandTotal)}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: '#f87171', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>-{fmt(t.stripeFees)}</td>
+                          <td style={{ padding: '14px 16px', textAlign: 'right', color: 'var(--accent)', fontSize: '14px', fontWeight: '700', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(t.grandTotal - t.stripeFees)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Month-by-Month Sections */}
+                {sortedMonths.map(([mk, mo]) => {
+                  const dt = new Date(mk + '-15');
+                  const label = dt.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+                  const moTotal = mo.stripe.gross + mo.cash + mo.check + mo.invoices.paid + mo.invoices.unpaid;
+
+                  return (
+                    <div key={mk} style={{ ...card, overflow: 'hidden', marginBottom: '16px' }}>
+                      <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.04))' }}>
+                        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>📅 {label}</h3>
+                        <span style={{ fontSize: '16px', fontWeight: '700', color: 'var(--accent)', fontFamily: 'monospace' }}>{fmt(moTotal)}</span>
+                      </div>
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                              {['Source', 'Count', 'Gross', 'Fees', 'Net'].map(h => (
+                                <th key={h} style={{ padding: '10px 16px', textAlign: h === 'Source' ? 'left' : 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--border-table)' }}>{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td style={{ padding: '10px 16px', color: '#818CF8', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>Stripe</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{mo.stripe.count}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(mo.stripe.gross)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#f87171', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{mo.stripe.fees > 0 ? '-' + fmt(mo.stripe.fees) : '—'}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(mo.stripe.net)}</td>
+                            </tr>
+                            <tr style={{ backgroundColor: 'var(--bg-table-stripe)' }}>
+                              <td style={{ padding: '10px 16px', color: '#4ade80', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>Cash</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{mo.cashCount}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(mo.cash)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>—</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(mo.cash)}</td>
+                            </tr>
+                            <tr>
+                              <td style={{ padding: '10px 16px', color: '#FBBF24', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>Check</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{mo.checkCount}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(mo.check)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>—</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(mo.check)}</td>
+                            </tr>
+                            <tr style={{ backgroundColor: 'var(--bg-table-stripe)' }}>
+                              <td style={{ padding: '10px 16px', color: '#38BDF8', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>Invoices</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{mo.invoices.count}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(mo.invoices.paid + mo.invoices.unpaid)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>—</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(mo.invoices.paid + mo.invoices.unpaid)}</td>
+                            </tr>
+                            <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '700' }}>TOTAL</td>
+                              <td style={{ padding: '10px 16px' }}></td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--accent)', fontSize: '13px', fontWeight: '700', fontFamily: 'monospace' }}>{fmt(moTotal)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#f87171', fontSize: '13px', fontFamily: 'monospace' }}>{mo.stripe.fees > 0 ? '-' + fmt(mo.stripe.fees) : '—'}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--accent)', fontSize: '13px', fontWeight: '700', fontFamily: 'monospace' }}>{fmt(moTotal - mo.stripe.fees)}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
+            );
+          })()}
+
+          {!fullReport && !fullReportLoading && (
+            <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📈</div>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Full Monthly Revenue Report</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Combines Stripe + Cash/Check + Invoices into one unified report with month-by-month breakdown</p>
             </div>
           )}
         </>
