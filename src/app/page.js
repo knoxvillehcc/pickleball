@@ -99,53 +99,10 @@ const moduleConfigs = [
 // ── Public landing page (shown to logged-out visitors) ─────────────────────────
 function PublicLanding() {
   const { theme, toggleTheme, isDark } = useTheme();
-  const [ifOpen,   setIfOpen]   = useState(false);
-  const [gspOpen,  setGspOpen]  = useState(false);
-  const [bspOpen,  setBspOpen]  = useState(false);
-  const [loadingStatus, setLoadingStatus] = useState(true);
-
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/indiafest/settings?key=is_published').then(r => r.json()).catch(() => ({})),
-      fetch('/api/indiafest/sponsor/settings?key=is_published').then(r => r.json()).catch(() => ({})),
-      fetch('/api/indiafest/sponsor/settings?key=basic_is_published').then(r => r.json()).catch(() => ({})),
-    ]).then(([ifest, gsp, bsp]) => {
-      setIfOpen(ifest.is_published === true || ifest.value === 'true');
-      setGspOpen(gsp.is_published === true || gsp.value === 'true');
-      setBspOpen(bsp.is_published === true || bsp.value === 'true');
-    }).finally(() => {
-      setLoadingStatus(false);
-    });
-  }, []);
 
   const [hovered, setHovered] = useState(null);
 
   const options = [
-    {
-      title: 'IndiaFest Vendor Registration',
-      desc: 'Reserve your booth for IndiaFest 2026 (Aug 23, 11am-5pm). Home Business ($351) or Established Store ($1001).',
-      href: '/register/indiafest/vendor',
-      accentColor: '#FF9933',
-      glowColor: 'rgba(255, 153, 51, 0.12)',
-      borderColor: 'var(--border)',
-      icon: '🎪',
-      badge: 'Cultural Festival',
-      cta: ifOpen ? 'Book Space' : 'Registration Closed',
-      isOpen: ifOpen,
-    },
-    {
-      title: 'India Fest 2026 — Sponsorship',
-      href: '/register/indiafest/sponsor',
-      accentColor: '#D4AF37',
-      glowColor: 'rgba(212, 175, 55, 0.14)',
-      borderColor: 'var(--border)',
-      icon: null,  // custom render
-      badge: 'Sponsorship Opportunities',
-      isOpen: gspOpen || bspOpen,
-      isSponsorCard: true,
-      gspOpen,
-      bspOpen,
-    },
     {
       title: 'Admin & Staff Portal',
       desc: 'Authorized operator access to system configurations, Odoo discrepancy scanner, logs, and report lists.',
@@ -235,122 +192,6 @@ function PublicLanding() {
         }}>
           {options.map((opt, i) => {
             const active = hovered === i;
-
-            // ── Custom dual-tier Sponsor card ──────────────────────────────────
-            if (opt.isSponsorCard) {
-              return (
-                <Link key={i} href={opt.href} style={{ textDecoration: 'none', cursor: opt.isOpen ? 'pointer' : 'default' }}>
-                  <div
-                    onMouseEnter={() => setHovered(i)}
-                    onMouseLeave={() => setHovered(null)}
-                    style={{
-                      background: 'var(--bg-card)',
-                      border: active && opt.isOpen ? `2px solid #D4AF37` : '2px solid var(--border)',
-                      borderRadius: '20px',
-                      padding: '28px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      height: '100%',
-                      transition: 'all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                      transform: active && opt.isOpen ? 'translateY(-6px)' : 'translateY(0)',
-                      boxShadow: active && opt.isOpen ? `0 12px 30px rgba(212,175,55,0.16), var(--shadow)` : 'var(--shadow)',
-                      position: 'relative',
-                    }}
-                  >
-                    {/* Badge row */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                      <div style={{
-                        display: 'inline-flex', alignItems: 'center', gap: '6px',
-                        background: active && opt.isOpen ? 'rgba(212,175,55,0.18)' : 'var(--bg-input)',
-                        borderRadius: '99px', padding: '4px 10px', border: '1px solid var(--border)',
-                      }}>
-                        <span style={{ fontSize: '10px', fontWeight: '850', color: active && opt.isOpen ? '#D4AF37' : 'var(--text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                          {opt.badge}
-                        </span>
-                      </div>
-                      {/* Show overall open/closed */}
-                      <span style={{ fontSize: '11px', fontWeight: '700', color: opt.isOpen ? 'var(--text-success)' : 'var(--text-error)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: opt.isOpen ? 'var(--text-success)' : 'var(--text-error)' }}/>
-                        {opt.isOpen ? 'Open' : 'Closed'}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h2 style={{ margin: '0 0 16px', fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
-                      🤝 India Fest 2026 — Sponsorship
-                    </h2>
-
-                    {/* Two tier rows stacked */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, marginBottom: '20px' }}>
-
-                      {/* Grand Sponsor tier */}
-                      <div style={{
-                        background: opt.gspOpen ? 'rgba(212,175,55,0.07)' : 'var(--bg-input)',
-                        border: `1.5px solid ${opt.gspOpen ? 'rgba(212,175,55,0.35)' : 'var(--border)'}`,
-                        borderRadius: '12px', padding: '12px 14px',
-                        opacity: opt.gspOpen ? 1 : 0.6,
-                      }}>
-                        {/* Header row */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                          <span style={{ fontSize: '18px' }}>🏆</span>
-                          <div style={{ flex: 1 }}>
-                            <span style={{ fontSize: '13px', fontWeight: '900', color: '#D4AF37' }}>Grand Sponsor</span>
-                            <span style={{ fontSize: '12px', fontWeight: '800', color: '#D4AF37', marginLeft: '6px' }}>$5,001+</span>
-                          </div>
-                          <span style={{ fontSize: '9px', fontWeight: '800', padding: '2px 8px', borderRadius: '99px', whiteSpace: 'nowrap', background: opt.gspOpen ? 'rgba(16,185,129,0.12)' : 'rgba(100,100,100,0.1)', color: opt.gspOpen ? 'var(--text-success)' : 'var(--text-muted)', border: `1px solid ${opt.gspOpen ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
-                            {opt.gspOpen ? '● OPEN' : '● CLOSED'}
-                          </span>
-                        </div>
-                        {/* Benefits row */}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px' }}>
-                          {['📢 Logo Ads', '🏠 10×10 Booth', '🎤 On-Stage', '🏳️ Banner'].map((b, j) => (
-                            <span key={j} style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>{b}</span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Basic Sponsor tier */}
-                      <div style={{
-                        background: opt.bspOpen ? 'rgba(45,122,58,0.07)' : 'var(--bg-input)',
-                        border: `1.5px solid ${opt.bspOpen ? 'rgba(45,122,58,0.35)' : 'var(--border)'}`,
-                        borderRadius: '12px', padding: '12px 14px',
-                        opacity: opt.bspOpen ? 1 : 0.6,
-                      }}>
-                        {/* Header row */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                          <span style={{ fontSize: '18px' }}>🌟</span>
-                          <div style={{ flex: 1 }}>
-                            <span style={{ fontSize: '13px', fontWeight: '900', color: '#2D7A3A' }}>Basic Sponsor</span>
-                            <span style={{ fontSize: '12px', fontWeight: '800', color: '#2D7A3A', marginLeft: '6px' }}>$1,001+</span>
-                          </div>
-                          <span style={{ fontSize: '9px', fontWeight: '800', padding: '2px 8px', borderRadius: '99px', whiteSpace: 'nowrap', background: opt.bspOpen ? 'rgba(16,185,129,0.12)' : 'rgba(100,100,100,0.1)', color: opt.bspOpen ? 'var(--text-success)' : 'var(--text-muted)', border: `1px solid ${opt.bspOpen ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
-                            {opt.bspOpen ? '● OPEN' : '● CLOSED'}
-                          </span>
-                        </div>
-                        {/* Benefits row */}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px' }}>
-                          {['🏳️ Banner Under Stage', '🌐 Website Credit'].map((b, j) => (
-                            <span key={j} style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>{b}</span>
-                          ))}
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* CTA */}
-                    <div style={{
-                      display: 'inline-flex', alignItems: 'center', gap: '6px',
-                      fontSize: '13.5px', fontWeight: '800',
-                      color: opt.isOpen ? '#D4AF37' : 'var(--text-muted)',
-                      transition: 'all 0.25s',
-                    }}>
-                      <span>{opt.isOpen ? 'View Sponsorship Options' : 'Registration Closed'}</span>
-                      {opt.isOpen && <span style={{ transition: 'transform 0.2s', transform: active ? 'translateX(4px)' : 'translateX(0)' }}>→</span>}
-                    </div>
-                  </div>
-                </Link>
-              );
-            }
 
             // ── Default card render ────────────────────────────────────────────
             return (
