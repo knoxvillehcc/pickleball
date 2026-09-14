@@ -239,32 +239,72 @@ export default function ScannerPage() {
 
   // ── LOGIN SCREEN ───────────────────────────────────────────────────────────
   if (mode === 'login') return (
-    <div style={{ ...S.page, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-      <div style={{ fontSize: '64px', marginBottom: '24px' }}>🪔</div>
-      <h1 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px' }}>Scanner Login</h1>
-      <p style={{ color: C.muted, marginBottom: '32px' }}>Enter your employee PIN</p>
+    <div style={{ ...S.page, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', background: 'linear-gradient(180deg, #0a0a0f 0%, #141420 100%)' }}>
 
-      {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '12px', padding: '12px', color: C.red, fontSize: '14px', marginBottom: '16px', width: '100%', maxWidth: '320px', textAlign: 'center' }}>{error}</div>}
+      {/* Glowing icon */}
+      <div style={{ width: '120px', height: '120px', borderRadius: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: 'linear-gradient(135deg, rgba(255,107,53,0.15), rgba(139,30,63,0.15))', border: '1px solid rgba(255,107,53,0.2)', boxShadow: '0 0 60px rgba(255,107,53,0.1)', marginBottom: '32px' }}>
+        🪔
+      </div>
 
-      <input style={{ ...S.input, maxWidth: '320px', letterSpacing: '12px', fontSize: '32px' }}
-        type="password" maxLength={6} placeholder="• • • •" value={pin}
+      <h1 style={{ fontSize: '28px', fontWeight: '800', margin: '0 0 4px', letterSpacing: '-0.02em' }}>Gate Scanner</h1>
+      <p style={{ color: C.muted, fontSize: '15px', marginBottom: '36px', fontWeight: '500' }}>Enter your staff PIN to begin</p>
+
+      {error && <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', padding: '14px 20px', color: C.red, fontSize: '14px', marginBottom: '20px', width: '100%', maxWidth: '340px', textAlign: 'center', backdropFilter: 'blur(10px)' }}>{error}</div>}
+
+      {/* PIN dots */}
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+        {[0,1,2,3].map(i => (
+          <div key={i} style={{
+            width: '18px', height: '18px', borderRadius: '50%',
+            background: pin.length > i ? C.primary : 'rgba(255,255,255,0.08)',
+            border: `2px solid ${pin.length > i ? C.primary : 'rgba(255,255,255,0.15)'}`,
+            boxShadow: pin.length > i ? `0 0 12px ${C.primary}40` : 'none',
+            transition: 'all 0.2s ease',
+          }} />
+        ))}
+      </div>
+
+      <input style={{ ...S.input, maxWidth: '340px', letterSpacing: '16px', fontSize: '28px', fontWeight: '700', background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)', borderColor: 'rgba(255,255,255,0.08)' }}
+        type="password" maxLength={6} placeholder="" value={pin}
         onChange={e => setPin(e.target.value.replace(/\D/g, ''))}
         onKeyDown={e => e.key === 'Enter' && handleLogin()} autoFocus />
 
-      {/* Date selector */}
-      <select value={eventDateId || ''} onChange={e => setEventDateId(parseInt(e.target.value))} style={{
-        ...S.input, maxWidth: '320px', marginTop: '16px', fontSize: '14px',
-      }}>
-        <option value="">Select Today&apos;s Date</option>
-        {dates.map(d => (
-          <option key={d.id} value={d.id}>{d.label} — {d.event_date}</option>
-        ))}
-      </select>
+      {/* Date selector — dark styled */}
+      <div style={{ width: '100%', maxWidth: '340px', marginTop: '20px', position: 'relative' }}>
+        <label style={{ fontSize: '12px', fontWeight: '600', color: C.muted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>Event Date</label>
+        <select value={eventDateId || ''} onChange={e => setEventDateId(parseInt(e.target.value))} style={{
+          width: '100%', padding: '16px 20px', borderRadius: '14px',
+          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(255,255,255,0.04)',
+          color: C.text, fontSize: '15px', fontWeight: '600',
+          outline: 'none', appearance: 'none', cursor: 'pointer',
+          WebkitAppearance: 'none', MozAppearance: 'none',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M2 4l4 4 4-4'/%3E%3C/svg%3E")`,
+          backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center',
+          boxSizing: 'border-box',
+        }}>
+          <option value="" style={{ background: '#141420', color: C.muted }}>Auto-detect today</option>
+          {dates.map(d => (
+            <option key={d.id} value={d.id} style={{ background: '#141420', color: C.text }}>
+              {d.label} — {new Date(d.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <button style={{ ...S.btn, maxWidth: '320px', marginTop: '20px', background: 'linear-gradient(135deg, #FF6B35, #8B1E3F)', color: 'white', opacity: loading || !pin ? 0.5 : 1 }}
+      <button style={{ ...S.btn, maxWidth: '340px', marginTop: '28px', background: 'linear-gradient(135deg, #FF6B35, #D4531F)', color: 'white', borderRadius: '16px', fontSize: '17px', letterSpacing: '-0.01em', boxShadow: loading || !pin ? 'none' : '0 4px 24px rgba(255,107,53,0.3)', opacity: loading || !pin ? 0.4 : 1, transition: 'all 0.3s ease' }}
         disabled={loading || !pin} onClick={handleLogin}>
-        {loading ? 'Authenticating...' : '🔐 Login'}
+        {loading ? 'Authenticating...' : 'Continue'}
       </button>
+
+      <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: '12px', marginTop: '40px', fontWeight: '500' }}>
+        Navratri 2026 • Hindu Community Center
+      </p>
+
+      <style>{`
+        select option { background: #141420 !important; color: #F8FAFC !important; }
+        input::placeholder { color: rgba(148,163,184,0.3) !important; }
+      `}</style>
     </div>
   );
 

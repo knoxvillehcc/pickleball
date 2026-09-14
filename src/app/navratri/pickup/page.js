@@ -119,18 +119,45 @@ export default function PickupPage() {
   const inputStyle = { width: '100%', padding: '16px', borderRadius: '14px', border: `1px solid ${C.border}`, background: 'rgba(255,255,255,0.05)', color: C.text, fontSize: '16px', outline: 'none', boxSizing: 'border-box' };
 
   if (mode === 'login') return (
-    <div style={{ minHeight: '100dvh', background: C.bg, color: C.text, fontFamily: "'Inter',sans-serif", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-      <div style={{ fontSize: '64px', marginBottom: '24px' }}>🎫</div>
-      <h1 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px' }}>Pickup Station</h1>
-      <p style={{ color: C.muted, marginBottom: '32px' }}>Enter your employee PIN</p>
-      {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '12px', padding: '12px', color: C.red, fontSize: '14px', marginBottom: '16px', width: '100%', maxWidth: '320px', textAlign: 'center' }}>{error}</div>}
-      <input style={{ ...inputStyle, maxWidth: '320px', letterSpacing: '12px', fontSize: '32px', textAlign: 'center' }}
-        type="password" maxLength={6} placeholder="• • • •" value={pin}
+    <div style={{ minHeight: '100dvh', background: 'linear-gradient(180deg, #0a0a0f 0%, #141420 100%)', color: C.text, fontFamily: "'Inter',sans-serif", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+
+      {/* Glowing icon */}
+      <div style={{ width: '120px', height: '120px', borderRadius: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: 'linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,107,53,0.12))', border: '1px solid rgba(255,215,0,0.2)', boxShadow: '0 0 60px rgba(255,215,0,0.08)', marginBottom: '32px' }}>
+        🎫
+      </div>
+
+      <h1 style={{ fontSize: '28px', fontWeight: '800', margin: '0 0 4px', letterSpacing: '-0.02em' }}>Pickup Station</h1>
+      <p style={{ color: C.muted, fontSize: '15px', marginBottom: '36px', fontWeight: '500' }}>Enter your staff PIN to begin</p>
+
+      {error && <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', padding: '14px 20px', color: C.red, fontSize: '14px', marginBottom: '20px', width: '100%', maxWidth: '340px', textAlign: 'center', backdropFilter: 'blur(10px)' }}>{error}</div>}
+
+      {/* PIN dots */}
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+        {[0,1,2,3].map(i => (
+          <div key={i} style={{
+            width: '18px', height: '18px', borderRadius: '50%',
+            background: pin.length > i ? C.accent : 'rgba(255,255,255,0.08)',
+            border: `2px solid ${pin.length > i ? C.accent : 'rgba(255,255,255,0.15)'}`,
+            boxShadow: pin.length > i ? '0 0 12px rgba(255,215,0,0.3)' : 'none',
+            transition: 'all 0.2s ease',
+          }} />
+        ))}
+      </div>
+
+      <input style={{ ...inputStyle, maxWidth: '340px', letterSpacing: '16px', fontSize: '28px', textAlign: 'center', fontWeight: '700', background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)', borderColor: 'rgba(255,255,255,0.08)' }}
+        type="password" maxLength={6} placeholder="" value={pin}
         onChange={e => setPin(e.target.value.replace(/\D/g, ''))} onKeyDown={e => e.key === 'Enter' && handleLogin()} autoFocus />
+
       <button onClick={handleLogin} disabled={loading || !pin}
-        style={{ width: '100%', maxWidth: '320px', padding: '18px', borderRadius: '14px', border: 'none', background: 'linear-gradient(135deg, #FF6B35, #8B1E3F)', color: 'white', fontSize: '18px', fontWeight: '800', cursor: 'pointer', marginTop: '20px', opacity: loading || !pin ? 0.5 : 1 }}>
-        {loading ? 'Authenticating...' : '🔐 Login'}
+        style={{ width: '100%', maxWidth: '340px', padding: '18px', borderRadius: '16px', border: 'none', background: 'linear-gradient(135deg, #FFD700, #F59E0B)', color: '#000', fontSize: '17px', fontWeight: '800', cursor: 'pointer', marginTop: '28px', opacity: loading || !pin ? 0.4 : 1, boxShadow: loading || !pin ? 'none' : '0 4px 24px rgba(255,215,0,0.25)', transition: 'all 0.3s ease', letterSpacing: '-0.01em' }}>
+        {loading ? 'Authenticating...' : 'Continue'}
       </button>
+
+      <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: '12px', marginTop: '40px', fontWeight: '500' }}>
+        Navratri 2026 • Wristband Distribution
+      </p>
+
+      <style>{`input::placeholder { color: rgba(148,163,184,0.3) !important; }`}</style>
     </div>
   );
 
