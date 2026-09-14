@@ -1,0 +1,373 @@
+[
+  {
+    "id": 2,
+    "name": "Registration for Indiafest",
+    "event_id": [
+      2,
+      "Indiafest"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 0,
+    "description": false,
+    "seats_max": 1000,
+    "seats_reserved": 0,
+    "seats_available": 998,
+    "seats_used": 2,
+    "registration_ids": [
+      4,
+      3,
+      2
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Free pioneer",
+    "event_id": [
+      5,
+      "Sports membership"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 0,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 9,
+    "name": "Discounted for General",
+    "event_id": [
+      5,
+      "Sports membership"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 251,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 3,
+    "name": "Registration for Sports(testing)",
+    "event_id": [
+      4,
+      "Sports(testing)"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 0,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": [
+      13
+    ]
+  },
+  {
+    "id": 34,
+    "name": "Pioneer Member",
+    "event_id": [
+      1,
+      "Navratri 2025"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 0,
+    "description": false,
+    "seats_max": 150,
+    "seats_reserved": 0,
+    "seats_available": 150,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 35,
+    "name": "General Member",
+    "event_id": [
+      1,
+      "Navratri 2025"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 30,
+    "description": false,
+    "seats_max": 1000,
+    "seats_reserved": 0,
+    "seats_available": 1000,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 36,
+    "name": "Non Member",
+    "event_id": [
+      1,
+      "Navratri 2025"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 40,
+    "description": false,
+    "seats_max": 500,
+    "seats_reserved": 0,
+    "seats_available": 500,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 22,
+    "name": "Pioneer Member",
+    "event_id": [
+      17,
+      "TEST - Musical Night"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 0,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": [
+      19
+    ]
+  },
+  {
+    "id": 23,
+    "name": "General Member",
+    "event_id": [
+      17,
+      "TEST - Musical Night"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 30,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": [
+      21,
+      20
+    ]
+  },
+  {
+    "id": 24,
+    "name": "Non Member",
+    "event_id": [
+      17,
+      "TEST - Musical Night"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 50,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 29,
+    "name": "Registration for TEST - Musical Night (copy)",
+    "event_id": [
+      18,
+      "TEST - Musical Night (copy)"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      67,
+      "Event Registration 1"
+    ],
+    "price": 1,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 76,
+    "name": "Middle School",
+    "event_id": [
+      1120,
+      "Pickleball Registration"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 25,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 77,
+    "name": "High School & college",
+    "event_id": [
+      1120,
+      "Pickleball Registration"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 25,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 78,
+    "name": "Adults",
+    "event_id": [
+      1120,
+      "Pickleball Registration"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 25,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 79,
+    "name": "Paddle rental",
+    "event_id": [
+      1120,
+      "Pickleball Registration"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 5,
+    "description": false,
+    "seats_max": 0,
+    "seats_reserved": 0,
+    "seats_available": 0,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 73,
+    "name": "Pioneer Member",
+    "event_id": [
+      1085,
+      "Navratri 2026"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 0,
+    "description": false,
+    "seats_max": 150,
+    "seats_reserved": 0,
+    "seats_available": 150,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 74,
+    "name": "General Member",
+    "event_id": [
+      1085,
+      "Navratri 2026"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 30,
+    "description": false,
+    "seats_max": 1000,
+    "seats_reserved": 0,
+    "seats_available": 1000,
+    "seats_used": 0,
+    "registration_ids": []
+  },
+  {
+    "id": 75,
+    "name": "Non Member",
+    "event_id": [
+      1085,
+      "Navratri 2026"
+    ],
+    "event_type_id": false,
+    "product_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "price": 40,
+    "description": false,
+    "seats_max": 500,
+    "seats_reserved": 0,
+    "seats_available": 500,
+    "seats_used": 0,
+    "registration_ids": []
+  }
+]

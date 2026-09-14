@@ -1,0 +1,268 @@
+[
+  {
+    "id": 1,
+    "name": "Sales",
+    "code": "INV",
+    "type": "sale",
+    "default_account_id": [
+      74,
+      "1000 Donation"
+    ],
+    "suspense_account_id": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 5,
+    "active": true
+  },
+  {
+    "id": 2,
+    "name": "Purchases",
+    "code": "BILL",
+    "type": "purchase",
+    "default_account_id": [
+      34,
+      "600000 Expenses"
+    ],
+    "suspense_account_id": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 6,
+    "active": true
+  },
+  {
+    "id": 6,
+    "name": "Bank",
+    "code": "BNK1",
+    "type": "bank",
+    "default_account_id": [
+      46,
+      "101401 HCC Bank"
+    ],
+    "suspense_account_id": [
+      47,
+      "101402 Bank Suspense Account"
+    ],
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 7,
+    "active": true
+  },
+  {
+    "id": 3,
+    "name": "Miscellaneous Operations",
+    "code": "MISC",
+    "type": "general",
+    "default_account_id": false,
+    "suspense_account_id": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 9,
+    "active": true
+  },
+  {
+    "id": 12,
+    "name": "Checks",
+    "code": "CHK1",
+    "type": "bank",
+    "default_account_id": [
+      121,
+      "1015 Checks"
+    ],
+    "suspense_account_id": [
+      47,
+      "101402 Bank Suspense Account"
+    ],
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 9,
+    "name": "Cash HCC",
+    "code": "CSH1",
+    "type": "cash",
+    "default_account_id": [
+      52,
+      "101501 Cash knoxville Mandir"
+    ],
+    "suspense_account_id": [
+      47,
+      "101402 Bank Suspense Account"
+    ],
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 10,
+    "name": "Dan Peti",
+    "code": "CSH2",
+    "type": "cash",
+    "default_account_id": [
+      54,
+      "111 Dan Peti"
+    ],
+    "suspense_account_id": [
+      47,
+      "101402 Bank Suspense Account"
+    ],
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 13,
+    "name": "Cash IPAD-1",
+    "code": "CSH3",
+    "type": "cash",
+    "default_account_id": [
+      122,
+      "1016 Cash IPAD-1"
+    ],
+    "suspense_account_id": [
+      47,
+      "101402 Bank Suspense Account"
+    ],
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 14,
+    "name": "Cash IPAD-2",
+    "code": "CSH4",
+    "type": "cash",
+    "default_account_id": [
+      123,
+      "1017 Cash IPAD-2"
+    ],
+    "suspense_account_id": [
+      47,
+      "101402 Bank Suspense Account"
+    ],
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 5,
+    "name": "Cash Basis Taxes",
+    "code": "CABA",
+    "type": "general",
+    "default_account_id": false,
+    "suspense_account_id": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 4,
+    "name": "Exchange Difference",
+    "code": "EXCH",
+    "type": "general",
+    "default_account_id": false,
+    "suspense_account_id": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 8,
+    "name": "Point of Sale",
+    "code": "POSS",
+    "type": "general",
+    "default_account_id": false,
+    "suspense_account_id": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 7,
+    "name": "Inventory Valuation",
+    "code": "STJ",
+    "type": "general",
+    "default_account_id": false,
+    "suspense_account_id": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 10,
+    "active": true
+  },
+  {
+    "id": 11,
+    "name": "Salaries",
+    "code": "SLR",
+    "type": "general",
+    "default_account_id": false,
+    "suspense_account_id": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "currency_id": false,
+    "bank_account_id": false,
+    "sequence": 99,
+    "active": true
+  }
+]

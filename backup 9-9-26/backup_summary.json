@@ -1,0 +1,30 @@
+{
+  "backupDate": "2026-09-10T01:55:23.419Z",
+  "odooVersion": "19.0 Enterprise",
+  "source": "https://knoxvillemandir.odoo.com/",
+  "database": "knoxvillemandir",
+  "summary": {
+    "contacts": 855,
+    "products": 115,
+    "productCategories": 28,
+    "chartOfAccounts": 120,
+    "events": 119
+  },
+  "files": [
+    "account_groups.json",
+    "chart_of_accounts.json",
+    "contacts.json",
+    "events.json",
+    "event_registrations.json",
+    "event_tickets.json",
+    "fiscal_positions.json",
+    "journals.json",
+    "products_templates.json",
+    "products_variants.json",
+    "product_attributes.json",
+    "product_attribute_values.json",
+    "product_categories.json",
+    "taxes.json",
+    "_fields_discovery.json"
+  ]
+}

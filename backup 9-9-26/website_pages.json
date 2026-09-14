@@ -1,0 +1,473 @@
+[
+  {
+    "id": 14,
+    "name": "Sports Membership",
+    "url": "/sports-membership",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4178,
+      "Sports Membership"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 20:29:31",
+    "write_date": "2026-01-17 20:59:49"
+  },
+  {
+    "id": 28,
+    "name": "Puja revervation",
+    "url": "/puja-revervation",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      6088,
+      "Puja revervation"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2026-01-15 13:01:28",
+    "write_date": "2026-01-15 13:28:47"
+  },
+  {
+    "id": 4,
+    "name": "Home",
+    "url": "/",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      1379,
+      "Home"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 01:34:33",
+    "write_date": "2026-02-04 00:10:05"
+  },
+  {
+    "id": 25,
+    "name": "Sponsorship",
+    "url": "/sponsorship",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      5927,
+      "Sponsorship"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-12-16 21:30:09",
+    "write_date": "2026-02-04 00:10:52"
+  },
+  {
+    "id": 31,
+    "name": "User Guide",
+    "url": "/user-guide",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      6101,
+      "User Guide"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2026-01-17 06:53:01",
+    "write_date": "2026-01-17 06:54:31"
+  },
+  {
+    "id": 13,
+    "name": "Membership",
+    "url": "/general-membership",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4177,
+      "Membership"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 20:29:15",
+    "write_date": "2026-01-17 20:59:44"
+  },
+  {
+    "id": 6,
+    "name": "Services",
+    "url": "/our-services",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      2288,
+      "Services"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 01:40:26",
+    "write_date": "2025-07-12 01:40:26"
+  },
+  {
+    "id": 8,
+    "name": "Privacy Policy",
+    "url": "/privacy",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      2290,
+      "Privacy Policy"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 01:40:26",
+    "write_date": "2025-07-12 01:40:26"
+  },
+  {
+    "id": 9,
+    "name": "Contact Us",
+    "url": "/contactus",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4144,
+      "Contact Us"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 03:50:21",
+    "write_date": "2025-08-31 14:57:10"
+  },
+  {
+    "id": 10,
+    "name": "Activities",
+    "url": "/activities",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4173,
+      "Activities"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 19:05:46",
+    "write_date": "2025-07-12 19:49:10"
+  },
+  {
+    "id": 30,
+    "name": "Test",
+    "url": "/test",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      6091,
+      "Test"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2026-01-16 04:29:00",
+    "write_date": "2026-01-23 05:59:35"
+  },
+  {
+    "id": 23,
+    "name": "Mandir Hall Rental",
+    "url": "/mandir-hall-rental",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      5014,
+      "Mandir Hall Rental"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-08-29 01:35:03",
+    "write_date": "2026-01-15 01:54:07"
+  },
+  {
+    "id": 16,
+    "name": "Temple History",
+    "url": "/temple-history",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4416,
+      "Temple History"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 23:30:14",
+    "write_date": "2025-07-13 00:01:40"
+  },
+  {
+    "id": 5,
+    "name": "About Us",
+    "url": "/about-us",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      2287,
+      "About Us"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 01:40:26",
+    "write_date": "2025-07-13 03:06:43"
+  },
+  {
+    "id": 17,
+    "name": "Cookie Policy",
+    "url": "/cookie-policy",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4424,
+      "Cookie Policy"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-13 15:56:39",
+    "write_date": "2025-07-13 15:56:39"
+  },
+  {
+    "id": 18,
+    "name": "Thanks (Contact us)",
+    "url": "/contactus-thank-you",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4925,
+      "Thanks (Contact us)"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-08-28 00:41:13",
+    "write_date": "2025-08-28 00:41:13"
+  },
+  {
+    "id": 20,
+    "name": "Purna Vidya Resgistration",
+    "url": "/purna-vidya-resgistration",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4927,
+      "Purna Vidya Resgistration"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-08-28 00:54:23",
+    "write_date": "2025-08-28 01:01:19"
+  },
+  {
+    "id": 19,
+    "name": "Calender",
+    "url": "/calender",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4926,
+      "Calender"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-08-28 00:48:23",
+    "write_date": "2025-08-28 01:10:51"
+  },
+  {
+    "id": 21,
+    "name": "Sanskrit Classes Registration ",
+    "url": "/sanskrit-classes-registration",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4932,
+      "Sanskrit Classes Registration "
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-08-28 01:12:42",
+    "write_date": "2025-08-28 01:13:32"
+  },
+  {
+    "id": 22,
+    "name": " Telegu Classes Registration",
+    "url": "/telegu-classes-registration",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      4933,
+      " Telegu Classes Registration"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-08-28 01:13:19",
+    "write_date": "2025-08-28 01:13:32"
+  },
+  {
+    "id": 32,
+    "name": "post",
+    "url": "/post",
+    "website_published": true,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      6108,
+      "post"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2026-01-23 18:14:05",
+    "write_date": "2026-01-23 18:18:00"
+  },
+  {
+    "id": 29,
+    "name": "HCC IT TEAM",
+    "url": "/hcc-it-team",
+    "website_published": false,
+    "website_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "view_id": [
+      6090,
+      "HCC IT TEAM"
+    ],
+    "is_published": false,
+    "date_publish": false,
+    "create_date": "2026-01-15 15:28:55",
+    "write_date": "2026-02-02 06:41:42"
+  },
+  {
+    "id": 3,
+    "name": "Contact Us",
+    "url": "/contactus",
+    "website_published": true,
+    "website_id": false,
+    "view_id": [
+      1372,
+      "Contact Us"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 01:34:33",
+    "write_date": "2025-07-12 01:34:33"
+  },
+  {
+    "id": 2,
+    "name": "Home",
+    "url": "/",
+    "website_published": true,
+    "website_id": false,
+    "view_id": [
+      1371,
+      "Home"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 01:34:33",
+    "write_date": "2025-07-12 01:34:33"
+  },
+  {
+    "id": 1,
+    "name": "Thanks (Contact us)",
+    "url": "/contactus-thank-you",
+    "website_published": true,
+    "website_id": false,
+    "view_id": [
+      1373,
+      "Thanks (Contact us)"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-07-12 01:34:33",
+    "write_date": "2025-12-13 18:11:19"
+  },
+  {
+    "id": 33,
+    "name": "Ticket Received",
+    "url": "/your-ticket-has-been-submitted",
+    "website_published": true,
+    "website_id": false,
+    "view_id": [
+      6226,
+      "Ticket Received"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2026-01-31 23:11:17",
+    "write_date": "2026-01-31 23:11:17"
+  },
+  {
+    "id": 24,
+    "name": "Task Submitted",
+    "url": "/your-task-has-been-submitted",
+    "website_published": true,
+    "website_id": false,
+    "view_id": [
+      5587,
+      "Task Submitted"
+    ],
+    "is_published": true,
+    "date_publish": false,
+    "create_date": "2025-11-22 15:40:36",
+    "write_date": "2025-12-13 18:11:57"
+  }
+]

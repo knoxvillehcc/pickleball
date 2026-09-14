@@ -30,12 +30,13 @@ const navLinks = [
   { href: '/pickleball',        label: 'Pickleball',        icon: <PBIcon />,         slug: 'pickleball' },
   { href: '/indiafest',         label: 'India Fest 2026',   icon: <IndiafestIcon />,  slug: 'indiafest' },
   { href: '/indiafest/sponsors',label: 'Sponsors Dashboard',icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🏆</span>, slug: 'sponsors' },
+  { href: '/navratri',          label: 'Navratri 2026',     icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🪔</span>, slug: 'navratri' },
   { href: '/settings',          label: 'Settings',          icon: <SettingsIcon />,   slug: 'settings' },
   { href: '/settings/users',    label: 'User Management',   icon: <UsersIcon />,      slug: 'users', adminOnly: true },
 ];
 
 // ── Public routes — no sidebar ─────────────────────────────────────────────────────
-const PUBLIC_PREFIXES = ['/register', '/login'];
+const PUBLIC_PREFIXES = ['/register', '/login', '/navratri-2026', '/navratri/scanner', '/navratri/pickup'];
 const isPublicRoute = (path) => PUBLIC_PREFIXES.some(p => path.startsWith(p));
 
 // ── Main ClientLayout ──────────────────────────────────────────────────────────

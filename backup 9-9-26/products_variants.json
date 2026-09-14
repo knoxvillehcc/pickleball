@@ -1,0 +1,2490 @@
+[
+  {
+    "id": 2,
+    "name": "Standard delivery",
+    "display_name": "[Delivery_007] Standard delivery",
+    "default_code": "Delivery_007",
+    "barcode": false,
+    "product_tmpl_id": [
+      2,
+      "[Delivery_007] Standard delivery"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      5,
+      "Deliveries"
+    ],
+    "code": "Delivery_007",
+    "create_date": "2025-07-12 01:40:46",
+    "write_date": "2026-01-07 05:02:28"
+  },
+  {
+    "id": 19,
+    "name": "10% on Tips",
+    "display_name": "10% on Tips",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      19,
+      "10% on Tips"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-07-13 15:58:42",
+    "write_date": "2026-03-25 17:00:24"
+  },
+  {
+    "id": 20,
+    "name": "10% on Tips",
+    "display_name": "10% on Tips",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      20,
+      "10% on Tips"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-07-13 15:58:42",
+    "write_date": "2026-03-25 17:00:24"
+  },
+  {
+    "id": 29,
+    "name": "100% on your order for pioneer members",
+    "display_name": "100% on your order for pioneer members",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      29,
+      "100% on your order for pioneer members"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-08-29 01:21:58",
+    "write_date": "2026-03-25 17:00:24"
+  },
+  {
+    "id": 27,
+    "name": "5% on your order",
+    "display_name": "5% on your order",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      27,
+      "5% on your order"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-08-29 01:20:34",
+    "write_date": "2026-03-25 17:00:24"
+  },
+  {
+    "id": 85,
+    "name": "Aarti",
+    "display_name": "Aarti",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      85,
+      "Aarti"
+    ],
+    "list_price": 11,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-02-14 21:33:13",
+    "write_date": "2026-06-20 16:54:56"
+  },
+  {
+    "id": 69,
+    "name": "Additional Donation (Optional)",
+    "display_name": "Additional Donation (Optional)",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      69,
+      "Additional Donation (Optional)"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      9,
+      "Donation"
+    ],
+    "code": false,
+    "create_date": "2026-01-10 14:06:28",
+    "write_date": "2026-08-26 18:58:20"
+  },
+  {
+    "id": 87,
+    "name": "Archana",
+    "display_name": "Archana",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      87,
+      "Archana"
+    ],
+    "list_price": 11,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-02-15 02:28:40",
+    "write_date": "2026-03-27 19:25:43"
+  },
+  {
+    "id": 41,
+    "name": "Auditorium Hall",
+    "display_name": "Auditorium Hall",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      41,
+      "Auditorium Hall"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-11-22 16:54:25",
+    "write_date": "2026-09-06 15:46:56"
+  },
+  {
+    "id": 34,
+    "name": "Auditorium Hall For Non-member",
+    "display_name": "Auditorium Hall For Non-member",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      34,
+      "Auditorium Hall For Non-member"
+    ],
+    "list_price": 2000,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-11-22 03:48:51",
+    "write_date": "2025-11-22 16:20:03"
+  },
+  {
+    "id": 30,
+    "name": "Auditorium Hall for members",
+    "display_name": "Auditorium Hall for members",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      30,
+      "Auditorium Hall for members"
+    ],
+    "list_price": 2000,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-08-29 02:01:36",
+    "write_date": "2025-11-22 16:18:40"
+  },
+  {
+    "id": 130,
+    "name": "Besan Ladoo",
+    "display_name": "Besan Ladoo",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      130,
+      "Besan Ladoo"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-08-02 22:30:56",
+    "write_date": "2026-08-26 04:47:16"
+  },
+  {
+    "id": 58,
+    "name": "Bhakharwadi",
+    "display_name": "Bhakharwadi",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      58,
+      "Bhakharwadi"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:12:23",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 108,
+    "name": "Bhog",
+    "display_name": "Bhog",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      108,
+      "Bhog"
+    ],
+    "list_price": 51,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-03-27 19:19:21",
+    "write_date": "2026-03-27 19:58:20"
+  },
+  {
+    "id": 115,
+    "name": "Bollywood",
+    "display_name": "Bollywood",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      115,
+      "Bollywood"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      10,
+      "HCC School / Donation"
+    ],
+    "code": false,
+    "create_date": "2026-05-05 12:38:42",
+    "write_date": "2026-08-26 19:01:38"
+  },
+  {
+    "id": 59,
+    "name": "Boondi Ladoo",
+    "display_name": "Boondi Ladoo",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      59,
+      "Boondi Ladoo"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:12:39",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 97,
+    "name": "Catering",
+    "display_name": "Catering",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      97,
+      "Catering"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": false,
+    "type": "consu",
+    "categ_id": [
+      15,
+      "Catering"
+    ],
+    "code": false,
+    "create_date": "2026-03-02 20:18:25",
+    "write_date": "2026-03-02 20:21:02"
+  },
+  {
+    "id": 98,
+    "name": "Catering by HCC",
+    "display_name": "Catering by HCC",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      98,
+      "Catering by HCC"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      15,
+      "Catering"
+    ],
+    "code": false,
+    "create_date": "2026-03-02 20:22:05",
+    "write_date": "2026-03-27 19:27:55"
+  },
+  {
+    "id": 91,
+    "name": "Chass",
+    "display_name": "Chass",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      91,
+      "Chass"
+    ],
+    "list_price": 3,
+    "standard_price": 0,
+    "active": false,
+    "type": "consu",
+    "categ_id": [
+      10,
+      "HCC School / Donation"
+    ],
+    "code": false,
+    "create_date": "2026-02-15 02:40:45",
+    "write_date": "2026-02-22 15:35:33"
+  },
+  {
+    "id": 74,
+    "name": "Chevdo",
+    "display_name": "Chevdo",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      74,
+      "Chevdo"
+    ],
+    "list_price": 8,
+    "standard_price": 6,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-02-07 17:39:40",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 93,
+    "name": "Chole Puri & Pulao",
+    "display_name": "Chole Puri & Pulao",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      93,
+      "Chole Puri & Pulao"
+    ],
+    "list_price": 7,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-02-22 03:51:30",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 112,
+    "name": "Class Rental",
+    "display_name": "Class Rental",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      112,
+      "Class Rental"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2026-04-19 16:25:03",
+    "write_date": "2026-08-26 18:30:18"
+  },
+  {
+    "id": 46,
+    "name": "Cleaning",
+    "display_name": "Cleaning",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      46,
+      "Cleaning"
+    ],
+    "list_price": 200,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-11-23 19:09:37",
+    "write_date": "2025-12-18 14:24:43"
+  },
+  {
+    "id": 31,
+    "name": "Cleaning Fee",
+    "display_name": "Cleaning Fee",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      31,
+      "Cleaning Fee"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      3,
+      "Services"
+    ],
+    "code": false,
+    "create_date": "2025-08-29 17:56:07",
+    "write_date": "2026-08-26 18:43:12"
+  },
+  {
+    "id": 117,
+    "name": "Cupcake",
+    "display_name": "Cupcake",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      117,
+      "Cupcake"
+    ],
+    "list_price": 7,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-05-10 14:15:08",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 111,
+    "name": "Dan Peti",
+    "display_name": "Dan Peti",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      111,
+      "Dan Peti"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      19,
+      "Dan Peti"
+    ],
+    "code": false,
+    "create_date": "2026-03-30 21:33:58",
+    "write_date": "2026-08-26 18:51:00"
+  },
+  {
+    "id": 92,
+    "name": "Devasthan Donation",
+    "display_name": "Devasthan Donation",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      92,
+      "Devasthan Donation"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      9,
+      "Donation"
+    ],
+    "code": false,
+    "create_date": "2026-02-22 03:41:44",
+    "write_date": "2026-08-26 19:11:12"
+  },
+  {
+    "id": 42,
+    "name": "Dining Hall",
+    "display_name": "Dining Hall",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      42,
+      "Dining Hall"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-11-23 02:50:44",
+    "write_date": "2026-08-26 19:05:53"
+  },
+  {
+    "id": 35,
+    "name": "Dining Hall For non-Members",
+    "display_name": "Dining Hall For non-Members",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      35,
+      "Dining Hall For non-Members"
+    ],
+    "list_price": 1001,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-11-22 03:50:46",
+    "write_date": "2025-11-22 16:19:13"
+  },
+  {
+    "id": 79,
+    "name": "Donation For HCC School",
+    "display_name": "Donation For HCC School",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      79,
+      "Donation For HCC School"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": false,
+    "type": "consu",
+    "categ_id": [
+      9,
+      "Donation"
+    ],
+    "code": false,
+    "create_date": "2026-02-09 01:11:19",
+    "write_date": "2026-02-15 02:26:36"
+  },
+  {
+    "id": 103,
+    "name": "Dosa Batter",
+    "display_name": "Dosa Batter",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      103,
+      "Dosa Batter"
+    ],
+    "list_price": 7,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-03-22 15:26:35",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 96,
+    "name": "Down Payment Rental",
+    "display_name": "Down Payment Rental",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      96,
+      "Down Payment Rental"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2026-02-28 17:46:18",
+    "write_date": "2026-03-25 19:10:52"
+  },
+  {
+    "id": 106,
+    "name": "Dry Fruits",
+    "display_name": "Dry Fruits",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      106,
+      "Dry Fruits"
+    ],
+    "list_price": 11,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-03-27 19:18:17",
+    "write_date": "2026-03-27 19:58:05"
+  },
+  {
+    "id": 1,
+    "name": "Event Admission / Registration",
+    "display_name": "Event Admission / Registration",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "list_price": 30,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      21,
+      "Events / Admission & Registration"
+    ],
+    "code": false,
+    "create_date": "2025-07-12 01:40:39",
+    "write_date": "2026-09-03 20:04:03"
+  },
+  {
+    "id": 134,
+    "name": "Event Beverage Sales",
+    "display_name": "Event Beverage Sales",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      134,
+      "Event Beverage Sales"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      17,
+      "Events / Food & Beverage"
+    ],
+    "code": false,
+    "create_date": "2026-08-26 18:24:10",
+    "write_date": "2026-08-26 18:31:02"
+  },
+  {
+    "id": 68,
+    "name": "Event Booth",
+    "display_name": "Event Booth",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      68,
+      "Event Booth"
+    ],
+    "list_price": 100,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      23,
+      "Events / Vendor Booth"
+    ],
+    "code": false,
+    "create_date": "2026-01-10 04:47:08",
+    "write_date": "2026-08-26 18:53:29"
+  },
+  {
+    "id": 100,
+    "name": "Event Food Sales",
+    "display_name": "Event Food Sales",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      100,
+      "Event Food Sales"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      17,
+      "Events / Food & Beverage"
+    ],
+    "code": false,
+    "create_date": "2026-03-21 17:06:20",
+    "write_date": "2026-08-26 18:23:32"
+  },
+  {
+    "id": 136,
+    "name": "Event General Income",
+    "display_name": "Event General Income",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      136,
+      "Event General Income"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      25,
+      "Events / General"
+    ],
+    "code": false,
+    "create_date": "2026-08-26 18:25:44",
+    "write_date": "2026-08-26 18:40:46"
+  },
+  {
+    "id": 135,
+    "name": "Event Merchandise Sales",
+    "display_name": "Event Merchandise Sales",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      135,
+      "Event Merchandise Sales"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      24,
+      "Events / Merchandise"
+    ],
+    "code": false,
+    "create_date": "2026-08-26 18:25:12",
+    "write_date": "2026-08-26 18:40:31"
+  },
+  {
+    "id": 101,
+    "name": "Event Raffle Ticket",
+    "display_name": "Event Raffle Ticket",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      101,
+      "Event Raffle Ticket"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      18,
+      "Events / Raffle"
+    ],
+    "code": false,
+    "create_date": "2026-03-21 17:07:30",
+    "write_date": "2026-08-26 18:24:40"
+  },
+  {
+    "id": 67,
+    "name": "Event Registration 1",
+    "display_name": "Event Registration 1",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      67,
+      "Event Registration 1"
+    ],
+    "list_price": 50,
+    "standard_price": 10,
+    "active": true,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-12-25 15:22:19",
+    "write_date": "2026-03-27 19:57:42"
+  },
+  {
+    "id": 131,
+    "name": "Event Sponsorship",
+    "display_name": "Event Sponsorship",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      131,
+      "Event Sponsorship"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      22,
+      "Events / Sponsorship"
+    ],
+    "code": false,
+    "create_date": "2026-08-05 20:11:54",
+    "write_date": "2026-08-26 18:39:30"
+  },
+  {
+    "id": 133,
+    "name": "Event Vendor Booth",
+    "display_name": "Event Vendor Booth",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      133,
+      "Event Vendor Booth"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      23,
+      "Events / Vendor Booth"
+    ],
+    "code": false,
+    "create_date": "2026-08-26 18:22:21",
+    "write_date": "2026-08-26 18:40:04"
+  },
+  {
+    "id": 52,
+    "name": "Fafda",
+    "display_name": "Fafda",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      52,
+      "Fafda"
+    ],
+    "list_price": 13,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:11:05",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 60,
+    "name": "Farali Chevdo",
+    "display_name": "Farali Chevdo",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      60,
+      "Farali Chevdo"
+    ],
+    "list_price": 12,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:12:53",
+    "write_date": "2026-08-30 22:16:00"
+  },
+  {
+    "id": 61,
+    "name": "Farsi Puri",
+    "display_name": "Farsi Puri",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      61,
+      "Farsi Puri"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:14:01",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 107,
+    "name": "Flower",
+    "display_name": "Flower",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      107,
+      "Flower"
+    ],
+    "list_price": 21,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-03-27 19:18:37",
+    "write_date": "2026-03-27 19:54:05"
+  },
+  {
+    "id": 28,
+    "name": "Free shipping",
+    "display_name": "Free shipping",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      28,
+      "Free shipping"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-08-29 01:20:34",
+    "write_date": "2026-03-25 17:01:05"
+  },
+  {
+    "id": 23,
+    "name": "Fulvadi",
+    "display_name": "Fulvadi",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      23,
+      "Fulvadi"
+    ],
+    "list_price": 5,
+    "standard_price": 0,
+    "active": false,
+    "type": "consu",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-08-27 17:57:54",
+    "write_date": "2025-11-22 16:19:43"
+  },
+  {
+    "id": 45,
+    "name": "Fulvadi",
+    "display_name": "Fulvadi",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      45,
+      "Fulvadi"
+    ],
+    "list_price": 8,
+    "standard_price": 6,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-11-23 03:15:29",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 12,
+    "name": "General Annual Donor",
+    "display_name": "General Annual Donor",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      12,
+      "General Annual Donor"
+    ],
+    "list_price": 301,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      7,
+      "Membership"
+    ],
+    "code": false,
+    "create_date": "2025-07-13 01:27:22",
+    "write_date": "2026-09-03 20:03:19"
+  },
+  {
+    "id": 8,
+    "name": "General Membership",
+    "display_name": "General Membership",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      8,
+      "General Membership"
+    ],
+    "list_price": 301,
+    "standard_price": 301,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      7,
+      "Membership"
+    ],
+    "code": false,
+    "create_date": "2025-07-12 14:32:38",
+    "write_date": "2025-07-13 01:39:34"
+  },
+  {
+    "id": 70,
+    "name": "Ghathiya",
+    "display_name": "Ghathiya",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      70,
+      "Ghathiya"
+    ],
+    "list_price": 8,
+    "standard_price": 6,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-02-07 17:36:03",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 18,
+    "name": "Gift Card",
+    "display_name": "Gift Card",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      18,
+      "Gift Card"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-07-13 15:56:41",
+    "write_date": "2026-03-25 17:01:18"
+  },
+  {
+    "id": 26,
+    "name": "Gift Card",
+    "display_name": "Gift Card",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      26,
+      "Gift Card"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2025-08-29 01:19:54",
+    "write_date": "2026-03-25 17:01:18"
+  },
+  {
+    "id": 105,
+    "name": "Grah Puja",
+    "display_name": "Grah Puja",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      105,
+      "Grah Puja"
+    ],
+    "list_price": 21,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-03-27 19:17:47",
+    "write_date": "2026-03-27 19:56:42"
+  },
+  {
+    "id": 22,
+    "name": "Gym Hall for Members",
+    "display_name": "Gym Hall for Members",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      22,
+      "Gym Hall for Members"
+    ],
+    "list_price": 3000,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-08-27 00:53:14",
+    "write_date": "2025-11-22 16:20:12"
+  },
+  {
+    "id": 36,
+    "name": "Gym Hall for non-Members",
+    "display_name": "Gym Hall for non-Members",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      36,
+      "Gym Hall for non-Members"
+    ],
+    "list_price": 3000,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-11-22 03:52:31",
+    "write_date": "2025-11-22 16:19:58"
+  },
+  {
+    "id": 43,
+    "name": "Gymnasium Hall",
+    "display_name": "Gymnasium Hall",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      43,
+      "Gymnasium Hall"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-11-23 02:52:31",
+    "write_date": "2026-09-06 15:44:33"
+  },
+  {
+    "id": 104,
+    "name": "HCC School Donation",
+    "display_name": "HCC School Donation",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      104,
+      "HCC School Donation"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      10,
+      "HCC School / Donation"
+    ],
+    "code": false,
+    "create_date": "2026-03-22 15:53:59",
+    "write_date": "2026-08-26 19:01:47"
+  },
+  {
+    "id": 116,
+    "name": "HCC T-Shirt",
+    "display_name": "HCC T-Shirt",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      116,
+      "HCC T-Shirt"
+    ],
+    "list_price": 20,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      26,
+      "General Merchandise"
+    ],
+    "code": false,
+    "create_date": "2026-05-05 12:40:02",
+    "write_date": "2026-08-26 19:05:24"
+  },
+  {
+    "id": 76,
+    "name": "Idli 1-plate",
+    "display_name": "Idli 1-plate",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      76,
+      "Idli 1-plate"
+    ],
+    "list_price": 6,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-02-08 15:26:03",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 77,
+    "name": "Idli 2-plate",
+    "display_name": "Idli 2-plate",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      77,
+      "Idli 2-plate"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-02-08 15:26:55",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 86,
+    "name": "Idli Batter",
+    "display_name": "Idli Batter",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      86,
+      "Idli Batter"
+    ],
+    "list_price": 7,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-02-14 21:46:23",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 139,
+    "name": "India Fest 2026 Sponsor Fee",
+    "display_name": "India Fest 2026 Sponsor Fee",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      139,
+      "India Fest 2026 Sponsor Fee"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2026-09-05 20:34:48",
+    "write_date": "2026-09-05 20:34:48"
+  },
+  {
+    "id": 138,
+    "name": "India Fest 2026 Vendor Fee",
+    "display_name": "India Fest 2026 Vendor Fee",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      138,
+      "India Fest 2026 Vendor Fee"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2026-09-05 20:34:47",
+    "write_date": "2026-09-05 20:34:47"
+  },
+  {
+    "id": 132,
+    "name": "IndiaFest 2026",
+    "display_name": "IndiaFest 2026",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      132,
+      "IndiaFest 2026"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      17,
+      "Events / Food & Beverage"
+    ],
+    "code": false,
+    "create_date": "2026-08-23 01:59:40",
+    "write_date": "2026-08-26 18:41:56"
+  },
+  {
+    "id": 53,
+    "name": "Jalebi",
+    "display_name": "Jalebi",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      53,
+      "Jalebi"
+    ],
+    "list_price": 12,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:11:21",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 54,
+    "name": "Kaju Katri",
+    "display_name": "Kaju Katri",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      54,
+      "Kaju Katri"
+    ],
+    "list_price": 12,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:11:32",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 126,
+    "name": "Khari Sing",
+    "display_name": "Khari Sing",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      126,
+      "Khari Sing"
+    ],
+    "list_price": 4,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-08-02 22:18:43",
+    "write_date": "2026-08-26 04:49:01"
+  },
+  {
+    "id": 44,
+    "name": "Kitchen",
+    "display_name": "Kitchen",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      44,
+      "Kitchen"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2025-11-23 02:54:38",
+    "write_date": "2026-08-26 19:06:02"
+  },
+  {
+    "id": 99,
+    "name": "Kite Sales",
+    "display_name": "Kite Sales",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      99,
+      "Kite Sales"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      24,
+      "Events / Merchandise"
+    ],
+    "code": false,
+    "create_date": "2026-03-21 17:06:09",
+    "write_date": "2026-08-26 18:41:23"
+  },
+  {
+    "id": 62,
+    "name": "Kopra Pak",
+    "display_name": "Kopra Pak",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      62,
+      "Kopra Pak"
+    ],
+    "list_price": 12,
+    "standard_price": 10,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:14:11",
+    "write_date": "2026-03-29 16:33:55"
+  },
+  {
+    "id": 129,
+    "name": "Ladoo",
+    "display_name": "Ladoo",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      129,
+      "Ladoo"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-08-02 22:29:39",
+    "write_date": "2026-08-26 04:49:10"
+  },
+  {
+    "id": 63,
+    "name": "Magaj",
+    "display_name": "Magaj",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      63,
+      "Magaj"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:14:21",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 113,
+    "name": "Manabaddi",
+    "display_name": "Manabaddi",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      113,
+      "Manabaddi"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      10,
+      "HCC School / Donation"
+    ],
+    "code": false,
+    "create_date": "2026-05-05 12:36:52",
+    "write_date": "2026-08-26 19:08:58"
+  },
+  {
+    "id": 55,
+    "name": "Methi Pak",
+    "display_name": "Methi Pak",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      55,
+      "Methi Pak"
+    ],
+    "list_price": 12,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:11:43",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 56,
+    "name": "Mohanthal",
+    "display_name": "Mohanthal",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      56,
+      "Mohanthal"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:11:55",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 66,
+    "name": "Monthly Event Sponsorship",
+    "display_name": "Monthly Event Sponsorship",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      66,
+      "Monthly Event Sponsorship"
+    ],
+    "list_price": 601,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      22,
+      "Events / Sponsorship"
+    ],
+    "code": false,
+    "create_date": "2025-12-18 21:42:09",
+    "write_date": "2026-08-26 18:59:29"
+  },
+  {
+    "id": 128,
+    "name": "Mysore Pak",
+    "display_name": "Mysore Pak",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      128,
+      "Mysore Pak"
+    ],
+    "list_price": 12,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-08-02 22:23:19",
+    "write_date": "2026-08-26 04:49:24"
+  },
+  {
+    "id": 119,
+    "name": "Navgrah Puja",
+    "display_name": "Navgrah Puja",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      119,
+      "Navgrah Puja"
+    ],
+    "list_price": 51,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-06-20 16:55:53",
+    "write_date": "2026-08-26 18:51:23"
+  },
+  {
+    "id": 75,
+    "name": "Nylon Sev",
+    "display_name": "Nylon Sev",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      75,
+      "Nylon Sev"
+    ],
+    "list_price": 8,
+    "standard_price": 6,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-02-07 17:40:31",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 72,
+    "name": "Papadi",
+    "display_name": "Papadi",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      72,
+      "Papadi"
+    ],
+    "list_price": 8,
+    "standard_price": 6,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-02-07 17:37:43",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 94,
+    "name": "Pav Bhaji",
+    "display_name": "Pav Bhaji",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      94,
+      "Pav Bhaji"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-02-23 22:22:16",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 57,
+    "name": "Peda",
+    "display_name": "Peda",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      57,
+      "Peda"
+    ],
+    "list_price": 12,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:12:04",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 125,
+    "name": "Pickleball Tournament Fee",
+    "display_name": "Pickleball Tournament Fee",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      125,
+      "Pickleball Tournament Fee"
+    ],
+    "list_price": 50,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      21,
+      "Events / Admission & Registration"
+    ],
+    "code": false,
+    "create_date": "2026-07-28 01:47:47",
+    "write_date": "2026-08-26 18:58:44"
+  },
+  {
+    "id": 13,
+    "name": "Pioneer Annual Donor",
+    "display_name": "Pioneer Annual Donor",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      13,
+      "Pioneer Annual Donor"
+    ],
+    "list_price": 1001,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      7,
+      "Membership"
+    ],
+    "code": false,
+    "create_date": "2025-07-13 01:28:56",
+    "write_date": "2026-09-03 20:03:21"
+  },
+  {
+    "id": 10,
+    "name": "Pioneer Membership",
+    "display_name": "Pioneer Membership",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      10,
+      "Pioneer Membership"
+    ],
+    "list_price": 1001,
+    "standard_price": 1001,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      7,
+      "Membership"
+    ],
+    "code": false,
+    "create_date": "2025-07-12 14:40:41",
+    "write_date": "2025-07-13 01:39:49"
+  },
+  {
+    "id": 82,
+    "name": "Priest Service",
+    "display_name": "Priest Service",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      82,
+      "Priest Service"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-02-11 17:39:12",
+    "write_date": "2026-08-26 18:51:33"
+  },
+  {
+    "id": 114,
+    "name": "Purna Vidya",
+    "display_name": "Purna Vidya",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      114,
+      "Purna Vidya"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      10,
+      "HCC School / Donation"
+    ],
+    "code": false,
+    "create_date": "2026-05-05 12:37:48",
+    "write_date": "2026-08-26 18:49:27"
+  },
+  {
+    "id": 88,
+    "name": "Rudrabhishek Member Donation",
+    "display_name": "Rudrabhishek Member Donation",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      88,
+      "Rudrabhishek Member Donation"
+    ],
+    "list_price": 101,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-02-15 02:28:58",
+    "write_date": "2026-03-27 19:59:05"
+  },
+  {
+    "id": 89,
+    "name": "Rudrabhishek Non Member Donation",
+    "display_name": "Rudrabhishek Non Member Donation",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      89,
+      "Rudrabhishek Non Member Donation"
+    ],
+    "list_price": 151,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-02-15 02:36:32",
+    "write_date": "2026-03-27 19:59:01"
+  },
+  {
+    "id": 64,
+    "name": "Sakkarpara",
+    "display_name": "Sakkarpara",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      64,
+      "Sakkarpara"
+    ],
+    "list_price": 8,
+    "standard_price": 7,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2025-12-17 21:14:36",
+    "write_date": "2026-08-02 22:32:03"
+  },
+  {
+    "id": 78,
+    "name": "Sambhar",
+    "display_name": "Sambhar",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      78,
+      "Sambhar"
+    ],
+    "list_price": 2,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-02-08 15:28:20",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 118,
+    "name": "Samskrita Bharati",
+    "display_name": "Samskrita Bharati",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      118,
+      "Samskrita Bharati"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      10,
+      "HCC School / Donation"
+    ],
+    "code": false,
+    "create_date": "2026-05-10 14:39:05",
+    "write_date": "2026-08-26 19:09:08"
+  },
+  {
+    "id": 109,
+    "name": "Saree – Customer Provided",
+    "display_name": "Saree – Customer Provided",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      109,
+      "Saree – Customer Provided"
+    ],
+    "list_price": 51,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-03-27 19:19:32",
+    "write_date": "2026-08-26 18:51:52"
+  },
+  {
+    "id": 110,
+    "name": "Saree – Provided by HCC",
+    "display_name": "Saree – Provided by HCC",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      110,
+      "Saree – Provided by HCC"
+    ],
+    "list_price": 101,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-03-27 19:19:45",
+    "write_date": "2026-08-26 18:52:06"
+  },
+  {
+    "id": 127,
+    "name": "Sata (Thor)",
+    "display_name": "Sata (Thor)",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      127,
+      "Sata (Thor)"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-08-02 22:20:38",
+    "write_date": "2026-08-26 04:50:15"
+  },
+  {
+    "id": 49,
+    "name": "Settle Due",
+    "display_name": "Settle Due",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      49,
+      "Settle Due"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      3,
+      "Services"
+    ],
+    "code": false,
+    "create_date": "2025-12-13 18:13:00",
+    "write_date": "2025-12-13 18:13:00"
+  },
+  {
+    "id": 14,
+    "name": "Sports Membership",
+    "display_name": "Sports Membership",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      14,
+      "Sports Membership"
+    ],
+    "list_price": 751,
+    "standard_price": 751,
+    "active": false,
+    "type": "service",
+    "categ_id": [
+      7,
+      "Membership"
+    ],
+    "code": false,
+    "create_date": "2025-07-13 01:30:59",
+    "write_date": "2025-12-18 02:17:52"
+  },
+  {
+    "id": 65,
+    "name": "Sports Membership",
+    "display_name": "Sports Membership",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      65,
+      "Sports Membership"
+    ],
+    "list_price": 751,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      14,
+      "Sports Membership"
+    ],
+    "code": false,
+    "create_date": "2025-12-18 15:28:33",
+    "write_date": "2026-08-26 18:58:00"
+  },
+  {
+    "id": 15,
+    "name": "Sports Membership w/General Annual Donor",
+    "display_name": "Sports Membership w/General Annual Donor",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      15,
+      "Sports Membership w/General Annual Donor"
+    ],
+    "list_price": 301,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      14,
+      "Sports Membership"
+    ],
+    "code": false,
+    "create_date": "2025-07-13 01:33:08",
+    "write_date": "2026-08-26 18:58:03"
+  },
+  {
+    "id": 124,
+    "name": "Table & Chair Rental",
+    "display_name": "Table & Chair Rental",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      124,
+      "Table & Chair Rental"
+    ],
+    "list_price": 0.5,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      8,
+      "Facility Rental"
+    ],
+    "code": false,
+    "create_date": "2026-06-21 20:17:43",
+    "write_date": "2026-08-26 19:05:45"
+  },
+  {
+    "id": 102,
+    "name": "Tamrind Rice - 32oz",
+    "display_name": "Tamrind Rice - 32oz",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      102,
+      "Tamrind Rice - 32oz"
+    ],
+    "list_price": 10,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-03-22 14:09:59",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 90,
+    "name": "Tamrind Rice -16oz",
+    "display_name": "Tamrind Rice -16oz",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      90,
+      "Tamrind Rice -16oz"
+    ],
+    "list_price": 5,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      27,
+      "HCC School / Fundraising Sales"
+    ],
+    "code": false,
+    "create_date": "2026-02-15 02:40:18",
+    "write_date": "2026-08-26 19:10:28"
+  },
+  {
+    "id": 81,
+    "name": "Temple Event",
+    "display_name": "Temple Event",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      81,
+      "Temple Event"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      11,
+      "Temple Puja"
+    ],
+    "code": false,
+    "create_date": "2026-02-11 17:38:02",
+    "write_date": "2026-03-27 19:55:08"
+  },
+  {
+    "id": 71,
+    "name": "Tikha Ghathiya",
+    "display_name": "Tikha Ghathiya",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      71,
+      "Tikha Ghathiya"
+    ],
+    "list_price": 8,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-02-07 17:36:55",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 73,
+    "name": "Tikhi Papadi",
+    "display_name": "Tikhi Papadi",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      73,
+      "Tikhi Papadi"
+    ],
+    "list_price": 8,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      12,
+      "Snacks"
+    ],
+    "code": false,
+    "create_date": "2026-02-07 17:38:58",
+    "write_date": "2026-03-25 19:14:47"
+  },
+  {
+    "id": 80,
+    "name": "Trustee $501",
+    "display_name": "Trustee $501",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      80,
+      "Trustee $501"
+    ],
+    "list_price": 501,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      13,
+      "Trustee Fee"
+    ],
+    "code": false,
+    "create_date": "2026-02-10 04:03:33",
+    "write_date": "2026-08-26 18:58:10"
+  },
+  {
+    "id": 121,
+    "name": "Umiya Mataji Pradhvani Aarti",
+    "display_name": "Umiya Mataji Pradhvani Aarti",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      121,
+      "Umiya Mataji Pradhvani Aarti"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      9,
+      "Donation"
+    ],
+    "code": false,
+    "create_date": "2026-06-21 20:12:47",
+    "write_date": "2026-08-26 19:11:22"
+  },
+  {
+    "id": 120,
+    "name": "Umiya Mataji Rath Pradhvani",
+    "display_name": "Umiya Mataji Rath Pradhvani",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      120,
+      "Umiya Mataji Rath Pradhvani"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "service",
+    "categ_id": [
+      9,
+      "Donation"
+    ],
+    "code": false,
+    "create_date": "2026-06-21 20:11:51",
+    "write_date": "2026-08-26 19:11:25"
+  },
+  {
+    "id": 83,
+    "name": "Yearly Banner 2026",
+    "display_name": "Yearly Banner 2026",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      83,
+      "Yearly Banner 2026"
+    ],
+    "list_price": 2500,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      9,
+      "Donation"
+    ],
+    "code": false,
+    "create_date": "2026-02-11 22:17:18",
+    "write_date": "2026-08-26 19:03:55"
+  },
+  {
+    "id": 84,
+    "name": "Yearly Banner 2026 - Custom Amount",
+    "display_name": "Yearly Banner 2026 - Custom Amount",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      84,
+      "Yearly Banner 2026 - Custom Amount"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": [
+      9,
+      "Donation"
+    ],
+    "code": false,
+    "create_date": "2026-02-14 20:14:13",
+    "write_date": "2026-08-26 19:06:22"
+  },
+  {
+    "id": 137,
+    "name": "nex door",
+    "display_name": "nex door",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      137,
+      "nex door"
+    ],
+    "list_price": 0,
+    "standard_price": 0,
+    "active": true,
+    "type": "consu",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2026-08-30 22:24:06",
+    "write_date": "2026-08-30 22:24:06"
+  },
+  {
+    "id": 95,
+    "name": "testing pos to backend membersszhip",
+    "display_name": "testing pos to backend membersszhip",
+    "default_code": false,
+    "barcode": false,
+    "product_tmpl_id": [
+      95,
+      "testing pos to backend membersszhip"
+    ],
+    "list_price": 1,
+    "standard_price": 0,
+    "active": false,
+    "type": "service",
+    "categ_id": false,
+    "code": false,
+    "create_date": "2026-02-23 23:40:31",
+    "write_date": "2026-08-26 05:13:51"
+  }
+]

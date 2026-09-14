@@ -1,0 +1,226 @@
+[
+  {
+    "id": 2,
+    "name": "Temple Donation",
+    "code_prefix_start": "100",
+    "code_prefix_end": "100",
+    "parent_id": false
+  },
+  {
+    "id": 26,
+    "name": "Jantorial",
+    "code_prefix_start": "1100",
+    "code_prefix_end": "1100",
+    "parent_id": false
+  },
+  {
+    "id": 4,
+    "name": "Dan Peti",
+    "code_prefix_start": "111",
+    "code_prefix_end": "111",
+    "parent_id": false
+  },
+  {
+    "id": 8,
+    "name": "Rental Income",
+    "code_prefix_start": "112",
+    "code_prefix_end": "112",
+    "parent_id": false
+  },
+  {
+    "id": 9,
+    "name": "Puja -Archana Income",
+    "code_prefix_start": "113",
+    "code_prefix_end": "113",
+    "parent_id": false
+  },
+  {
+    "id": 10,
+    "name": "Priest Services",
+    "code_prefix_start": "114",
+    "code_prefix_end": "114",
+    "parent_id": false
+  },
+  {
+    "id": 11,
+    "name": "Misc Income",
+    "code_prefix_start": "115",
+    "code_prefix_end": "115",
+    "parent_id": false
+  },
+  {
+    "id": 28,
+    "name": "Pest Control",
+    "code_prefix_start": "1300",
+    "code_prefix_end": "1300",
+    "parent_id": false
+  },
+  {
+    "id": 29,
+    "name": "Repair and Maintanance",
+    "code_prefix_start": "1400",
+    "code_prefix_end": "1400",
+    "parent_id": false
+  },
+  {
+    "id": 30,
+    "name": "License & Taxes",
+    "code_prefix_start": "1500",
+    "code_prefix_end": "1500",
+    "parent_id": false
+  },
+  {
+    "id": 31,
+    "name": "Insurance",
+    "code_prefix_start": "1600",
+    "code_prefix_end": "1600",
+    "parent_id": false
+  },
+  {
+    "id": 32,
+    "name": "Professional Fees",
+    "code_prefix_start": "1700",
+    "code_prefix_end": "1700",
+    "parent_id": false
+  },
+  {
+    "id": 3,
+    "name": "Event Income",
+    "code_prefix_start": "200",
+    "code_prefix_end": "200",
+    "parent_id": false
+  },
+  {
+    "id": 1,
+    "name": "Membership",
+    "code_prefix_start": "201",
+    "code_prefix_end": "201",
+    "parent_id": false
+  },
+  {
+    "id": 5,
+    "name": "Snack Sales",
+    "code_prefix_start": "202",
+    "code_prefix_end": "202",
+    "parent_id": false
+  },
+  {
+    "id": 6,
+    "name": "Catering Sales",
+    "code_prefix_start": "203",
+    "code_prefix_end": "203",
+    "parent_id": false
+  },
+  {
+    "id": 7,
+    "name": "General Product Sales",
+    "code_prefix_start": "204",
+    "code_prefix_end": "204",
+    "parent_id": false
+  },
+  {
+    "id": 17,
+    "name": "HCC School Income",
+    "code_prefix_start": "205",
+    "code_prefix_end": "205",
+    "parent_id": false
+  },
+  {
+    "id": 12,
+    "name": "Event Expenses",
+    "code_prefix_start": "300",
+    "code_prefix_end": "300",
+    "parent_id": false
+  },
+  {
+    "id": 13,
+    "name": "Catering Expense",
+    "code_prefix_start": "301",
+    "code_prefix_end": "301",
+    "parent_id": false
+  },
+  {
+    "id": 14,
+    "name": "Snack Expense",
+    "code_prefix_start": "302",
+    "code_prefix_end": "302",
+    "parent_id": false
+  },
+  {
+    "id": 15,
+    "name": "Rental Expense",
+    "code_prefix_start": "303",
+    "code_prefix_end": "303",
+    "parent_id": false
+  },
+  {
+    "id": 16,
+    "name": "Temple Expense",
+    "code_prefix_start": "304",
+    "code_prefix_end": "304",
+    "parent_id": false
+  },
+  {
+    "id": 18,
+    "name": "HCC School Fundraising Expense",
+    "code_prefix_start": "305",
+    "code_prefix_end": "305",
+    "parent_id": false
+  },
+  {
+    "id": 19,
+    "name": "General Merchandise Expense",
+    "code_prefix_start": "306",
+    "code_prefix_end": "306",
+    "parent_id": false
+  },
+  {
+    "id": 20,
+    "name": "Utilities",
+    "code_prefix_start": "400",
+    "code_prefix_end": "400",
+    "parent_id": false
+  },
+  {
+    "id": 21,
+    "name": "Payroll Expense",
+    "code_prefix_start": "500",
+    "code_prefix_end": "500",
+    "parent_id": false
+  },
+  {
+    "id": 22,
+    "name": "Kitchen Supplies",
+    "code_prefix_start": "600",
+    "code_prefix_end": "600",
+    "parent_id": false
+  },
+  {
+    "id": 23,
+    "name": "Temple Supllies",
+    "code_prefix_start": "700",
+    "code_prefix_end": "700",
+    "parent_id": false
+  },
+  {
+    "id": 24,
+    "name": "Landscaping",
+    "code_prefix_start": "800",
+    "code_prefix_end": "800",
+    "parent_id": false
+  },
+  {
+    "id": 25,
+    "name": "Retirement Expense",
+    "code_prefix_start": "900",
+    "code_prefix_end": "900",
+    "parent_id": false
+  },
+  {
+    "id": 27,
+    "name": "Credit Card Processing Fee",
+    "code_prefix_start": "950",
+    "code_prefix_end": "950",
+    "parent_id": false
+  }
+]

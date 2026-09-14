@@ -1,0 +1,1883 @@
+[
+  {
+    "id": 74,
+    "name": "Donation",
+    "code": "1000",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "General Temple Income",
+    "tax_ids": [],
+    "group_id": [
+      2,
+      "100 Temple Donation"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-21 17:52:45",
+    "write_date": "2026-08-26 03:20:30"
+  },
+  {
+    "id": 81,
+    "name": "Yearly Banner",
+    "code": "1003",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      2,
+      "100 Temple Donation"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-25 19:06:17",
+    "write_date": "2026-03-25 19:06:27"
+  },
+  {
+    "id": 82,
+    "name": "HCC School Donation",
+    "code": "1004",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      2,
+      "100 Temple Donation"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-25 19:07:49",
+    "write_date": "2026-08-26 18:34:50"
+  },
+  {
+    "id": 1,
+    "name": "Current Assets",
+    "code": "101000",
+    "account_type": "asset_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 44,
+    "name": "Account Receivable (PoS)",
+    "code": "101300",
+    "account_type": "asset_receivable",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 46,
+    "name": "HCC Bank",
+    "code": "101401",
+    "account_type": "asset_cash",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-03-25 21:13:09"
+  },
+  {
+    "id": 47,
+    "name": "Bank Suspense Account",
+    "code": "101402",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-09-03 05:21:42"
+  },
+  {
+    "id": 49,
+    "name": "Outstanding Receipts",
+    "code": "101403",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 50,
+    "name": "Outstanding Payments",
+    "code": "101404",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 121,
+    "name": "Checks",
+    "code": "1015",
+    "account_type": "asset_cash",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2026-08-31 19:34:01",
+    "write_date": "2026-08-31 19:34:01"
+  },
+  {
+    "id": 52,
+    "name": "Cash knoxville Mandir",
+    "code": "101501",
+    "account_type": "asset_cash",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 04:05:15",
+    "write_date": "2025-07-12 04:05:15"
+  },
+  {
+    "id": 122,
+    "name": "Cash IPAD-1",
+    "code": "1016",
+    "account_type": "asset_cash",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2026-08-31 22:54:41",
+    "write_date": "2026-08-31 22:54:41"
+  },
+  {
+    "id": 123,
+    "name": "Cash IPAD-2",
+    "code": "1017",
+    "account_type": "asset_cash",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2026-08-31 22:54:42",
+    "write_date": "2026-08-31 22:54:42"
+  },
+  {
+    "id": 48,
+    "name": "Liquidity Transfer",
+    "code": "101701",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 114,
+    "name": "Jantorial",
+    "code": "11000",
+    "account_type": "expense_other",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      26,
+      "1100 Jantorial"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:22:44",
+    "write_date": "2026-08-26 19:22:44"
+  },
+  {
+    "id": 2,
+    "name": "Stock Valuation",
+    "code": "110100",
+    "account_type": "asset_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-08-26 19:04:56"
+  },
+  {
+    "id": 3,
+    "name": "Stock Interim (Received)",
+    "code": "110200",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 4,
+    "name": "Stock Interim (Delivered)",
+    "code": "110300",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 5,
+    "name": "Cost of Production",
+    "code": "110400",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 6,
+    "name": "Work in Progress",
+    "code": "110500",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 54,
+    "name": "Dan Peti",
+    "code": "111",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      4,
+      "111 Dan Peti"
+    ],
+    "currency_id": false,
+    "create_date": "2025-11-21 03:26:50",
+    "write_date": "2026-08-26 03:39:04"
+  },
+  {
+    "id": 56,
+    "name": "Rental Income",
+    "code": "112",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      8,
+      "112 Rental Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-01-03 22:31:32",
+    "write_date": "2026-08-26 03:47:28"
+  },
+  {
+    "id": 76,
+    "name": "Puja-Archana",
+    "code": "113",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      9,
+      "113 Puja -Archana Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-25 18:32:59",
+    "write_date": "2026-08-26 03:48:14"
+  },
+  {
+    "id": 87,
+    "name": "Priest Services",
+    "code": "114",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      10,
+      "114 Priest Services"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 03:49:34",
+    "write_date": "2026-08-26 03:50:01"
+  },
+  {
+    "id": 88,
+    "name": "Misc Income",
+    "code": "115",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      11,
+      "115 Misc Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 03:51:57",
+    "write_date": "2026-08-26 03:51:57"
+  },
+  {
+    "id": 7,
+    "name": "Account Receivable",
+    "code": "121000",
+    "account_type": "asset_receivable",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 8,
+    "name": "Products to receive",
+    "code": "121100",
+    "account_type": "asset_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 9,
+    "name": "Owner's Current Account",
+    "code": "122000",
+    "account_type": "asset_receivable",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 10,
+    "name": "Prepaid Expenses",
+    "code": "128000",
+    "account_type": "asset_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 116,
+    "name": "Pest Control",
+    "code": "13000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      28,
+      "1300 Pest Control"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:23:55",
+    "write_date": "2026-08-26 19:23:55"
+  },
+  {
+    "id": 11,
+    "name": "Tax Paid",
+    "code": "131000",
+    "account_type": "asset_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 12,
+    "name": "Tax Receivable",
+    "code": "132000",
+    "account_type": "asset_receivable",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 117,
+    "name": "Repair & Maintanance",
+    "code": "14000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      29,
+      "1400 Repair and Maintanance"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:24:28",
+    "write_date": "2026-08-26 19:24:28"
+  },
+  {
+    "id": 13,
+    "name": "Prepayments",
+    "code": "141000",
+    "account_type": "asset_prepayments",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 118,
+    "name": "License & Taxes",
+    "code": "15000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      30,
+      "1500 License & Taxes"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:25:13",
+    "write_date": "2026-08-26 19:25:13"
+  },
+  {
+    "id": 14,
+    "name": "Fixed Asset",
+    "code": "151000",
+    "account_type": "asset_fixed",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 119,
+    "name": "Insurance",
+    "code": "16000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      31,
+      "1600 Insurance"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:25:40",
+    "write_date": "2026-08-26 19:25:40"
+  },
+  {
+    "id": 120,
+    "name": "Professional Fees",
+    "code": "17000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      32,
+      "1700 Professional Fees"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:26:03",
+    "write_date": "2026-08-26 19:26:03"
+  },
+  {
+    "id": 15,
+    "name": "Non-current assets",
+    "code": "191000",
+    "account_type": "asset_non_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 63,
+    "name": "Event Merchandise / Other Sales",
+    "code": "2001",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the incomes by type of events-in this case Kite Festival",
+    "tax_ids": [],
+    "group_id": [
+      3,
+      "200 Event Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:04:57",
+    "write_date": "2026-08-26 18:06:16"
+  },
+  {
+    "id": 64,
+    "name": "Event Food & Beverage Income",
+    "code": "2002",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the incomes by type of events-all type of food sell",
+    "tax_ids": [],
+    "group_id": [
+      3,
+      "200 Event Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:12:35",
+    "write_date": "2026-08-26 18:05:47"
+  },
+  {
+    "id": 65,
+    "name": "Event Raffle Income",
+    "code": "2003",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the incomes by type of events-all type of Raffle draw",
+    "tax_ids": [],
+    "group_id": [
+      3,
+      "200 Event Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:13:13",
+    "write_date": "2026-08-26 18:05:54"
+  },
+  {
+    "id": 86,
+    "name": "Event Admission / Ticket Income",
+    "code": "2004",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the incomes by type of events-in this case Kite Festival",
+    "tax_ids": [],
+    "group_id": [
+      3,
+      "200 Event Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 03:30:54",
+    "write_date": "2026-08-26 18:05:40"
+  },
+  {
+    "id": 89,
+    "name": "Event Sponsorship Income",
+    "code": "2005",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      3,
+      "200 Event Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:04:28",
+    "write_date": "2026-08-26 18:05:59"
+  },
+  {
+    "id": 84,
+    "name": "Event General Income",
+    "code": "2006",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the incomes by type of events-in this case Kite Festival",
+    "tax_ids": [],
+    "group_id": [
+      3,
+      "200 Event Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-25 19:12:38",
+    "write_date": "2026-08-26 18:06:08"
+  },
+  {
+    "id": 85,
+    "name": "Event Vendor / Booth Income",
+    "code": "2007",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the incomes by type of events-in this case Kite Festival",
+    "tax_ids": [],
+    "group_id": [
+      3,
+      "200 Event Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-23 02:03:55",
+    "write_date": "2026-08-26 18:05:30"
+  },
+  {
+    "id": 59,
+    "name": "Pioneer Membership",
+    "code": "2012",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      1,
+      "201 Membership"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-14 02:16:58",
+    "write_date": "2026-08-26 03:24:45"
+  },
+  {
+    "id": 60,
+    "name": "General Membership",
+    "code": "2013",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      1,
+      "201 Membership"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-14 02:18:12",
+    "write_date": "2026-08-26 03:24:51"
+  },
+  {
+    "id": 61,
+    "name": "Sports Membership W/General",
+    "code": "2014",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      1,
+      "201 Membership"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-14 02:18:29",
+    "write_date": "2026-08-26 03:24:57"
+  },
+  {
+    "id": 62,
+    "name": "Sports Membership",
+    "code": "2015",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      1,
+      "201 Membership"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-14 02:18:59",
+    "write_date": "2026-08-26 03:25:01"
+  },
+  {
+    "id": 58,
+    "name": "Trustee Fee",
+    "code": "2016",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      1,
+      "201 Membership"
+    ],
+    "currency_id": false,
+    "create_date": "2026-02-10 04:05:53",
+    "write_date": "2026-08-26 03:25:06"
+  },
+  {
+    "id": 77,
+    "name": "Snack & Sweet Sales",
+    "code": "202",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the incomes by type of events-all type of food sell",
+    "tax_ids": [],
+    "group_id": [
+      5,
+      "202 Snack Sales"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-25 18:59:52",
+    "write_date": "2026-08-26 03:45:54"
+  },
+  {
+    "id": 79,
+    "name": "Catering Income",
+    "code": "203",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the incomes by type of events-all type of food sell",
+    "tax_ids": [],
+    "group_id": [
+      6,
+      "203 Catering Sales"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-25 19:01:34",
+    "write_date": "2026-08-26 03:42:38"
+  },
+  {
+    "id": 28,
+    "name": "General Product Sales",
+    "code": "204",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      7,
+      "204 General Product Sales"
+    ],
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-08-26 03:43:25"
+  },
+  {
+    "id": 96,
+    "name": "HCC School Program / Fundraising Income",
+    "code": "205",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      17,
+      "205 HCC School Income"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:32:24",
+    "write_date": "2026-08-26 18:32:24"
+  },
+  {
+    "id": 17,
+    "name": "Account Payable",
+    "code": "211000",
+    "account_type": "liability_payable",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 18,
+    "name": "Bills to receive",
+    "code": "211100",
+    "account_type": "liability_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 19,
+    "name": "Deferred Revenue",
+    "code": "212000",
+    "account_type": "liability_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 16,
+    "name": "Current Liabilities",
+    "code": "222000",
+    "account_type": "liability_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-08-26 03:45:17"
+  },
+  {
+    "id": 45,
+    "name": "Credit Card",
+    "code": "222100",
+    "account_type": "liability_credit_card",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-08-26 03:45:27"
+  },
+  {
+    "id": 20,
+    "name": "Salary Payable",
+    "code": "230000",
+    "account_type": "liability_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 21,
+    "name": "Employee Payroll Taxes",
+    "code": "230100",
+    "account_type": "liability_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 22,
+    "name": "Employer Payroll Taxes",
+    "code": "230200",
+    "account_type": "liability_current",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 23,
+    "name": "Tax Received",
+    "code": "251000",
+    "account_type": "liability_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 24,
+    "name": "Tax Payable",
+    "code": "252000",
+    "account_type": "liability_payable",
+    "reconcile": true,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 25,
+    "name": "Non-current Liabilities",
+    "code": "291000",
+    "account_type": "liability_non_current",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 66,
+    "name": "Event Raffle & Prize Expense",
+    "code": "30001",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the expense by type of events-all type of Raffle draw",
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:13:40",
+    "write_date": "2026-08-26 18:12:13"
+  },
+  {
+    "id": 67,
+    "name": "Event Food & Catering Expense",
+    "code": "30002",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the expense by type of events-all type of Raffle draw",
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:14:15",
+    "write_date": "2026-08-26 18:12:17"
+  },
+  {
+    "id": 68,
+    "name": "Event Security / Police Expense",
+    "code": "30003",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the expense by type of events-all type of Raffle draw",
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:14:24",
+    "write_date": "2026-08-26 18:12:19"
+  },
+  {
+    "id": 69,
+    "name": "Event Beverage Expense",
+    "code": "30004",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the expense by type of events-all type of Raffle draw",
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:14:36",
+    "write_date": "2026-08-26 18:12:22"
+  },
+  {
+    "id": 70,
+    "name": "Event Venue / Rental Expense",
+    "code": "30005",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the expense by type of events-all type of Raffle draw",
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:14:48",
+    "write_date": "2026-08-26 18:12:26"
+  },
+  {
+    "id": 71,
+    "name": "Event Cleaning Expense",
+    "code": "30006",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the expense by type of events-all type of Raffle draw",
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-20 21:14:57",
+    "write_date": "2026-08-26 18:12:29"
+  },
+  {
+    "id": 73,
+    "name": "Event Merchandise / Supplies Expense",
+    "code": "30007",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-21 17:05:48",
+    "write_date": "2026-08-26 18:12:32"
+  },
+  {
+    "id": 90,
+    "name": "Event Entertainment Expense",
+    "code": "30008",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:08:55",
+    "write_date": "2026-08-26 18:12:35"
+  },
+  {
+    "id": 91,
+    "name": "Event Decorations Expense",
+    "code": "30009",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:09:06",
+    "write_date": "2026-08-26 18:12:38"
+  },
+  {
+    "id": 92,
+    "name": "Event Marketing & Printing Expense",
+    "code": "30010",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:09:26",
+    "write_date": "2026-08-26 18:12:40"
+  },
+  {
+    "id": 93,
+    "name": "Event Equipment Rental Expense",
+    "code": "30011",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:11:28",
+    "write_date": "2026-08-26 18:12:43"
+  },
+  {
+    "id": 94,
+    "name": "Event Permits & Fees",
+    "code": "30012",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:11:39",
+    "write_date": "2026-08-26 18:12:46"
+  },
+  {
+    "id": 95,
+    "name": "Event Miscellaneous Expense",
+    "code": "30013",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      12,
+      "300 Event Expenses"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:11:49",
+    "write_date": "2026-08-26 18:12:49"
+  },
+  {
+    "id": 80,
+    "name": "Catering Expense",
+    "code": "301",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "General Temple expenses",
+    "tax_ids": [],
+    "group_id": [
+      13,
+      "301 Catering Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-25 19:02:00",
+    "write_date": "2026-08-26 04:40:23"
+  },
+  {
+    "id": 78,
+    "name": "Snack Expense",
+    "code": "302",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "This will be used to track all the expense by type of events-all type of Raffle draw",
+    "tax_ids": [],
+    "group_id": [
+      14,
+      "302 Snack Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-25 19:00:15",
+    "write_date": "2026-08-26 04:40:52"
+  },
+  {
+    "id": 57,
+    "name": "Rental Expense",
+    "code": "303",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      15,
+      "303 Rental Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-01-03 22:31:55",
+    "write_date": "2026-08-26 04:39:47"
+  },
+  {
+    "id": 75,
+    "name": "Temple Expenses",
+    "code": "304",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": "General Temple expenses",
+    "tax_ids": [],
+    "group_id": [
+      16,
+      "304 Temple Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-03-21 17:54:54",
+    "write_date": "2026-08-26 04:41:18"
+  },
+  {
+    "id": 97,
+    "name": "HCC School Program / Fundraising Expense",
+    "code": "305",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      18,
+      "305 HCC School Fundraising Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:33:23",
+    "write_date": "2026-08-26 18:33:23"
+  },
+  {
+    "id": 98,
+    "name": "General Merchandise Expense",
+    "code": "306",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      19,
+      "306 General Merchandise Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 18:34:07",
+    "write_date": "2026-08-26 18:46:11"
+  },
+  {
+    "id": 26,
+    "name": "Capital",
+    "code": "311000",
+    "account_type": "equity",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-08-26 04:40:34"
+  },
+  {
+    "id": 27,
+    "name": "Dividends",
+    "code": "322000",
+    "account_type": "equity",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-08-26 04:39:57"
+  },
+  {
+    "id": 99,
+    "name": "Electric",
+    "code": "4001",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      20,
+      "400 Utilities"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:14:49",
+    "write_date": "2026-08-26 19:16:31"
+  },
+  {
+    "id": 100,
+    "name": "Water",
+    "code": "4002",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      20,
+      "400 Utilities"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:14:57",
+    "write_date": "2026-08-26 19:16:36"
+  },
+  {
+    "id": 101,
+    "name": "Sewer",
+    "code": "4003",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      20,
+      "400 Utilities"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:15:07",
+    "write_date": "2026-08-26 19:16:45"
+  },
+  {
+    "id": 102,
+    "name": "Gas",
+    "code": "4004",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      20,
+      "400 Utilities"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:15:15",
+    "write_date": "2026-08-26 19:16:48"
+  },
+  {
+    "id": 103,
+    "name": "Septic",
+    "code": "4005",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      20,
+      "400 Utilities"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:15:23",
+    "write_date": "2026-08-26 19:16:51"
+  },
+  {
+    "id": 104,
+    "name": "Trash Removal",
+    "code": "4006",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      20,
+      "400 Utilities"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:15:32",
+    "write_date": "2026-08-26 19:16:53"
+  },
+  {
+    "id": 29,
+    "name": "Foreign Exchange Gain",
+    "code": "441000",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 30,
+    "name": "Cash Difference Gain",
+    "code": "442000",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 31,
+    "name": "Cash Discount Loss",
+    "code": "443000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 32,
+    "name": "Other Income",
+    "code": "450000",
+    "account_type": "income_other",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 33,
+    "name": "Cost of Goods Sold",
+    "code": "500000",
+    "account_type": "expense_direct_cost",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      21,
+      "500 Payroll Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 105,
+    "name": "Payroll Expense",
+    "code": "5001",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      21,
+      "500 Payroll Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:17:24",
+    "write_date": "2026-08-26 19:18:52"
+  },
+  {
+    "id": 106,
+    "name": "Payroll Taxes",
+    "code": "5002",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      21,
+      "500 Payroll Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:18:15",
+    "write_date": "2026-08-26 19:18:58"
+  },
+  {
+    "id": 34,
+    "name": "Expenses",
+    "code": "600000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      22,
+      "600 Kitchen Supplies"
+    ],
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 107,
+    "name": "Kitchen Groceries",
+    "code": "6001",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      22,
+      "600 Kitchen Supplies"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:19:18",
+    "write_date": "2026-08-26 19:19:50"
+  },
+  {
+    "id": 108,
+    "name": "Kitchen Paper Products",
+    "code": "6002",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      22,
+      "600 Kitchen Supplies"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:20:02",
+    "write_date": "2026-08-26 19:20:02"
+  },
+  {
+    "id": 109,
+    "name": "Kitchen Utensils",
+    "code": "6003",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      22,
+      "600 Kitchen Supplies"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:20:14",
+    "write_date": "2026-08-26 19:20:14"
+  },
+  {
+    "id": 55,
+    "name": "Stock Variation",
+    "code": "610000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2026-01-02 05:39:00",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 35,
+    "name": "Purchase of Equipments",
+    "code": "611000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 36,
+    "name": "Rent",
+    "code": "612000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 37,
+    "name": "Bank Fees",
+    "code": "620000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 38,
+    "name": "Salary Expenses",
+    "code": "630000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 39,
+    "name": "Foreign Exchange Loss",
+    "code": "641000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 40,
+    "name": "Cash Difference Loss",
+    "code": "642000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 41,
+    "name": "Cash Discount Gain",
+    "code": "643000",
+    "account_type": "income",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  },
+  {
+    "id": 110,
+    "name": "Temple Supplies",
+    "code": "7001",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      23,
+      "700 Temple Supllies"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:20:29",
+    "write_date": "2026-08-26 19:20:46"
+  },
+  {
+    "id": 111,
+    "name": "Landscaping",
+    "code": "8001",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      24,
+      "800 Landscaping"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:21:08",
+    "write_date": "2026-08-26 19:21:08"
+  },
+  {
+    "id": 112,
+    "name": "Retirement Expense",
+    "code": "9001",
+    "account_type": "expense_other",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      25,
+      "900 Retirement Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:21:36",
+    "write_date": "2026-08-26 19:21:36"
+  },
+  {
+    "id": 113,
+    "name": "Charles Schwab IRA",
+    "code": "9002",
+    "account_type": "expense_other",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      25,
+      "900 Retirement Expense"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:22:13",
+    "write_date": "2026-08-26 19:22:13"
+  },
+  {
+    "id": 115,
+    "name": "Credit Card Processing Fee",
+    "code": "950",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": [
+      27,
+      "950 Credit Card Processing Fee"
+    ],
+    "currency_id": false,
+    "create_date": "2026-08-26 19:23:20",
+    "write_date": "2026-09-03 05:00:08"
+  },
+  {
+    "id": 42,
+    "name": "RD Expenses",
+    "code": "961000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 43,
+    "name": "Sales Expenses",
+    "code": "962000",
+    "account_type": "expense",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2026-01-02 05:39:00"
+  },
+  {
+    "id": 51,
+    "name": "Undistributed Profits/Losses",
+    "code": "999999",
+    "account_type": "equity_unaffected",
+    "reconcile": false,
+    "active": true,
+    "description": false,
+    "tax_ids": [],
+    "group_id": false,
+    "currency_id": false,
+    "create_date": "2025-07-12 01:40:50",
+    "write_date": "2025-07-12 02:36:30"
+  }
+]

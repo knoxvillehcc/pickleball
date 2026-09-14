@@ -1,0 +1,521 @@
+[
+  {
+    "id": 15,
+    "name": "Catering",
+    "complete_name": "Catering",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "15/",
+    "product_count": 1,
+    "property_account_income_categ_id": [
+      79,
+      "203 Catering Income"
+    ],
+    "property_account_expense_categ_id": [
+      80,
+      "301 Catering Expense"
+    ],
+    "create_date": "2026-03-02 20:19:54",
+    "write_date": "2026-03-25 19:04:37"
+  },
+  {
+    "id": 19,
+    "name": "Dan Peti",
+    "complete_name": "Dan Peti",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "19/",
+    "product_count": 1,
+    "property_account_income_categ_id": [
+      54,
+      "111 Dan Peti"
+    ],
+    "property_account_expense_categ_id": false,
+    "create_date": "2026-03-30 21:33:55",
+    "write_date": "2026-03-30 21:33:55"
+  },
+  {
+    "id": 5,
+    "name": "Deliveries",
+    "complete_name": "Deliveries",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "5/",
+    "product_count": 1,
+    "property_account_income_categ_id": [
+      28,
+      "204 General Product Sales"
+    ],
+    "property_account_expense_categ_id": [
+      34,
+      "600000 Expenses"
+    ],
+    "create_date": "2025-07-12 01:40:46",
+    "write_date": "2025-07-12 01:40:46"
+  },
+  {
+    "id": 9,
+    "name": "Donation",
+    "complete_name": "Donation",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "9/",
+    "product_count": 6,
+    "property_account_income_categ_id": [
+      74,
+      "1000 Donation"
+    ],
+    "property_account_expense_categ_id": [
+      75,
+      "304 Temple Expenses"
+    ],
+    "create_date": "2026-01-10 19:08:53",
+    "write_date": "2026-03-25 19:07:35"
+  },
+  {
+    "id": 21,
+    "name": "Events / Admission & Registration",
+    "complete_name": "Events / Admission & Registration",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "21/",
+    "product_count": 2,
+    "property_account_income_categ_id": [
+      86,
+      "2004 Event Admission / Ticket Income"
+    ],
+    "property_account_expense_categ_id": [
+      34,
+      "600000 Expenses"
+    ],
+    "create_date": "2026-08-26 18:35:38",
+    "write_date": "2026-08-26 18:35:38"
+  },
+  {
+    "id": 17,
+    "name": "Events / Food & Beverage",
+    "complete_name": "Events / Food & Beverage",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "17/",
+    "product_count": 3,
+    "property_account_income_categ_id": [
+      64,
+      "2002 Event Food & Beverage Income"
+    ],
+    "property_account_expense_categ_id": [
+      67,
+      "30002 Event Food & Catering Expense"
+    ],
+    "create_date": "2026-03-21 17:07:22",
+    "write_date": "2026-08-26 18:35:56"
+  },
+  {
+    "id": 25,
+    "name": "Events / General",
+    "complete_name": "Events / General",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "25/",
+    "product_count": 1,
+    "property_account_income_categ_id": [
+      84,
+      "2006 Event General Income"
+    ],
+    "property_account_expense_categ_id": [
+      95,
+      "30013 Event Miscellaneous Expense"
+    ],
+    "create_date": "2026-08-26 18:37:35",
+    "write_date": "2026-08-26 18:37:35"
+  },
+  {
+    "id": 24,
+    "name": "Events / Merchandise",
+    "complete_name": "Events / Merchandise",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "24/",
+    "product_count": 2,
+    "property_account_income_categ_id": [
+      63,
+      "2001 Event Merchandise / Other Sales"
+    ],
+    "property_account_expense_categ_id": [
+      73,
+      "30007 Event Merchandise / Supplies Expense"
+    ],
+    "create_date": "2026-08-26 18:37:19",
+    "write_date": "2026-08-26 18:37:19"
+  },
+  {
+    "id": 18,
+    "name": "Events / Raffle",
+    "complete_name": "Events / Raffle",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "18/",
+    "product_count": 1,
+    "property_account_income_categ_id": [
+      65,
+      "2003 Event Raffle Income"
+    ],
+    "property_account_expense_categ_id": [
+      66,
+      "30001 Event Raffle & Prize Expense"
+    ],
+    "create_date": "2026-03-21 17:07:41",
+    "write_date": "2026-08-26 18:37:00"
+  },
+  {
+    "id": 22,
+    "name": "Events / Sponsorship",
+    "complete_name": "Events / Sponsorship",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "22/",
+    "product_count": 2,
+    "property_account_income_categ_id": [
+      89,
+      "2005 Event Sponsorship Income"
+    ],
+    "property_account_expense_categ_id": [
+      95,
+      "30013 Event Miscellaneous Expense"
+    ],
+    "create_date": "2026-08-26 18:36:20",
+    "write_date": "2026-08-26 18:36:20"
+  },
+  {
+    "id": 23,
+    "name": "Events / Vendor Booth",
+    "complete_name": "Events / Vendor Booth",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "23/",
+    "product_count": 2,
+    "property_account_income_categ_id": [
+      85,
+      "2007 Event Vendor / Booth Income"
+    ],
+    "property_account_expense_categ_id": [
+      95,
+      "30013 Event Miscellaneous Expense"
+    ],
+    "create_date": "2026-08-26 18:36:47",
+    "write_date": "2026-08-26 18:36:47"
+  },
+  {
+    "id": 2,
+    "name": "Expenses",
+    "complete_name": "Expenses",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "2/",
+    "product_count": 0,
+    "property_account_income_categ_id": [
+      28,
+      "204 General Product Sales"
+    ],
+    "property_account_expense_categ_id": [
+      80,
+      "301 Catering Expense"
+    ],
+    "create_date": "2025-07-12 01:40:29",
+    "write_date": "2026-03-25 19:08:58"
+  },
+  {
+    "id": 8,
+    "name": "Facility Rental",
+    "complete_name": "Facility Rental",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "8/",
+    "product_count": 7,
+    "property_account_income_categ_id": [
+      56,
+      "112 Rental Income"
+    ],
+    "property_account_expense_categ_id": [
+      57,
+      "303 Rental Expense"
+    ],
+    "create_date": "2025-10-09 00:03:47",
+    "write_date": "2026-08-26 19:10:58"
+  },
+  {
+    "id": 6,
+    "name": "Food",
+    "complete_name": "Food",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "6/",
+    "product_count": 0,
+    "property_account_income_categ_id": [
+      64,
+      "2002 Event Food & Beverage Income"
+    ],
+    "property_account_expense_categ_id": [
+      67,
+      "30002 Event Food & Catering Expense"
+    ],
+    "create_date": "2025-07-12 02:01:51",
+    "write_date": "2026-03-25 19:09:15"
+  },
+  {
+    "id": 26,
+    "name": "General Merchandise",
+    "complete_name": "General Merchandise",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "26/",
+    "product_count": 1,
+    "property_account_income_categ_id": [
+      28,
+      "204 General Product Sales"
+    ],
+    "property_account_expense_categ_id": [
+      34,
+      "600000 Expenses"
+    ],
+    "create_date": "2026-08-26 18:46:11",
+    "write_date": "2026-08-26 18:46:11"
+  },
+  {
+    "id": 1,
+    "name": "Goods",
+    "complete_name": "Goods",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "1/",
+    "product_count": 0,
+    "property_account_income_categ_id": [
+      28,
+      "204 General Product Sales"
+    ],
+    "property_account_expense_categ_id": [
+      34,
+      "600000 Expenses"
+    ],
+    "create_date": "2025-07-12 01:40:29",
+    "write_date": "2025-07-12 01:40:29"
+  },
+  {
+    "id": 10,
+    "name": "HCC School / Donation",
+    "complete_name": "HCC School / Donation",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "10/",
+    "product_count": 5,
+    "property_account_income_categ_id": [
+      82,
+      "1004 HCC School Donation"
+    ],
+    "property_account_expense_categ_id": false,
+    "create_date": "2026-02-15 02:26:06",
+    "write_date": "2026-08-26 19:00:14"
+  },
+  {
+    "id": 27,
+    "name": "HCC School / Fundraising Sales",
+    "complete_name": "HCC School / Fundraising Sales",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "27/",
+    "product_count": 10,
+    "property_account_income_categ_id": [
+      96,
+      "205 HCC School Program / Fundraising Income"
+    ],
+    "property_account_expense_categ_id": [
+      95,
+      "30013 Event Miscellaneous Expense"
+    ],
+    "create_date": "2026-08-26 19:04:23",
+    "write_date": "2026-08-26 19:04:37"
+  },
+  {
+    "id": 28,
+    "name": "HCC School / Programs",
+    "complete_name": "HCC School / Programs",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "28/",
+    "product_count": 0,
+    "property_account_income_categ_id": [
+      96,
+      "205 HCC School Program / Fundraising Income"
+    ],
+    "property_account_expense_categ_id": [
+      97,
+      "305 HCC School Program / Fundraising Expense"
+    ],
+    "create_date": "2026-08-26 19:04:56",
+    "write_date": "2026-08-26 19:04:56"
+  },
+  {
+    "id": 20,
+    "name": "IndiaFest 2026",
+    "complete_name": "IndiaFest 2026",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "20/",
+    "product_count": 0,
+    "property_account_income_categ_id": [
+      28,
+      "204 General Product Sales"
+    ],
+    "property_account_expense_categ_id": [
+      34,
+      "600000 Expenses"
+    ],
+    "create_date": "2026-08-23 02:00:00",
+    "write_date": "2026-08-23 02:00:00"
+  },
+  {
+    "id": 16,
+    "name": "Kite Festival",
+    "complete_name": "Kite Festival",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "16/",
+    "product_count": 0,
+    "property_account_income_categ_id": [
+      63,
+      "2001 Event Merchandise / Other Sales"
+    ],
+    "property_account_expense_categ_id": [
+      73,
+      "30007 Event Merchandise / Supplies Expense"
+    ],
+    "create_date": "2026-03-21 17:05:53",
+    "write_date": "2026-03-21 17:05:53"
+  },
+  {
+    "id": 7,
+    "name": "Membership",
+    "complete_name": "Membership",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "7/",
+    "product_count": 2,
+    "property_account_income_categ_id": false,
+    "property_account_expense_categ_id": false,
+    "create_date": "2025-07-12 14:38:58",
+    "write_date": "2026-03-25 19:09:54"
+  },
+  {
+    "id": 3,
+    "name": "Services",
+    "complete_name": "Services",
+    "parent_id": false,
+    "child_id": [
+      4
+    ],
+    "parent_path": "3/",
+    "product_count": 2,
+    "property_account_income_categ_id": [
+      74,
+      "1000 Donation"
+    ],
+    "property_account_expense_categ_id": [
+      75,
+      "304 Temple Expenses"
+    ],
+    "create_date": "2025-07-12 01:40:29",
+    "write_date": "2026-03-25 19:11:31"
+  },
+  {
+    "id": 4,
+    "name": "Events",
+    "complete_name": "Services / Events",
+    "parent_id": [
+      3,
+      "Services"
+    ],
+    "child_id": [],
+    "parent_path": "3/4/",
+    "product_count": 0,
+    "property_account_income_categ_id": [
+      84,
+      "2006 Event General Income"
+    ],
+    "property_account_expense_categ_id": [
+      75,
+      "304 Temple Expenses"
+    ],
+    "create_date": "2025-07-12 01:40:39",
+    "write_date": "2026-03-25 19:13:16"
+  },
+  {
+    "id": 12,
+    "name": "Snacks",
+    "complete_name": "Snacks",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "12/",
+    "product_count": 25,
+    "property_account_income_categ_id": [
+      77,
+      "202 Snack & Sweet Sales"
+    ],
+    "property_account_expense_categ_id": [
+      78,
+      "302 Snack Expense"
+    ],
+    "create_date": "2026-02-15 02:32:10",
+    "write_date": "2026-03-25 19:13:25"
+  },
+  {
+    "id": 14,
+    "name": "Sports Membership",
+    "complete_name": "Sports Membership",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "14/",
+    "product_count": 2,
+    "property_account_income_categ_id": false,
+    "property_account_expense_categ_id": false,
+    "create_date": "2026-02-15 02:48:06",
+    "write_date": "2026-03-25 19:15:30"
+  },
+  {
+    "id": 11,
+    "name": "Temple Puja",
+    "complete_name": "Temple Puja",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "11/",
+    "product_count": 13,
+    "property_account_income_categ_id": [
+      76,
+      "113 Puja-Archana"
+    ],
+    "property_account_expense_categ_id": [
+      75,
+      "304 Temple Expenses"
+    ],
+    "create_date": "2026-02-15 02:28:00",
+    "write_date": "2026-03-25 19:16:00"
+  },
+  {
+    "id": 13,
+    "name": "Trustee Fee",
+    "complete_name": "Trustee Fee",
+    "parent_id": false,
+    "child_id": [],
+    "parent_path": "13/",
+    "product_count": 1,
+    "property_account_income_categ_id": [
+      58,
+      "2016 Trustee Fee"
+    ],
+    "property_account_expense_categ_id": [
+      34,
+      "600000 Expenses"
+    ],
+    "create_date": "2026-02-15 02:47:25",
+    "write_date": "2026-03-25 19:04:20"
+  }
+]

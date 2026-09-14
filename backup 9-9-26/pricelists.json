@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "Default",
+    "active": true,
+    "currency_id": [
+      1,
+      "USD"
+    ],
+    "item_ids": [
+      22,
+      25,
+      21,
+      17,
+      16
+    ],
+    "sequence": 10,
+    "create_date": "2025-08-26 18:31:49",
+    "write_date": "2025-11-22 16:24:31"
+  },
+  {
+    "id": 3,
+    "name": "G-Member",
+    "active": true,
+    "currency_id": [
+      1,
+      "USD"
+    ],
+    "item_ids": [
+      23,
+      19
+    ],
+    "sequence": 16,
+    "create_date": "2025-11-22 15:50:36",
+    "write_date": "2025-11-22 16:29:14"
+  },
+  {
+    "id": 4,
+    "name": "P-Member",
+    "active": true,
+    "currency_id": [
+      1,
+      "USD"
+    ],
+    "item_ids": [],
+    "sequence": 16,
+    "create_date": "2025-11-22 15:51:04",
+    "write_date": "2026-07-15 21:52:21"
+  }
+]

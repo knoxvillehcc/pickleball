@@ -1,0 +1,65 @@
+[
+  {
+    "id": 9,
+    "name": "Brand",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  },
+  {
+    "id": 1,
+    "name": "color",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  },
+  {
+    "id": 2,
+    "name": "gender",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  },
+  {
+    "id": 3,
+    "name": "material",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  },
+  {
+    "id": 4,
+    "name": "pattern",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  },
+  {
+    "id": 5,
+    "name": "manufacturer",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  },
+  {
+    "id": 6,
+    "name": "brand",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  },
+  {
+    "id": 7,
+    "name": "size",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  },
+  {
+    "id": 8,
+    "name": "age group",
+    "display_type": "radio",
+    "create_variant": "always",
+    "value_ids": []
+  }
+]

@@ -1,0 +1,327 @@
+[
+  {
+    "id": 23,
+    "pricelist_id": [
+      3,
+      "G-Member (USD)"
+    ],
+    "product_tmpl_id": [
+      67,
+      "Event Registration 1"
+    ],
+    "product_id": [
+      67,
+      "Event Registration 1"
+    ],
+    "categ_id": false,
+    "applied_on": "0_product_variant",
+    "compute_price": "fixed",
+    "fixed_price": 30,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 0,
+    "date_start": false,
+    "date_end": false,
+    "create_date": "2025-12-25 15:23:05",
+    "write_date": "2025-12-25 15:23:05"
+  },
+  {
+    "id": 22,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      67,
+      "Event Registration 1"
+    ],
+    "product_id": [
+      67,
+      "Event Registration 1"
+    ],
+    "categ_id": false,
+    "applied_on": "0_product_variant",
+    "compute_price": "fixed",
+    "fixed_price": 50,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 0,
+    "date_start": false,
+    "date_end": false,
+    "create_date": "2025-12-25 15:23:05",
+    "write_date": "2025-12-25 15:23:05"
+  },
+  {
+    "id": 28,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      15,
+      "Sports Membership w/General Annual Donor"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 301,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 1,
+    "date_start": "2026-01-01 05:15:00",
+    "date_end": "2027-01-01 04:45:00",
+    "create_date": "2026-03-31 14:25:15",
+    "write_date": "2026-03-31 14:28:09"
+  },
+  {
+    "id": 25,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      13,
+      "Pioneer Annual Donor"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 1001,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 1,
+    "date_start": "2026-12-31 13:00:00",
+    "date_end": false,
+    "create_date": "2026-01-21 13:41:40",
+    "write_date": "2026-01-21 13:41:40"
+  },
+  {
+    "id": 8,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      12,
+      "General Annual Donor"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 301,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 1,
+    "date_start": "2026-01-01 11:00:00",
+    "date_end": "2027-01-01 04:45:00",
+    "create_date": "2025-08-21 02:39:41",
+    "write_date": "2026-01-21 13:51:22"
+  },
+  {
+    "id": 6,
+    "pricelist_id": [
+      3,
+      "G-Member (USD)"
+    ],
+    "product_tmpl_id": [
+      15,
+      "Sports Membership w/General Annual Donor"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 351,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 1,
+    "date_start": "2026-01-01 13:00:00",
+    "date_end": "2027-01-01 04:45:00",
+    "create_date": "2025-07-13 01:33:08",
+    "write_date": "2026-01-21 13:50:26"
+  },
+  {
+    "id": 5,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      14,
+      "Sports Membership"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 751,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 1,
+    "date_start": "2025-01-01 05:00:00",
+    "date_end": "2026-01-01 04:45:00",
+    "create_date": "2025-07-13 01:30:59",
+    "write_date": "2025-11-22 16:24:53"
+  },
+  {
+    "id": 4,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      13,
+      "Pioneer Annual Donor"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 1001,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 1,
+    "date_start": "2026-01-01 13:00:00",
+    "date_end": "2027-01-01 04:45:00",
+    "create_date": "2025-07-13 01:28:56",
+    "write_date": "2026-01-21 13:51:12"
+  },
+  {
+    "id": 2,
+    "pricelist_id": false,
+    "product_tmpl_id": [
+      8,
+      "General Membership"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 301,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 1,
+    "date_start": "2025-04-01 04:00:00",
+    "date_end": "2026-01-01 04:45:00",
+    "create_date": "2025-07-12 20:43:47",
+    "write_date": "2025-07-12 20:43:47"
+  },
+  {
+    "id": 21,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 50,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 0,
+    "date_start": false,
+    "date_end": false,
+    "create_date": "2025-12-25 14:54:33",
+    "write_date": "2025-12-25 14:54:33"
+  },
+  {
+    "id": 19,
+    "pricelist_id": [
+      3,
+      "G-Member (USD)"
+    ],
+    "product_tmpl_id": [
+      1,
+      "Event Admission / Registration"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 30,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 0,
+    "date_start": false,
+    "date_end": false,
+    "create_date": "2025-12-25 14:54:33",
+    "write_date": "2025-12-25 14:54:33"
+  },
+  {
+    "id": 18,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      65,
+      "Sports Membership"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 751,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 0,
+    "date_start": "2026-01-01 13:00:00",
+    "date_end": "2027-01-01 04:45:00",
+    "create_date": "2025-12-18 15:38:48",
+    "write_date": "2026-01-21 13:51:04"
+  },
+  {
+    "id": 17,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      65,
+      "Sports Membership"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 751,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 0,
+    "date_start": false,
+    "date_end": false,
+    "create_date": "2025-12-18 15:37:01",
+    "write_date": "2025-12-18 15:37:01"
+  },
+  {
+    "id": 16,
+    "pricelist_id": [
+      1,
+      "Default (USD)"
+    ],
+    "product_tmpl_id": [
+      65,
+      "Sports Membership"
+    ],
+    "product_id": false,
+    "categ_id": false,
+    "applied_on": "1_product",
+    "compute_price": "fixed",
+    "fixed_price": 751,
+    "percent_price": 0,
+    "base": "list_price",
+    "min_quantity": 0,
+    "date_start": false,
+    "date_end": false,
+    "create_date": "2025-12-18 15:28:33",
+    "write_date": "2025-12-18 15:28:33"
+  }
+]

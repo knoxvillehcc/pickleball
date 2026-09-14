@@ -1,0 +1,62 @@
+[
+  {
+    "id": 2,
+    "name": "IndiaFest 2026",
+    "code": false,
+    "plan_id": [
+      1,
+      "HCC Events"
+    ],
+    "root_plan_id": [
+      1,
+      "HCC Events"
+    ],
+    "partner_id": false,
+    "active": true,
+    "balance": 21544,
+    "debit": 40,
+    "credit": 21584,
+    "create_date": "2026-08-25 20:32:16",
+    "write_date": "2026-08-25 20:32:16"
+  },
+  {
+    "id": 1,
+    "name": "Kite Festival 2026",
+    "code": false,
+    "plan_id": [
+      1,
+      "HCC Events"
+    ],
+    "root_plan_id": [
+      1,
+      "HCC Events"
+    ],
+    "partner_id": false,
+    "active": true,
+    "balance": 13909,
+    "debit": 10320,
+    "credit": 24229,
+    "create_date": "2026-03-21 17:01:28",
+    "write_date": "2026-03-21 17:01:28"
+  },
+  {
+    "id": 3,
+    "name": "Navratri 2026",
+    "code": false,
+    "plan_id": [
+      1,
+      "HCC Events"
+    ],
+    "root_plan_id": [
+      1,
+      "HCC Events"
+    ],
+    "partner_id": false,
+    "active": true,
+    "balance": 0,
+    "debit": 0,
+    "credit": 0,
+    "create_date": "2026-08-26 18:07:04",
+    "write_date": "2026-08-26 18:07:04"
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "backupDate": "2026-09-10T02:09:03.295Z",
+  "source": "https://knoxvillemandir.odoo.com/",
+  "database": "knoxvillemandir",
+  "odooVersion": "19.0 Enterprise",
+  "results": {
+    "account.move": 10260,
+    "account.move.line": 23103,
+    "account.payment": 415,
+    "pos.order": 3006,
+    "pos.order.line": 4045,
+    "pos.session": 250,
+    "pos.payment": 3069,
+    "product.pricelist": 3,
+    "account.bank.statement.line": 481,
+    "res.company": 1,
+    "res.users": 191,
+    "account.analytic.account": 3,
+    "website.page": 27,
+    "mail.template": 55,
+    "ir.attachment": 3784
+  }
+}

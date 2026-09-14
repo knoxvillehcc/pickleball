@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1,
+    "name": "15%",
+    "type_tax_use": "sale",
+    "amount_type": "percent",
+    "amount": 15,
+    "description": false,
+    "tax_group_id": [
+      1,
+      "Tax 15%"
+    ],
+    "active": false,
+    "price_include": false,
+    "include_base_amount": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "sequence": 1,
+    "invoice_repartition_line_ids": [
+      1,
+      2
+    ],
+    "refund_repartition_line_ids": [
+      3,
+      4
+    ]
+  },
+  {
+    "id": 2,
+    "name": "15%",
+    "type_tax_use": "purchase",
+    "amount_type": "percent",
+    "amount": 15,
+    "description": false,
+    "tax_group_id": [
+      1,
+      "Tax 15%"
+    ],
+    "active": false,
+    "price_include": false,
+    "include_base_amount": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "sequence": 1,
+    "invoice_repartition_line_ids": [
+      5,
+      6
+    ],
+    "refund_repartition_line_ids": [
+      7,
+      8
+    ]
+  },
+  {
+    "id": 3,
+    "name": "0% Exports",
+    "type_tax_use": "sale",
+    "amount_type": "percent",
+    "amount": 0,
+    "description": false,
+    "tax_group_id": [
+      2,
+      "Tax 0%"
+    ],
+    "active": false,
+    "price_include": false,
+    "include_base_amount": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "sequence": 1,
+    "invoice_repartition_line_ids": [
+      9,
+      10
+    ],
+    "refund_repartition_line_ids": [
+      11,
+      12
+    ]
+  },
+  {
+    "id": 4,
+    "name": "0% Imports",
+    "type_tax_use": "purchase",
+    "amount_type": "percent",
+    "amount": 0,
+    "description": false,
+    "tax_group_id": [
+      2,
+      "Tax 0%"
+    ],
+    "active": false,
+    "price_include": false,
+    "include_base_amount": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "sequence": 1,
+    "invoice_repartition_line_ids": [
+      13,
+      14
+    ],
+    "refund_repartition_line_ids": [
+      15,
+      16
+    ]
+  },
+  {
+    "id": 5,
+    "name": "10",
+    "type_tax_use": "sale",
+    "amount_type": "percent",
+    "amount": 0,
+    "description": false,
+    "tax_group_id": [
+      1,
+      "Tax 15%"
+    ],
+    "active": false,
+    "price_include": false,
+    "include_base_amount": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "sequence": 1,
+    "invoice_repartition_line_ids": [
+      17,
+      18
+    ],
+    "refund_repartition_line_ids": [
+      19,
+      20
+    ]
+  },
+  {
+    "id": 6,
+    "name": "3",
+    "type_tax_use": "sale",
+    "amount_type": "percent",
+    "amount": 3,
+    "description": false,
+    "tax_group_id": [
+      1,
+      "Tax 15%"
+    ],
+    "active": false,
+    "price_include": false,
+    "include_base_amount": false,
+    "company_id": [
+      1,
+      "Hindu Community Center"
+    ],
+    "sequence": 1,
+    "invoice_repartition_line_ids": [
+      21,
+      22
+    ],
+    "refund_repartition_line_ids": [
+      23,
+      24
+    ]
+  }
+]

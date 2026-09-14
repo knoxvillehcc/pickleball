@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Domestic",
+    "auto_apply": true,
+    "country_id": [
+      233,
+      "United States"
+    ],
+    "country_group_id": false,
+    "tax_ids": [],
+    "account_ids": [],
+    "note": false
+  },
+  {
+    "id": 2,
+    "name": "Foreign Trade",
+    "auto_apply": true,
+    "country_id": false,
+    "country_group_id": false,
+    "tax_ids": [],
+    "account_ids": [],
+    "note": false
+  },
+  {
+    "id": 3,
+    "name": "Automatic Tax Mapping (AvaTax)",
+    "auto_apply": false,
+    "country_id": [
+      233,
+      "United States"
+    ],
+    "country_group_id": false,
+    "tax_ids": [],
+    "account_ids": [],
+    "note": false
+  }
+]
