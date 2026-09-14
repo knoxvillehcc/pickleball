@@ -102,14 +102,14 @@ export async function syncMembersFromOdoo(eventId, membershipYear) {
     const partnerIds = Array.from(memberMap.keys());
     if (partnerIds.length > 0) {
       const partners = await odooCall(creds, uid, 'res.partner', 'read', [partnerIds], {
-        fields: ['id', 'name', 'phone', 'mobile', 'email'],
+        fields: ['id', 'name', 'phone', 'email'],
       });
 
       for (const partner of partners) {
         const member = memberMap.get(partner.id);
         if (!member) continue;
 
-        const phone = partner.mobile || partner.phone || '';
+        const phone = partner.phone || '';
         const email = partner.email || '';
 
         await db.upsertMember({
@@ -173,9 +173,9 @@ export async function verifyMembership(eventId, phone) {
     const uid   = await odooAuth(creds);
 
     const partners = await odooCall(creds, uid, 'res.partner', 'search_read', [
-      [['|', ['phone', 'ilike', cleanPhone], ['mobile', 'ilike', cleanPhone]]]
+      [['phone', 'ilike', cleanPhone]]
     ], {
-      fields: ['id', 'name', 'phone', 'mobile', 'email'],
+      fields: ['id', 'name', 'phone', 'email'],
       limit: 5,
     });
 
@@ -196,7 +196,7 @@ export async function verifyMembership(eventId, phone) {
           odoo_partner_id: partner.id,
           membership_type: memberType,
           name: partner.name,
-          phone: (partner.mobile || partner.phone || '').replace(/\D/g, ''),
+          phone: (partner.phone || '').replace(/\D/g, ''),
           email: partner.email || '',
           synced_at: new Date().toISOString(),
         });
