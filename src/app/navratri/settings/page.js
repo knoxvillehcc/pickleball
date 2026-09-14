@@ -131,12 +131,12 @@ export default function SettingsPage() {
 
       {/* Pricing */}
       <div style={sectionStyle}>
-        <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '16px' }}>💰 Pricing (in cents)</h3>
+        <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '16px' }}>💰 Pricing</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-          <div><label style={labelStyle}>General Daily (¢)</label><input style={inputStyle} type="number" value={event.price_general_daily || ''} onChange={e => updateField('price_general_daily', parseInt(e.target.value))} /></div>
-          <div><label style={labelStyle}>Pioneer Guest Daily (¢)</label><input style={inputStyle} type="number" value={event.price_pioneer_guest_daily || ''} onChange={e => updateField('price_pioneer_guest_daily', parseInt(e.target.value))} /></div>
-          <div><label style={labelStyle}>Non-Member Daily (¢)</label><input style={inputStyle} type="number" value={event.price_nonmember_daily || ''} onChange={e => updateField('price_nonmember_daily', parseInt(e.target.value))} /></div>
-          <div><label style={labelStyle}>Combo/Full Pass (¢)</label><input style={inputStyle} type="number" value={event.price_combo || ''} onChange={e => updateField('price_combo', parseInt(e.target.value))} /></div>
+          <div><label style={labelStyle}>General Daily ($)</label><input style={inputStyle} type="number" step="0.01" value={((event.price_general_daily || 0) / 100).toFixed(2)} onChange={e => updateField('price_general_daily', Math.round(parseFloat(e.target.value) * 100))} /></div>
+          <div><label style={labelStyle}>Pioneer Guest Daily ($)</label><input style={inputStyle} type="number" step="0.01" value={((event.price_pioneer_guest_daily || 0) / 100).toFixed(2)} onChange={e => updateField('price_pioneer_guest_daily', Math.round(parseFloat(e.target.value) * 100))} /></div>
+          <div><label style={labelStyle}>Non-Member Daily ($)</label><input style={inputStyle} type="number" step="0.01" value={((event.price_nonmember_daily || 0) / 100).toFixed(2)} onChange={e => updateField('price_nonmember_daily', Math.round(parseFloat(e.target.value) * 100))} /></div>
+          <div><label style={labelStyle}>Combo/Full Pass ($)</label><input style={inputStyle} type="number" step="0.01" value={((event.price_combo || 0) / 100).toFixed(2)} onChange={e => updateField('price_combo', Math.round(parseFloat(e.target.value) * 100))} /></div>
         </div>
       </div>
 
