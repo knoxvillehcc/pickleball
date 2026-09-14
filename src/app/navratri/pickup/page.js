@@ -88,7 +88,15 @@ export default function PickupPage() {
     if (!selectedOrder) return;
     setLoading(true); setError(''); setPickupResult(null);
     try {
-      const pickupType = parkingQty > 0 && wristbandQty > 0 ? 'wristband_and_parking' : parkingQty > 0 ? 'parking_only' : 'wristband_only';
+      // Determine pickup_type based on order type (DB constraint: combo_wristband, pioneer_wristband, parking_pass)
+      let pickupType;
+      if (parkingQty > 0 && wristbandQty === 0) {
+        pickupType = 'parking_pass';
+      } else if (selectedOrder.customerType === 'pioneer' || selectedOrder.customerType === 'committee') {
+        pickupType = 'pioneer_wristband';
+      } else {
+        pickupType = 'combo_wristband';
+      }
       const res = await fetch('/api/navratri/pickup', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

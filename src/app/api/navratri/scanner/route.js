@@ -138,18 +138,7 @@ export async function POST(request) {
       // 2. Look up the ticket to get the token_secret
       const ticket = await db.getTicketByToken(token);
       if (!ticket) {
-        // Log failed scan attempt
-        await db.createCheckin({
-          ticket_id:          0, // No valid ticket
-          event_date_id:      eventDateId || 0,
-          employee_odoo_id:   session.employee_odoo_id,
-          employee_name:      session.employee_name,
-          quantity_checked_in: 0,
-          scan_result:        'invalid',
-          device_info:        reqInfo.deviceInfo,
-          ip_address:         reqInfo.ipAddress,
-        });
-
+        // Don't log with ticket_id=0 (FK violation) — just return invalid
         return NextResponse.json({
           valid: false,
           reason: 'Ticket not found',
@@ -224,39 +213,55 @@ export async function POST(request) {
         return NextResponse.json({ error: 'ticketId is required' }, { status: 400 });
       }
 
-      const result = await confirmCheckin(
-        ticketId, eventDateId,
-        session.employee_odoo_id, session.employee_name,
-        reqInfo.deviceInfo, reqInfo.ipAddress
-      );
-
-      if (!result.success) {
-        return NextResponse.json({
-          success: false,
-          reason: result.reason,
-        }, { status: 409 });
+      // Use the ticket's own event_date_id if none provided from scanner
+      let resolvedDateId = eventDateId;
+      if (!resolvedDateId) {
+        const ticket = await db.query('navratri_tickets', `id=eq.${ticketId}`, { limit: 1 });
+        resolvedDateId = ticket?.[0]?.event_date_id || null;
       }
 
-      await logAudit({
-        eventId: session.event_id,
-        action: auditActions.TICKET_CHECKIN,
-        entityType: 'ticket',
-        entityId: ticketId,
-        employeeOdooId: session.employee_odoo_id,
-        newValue: {
-          quantity: result.quantity,
-          checkinId: result.checkinId,
-          employee: session.employee_name,
-        },
-        ...reqInfo,
-      });
+      if (!resolvedDateId) {
+        return NextResponse.json({ success: false, reason: 'No event date selected. Please select a date on the scanner login.' }, { status: 400 });
+      }
 
-      return NextResponse.json({
-        success: true,
-        checkinId: result.checkinId,
-        quantity: result.quantity,
-        message: `✅ Checked in ${result.quantity} person(s)`,
-      });
+      try {
+        const result = await confirmCheckin(
+          ticketId, resolvedDateId,
+          session.employee_odoo_id, session.employee_name,
+          reqInfo.deviceInfo, reqInfo.ipAddress
+        );
+
+        if (!result.success) {
+          return NextResponse.json({
+            success: false,
+            reason: result.reason,
+          }, { status: 409 });
+        }
+
+        await logAudit({
+          eventId: session.event_id,
+          action: auditActions.TICKET_CHECKIN,
+          entityType: 'ticket',
+          entityId: ticketId,
+          employeeOdooId: session.employee_odoo_id,
+          newValue: {
+            quantity: result.quantity,
+            checkinId: result.checkinId,
+            employee: session.employee_name,
+          },
+          ...reqInfo,
+        });
+
+        return NextResponse.json({
+          success: true,
+          checkinId: result.checkinId,
+          quantity: result.quantity,
+          message: `✅ Checked in ${result.quantity} person(s)`,
+        });
+      } catch (checkinErr) {
+        console.error('[scanner/checkin] Error:', checkinErr.message);
+        return NextResponse.json({ success: false, reason: checkinErr.message }, { status: 500 });
+      }
     }
 
     // ── Manual Lookup ────────────────────────────────────────────────────────

@@ -194,8 +194,11 @@ export default function ScannerPage() {
 
   // ── Confirm Check-In ──────────────────────────────────────────────────────
   const handleConfirmCheckin = async () => {
-    if (!scanResult?.ticketId) return;
-    setLoading(true);
+    if (!scanResult?.ticketId) {
+      setError('No ticket ID — cannot check in');
+      return;
+    }
+    setLoading(true); setError('');
     try {
       const res = await fetch('/api/navratri/scanner', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -204,13 +207,20 @@ export default function ScannerPage() {
       const data = await res.json();
       if (data.success) {
         setScanResult({ ...scanResult, confirmed: true, message: data.message });
-        // Auto-return to scan after 2 seconds
+        // Haptic feedback on success
+        if (navigator.vibrate) navigator.vibrate(200);
+        // Auto-return to scan after 2.5 seconds
         setTimeout(() => { setScanResult(null); setMode('scan'); }, 2500);
       } else {
-        setError(data.reason || 'Check-in failed');
+        setError(data.reason || data.error || 'Check-in failed');
+        // Haptic feedback on error
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       }
-    } catch { setError('Check-in failed'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      setError('Check-in failed: ' + (err.message || 'Network error'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ── Manual Lookup ──────────────────────────────────────────────────────────
