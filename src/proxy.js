@@ -25,6 +25,17 @@ const PUBLIC_PREFIXES = [
   '/api/auth/login', '/api/auth/logout',
   '/api/pickleball/register', '/api/pickleball/webhook',
   '/api/pickleball/settings', '/api/health',
+  // Navratri public routes
+  '/navratri-2026',                    // Public registration page
+  '/navratri/scanner',                 // Staff scanner (has own PIN auth)
+  '/navratri/pickup',                  // Staff pickup (has own PIN auth)
+  '/api/navratri/verify',              // OTP verify (public)
+  '/api/navratri/checkout',            // Stripe checkout (public)
+  '/api/navratri/webhook',             // Stripe webhook
+  '/api/navratri/events',              // Event info (public read)
+  '/api/navratri/tickets',             // Ticket lookup (public)
+  '/api/navratri/scanner',             // Scanner auth + validate
+  '/api/navratri/pickup',              // Pickup lookup + confirm
   '/_next', '/favicon',
 ];
 

@@ -66,6 +66,7 @@ export default function NavratriPublicPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [consentMarketing, setConsentMarketing] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [existingOrder, setExistingOrder] = useState(null);
 
   // Load event data
   useEffect(() => {
@@ -122,6 +123,20 @@ export default function NavratriPublicPage() {
         setMemberData(data.membership);
         setName(data.membership.name || '');
         setEmail(data.membership.email || '');
+
+        // Check if pioneer/committee already has an existing order
+        if (data.membership.existingOrder) {
+          setExistingOrder(data.membership.existingOrder);
+          setStep('already_claimed');
+          return;
+        }
+
+        // Pioneer/committee: auto-select free pass and go to review
+        if (data.membership.type === 'pioneer' || data.membership.type === 'committee') {
+          setOrderType('pioneer_claim');
+          setStep('review');
+          return;
+        }
       } else {
         setCustomerType('non_member');
       }
@@ -271,6 +286,41 @@ export default function NavratriPublicPage() {
             <button style={{ ...S.btnOutline, marginTop: '12px' }} onClick={handleSkipVerify}>
               Skip — Buy as Non-Member ($30/day)
             </button>
+          </div>
+        )}
+
+        {/* ── ALREADY CLAIMED ─────────────────────────────────────────── */}
+        {step === 'already_claimed' && existingOrder && (
+          <div style={S.section}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>
+                {existingOrder.pickedUp ? '✅' : '🎟️'}
+              </div>
+              <h2 style={{ ...S.sectionTitle, textAlign: 'center' }}>
+                {existingOrder.pickedUp ? 'Wristbands Already Picked Up' : 'Pass Already Claimed'}
+              </h2>
+              <p style={{ color: C.muted, fontSize: '14px', lineHeight: '1.6' }}>
+                {existingOrder.pickedUp
+                  ? `Your wristbands were picked up on ${new Date(existingOrder.pickedUpAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}.`
+                  : `You already claimed your Pioneer Free Pass (Order: ${existingOrder.orderNumber}).`
+                }
+              </p>
+              {!existingOrder.pickedUp && (
+                <p style={{ color: C.accent, fontSize: '14px', fontWeight: '700', marginTop: '12px' }}>
+                  📍 Pick up your wristbands at the registration desk on any event day.
+                </p>
+              )}
+              <div style={{ marginTop: '20px' }}>
+                <a href={`/navratri-2026/tickets?phone=${encodeURIComponent(phone)}`}
+                  style={{ ...S.btn, display: 'inline-block', textDecoration: 'none', padding: '14px 32px', width: 'auto' }}>
+                  🎫 View My Tickets
+                </a>
+              </div>
+              <button style={{ ...S.btnOutline, marginTop: '12px' }}
+                onClick={() => { setStep('select'); setExistingOrder(null); }}>
+                Buy Guest Tickets Instead
+              </button>
+            </div>
           </div>
         )}
 

@@ -61,10 +61,33 @@ export async function POST(request) {
 
       // OTP verified — now check membership
       let membership = null;
+      let existingOrder = null;
       if (eventSlug) {
         const event = await db.getEventBySlug(eventSlug);
         if (event) {
           membership = await verifyMembership(event.id, phone);
+
+          // For pioneer/committee, check for existing free-claim orders
+          if (membership?.found && (membership.member?.membership_type === 'pioneer' || membership.member?.membership_type === 'committee')) {
+            const cleanPhone = phone.replace(/\D/g, '');
+            const existingOrders = await db.query('navratri_orders',
+              `event_id=eq.${event.id}&customer_type=in.(pioneer,committee)&purchaser_phone=ilike.*${cleanPhone}*&status=in.(active,completed)`,
+              { limit: 1, order: 'created_at.desc' }
+            );
+            if (existingOrders.length > 0) {
+              const order = existingOrders[0];
+              // Check if any tickets have been picked up
+              const pickedUpTickets = await db.query('navratri_tickets',
+                `order_id=eq.${order.id}&picked_up=eq.true`,
+                { limit: 1 }
+              );
+              existingOrder = {
+                orderNumber: order.order_number,
+                pickedUp: pickedUpTickets.length > 0,
+                pickedUpAt: pickedUpTickets[0]?.picked_up_at || null,
+              };
+            }
+          }
         }
       }
 
@@ -77,6 +100,7 @@ export async function POST(request) {
           email: membership.member?.email || null,
           odooPartnerId: membership.member?.odoo_partner_id || null,
           source: membership.source,
+          existingOrder: existingOrder || null,
           allMatches: membership.allMatches?.map(m => ({
             name: m.name,
             type: m.membership_type,
