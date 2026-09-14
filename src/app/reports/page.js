@@ -80,6 +80,59 @@ export default function ReportsPage() {
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 
+  const downloadPDFNoPrice = () => {
+    try {
+      const doc     = new jsPDF('landscape');
+      const dateStr = new Date().toLocaleDateString();
+      const timeStr = new Date().toLocaleTimeString();
+      const userName = currentUser?.name || currentUser?.email || 'Admin';
+
+      doc.setFontSize(20);
+      doc.text('Member Directory Report', 10, 15);
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Printed by: ${userName}  |  Date: ${dateStr}  |  Time: ${timeStr}`, 10, 22);
+
+      // Summary without revenue
+      const summaryBody = Object.entries(data.summary).map(([type, stats]) => {
+        return [type, stats.count.toString()];
+      });
+      const totalCount = Object.values(data.summary).reduce((s, x) => s + x.count, 0);
+      summaryBody.push(['TOTAL MEMBERS', totalCount.toString()]);
+
+      autoTable(doc, {
+        startY: 35,
+        head: [['Subscription Type', 'Active Members']],
+        body: summaryBody,
+        theme: 'grid',
+        headStyles: { fillColor: [15, 23, 42] },
+        margin: { top: 10, bottom: 10, left: 10, right: 10 },
+        didParseCell: (d) => {
+          if (d.section === 'body' && d.row.index === summaryBody.length - 1) {
+            d.cell.styles.fillColor   = [240, 240, 240];
+            d.cell.styles.fontStyle   = 'bold';
+            d.cell.styles.textColor   = [15, 23, 42];
+          }
+        },
+      });
+
+      // Detail without amount column
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 10,
+        head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Start Date']],
+        body: data.results.map(r => [r.customer, r.type, r.order, r.date]),
+        theme: 'striped',
+        headStyles: { fillColor: [15, 23, 42] },
+        styles: { fontSize: 8, cellPadding: 1.2 },
+        alternateRowStyles: { fillColor: [230, 235, 240] },
+        margin: { top: 10, bottom: 8, left: 10, right: 10 },
+        columnStyles: { 0:{cellWidth:70}, 1:{cellWidth:100}, 2:{cellWidth:45}, 3:{cellWidth:40} },
+      });
+
+      doc.save('Member_Directory_' + dateStr.replace(/\//g, '-') + '.pdf');
+    } catch (err) { alert('PDF error: ' + err.message); }
+  };
+
   const totalMembers  = Object.values(data.summary).reduce((s, x) => s + x.count,   0);
   const totalRevenue  = Object.values(data.summary).reduce((s, x) => s + x.revenue, 0);
 
@@ -105,17 +158,29 @@ export default function ReportsPage() {
           </p>
         </div>
         {!loading && data.results.length > 0 && (
-          <button onClick={downloadPDF} style={{
-            background: 'var(--accent)',
-            color: 'white', fontWeight: '800', fontSize: '14px',
-            padding: '12px 28px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: '10px',
-            boxShadow: '0 4px 12px var(--accent-glow)',
-            position: 'relative', zIndex: 1,
-          }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-            Download PDF Report
-          </button>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button onClick={downloadPDF} style={{
+              background: 'var(--accent)',
+              color: 'white', fontWeight: '800', fontSize: '14px',
+              padding: '12px 28px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '10px',
+              boxShadow: '0 4px 12px var(--accent-glow)',
+              position: 'relative', zIndex: 1,
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              Download PDF Report
+            </button>
+            <button onClick={downloadPDFNoPrice} style={{
+              background: 'transparent',
+              color: 'var(--accent)', fontWeight: '800', fontSize: '14px',
+              padding: '12px 28px', borderRadius: '12px', border: '2px solid var(--accent)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '10px',
+              position: 'relative', zIndex: 1,
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              Export Without Prices
+            </button>
+          </div>
         )}
       </div>
 
