@@ -484,7 +484,11 @@ export default function ScannerPage() {
                   background: 'rgba(255,255,255,0.03)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
                   <div>
-                    <span style={{ fontSize: '13px' }}>{ticket.type} × {ticket.quantity}</span>
+                    <span style={{ fontSize: '13px', fontWeight: '600' }}>
+                      {ticket.type === 'daily_entry' ? 'Daily Entry' : ticket.type === 'combo_pass' ? 'Combo Pass' : ticket.type === 'pioneer_pass' ? 'Pioneer Pass' : ticket.type}
+                      {ticket.eventDate ? ` — ${new Date(ticket.eventDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}` : ''}
+                      {` × ${ticket.quantity}`}
+                    </span>
                     <span style={{
                       marginLeft: '8px', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700',
                       background: ticket.status === 'active' ? 'rgba(52,211,153,0.1)' : ticket.status === 'used' ? 'rgba(148,163,184,0.1)' : 'rgba(239,68,68,0.1)',

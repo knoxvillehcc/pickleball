@@ -269,6 +269,11 @@ export async function POST(request) {
       // Search orders by phone, name, or order number
       const orders = await db.getOrders(eventId, { search, limit: 10 });
 
+      // Fetch all event dates for label lookup
+      const eventDates = await db.getEventDates(eventId);
+      const dateMap = {};
+      eventDates.forEach(d => { dateMap[d.id] = d; });
+
       const results = [];
       for (const order of orders) {
         const tickets = await db.getTicketsByOrder(order.id);
@@ -279,14 +284,19 @@ export async function POST(request) {
           customerType: order.customer_type,
           orderType: order.order_type,
           paymentStatus: order.payment_status,
-          tickets: tickets.map(t => ({
-            id: t.id,
-            type: t.ticket_type,
-            status: t.status,
-            quantity: t.quantity,
-            eventDateId: t.event_date_id,
-            checkedInAt: t.checked_in_at,
-          })),
+          tickets: tickets.map(t => {
+            const dateInfo = dateMap[t.event_date_id];
+            return {
+              id: t.id,
+              type: t.ticket_type,
+              status: t.status,
+              quantity: t.quantity,
+              eventDateId: t.event_date_id,
+              eventDate: dateInfo?.event_date || null,
+              dateLabel: dateInfo?.label || null,
+              checkedInAt: t.checked_in_at,
+            };
+          }),
         });
       }
 
