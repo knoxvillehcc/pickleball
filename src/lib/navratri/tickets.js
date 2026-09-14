@@ -213,16 +213,20 @@ export async function validateTicketForCheckin(token, eventDateId) {
     };
   }
 
-  // 4. Check date match (skip for combo/pioneer pickup tickets)
+  // 4. Check date match
   if (ticket.ticket_type === 'daily_entry' && ticket.event_date_id) {
     if (ticket.event_date_id !== eventDateId) {
       // Look up the actual date for a helpful message
       const correctDate = await db.query('navratri_event_dates',
         `id=eq.${ticket.event_date_id}`, { select: 'event_date,label', limit: 1 });
-      const dateLabel = correctDate?.[0]?.label || correctDate?.[0]?.event_date || 'another date';
+      const dateInfo = correctDate?.[0];
+      const dateLabel = dateInfo
+        ? `${dateInfo.label} (${new Date(dateInfo.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })})`
+        : 'another date';
       return {
         valid: false, ticket, order,
-        reason: `This ticket is for ${dateLabel}, not today`, scanResult: 'wrong_date',
+        reason: `❌ Wrong date! This ticket is for ${dateLabel}. Scanning is only allowed on the day of the event.`,
+        scanResult: 'wrong_date',
       };
     }
   }

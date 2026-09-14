@@ -41,6 +41,7 @@ export default function ScannerPage() {
   const [eventId, setEventId] = useState(null);
   const [eventDateId, setEventDateId] = useState(null);
   const [dates, setDates] = useState([]);
+  const [autoDateLabel, setAutoDateLabel] = useState('');
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const scannerRef = useRef(null);
@@ -60,7 +61,10 @@ export default function ScannerPage() {
           // Auto-select today's date
           const today = new Date().toISOString().split('T')[0];
           const todayDate = (dData.dates || []).find(d => d.event_date === today);
-          if (todayDate) setEventDateId(todayDate.id);
+          if (todayDate) {
+            setEventDateId(todayDate.id);
+            setAutoDateLabel(`${todayDate.label} — ${new Date(todayDate.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`);
+          }
         }
       } catch { }
     })();
@@ -300,6 +304,20 @@ export default function ScannerPage() {
             </option>
           ))}
         </select>
+
+        {/* Auto-date confirmation */}
+        {autoDateLabel && eventDateId && (
+          <div style={{ marginTop: '10px', padding: '10px 16px', borderRadius: '10px', background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '16px' }}>✅</span>
+            <span style={{ fontSize: '13px', color: C.green, fontWeight: '600' }}>Today's event: {autoDateLabel}</span>
+          </div>
+        )}
+        {!autoDateLabel && dates.length > 0 && !eventDateId && (
+          <div style={{ marginTop: '10px', padding: '10px 16px', borderRadius: '10px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '16px' }}>⚠️</span>
+            <span style={{ fontSize: '13px', color: C.accent, fontWeight: '600' }}>No event today — select a date manually</span>
+          </div>
+        )}
       </div>
 
       <button style={{ ...S.btn, maxWidth: '340px', marginTop: '28px', background: 'linear-gradient(135deg, #FF6B35, #D4531F)', color: 'white', borderRadius: '16px', fontSize: '17px', letterSpacing: '-0.01em', boxShadow: loading || !pin ? 'none' : '0 4px 24px rgba(255,107,53,0.3)', opacity: loading || !pin ? 0.4 : 1, transition: 'all 0.3s ease' }}

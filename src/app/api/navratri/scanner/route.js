@@ -224,6 +224,20 @@ export async function POST(request) {
         return NextResponse.json({ success: false, reason: 'No event date selected. Please select a date on the scanner login.' }, { status: 400 });
       }
 
+      // ── Enforce today-only scanning ─────────────────────────────────────────
+      const ticketDate = await db.getEventDateById(resolvedDateId);
+      if (ticketDate) {
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // YYYY-MM-DD
+        if (ticketDate.event_date !== today) {
+          const ticketDateFormatted = new Date(ticketDate.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+          const todayFormatted = new Date(today + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+          return NextResponse.json({
+            success: false,
+            reason: `❌ Wrong date! This ticket is for ${ticketDateFormatted} (${ticketDate.label}). Today is ${todayFormatted}. Check-in is only allowed on the day of the event.`,
+          }, { status: 409 });
+        }
+      }
+
       try {
         const result = await confirmCheckin(
           ticketId, resolvedDateId,
