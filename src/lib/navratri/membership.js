@@ -39,74 +39,69 @@ export async function syncMembersFromOdoo(eventId, membershipYear) {
   let generals = 0;
   let pioneers = 0;
 
-  // Strategy 1: Search by membership subscription/invoices
-  // Look for partners who have paid membership invoices for the year
   try {
-    // Find membership products (adjust these names to match your Odoo config)
-    const memberProducts = await odooCall(creds, uid, 'product.product', 'search_read', [
-      [['name', 'ilike', 'member']]
-    ], { fields: ['id', 'name'], limit: 50 });
-
-    console.log('[navratri/membership] Found products:', memberProducts.map(p => `${p.id}: ${p.name}`));
-
-    const generalProductIds = [];
-    const pioneerProductIds = [];
-
-    for (const prod of memberProducts) {
-      const nameLower = prod.name.toLowerCase();
-      if (nameLower.includes('pioneer')) {
-        pioneerProductIds.push(prod.id);
-      } else if (nameLower.includes('general') || nameLower.includes('member')) {
-        generalProductIds.push(prod.id);
-      }
-    }
-
-    console.log('[navratri/membership] General product IDs:', generalProductIds, 'Pioneer product IDs:', pioneerProductIds);
-
-    // Widen date range: catch memberships invoiced up to 6 months before the year
-    const yearStart = `${membershipYear - 1}-07-01`;
-    const yearEnd   = `${membershipYear}-12-31`;
-
-    console.log('[navratri/membership] Searching invoices from', yearStart, 'to', yearEnd);
-
-    const invoiceLines = await odooCall(creds, uid, 'account.move.line', 'search_read', [
-      [
-        ['move_id.move_type', '=', 'out_invoice'],
-        ['move_id.state', '=', 'posted'],
-        ['move_id.payment_state', 'in', ['paid', 'in_payment']],
-        ['product_id', 'in', [...generalProductIds, ...pioneerProductIds]],
-        ['move_id.invoice_date', '>=', yearStart],
-        ['move_id.invoice_date', '<=', yearEnd],
-      ]
+    // ── Step 1: Get all active subscriptions ──────────────────────────────
+    const subscriptions = await odooCall(creds, uid, 'sale.order', 'search_read', [
+      [['state', 'in', ['sale', 'done']], ['is_subscription', '=', true]]
     ], {
-      fields: ['partner_id', 'product_id'],
-      limit: 2000,
+      fields: ['id', 'name', 'partner_id', 'order_line', 'amount_total', 'date_order']
     });
 
-    console.log('[navratri/membership] Found', invoiceLines.length, 'invoice lines');
+    console.log('[navratri/membership] Found', subscriptions.length, 'active subscriptions');
 
-    // Deduplicate by partner and determine membership type
-    // Pioneer takes precedence over General
+    if (subscriptions.length === 0) {
+      return { synced: 0, generals: 0, pioneers: 0 };
+    }
+
+    // ── Step 2: Get order lines to identify membership product types ─────
+    const orderIds = subscriptions.map(s => s.id);
+    const orderLines = await odooCall(creds, uid, 'sale.order.line', 'search_read', [
+      [['order_id', 'in', orderIds]]
+    ], {
+      fields: ['id', 'order_id', 'product_id', 'price_subtotal']
+    });
+
+    console.log('[navratri/membership] Found', orderLines.length, 'order lines');
+
+    // ── Step 3: Build member map — deduplicate by partner, pioneer wins ──
     const memberMap = new Map();
 
-    for (const line of invoiceLines) {
-      if (!line.partner_id) continue;
-      const partnerId = line.partner_id[0];
-      const productId = line.product_id?.[0];
+    for (const sub of subscriptions) {
+      if (!sub.partner_id) continue;
+      const partnerId = sub.partner_id[0];
+      const partnerName = sub.partner_id[1];
 
-      const isPioneer = pioneerProductIds.includes(productId);
-      const existing = memberMap.get(partnerId);
+      // Get this subscription's product lines
+      const lines = orderLines.filter(l => l.order_id[0] === sub.id);
 
-      if (!existing || isPioneer) {
-        memberMap.set(partnerId, {
-          odoo_partner_id: partnerId,
-          name: line.partner_id[1],
-          membership_type: isPioneer ? 'pioneer' : 'general',
-        });
+      for (const line of lines) {
+        if (!line.product_id) continue;
+        const productName = line.product_id[1].toLowerCase();
+
+        // Only include membership products (general, pioneer, sports member)
+        const isGeneral = productName.includes('general');
+        const isPioneer = productName.includes('pioneer');
+        const isMember = productName.includes('member') || productName.includes('sports');
+
+        if (!isGeneral && !isPioneer && !isMember) continue;
+
+        const memberType = isPioneer ? 'pioneer' : 'general';
+        const existing = memberMap.get(partnerId);
+
+        // Pioneer takes precedence over general
+        if (!existing || (memberType === 'pioneer' && existing.membership_type !== 'pioneer')) {
+          memberMap.set(partnerId, {
+            odoo_partner_id: partnerId,
+            name: partnerName,
+            membership_type: memberType,
+          });
+        }
       }
     }
 
-    // Fetch full partner details for all members
+    console.log('[navratri/membership] Unique members found:', memberMap.size);
+
+    // ── Step 4: Fetch full partner details and upsert ────────────────────
     const partnerIds = Array.from(memberMap.keys());
     if (partnerIds.length > 0) {
       const partners = await odooCall(creds, uid, 'res.partner', 'read', [partnerIds], {
@@ -125,7 +120,7 @@ export async function syncMembersFromOdoo(eventId, membershipYear) {
           odoo_partner_id: partner.id,
           membership_type: member.membership_type,
           name: partner.name,
-          phone: phone.replace(/\D/g, ''), // Store digits only
+          phone: phone.replace(/\D/g, ''),
           email,
           synced_at: new Date().toISOString(),
         });
