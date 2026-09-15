@@ -47,6 +47,8 @@ export async function syncMembersFromOdoo(eventId, membershipYear) {
       [['name', 'ilike', 'member']]
     ], { fields: ['id', 'name'], limit: 50 });
 
+    console.log('[navratri/membership] Found products:', memberProducts.map(p => `${p.id}: ${p.name}`));
+
     const generalProductIds = [];
     const pioneerProductIds = [];
 
@@ -59,9 +61,13 @@ export async function syncMembersFromOdoo(eventId, membershipYear) {
       }
     }
 
-    // Find paid invoices for this year with membership products
-    const yearStart = `${membershipYear}-01-01`;
+    console.log('[navratri/membership] General product IDs:', generalProductIds, 'Pioneer product IDs:', pioneerProductIds);
+
+    // Widen date range: catch memberships invoiced up to 6 months before the year
+    const yearStart = `${membershipYear - 1}-07-01`;
     const yearEnd   = `${membershipYear}-12-31`;
+
+    console.log('[navratri/membership] Searching invoices from', yearStart, 'to', yearEnd);
 
     const invoiceLines = await odooCall(creds, uid, 'account.move.line', 'search_read', [
       [
@@ -76,6 +82,8 @@ export async function syncMembersFromOdoo(eventId, membershipYear) {
       fields: ['partner_id', 'product_id'],
       limit: 2000,
     });
+
+    console.log('[navratri/membership] Found', invoiceLines.length, 'invoice lines');
 
     // Deduplicate by partner and determine membership type
     // Pioneer takes precedence over General
