@@ -97,6 +97,68 @@ export async function POST(request) {
         return NextResponse.json({ error: 'orderId and pickupType required' }, { status: 400 });
       }
 
+      // ── Validate against what was sold ──────────────────────────────────────
+      const order = await db.getOrderById(orderId);
+      if (!order) {
+        return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      }
+
+      // Only allow pickup for paid orders
+      if (order.payment_status !== 'paid' && order.payment_method !== 'complimentary') {
+        return NextResponse.json({ error: `Cannot pick up — order is ${order.payment_status}` }, { status: 400 });
+      }
+
+      // Calculate what was purchased
+      const orderItems = await db.getOrderItems(orderId);
+      let purchasedWristbands = 0;
+      let purchasedParking = 0;
+
+      for (const item of orderItems) {
+        const qty = item.quantity - (item.refunded_qty || 0);
+        if (item.ticket_type === 'combo' || item.ticket_type === 'pioneer_free') {
+          // Combo and pioneer get 2 wristbands per quantity unit
+          purchasedWristbands += qty * 2;
+        }
+        // Daily tickets don't get wristbands (they check in via QR)
+      }
+
+      // Check entitlement for parking
+      if (odooPartnerId) {
+        const entitlement = await db.getEntitlement(session.event_id, odooPartnerId);
+        if (entitlement?.parking_eligible) {
+          purchasedParking = 1; // 1 parking pass per eligible member
+          if (entitlement.parking_picked_up) purchasedParking = 0; // Already picked up
+        }
+      }
+
+      // Calculate what was already picked up
+      const existingPickups = await db.getPickupsForOrder(orderId);
+      let alreadyPickedWristbands = 0;
+      let alreadyPickedParking = 0;
+      for (const p of existingPickups) {
+        alreadyPickedWristbands += p.wristband_qty || 0;
+        alreadyPickedParking += p.parking_qty || 0;
+      }
+
+      // Validate wristband quantity
+      const remainingWristbands = purchasedWristbands - alreadyPickedWristbands;
+      if (wristbandQty > 0 && wristbandQty > remainingWristbands) {
+        const msg = remainingWristbands <= 0
+          ? `❌ All ${purchasedWristbands} wristband(s) already picked up for this order.`
+          : `❌ Only ${remainingWristbands} wristband(s) remaining (${purchasedWristbands} purchased, ${alreadyPickedWristbands} already picked up).`;
+        return NextResponse.json({ error: msg }, { status: 400 });
+      }
+
+      // Validate parking quantity
+      if (parkingQty > 0 && parkingQty > (purchasedParking - alreadyPickedParking)) {
+        return NextResponse.json({ error: '❌ Parking pass already picked up or not eligible.' }, { status: 400 });
+      }
+
+      // No zero pickups
+      if ((wristbandQty || 0) === 0 && (parkingQty || 0) === 0) {
+        return NextResponse.json({ error: 'Nothing to pick up — select wristbands or parking.' }, { status: 400 });
+      }
+
       const pickup = await db.createPickup({
         order_id:          orderId,
         odoo_partner_id:   odooPartnerId || null,

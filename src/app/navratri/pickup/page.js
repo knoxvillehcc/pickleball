@@ -77,10 +77,18 @@ export default function PickupPage() {
 
   const handleSelectOrder = async (order) => {
     setSelectedOrder(order);
-    // Set default wristband qty based on order type
-    const wQty = order.orderType === 'combo' || order.orderType === 'pioneer_claim' ? 2 : 0;
-    setWristbandQty(wQty);
+    // Calculate max quantities based on order type and existing pickups
+    const isComboOrPioneer = order.orderType === 'combo' || order.orderType === 'pioneer_claim';
+    const maxW = isComboOrPioneer ? 2 : 0;
+    // Subtract already picked up
+    const alreadyPickedW = (order.pickups || []).reduce((s, p) => s + (p.type?.includes('wristband') ? (p.qty || 0) : 0), 0);
+    const alreadyPickedP = (order.pickups || []).reduce((s, p) => s + (p.type === 'parking_pass' ? (p.qty || 0) : 0), 0);
+    const remainW = Math.max(0, maxW - alreadyPickedW);
+    const remainP = 0; // Parking handled by entitlement on API side
+    setWristbandQty(remainW);
     setParkingQty(0);
+    // Store max quantities for UI enforcement
+    setSelectedOrder({ ...order, maxWristbands: maxW, remainingWristbands: remainW, alreadyPickedW });
     setMode('confirm');
   };
 
@@ -187,21 +195,40 @@ export default function PickupPage() {
 
           {error && <div style={{ background: 'rgba(239,68,68,0.1)', borderRadius: '12px', padding: '12px', color: C.red, fontSize: '14px', marginTop: '12px' }}>{error}</div>}
 
+          {/* Already picked up warning */}
+          {selectedOrder.alreadyPickedW > 0 && (
+            <div style={{ background: 'rgba(255,215,0,0.1)', borderRadius: '12px', padding: '12px', marginTop: '12px', fontSize: '13px', color: C.accent, fontWeight: '600' }}>
+              ⚠️ Already picked up: {selectedOrder.alreadyPickedW} wristband(s)
+            </div>
+          )}
+
+          {selectedOrder.remainingWristbands <= 0 && selectedOrder.maxWristbands > 0 && (
+            <div style={{ background: 'rgba(239,68,68,0.1)', borderRadius: '12px', padding: '12px', marginTop: '12px', fontSize: '13px', color: C.red, fontWeight: '600' }}>
+              ❌ All wristbands already picked up for this order
+            </div>
+          )}
+
           <div style={{ marginTop: '24px' }}>
-            <label style={{ fontSize: '14px', fontWeight: '700', color: C.accent }}>Wristbands</label>
+            <label style={{ fontSize: '14px', fontWeight: '700', color: C.accent }}>
+              Wristbands {selectedOrder.maxWristbands > 0 && <span style={{ color: C.muted, fontWeight: '500' }}>(max {selectedOrder.maxWristbands}, {selectedOrder.remainingWristbands} remaining)</span>}
+            </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
-              <button onClick={() => setWristbandQty(Math.max(0, wristbandQty - 1))} style={{ width: '48px', height: '48px', borderRadius: '12px', border: `1px solid ${C.border}`, background: 'transparent', color: C.text, fontSize: '24px', cursor: 'pointer' }}>−</button>
+              <button onClick={() => setWristbandQty(Math.max(0, wristbandQty - 1))} disabled={wristbandQty <= 0}
+                style={{ width: '48px', height: '48px', borderRadius: '12px', border: `1px solid ${C.border}`, background: 'transparent', color: wristbandQty <= 0 ? C.border : C.text, fontSize: '24px', cursor: wristbandQty <= 0 ? 'not-allowed' : 'pointer' }}>−</button>
               <span style={{ fontSize: '32px', fontWeight: '900', minWidth: '40px', textAlign: 'center' }}>{wristbandQty}</span>
-              <button onClick={() => setWristbandQty(wristbandQty + 1)} style={{ width: '48px', height: '48px', borderRadius: '12px', border: `1px solid ${C.border}`, background: 'transparent', color: C.text, fontSize: '24px', cursor: 'pointer' }}>+</button>
+              <button onClick={() => setWristbandQty(Math.min(selectedOrder.remainingWristbands || 0, wristbandQty + 1))} disabled={wristbandQty >= (selectedOrder.remainingWristbands || 0)}
+                style={{ width: '48px', height: '48px', borderRadius: '12px', border: `1px solid ${C.border}`, background: 'transparent', color: wristbandQty >= (selectedOrder.remainingWristbands || 0) ? C.border : C.text, fontSize: '24px', cursor: wristbandQty >= (selectedOrder.remainingWristbands || 0) ? 'not-allowed' : 'pointer' }}>+</button>
             </div>
           </div>
 
           <div style={{ marginTop: '24px' }}>
             <label style={{ fontSize: '14px', fontWeight: '700', color: C.accent }}>Parking Passes</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
-              <button onClick={() => setParkingQty(Math.max(0, parkingQty - 1))} style={{ width: '48px', height: '48px', borderRadius: '12px', border: `1px solid ${C.border}`, background: 'transparent', color: C.text, fontSize: '24px', cursor: 'pointer' }}>−</button>
+              <button onClick={() => setParkingQty(Math.max(0, parkingQty - 1))} disabled={parkingQty <= 0}
+                style={{ width: '48px', height: '48px', borderRadius: '12px', border: `1px solid ${C.border}`, background: 'transparent', color: parkingQty <= 0 ? C.border : C.text, fontSize: '24px', cursor: parkingQty <= 0 ? 'not-allowed' : 'pointer' }}>−</button>
               <span style={{ fontSize: '32px', fontWeight: '900', minWidth: '40px', textAlign: 'center' }}>{parkingQty}</span>
-              <button onClick={() => setParkingQty(parkingQty + 1)} style={{ width: '48px', height: '48px', borderRadius: '12px', border: `1px solid ${C.border}`, background: 'transparent', color: C.text, fontSize: '24px', cursor: 'pointer' }}>+</button>
+              <button onClick={() => setParkingQty(Math.min(1, parkingQty + 1))} disabled={parkingQty >= 1}
+                style={{ width: '48px', height: '48px', borderRadius: '12px', border: `1px solid ${C.border}`, background: 'transparent', color: parkingQty >= 1 ? C.border : C.text, fontSize: '24px', cursor: parkingQty >= 1 ? 'not-allowed' : 'pointer' }}>+</button>
             </div>
           </div>
 
