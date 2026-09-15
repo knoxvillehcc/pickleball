@@ -1,17 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ClientLayout';
-
-const T = (theme) => ({
-  card: theme === 'dark' ? '#1e293b' : '#FFFFFF',
-  border: theme === 'dark' ? 'rgba(148,163,184,0.15)' : 'rgba(0,0,0,0.08)',
-  text: theme === 'dark' ? '#F8FAFC' : '#0f172a', muted: theme === 'dark' ? '#94A3B8' : '#64748B',
-  primary: '#FF6B35', green: '#34D399', red: '#EF4444', accent: '#FFD700',
-});
+import { colors, spacing, type, radii, btn, input as dsInput, card, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
 
 export default function ManualIssuePage() {
   const { theme } = useTheme();
-  const t = T(theme);
+  const c = colors(theme);
+
   const [eventId, setEventId] = useState(null);
   const [event, setEvent] = useState(null);
   const [dates, setDates] = useState([]);
@@ -82,43 +77,41 @@ export default function ManualIssuePage() {
     finally { setLoading(false); }
   };
 
-  const inputStyle = { width: '100%', padding: '12px 16px', borderRadius: '12px', border: `1px solid ${t.border}`, background: 'transparent', color: t.text, fontSize: '14px', outline: 'none', boxSizing: 'border-box' };
-  const labelStyle = { display: 'block', fontSize: '13px', fontWeight: '600', color: t.muted, marginBottom: '6px', marginTop: '16px' };
+  const labelStyle = { ...type.label, color: c.muted, display: 'block', marginBottom: spacing.xs, marginTop: spacing.base };
+  const inputS = dsInput(theme);
 
   return (
-    <div style={{ padding: '24px 28px', color: t.text, maxWidth: '700px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: '900', margin: 0 }}>📝 Manual Ticket Issue</h1>
-        <a href="/navratri" style={{ color: t.primary, fontSize: '14px', textDecoration: 'none' }}>← Dashboard</a>
+    <div style={{ padding: `${spacing.xl}px`, color: c.text, maxWidth: '700px', fontFamily: type.fontFamily }}>
+      <style>{keyframes}</style>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl }}>
+        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>📝 Manual Ticket Issue</h1>
+        <a href="/navratri" style={{ ...type.bodyMedium, color: c.primary, textDecoration: 'none' }}>← Dashboard</a>
       </div>
 
       {result && (
-        <div style={{ padding: '16px 20px', borderRadius: '12px', marginBottom: '20px',
-          background: result.error ? 'rgba(239,68,68,0.1)' : 'rgba(52,211,153,0.1)',
-          border: `1px solid ${result.error ? 'rgba(239,68,68,0.3)' : 'rgba(52,211,153,0.3)'}`,
-          color: result.error ? t.red : t.green,
-        }}>
+        <div style={{ ...alertStyle(result.error ? 'error' : 'success', theme), marginBottom: spacing.lg }}>
           {result.error ? `❌ ${result.error}` : `✅ Order ${result.orderNumber} created — ${result.ticketsCreated} ticket(s), $${result.totalAmount?.toFixed(2)}`}
         </div>
       )}
 
-      <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '28px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+      <div style={{ ...card(theme), padding: spacing.xl }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: `0 ${spacing.lg}px` }}>
           <div>
             <label style={labelStyle}>Name *</label>
-            <input style={inputStyle} value={form.purchaserName} onChange={e => updateField('purchaserName', e.target.value)} placeholder="Full name" />
+            <input style={inputS} value={form.purchaserName} onChange={e => updateField('purchaserName', e.target.value)} placeholder="Full name" />
           </div>
           <div>
             <label style={labelStyle}>Phone *</label>
-            <input style={inputStyle} value={form.purchaserPhone} onChange={e => updateField('purchaserPhone', e.target.value)} placeholder="(865) 555-1234" />
+            <input style={inputS} value={form.purchaserPhone} onChange={e => updateField('purchaserPhone', e.target.value)} placeholder="(865) 555-1234" />
           </div>
           <div>
             <label style={labelStyle}>Email</label>
-            <input style={inputStyle} value={form.purchaserEmail} onChange={e => updateField('purchaserEmail', e.target.value)} placeholder="email@example.com" />
+            <input style={inputS} value={form.purchaserEmail} onChange={e => updateField('purchaserEmail', e.target.value)} placeholder="email@example.com" />
           </div>
           <div>
             <label style={labelStyle}>Customer Type</label>
-            <select style={inputStyle} value={form.customerType} onChange={e => updateField('customerType', e.target.value)}>
+            <select style={{ ...inputS, cursor: 'pointer', appearance: 'auto' }} value={form.customerType} onChange={e => updateField('customerType', e.target.value)}>
               <option value="non_member">Non-Member</option>
               <option value="general">General Member</option>
               <option value="pioneer">Pioneer Member</option>
@@ -126,7 +119,7 @@ export default function ManualIssuePage() {
           </div>
           <div>
             <label style={labelStyle}>Payment Method *</label>
-            <select style={inputStyle} value={form.paymentMethod} onChange={e => updateField('paymentMethod', e.target.value)}>
+            <select style={{ ...inputS, cursor: 'pointer', appearance: 'auto' }} value={form.paymentMethod} onChange={e => updateField('paymentMethod', e.target.value)}>
               <option value="cash">💵 Cash</option>
               <option value="check">📝 Check</option>
               <option value="complimentary">🎁 Complimentary</option>
@@ -135,40 +128,52 @@ export default function ManualIssuePage() {
           {form.paymentMethod === 'check' && (
             <div>
               <label style={labelStyle}>Check Number</label>
-              <input style={inputStyle} value={form.checkNumber} onChange={e => updateField('checkNumber', e.target.value)} placeholder="#1234" />
+              <input style={inputS} value={form.checkNumber} onChange={e => updateField('checkNumber', e.target.value)} placeholder="#1234" />
             </div>
           )}
         </div>
 
-        <label style={labelStyle}>Reason *</label>
-        <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={2} value={form.reason}
+        <label style={{ ...labelStyle, marginTop: spacing.lg }}>Reason *</label>
+        <textarea style={{ ...inputS, resize: 'vertical' }} rows={2} value={form.reason}
           onChange={e => updateField('reason', e.target.value)} placeholder="Why is this being issued manually?" />
 
         {/* Date selection */}
-        <label style={{ ...labelStyle, marginTop: '24px' }}>Select Dates</label>
+        <label style={{ ...labelStyle, marginTop: spacing.xl }}>Select Dates</label>
         <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
           {dates.map(d => (
-            <div key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${t.border}` }}>
+            <div key={d.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${spacing.md}px 0`, borderBottom: `1px solid ${c.border}` }}>
               <div>
-                <span style={{ fontWeight: '600', fontSize: '14px' }}>{d.label}</span>
-                <span style={{ fontSize: '12px', color: t.muted, marginLeft: '8px' }}>{d.event_date}</span>
+                <span style={{ ...type.bodyMedium, color: c.text }}>{d.label}</span>
+                <span style={{ ...type.caption, color: c.muted, marginLeft: spacing.sm }}>{d.event_date}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <button onClick={() => updateDateQty(d.id, -1)} style={{ width: '32px', height: '32px', borderRadius: '8px', border: `1px solid ${t.border}`, background: 'transparent', color: t.text, cursor: 'pointer', fontSize: '16px' }}>−</button>
-                <span style={{ fontWeight: '800', minWidth: '20px', textAlign: 'center' }}>{form.selectedDates[d.id] || 0}</span>
-                <button onClick={() => updateDateQty(d.id, 1)} style={{ width: '32px', height: '32px', borderRadius: '8px', border: `1px solid ${t.border}`, background: 'transparent', color: t.text, cursor: 'pointer', fontSize: '16px' }}>+</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
+                <button onClick={() => updateDateQty(d.id, -1)} style={{
+                  width: '36px', height: '36px', borderRadius: `${radii.sm}px`,
+                  border: `1px solid ${c.border}`, background: 'transparent',
+                  color: c.text, cursor: 'pointer', fontSize: '16px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>−</button>
+                <span style={{ ...type.bodyMedium, minWidth: '20px', textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>{form.selectedDates[d.id] || 0}</span>
+                <button onClick={() => updateDateQty(d.id, 1)} style={{
+                  width: '36px', height: '36px', borderRadius: `${radii.sm}px`,
+                  border: `1px solid ${c.border}`, background: 'transparent',
+                  color: c.text, cursor: 'pointer', fontSize: '16px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>+</button>
               </div>
             </div>
           ))}
         </div>
 
         {/* Total & Submit */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px', padding: '16px 0', borderTop: `2px solid ${t.border}` }}>
-          <span style={{ fontSize: '18px', fontWeight: '800' }}>Total: <span style={{ color: t.accent }}>${getTotal().toFixed(2)}</span></span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.xl, paddingTop: spacing.base, borderTop: `2px solid ${c.border}` }}>
+          <span style={type.sectionTitle}>
+            Total: <span style={{ color: c.accent }}>${getTotal().toFixed(2)}</span>
+          </span>
           <button onClick={handleSubmit}
             disabled={loading || !form.purchaserName || !form.purchaserPhone || !form.reason || Object.keys(form.selectedDates).length === 0}
-            style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: t.primary, color: 'white', fontSize: '16px', fontWeight: '800', cursor: 'pointer', opacity: loading ? 0.5 : 1 }}>
-            {loading ? 'Creating...' : '📝 Issue Tickets'}
+            style={{ ...btn('primary', theme), width: 'auto', padding: `${spacing.md}px ${spacing['2xl']}px`, opacity: loading ? 0.5 : 1 }}>
+            {loading ? 'Creating…' : '📝 Issue Tickets'}
           </button>
         </div>
       </div>

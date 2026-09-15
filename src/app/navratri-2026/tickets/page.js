@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { colors, spacing, type, radii, card, page as pageStyle, keyframes, alert as alertStyle, emptyState as emptyStateStyle } from '@/lib/navratri/designSystem';
 
 /**
  * ═══════════════════════════════════════════════════════════════════
@@ -12,15 +13,24 @@ import { useState, useEffect, useRef, useCallback } from 'react';
  * URL: /navratri-2026/tickets?order=NV-2026-000001&phone=8651234567
  */
 
-const C = {
-  bg: '#0f0d13', card: '#1a1625', border: 'rgba(139,30,63,0.25)',
-  primary: '#FF6B35', secondary: '#8B1E3F', accent: '#FFD700',
-  text: '#F8FAFC', muted: '#94A3B8', green: '#34D399', red: '#EF4444',
-};
-
 const QR_WINDOW_MS = 30000;
 
+function usePreferredTheme() {
+  const [theme, setTheme] = useState('dark');
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: light)');
+    setTheme(mq.matches ? 'light' : 'dark');
+    const handler = (e) => setTheme(e.matches ? 'light' : 'dark');
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return theme;
+}
+
 export default function TicketViewerPage() {
+  const theme = usePreferredTheme();
+  const c = colors(theme);
+
   const [tickets, setTickets] = useState([]);
   const [order, setOrder] = useState(null);
   const [venue, setVenue] = useState(null);
@@ -62,7 +72,6 @@ export default function TicketViewerPage() {
     const timeWindow = Math.floor(Date.now() / QR_WINDOW_MS);
 
     try {
-      // Generate HMAC using Web Crypto
       const key = await crypto.subtle.importKey(
         'raw', new TextEncoder().encode(ticket.tokenSecret),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
@@ -74,20 +83,14 @@ export default function TicketViewerPage() {
         .map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
 
       const qrPayload = `NV:${ticket.token}:${timeWindow}:${hmac}`;
-
-      // Generate QR code on canvas
-      drawQR(qrPayload);
+      const qrBg = theme === 'light' ? 'FFFFFF' : '18181B';
+      const qrFg = theme === 'light' ? '171717' : 'FAFAFA';
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(qrPayload)}&bgcolor=${qrBg}&color=${qrFg}&format=svg`;
+      setQrDataUrl(qrUrl);
     } catch (err) {
       console.error('QR generation failed:', err);
     }
-  }, []);
-
-  // QR Drawing (simple QR implementation using API)
-  const drawQR = (data) => {
-    // Use qrserver API for QR generation
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(data)}&bgcolor=1a1625&color=F8FAFC&format=svg`;
-    setQrDataUrl(qrUrl);
-  };
+  }, [theme]);
 
   // Refresh QR every 30 seconds
   useEffect(() => {
@@ -98,7 +101,7 @@ export default function TicketViewerPage() {
       setCountdown(30);
     };
 
-    refreshQR(); // Initial
+    refreshQR();
 
     const interval = setInterval(() => {
       setCountdown(prev => {
@@ -113,54 +116,69 @@ export default function TicketViewerPage() {
     return () => clearInterval(interval);
   }, [tickets, activeTicketIdx, generateQR]);
 
+  // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text }}>
+    <div style={{ ...pageStyle(theme), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px', animation: 'pulse 2s infinite' }}>🪔</div>
-        <p style={{ color: C.muted }}>Loading your tickets...</p>
+        <div style={{ width: '40px', height: '40px', border: `3px solid ${c.border}`, borderTopColor: c.primary, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+        <p style={{ ...type.body, color: c.muted }}>Loading your tickets…</p>
       </div>
+      <style>{keyframes}</style>
     </div>
   );
 
+  // ── Error ─────────────────────────────────────────────────────────────────
   if (error) return (
-    <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text, padding: '20px' }}>
+    <div style={{ ...pageStyle(theme), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
-        <h2 style={{ color: C.red, marginBottom: '12px' }}>Unable to Load Tickets</h2>
-        <p style={{ color: C.muted, fontSize: '14px' }}>{error}</p>
+        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: c.redBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '28px' }}>⚠️</div>
+        <h2 style={{ ...type.sectionTitle, color: c.red, marginBottom: spacing.sm }}>Unable to Load Tickets</h2>
+        <p style={{ ...type.secondary, color: c.muted }}>{error}</p>
       </div>
+      <style>{keyframes}</style>
     </div>
   );
 
+  // ── Empty ─────────────────────────────────────────────────────────────────
   if (tickets.length === 0) return (
-    <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.text, padding: '20px' }}>
+    <div style={{ ...pageStyle(theme), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎫</div>
-        <h2>No Active Tickets</h2>
-        <p style={{ color: C.muted }}>No active tickets found for this order.</p>
+        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: c.accentBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '28px' }}>🎫</div>
+        <h2 style={{ ...type.sectionTitle, color: c.text }}>No Active Tickets</h2>
+        <p style={{ ...type.secondary, color: c.muted, marginTop: spacing.sm }}>No active tickets found for this order.</p>
       </div>
+      <style>{keyframes}</style>
     </div>
   );
 
   const activeTicket = tickets[activeTicketIdx];
 
   return (
-    <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: "'Inter','Segoe UI',sans-serif" }}>
-      {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #FF6B35, #8B1E3F)', padding: '20px', textAlign: 'center' }}>
-        <div style={{ fontSize: '14px', opacity: 0.8 }}>🪔 Navratri 2026</div>
-        <div style={{ fontSize: '18px', fontWeight: '800', marginTop: '4px' }}>{order?.purchaserName}</div>
-        <div style={{ fontSize: '12px', opacity: 0.7, marginTop: '2px' }}>Order: {order?.orderNumber}</div>
+    <div style={pageStyle(theme)}>
+      <style>{keyframes}</style>
+
+      {/* ── Header ────────────────────────────────────────────────────────── */}
+      <div style={{
+        background: c.gradient, padding: `${spacing.lg}px ${spacing.base}px`,
+        textAlign: 'center',
+      }}>
+        <p style={{ ...type.overline, color: 'rgba(255,255,255,0.7)', margin: 0 }}>NAVRATRI 2026</p>
+        <p style={{ ...type.cardTitle, color: '#fff', margin: `${spacing.xs}px 0 0` }}>{order?.purchaserName}</p>
+        <p style={{ ...type.caption, color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>Order: {order?.orderNumber}</p>
       </div>
 
-      {/* Ticket tabs (if multiple) */}
+      {/* ── Ticket tabs (if multiple) ─────────────────────────────────────── */}
       {tickets.length > 1 && (
-        <div style={{ display: 'flex', overflowX: 'auto', padding: '12px 16px 0', gap: '8px' }}>
+        <div style={{ display: 'flex', overflowX: 'auto', padding: `${spacing.md}px ${spacing.base}px 0`, gap: `${spacing.sm}px`, WebkitOverflowScrolling: 'touch' }}>
           {tickets.map((t, i) => (
             <button key={t.id} onClick={() => setActiveTicketIdx(i)} style={{
-              padding: '8px 16px', borderRadius: '10px', border: 'none', fontSize: '13px', fontWeight: '700',
-              background: i === activeTicketIdx ? C.primary : 'rgba(255,255,255,0.05)',
-              color: i === activeTicketIdx ? 'white' : C.muted, cursor: 'pointer', whiteSpace: 'nowrap',
+              padding: `${spacing.sm}px ${spacing.base}px`,
+              borderRadius: `${radii.sm}px`, border: 'none',
+              fontSize: '13px', fontWeight: '600',
+              background: i === activeTicketIdx ? c.primary : c.inputBg,
+              color: i === activeTicketIdx ? '#fff' : c.muted,
+              cursor: 'pointer', whiteSpace: 'nowrap',
+              transition: 'all 0.15s',
             }}>
               {t.dateLabel}
             </button>
@@ -168,73 +186,78 @@ export default function TicketViewerPage() {
         </div>
       )}
 
-      {/* QR Code Area */}
-      <div style={{ padding: '24px 16px', maxWidth: '400px', margin: '0 auto' }}>
+      {/* ── Ticket Card ───────────────────────────────────────────────────── */}
+      <div style={{ padding: `${spacing.xl}px ${spacing.base}px`, maxWidth: '420px', margin: '0 auto' }}>
         <div style={{
-          background: C.card, borderRadius: '24px', border: `1px solid ${C.border}`,
-          overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+          ...card(theme, 'elevated'),
+          borderRadius: `${radii.xl}px`,
+          overflow: 'hidden',
         }}>
-          {/* Ticket info */}
-          <div style={{ padding: '24px 24px 16px', textAlign: 'center' }}>
+          {/* Ticket info header */}
+          <div style={{ padding: `${spacing.xl}px ${spacing.xl}px ${spacing.base}px`, textAlign: 'center' }}>
             <div style={{
-              display: 'inline-block', padding: '6px 16px', borderRadius: '20px',
-              background: 'rgba(255,215,0,0.1)', color: C.accent, fontSize: '13px', fontWeight: '700',
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              padding: `${spacing.xs}px ${spacing.md}px`,
+              borderRadius: radii.full,
+              background: c.accentBg, color: c.accent,
+              ...type.caption, fontWeight: '600',
             }}>
               {activeTicket.type === 'daily_entry' ? `📅 ${activeTicket.dateLabel}` :
                 activeTicket.type === 'combo_pickup' ? '🎪 Full Event Pass' : '🏆 Pioneer Pass'}
             </div>
-            <div style={{ fontSize: '14px', color: C.muted, marginTop: '8px' }}>
-              Qty: <strong style={{ color: C.text }}>{activeTicket.quantity}</strong> person(s)
+            <div style={{ ...type.secondary, color: c.muted, marginTop: spacing.sm }}>
+              Qty: <strong style={{ color: c.text }}>{activeTicket.quantity}</strong> person(s)
             </div>
           </div>
 
           {/* QR Code */}
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '0 24px 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: `0 ${spacing.xl}px ${spacing.base}px` }}>
             <div style={{
-              width: '280px', height: '280px', background: '#1a1625', borderRadius: '16px',
+              width: '280px', height: '280px',
+              background: c.card, borderRadius: `${radii.lg}px`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: `2px solid ${C.border}`, position: 'relative',
+              border: `1px solid ${c.border}`,
             }}>
               {qrDataUrl ? (
-                <img src={qrDataUrl} alt="QR Code" style={{ width: '260px', height: '260px', borderRadius: '8px' }} />
+                <img src={qrDataUrl} alt="QR Code" style={{ width: '260px', height: '260px', borderRadius: `${radii.sm}px` }} />
               ) : (
-                <div style={{ color: C.muted }}>Generating QR...</div>
+                <div style={{ width: '36px', height: '36px', border: `3px solid ${c.border}`, borderTopColor: c.primary, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               )}
             </div>
           </div>
 
           {/* Countdown */}
-          <div style={{ textAlign: 'center', padding: '0 24px 20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <div style={{ textAlign: 'center', padding: `0 ${spacing.xl}px ${spacing.lg}px` }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
               <div style={{
                 width: '8px', height: '8px', borderRadius: '50%',
-                background: countdown > 10 ? C.green : countdown > 5 ? C.accent : C.red,
-                animation: countdown <= 5 ? 'pulse 0.5s infinite' : 'none',
+                background: countdown > 10 ? c.green : countdown > 5 ? c.amber : c.red,
+                transition: 'background 0.3s',
               }} />
-              <span style={{ fontSize: '13px', color: C.muted }}>
-                Refreshes in <strong style={{ color: C.text }}>{countdown}s</strong>
+              <span style={{ ...type.caption, color: c.muted }}>
+                Refreshes in <strong style={{ color: c.text, fontVariantNumeric: 'tabular-nums' }}>{countdown}s</strong>
               </span>
             </div>
-            <p style={{ fontSize: '11px', color: 'rgba(148,163,184,0.6)', marginTop: '8px' }}>
-              This QR code changes every 30 seconds for your security
+            <p style={{ ...type.caption, color: c.placeholder, marginTop: spacing.xs }}>
+              QR code changes every 30s for security
             </p>
           </div>
 
-          {/* Divider with dots */}
-          <div style={{ position: 'relative', margin: '0 16px' }}>
-            <div style={{ borderTop: `2px dashed ${C.border}` }} />
-            <div style={{ position: 'absolute', left: '-24px', top: '-12px', width: '24px', height: '24px', borderRadius: '50%', background: C.bg }} />
-            <div style={{ position: 'absolute', right: '-24px', top: '-12px', width: '24px', height: '24px', borderRadius: '50%', background: C.bg }} />
+          {/* Divider with punch holes */}
+          <div style={{ position: 'relative', margin: `0 ${spacing.base}px` }}>
+            <div style={{ borderTop: `2px dashed ${c.border}` }} />
+            <div style={{ position: 'absolute', left: '-24px', top: '-12px', width: '24px', height: '24px', borderRadius: '50%', background: c.bg }} />
+            <div style={{ position: 'absolute', right: '-24px', top: '-12px', width: '24px', height: '24px', borderRadius: '50%', background: c.bg }} />
           </div>
 
           {/* Venue info */}
-          <div style={{ padding: '20px 24px', textAlign: 'center' }}>
-            <div style={{ fontSize: '14px', fontWeight: '700' }}>{venue?.name}</div>
-            <div style={{ fontSize: '12px', color: C.muted, marginTop: '4px' }}>{venue?.address}</div>
+          <div style={{ padding: `${spacing.lg}px ${spacing.xl}px`, textAlign: 'center' }}>
+            <div style={{ ...type.bodyMedium, color: c.text }}>{venue?.name}</div>
+            <div style={{ ...type.caption, color: c.muted, marginTop: spacing.xs }}>{venue?.address}</div>
             {activeTicket.date && (
-              <div style={{ fontSize: '13px', color: C.accent, marginTop: '8px', fontWeight: '700' }}>
+              <div style={{ ...type.bodyMedium, color: c.accent, marginTop: spacing.sm }}>
                 {new Date(activeTicket.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-                {' • '}7:00 PM – 11:00 PM
+                {' · '}7:00 PM – 11:00 PM
               </div>
             )}
           </div>
@@ -242,11 +265,14 @@ export default function TicketViewerPage() {
 
         {/* Instructions */}
         <div style={{
-          marginTop: '24px', padding: '16px 20px', borderRadius: '16px',
-          background: 'rgba(255,107,53,0.05)', border: `1px solid rgba(255,107,53,0.15)`,
+          marginTop: spacing.xl,
+          padding: `${spacing.base}px ${spacing.lg}px`,
+          borderRadius: `${radii.lg}px`,
+          background: c.primaryBg,
+          border: `1px solid rgba(255,107,53,0.12)`,
         }}>
-          <div style={{ fontSize: '14px', fontWeight: '700', marginBottom: '8px' }}>📋 At the Gate:</div>
-          <ol style={{ margin: 0, paddingLeft: '20px', color: C.muted, fontSize: '13px', lineHeight: '1.8' }}>
+          <div style={{ ...type.bodyMedium, color: c.text, marginBottom: spacing.sm }}>At the Gate</div>
+          <ol style={{ margin: 0, paddingLeft: '20px', color: c.muted, ...type.secondary, lineHeight: '1.9' }}>
             <li>Show this screen to the scanner</li>
             <li>Staff will scan your QR code</li>
             <li>Staff will verify your name</li>
@@ -254,10 +280,6 @@ export default function TicketViewerPage() {
           </ol>
         </div>
       </div>
-
-      <style>{`
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-      `}</style>
     </div>
   );
 }

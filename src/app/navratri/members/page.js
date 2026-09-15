@@ -1,17 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ClientLayout';
-
-const T = (theme) => ({
-  card: theme === 'dark' ? '#1e293b' : '#FFFFFF',
-  border: theme === 'dark' ? 'rgba(148,163,184,0.15)' : 'rgba(0,0,0,0.08)',
-  text: theme === 'dark' ? '#F8FAFC' : '#0f172a', muted: theme === 'dark' ? '#94A3B8' : '#64748B',
-  primary: '#FF6B35', green: '#34D399', red: '#EF4444', accent: '#FFD700', blue: '#60A5FA',
-});
+import { colors, spacing, type, radii, btn, input as dsInput, card, chip, table as tableStyle, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
 
 export default function MembersPage() {
   const { theme } = useTheme();
-  const t = T(theme);
+  const c = colors(theme);
+  const t = tableStyle(theme);
+
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -50,12 +46,8 @@ export default function MembersPage() {
         body: JSON.stringify({ action: 'sync', eventId }),
       });
       const data = await res.json();
-      if (data.success) {
-        setSyncResult(data);
-        loadMembers();
-      } else {
-        setSyncResult({ error: data.error });
-      }
+      if (data.success) { setSyncResult(data); loadMembers(); }
+      else { setSyncResult({ error: data.error }); }
     } catch (err) { setSyncResult({ error: err.message }); }
     finally { setSyncing(false); }
   };
@@ -82,42 +74,42 @@ export default function MembersPage() {
   const committeeCount = members.filter(m => m.is_committee).length;
 
   return (
-    <div style={{ padding: '24px 28px', color: t.text }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+    <div style={{ padding: `${spacing.xl}px`, color: c.text, fontFamily: type.fontFamily }}>
+      <style>{keyframes}</style>
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl, flexWrap: 'wrap', gap: spacing.md }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: '900', margin: 0 }}>👥 Members</h1>
-          <p style={{ color: t.muted, fontSize: '13px', marginTop: '4px' }}>
-            {members.length} total • {generalCount} general • {pioneerCount} pioneer • {committeeCount} committee
+          <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>👥 Members</h1>
+          <p style={{ ...type.secondary, color: c.muted, marginTop: spacing.xs }}>
+            {members.length} total · {generalCount} general · {pioneerCount} pioneer · {committeeCount} committee
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <a href="/navratri" style={{ padding: '10px 18px', borderRadius: '10px', border: `1px solid ${t.border}`, color: t.text, textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}>← Dashboard</a>
+        <div style={{ display: 'flex', gap: spacing.md }}>
+          <a href="/navratri" style={{ ...btn('secondary', theme), textDecoration: 'none', ...type.caption }}>← Dashboard</a>
           <button onClick={handleSync} disabled={syncing}
-            style={{ padding: '10px 20px', borderRadius: '10px', border: 'none', background: t.primary, color: 'white', fontWeight: '700', cursor: 'pointer', opacity: syncing ? 0.5 : 1 }}>
-            {syncing ? '🔄 Syncing...' : '🔄 Sync from Odoo'}
+            style={{ ...btn('primary', theme), width: 'auto', ...type.caption, opacity: syncing ? 0.5 : 1 }}>
+            {syncing ? '🔄 Syncing…' : '🔄 Sync from Odoo'}
           </button>
         </div>
       </div>
 
+      {/* Sync result */}
       {syncResult && (
-        <div style={{ padding: '14px 20px', borderRadius: '12px', marginBottom: '16px',
-          background: syncResult.error ? 'rgba(239,68,68,0.1)' : 'rgba(52,211,153,0.1)',
-          border: `1px solid ${syncResult.error ? 'rgba(239,68,68,0.3)' : 'rgba(52,211,153,0.3)'}`,
-          color: syncResult.error ? t.red : t.green, fontSize: '14px',
-        }}>
+        <div style={{ ...alertStyle(syncResult.error ? 'error' : 'success', theme), marginBottom: spacing.base }}>
           {syncResult.error ? `❌ ${syncResult.error}` : `✅ Synced ${syncResult.synced} members (${syncResult.generals} general, ${syncResult.pioneers} pioneer)`}
         </div>
       )}
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: spacing.md, marginBottom: spacing.lg, flexWrap: 'wrap', alignItems: 'center' }}>
         <input value={search} onChange={e => setSearch(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && loadMembers(search)}
-          placeholder="Search by name, phone, or email..."
-          style={{ flex: 1, minWidth: '200px', padding: '12px 16px', borderRadius: '12px', border: `1px solid ${t.border}`, background: 'transparent', color: t.text, fontSize: '14px', outline: 'none' }} />
-        <button onClick={() => loadMembers(search)} style={{ padding: '12px 20px', borderRadius: '12px', border: 'none', background: t.primary, color: 'white', fontWeight: '700', cursor: 'pointer' }}>Search</button>
+          placeholder="Search by name, phone, or email…"
+          style={{ ...dsInput(theme), flex: 1, minWidth: '200px' }} />
+        <button onClick={() => loadMembers(search)} style={{ ...btn('primary', theme), width: 'auto', padding: `${spacing.md}px ${spacing.xl}px` }}>Search</button>
 
-        <div style={{ display: 'flex', gap: '4px', background: theme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderRadius: '10px', padding: '3px' }}>
+        <div style={{ display: 'flex', gap: '3px', background: c.inputBg, borderRadius: `${radii.sm}px`, padding: '3px' }}>
           {[
             { key: 'all', label: `All (${members.length})` },
             { key: 'general', label: `General (${generalCount})` },
@@ -125,63 +117,64 @@ export default function MembersPage() {
             { key: 'committee', label: `Committee (${committeeCount})` },
           ].map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)} style={{
-              padding: '8px 14px', borderRadius: '8px', border: 'none', fontSize: '12px', fontWeight: '600',
-              background: filter === f.key ? t.primary : 'transparent',
-              color: filter === f.key ? 'white' : t.muted, cursor: 'pointer',
+              padding: `${spacing.sm}px ${spacing.md}px`, borderRadius: `${radii.xs}px`, border: 'none',
+              ...type.caption,
+              background: filter === f.key ? c.primary : 'transparent',
+              color: filter === f.key ? '#fff' : c.muted, cursor: 'pointer', transition: 'all 0.15s',
             }}>{f.label}</button>
           ))}
         </div>
       </div>
 
       {/* Members table */}
-      <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', overflow: 'hidden' }}>
+      <div style={{ ...card(theme), overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: t.muted }}>Loading members...</div>
+          <div style={{ padding: spacing['3xl'], textAlign: 'center' }}>
+            <div style={{ width: '32px', height: '32px', border: `3px solid ${c.border}`, borderTopColor: c.primary, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
+            <p style={{ ...type.body, color: c.muted }}>Loading members…</p>
+          </div>
         ) : filteredMembers.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: t.muted }}>
+          <div style={{ padding: spacing['3xl'], textAlign: 'center', ...type.body, color: c.muted }}>
             {members.length === 0 ? 'No members synced yet. Click "Sync from Odoo" to import.' : 'No members match your filter.'}
           </div>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: `2px solid ${t.border}` }}>
-                {['Name', 'Type', 'Phone', 'Email', 'Odoo ID', 'Committee', 'Last Synced'].map(h => (
-                  <th key={h} style={{ padding: '14px 12px', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: t.muted, textTransform: 'uppercase' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredMembers.map((m, i) => (
-                <tr key={m.id || i} style={{ borderBottom: `1px solid ${t.border}` }}>
-                  <td style={{ padding: '12px', fontSize: '14px', fontWeight: '600' }}>{m.name}</td>
-                  <td style={{ padding: '12px' }}>
-                    <span style={{
-                      fontSize: '12px', padding: '3px 10px', borderRadius: '8px', fontWeight: '700',
-                      background: m.membership_type === 'pioneer' ? 'rgba(255,215,0,0.1)' : 'rgba(96,165,250,0.1)',
-                      color: m.membership_type === 'pioneer' ? t.accent : t.blue,
-                    }}>
-                      {m.membership_type === 'pioneer' ? '🏆 Pioneer' : '👤 General'}
-                    </span>
-                  </td>
-                  <td style={{ padding: '12px', fontSize: '13px', color: t.muted, fontFamily: 'monospace' }}>{m.phone}</td>
-                  <td style={{ padding: '12px', fontSize: '13px', color: t.muted }}>{m.email}</td>
-                  <td style={{ padding: '12px', fontSize: '12px', fontFamily: 'monospace', color: t.muted }}>{m.odoo_partner_id}</td>
-                  <td style={{ padding: '12px' }}>
-                    <button onClick={() => handleToggleCommittee(m)} style={{
-                      padding: '4px 12px', borderRadius: '8px', border: 'none', fontSize: '12px', fontWeight: '700', cursor: 'pointer',
-                      background: m.is_committee ? 'rgba(52,211,153,0.15)' : 'rgba(255,255,255,0.05)',
-                      color: m.is_committee ? t.green : t.muted,
-                    }}>
-                      {m.is_committee ? '✅ Yes' : 'No'}
-                    </button>
-                  </td>
-                  <td style={{ padding: '12px', fontSize: '12px', color: t.muted }}>
-                    {m.synced_at ? new Date(m.synced_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
-                  </td>
+          <div style={t.wrapper}>
+            <table style={t.table}>
+              <thead>
+                <tr>
+                  {['Name', 'Type', 'Phone', 'Email', 'Odoo ID', 'Committee', 'Last Synced'].map(h => (
+                    <th key={h} style={t.th}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredMembers.map((m, i) => (
+                  <tr key={m.id || i} style={t.row}>
+                    <td style={{ ...t.td, ...type.bodyMedium }}>{m.name}</td>
+                    <td style={t.td}>
+                      <span style={chip(m.membership_type === 'pioneer' ? 'active' : 'valid', theme)}>
+                        {m.membership_type === 'pioneer' ? '🏆 Pioneer' : '👤 General'}
+                      </span>
+                    </td>
+                    <td style={{ ...t.tdMuted, fontFamily: 'monospace' }}>{m.phone}</td>
+                    <td style={t.tdMuted}>{m.email}</td>
+                    <td style={{ ...t.tdMuted, fontFamily: 'monospace', fontSize: '12px' }}>{m.odoo_partner_id}</td>
+                    <td style={t.td}>
+                      <button onClick={() => handleToggleCommittee(m)} style={{
+                        ...chip(m.is_committee ? 'active' : 'pending', theme),
+                        cursor: 'pointer', border: 'none',
+                      }}>
+                        {m.is_committee ? '✅ Yes' : 'No'}
+                      </button>
+                    </td>
+                    <td style={t.tdMuted}>
+                      {m.synced_at ? new Date(m.synced_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

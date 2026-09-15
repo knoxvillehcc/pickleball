@@ -1,27 +1,18 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/components/ClientLayout';
-
-const T = (theme) => ({
-  bg:       theme === 'dark' ? '#0f172a' : '#F8FAFC',
-  card:     theme === 'dark' ? '#1e293b' : '#FFFFFF',
-  border:   theme === 'dark' ? 'rgba(148,163,184,0.15)' : 'rgba(0,0,0,0.08)',
-  text:     theme === 'dark' ? '#F8FAFC' : '#0f172a',
-  muted:    theme === 'dark' ? '#94A3B8' : '#64748B',
-  primary:  '#FF6B35', secondary: '#8B1E3F', accent: '#FFD700',
-  green:    '#34D399', red: '#EF4444', blue: '#60A5FA',
-});
+import { colors, spacing, type, radii, btn, card, chip, table as tableStyle, emptyState as emptyStateStyle, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
 
 export default function NavratriDashboard() {
   const { theme } = useTheme();
-  const t = T(theme);
+  const c = colors(theme);
   const [overview, setOverview] = useState(null);
   const [dateStats, setDateStats] = useState([]);
   const [events, setEvents] = useState([]);
   const [activeEvent, setActiveEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [health, setHealth] = useState(null);
-  const [tab, setTab] = useState('overview'); // overview, dates, orders, members, accounting
+  const [tab, setTab] = useState('overview');
 
   // Load data
   useEffect(() => {
@@ -60,72 +51,80 @@ export default function NavratriDashboard() {
 
   const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n || 0);
 
+  const t = tableStyle(theme);
+
   if (loading) return (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
-      <div style={{ fontSize: '48px', marginBottom: '16px' }}>🪔</div>
-      <p style={{ color: t.muted }}>Loading Navratri Dashboard...</p>
+    <div style={{ padding: spacing['3xl'], textAlign: 'center' }}>
+      <style>{keyframes}</style>
+      <div style={{ width: '40px', height: '40px', border: `3px solid ${c.border}`, borderTopColor: c.primary, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+      <p style={{ ...type.body, color: c.muted }}>Loading Navratri Dashboard…</p>
     </div>
   );
 
   return (
-    <div style={{ padding: '24px 28px', color: t.text, minHeight: '100vh' }}>
+    <div style={{ padding: `${spacing.xl}px ${spacing.xl}px`, color: c.text, minHeight: '100vh', fontFamily: type.fontFamily }}>
+      <style>{keyframes}</style>
+
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xl, flexWrap: 'wrap', gap: spacing.base }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '900', margin: 0 }}>🪔 Navratri 2026</h1>
-          <p style={{ color: t.muted, fontSize: '14px', marginTop: '4px' }}>
+          <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>🪔 Navratri 2026</h1>
+          <p style={{ ...type.secondary, color: c.muted, marginTop: spacing.xs }}>
             {activeEvent?.status === 'active' ? '🟢 Event Active' :
               activeEvent?.status === 'published' ? '🟡 Published' :
               activeEvent?.status === 'draft' ? '⚪ Draft' : activeEvent?.status || 'No events'}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          {health && (
-            <span style={{
-              padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '700',
-              background: health.status === 'healthy' ? 'rgba(52,211,153,0.1)' : 'rgba(239,68,68,0.1)',
-              color: health.status === 'healthy' ? t.green : t.red,
-            }}>
-              {health.status === 'healthy' ? '✅ All Systems OK' : '⚠️ System Degraded'}
-            </span>
-          )}
-        </div>
+        {health && (
+          <span style={chip(health.status === 'healthy' ? 'active' : 'invalid', theme)}>
+            {health.status === 'healthy' ? '✅ All Systems OK' : '⚠️ System Degraded'}
+          </span>
+        )}
       </div>
 
       {/* Quick Nav */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: spacing.sm, marginBottom: spacing.lg, flexWrap: 'wrap' }}>
         {[
           { href: '/navratri/orders', icon: '🎫', label: 'Orders' },
           { href: '/navratri/members', icon: '👥', label: 'Members' },
           { href: '/navratri/manual', icon: '📝', label: 'Manual Issue' },
           { href: '/navratri/accounting', icon: '💰', label: 'Accounting' },
-          { href: '/navratri/communications', icon: '📢', label: 'Communications' },
+          { href: '/navratri/communications', icon: '📢', label: 'Comms' },
           { href: '/navratri/scanner', icon: '📸', label: 'Scanner' },
           { href: '/navratri/pickup', icon: '🎫', label: 'Pickup' },
           { href: '/navratri/settings', icon: '⚙️', label: 'Settings' },
           { href: '/navratri-2026', icon: '🌐', label: 'Public Page', external: true },
         ].map(link => (
           <a key={link.href} href={link.href} target={link.external ? '_blank' : undefined}
-            style={{ padding: '10px 18px', borderRadius: '12px', background: t.card, border: `1px solid ${t.border}`, color: t.text, textDecoration: 'none', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.15s' }}>
+            style={{
+              ...btn('secondary', theme), padding: `${spacing.sm}px ${spacing.base}px`,
+              textDecoration: 'none', ...type.caption, display: 'inline-flex', gap: '6px',
+            }}>
             {link.icon} {link.label}
           </a>
         ))}
       </div>
 
       {/* Tab Bar */}
-      <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', background: theme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderRadius: '12px', padding: '4px' }}>
+      <div style={{
+        display: 'flex', gap: '3px', marginBottom: spacing.xl,
+        background: c.inputBg, borderRadius: `${radii.md}px`, padding: '3px',
+        overflowX: 'auto', WebkitOverflowScrolling: 'touch',
+      }}>
         {[
-          { key: 'overview', label: '📊 Overview' },
-          { key: 'dates', label: '📅 By Date' },
-          { key: 'orders', label: '🎫 Orders' },
-          { key: 'members', label: '👥 Members' },
-          { key: 'accounting', label: '💰 Accounting' },
+          { key: 'overview', label: 'Overview' },
+          { key: 'dates', label: 'By Date' },
+          { key: 'orders', label: 'Orders' },
+          { key: 'members', label: 'Members' },
+          { key: 'accounting', label: 'Accounting' },
         ].map(tb => (
           <button key={tb.key} onClick={() => setTab(tb.key)} style={{
-            padding: '10px 18px', borderRadius: '10px', border: 'none', fontSize: '14px', fontWeight: '600',
-            background: tab === tb.key ? t.primary : 'transparent',
-            color: tab === tb.key ? 'white' : t.muted,
-            cursor: 'pointer', transition: 'all 0.2s',
+            padding: `${spacing.sm}px ${spacing.base}px`,
+            borderRadius: `${radii.sm}px`, border: 'none',
+            ...type.bodyMedium, fontSize: '14px',
+            background: tab === tb.key ? c.primary : 'transparent',
+            color: tab === tb.key ? '#fff' : c.muted,
+            cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap',
           }}>
             {tb.label}
           </button>
@@ -136,73 +135,58 @@ export default function NavratriDashboard() {
       {tab === 'overview' && overview && (
         <>
           {/* KPI Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: spacing.base, marginBottom: spacing.xl }}>
             {[
-              { label: 'Total Revenue', value: fmt(overview.totalRevenue), color: t.green, icon: '💰' },
-              { label: 'Net Revenue', value: fmt(overview.netRevenue), color: t.accent, icon: '📈' },
-              { label: 'Stripe Fees', value: fmt(overview.totalFees), color: t.red, icon: '💳' },
-              { label: 'Refunds', value: fmt(overview.totalRefunds), color: t.red, icon: '↩️' },
-              { label: 'Total Orders', value: overview.totalOrders, color: t.blue, icon: '🎫' },
-              { label: 'Pending Orders', value: overview.pendingOrders, color: t.accent, icon: '⏳' },
-              { label: 'Total Check-ins', value: overview.totalCheckins, color: t.green, icon: '✅' },
-              { label: 'Members Synced', value: overview.membersSynced, color: t.blue, icon: '👥' },
+              { label: 'Total Revenue', value: fmt(overview.totalRevenue), color: c.green, icon: '💰' },
+              { label: 'Net Revenue', value: fmt(overview.netRevenue), color: c.accent, icon: '📈' },
+              { label: 'Stripe Fees', value: fmt(overview.totalFees), color: c.red, icon: '💳' },
+              { label: 'Refunds', value: fmt(overview.totalRefunds), color: c.red, icon: '↩️' },
+              { label: 'Total Orders', value: overview.totalOrders, color: c.blue, icon: '🎫' },
+              { label: 'Pending', value: overview.pendingOrders, color: c.amber, icon: '⏳' },
+              { label: 'Check-ins', value: overview.totalCheckins, color: c.green, icon: '✅' },
+              { label: 'Members Synced', value: overview.membersSynced, color: c.blue, icon: '👥' },
             ].map((kpi, i) => (
-              <div key={i} style={{
-                background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '20px',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '13px', color: t.muted }}>{kpi.label}</span>
-                  <span style={{ fontSize: '20px' }}>{kpi.icon}</span>
+              <div key={i} style={{ ...card(theme), padding: spacing.lg }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm }}>
+                  <span style={{ ...type.caption, color: c.muted }}>{kpi.label}</span>
+                  <span style={{ fontSize: '18px' }}>{kpi.icon}</span>
                 </div>
-                <div style={{ fontSize: '24px', fontWeight: '900', color: kpi.color }}>{kpi.value}</div>
+                <div style={{ ...type.tabletNum, color: kpi.color }}>{kpi.value}</div>
               </div>
             ))}
           </div>
 
           {/* Revenue Breakdown */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-            {/* By Method */}
-            <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '20px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '16px' }}>By Payment Method</h3>
-              {Object.entries(overview.revenueByMethod || {}).map(([method, amount]) => (
-                <div key={method} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid ${t.border}` }}>
-                  <span style={{ fontSize: '14px', textTransform: 'capitalize' }}>
-                    {method === 'stripe' ? '💳 Stripe' : method === 'cash' ? '💵 Cash' : method === 'check' ? '📝 Check' : '🎁 Complimentary'}
-                  </span>
-                  <span style={{ fontWeight: '700', fontSize: '14px' }}>{fmt(amount)}</span>
-                </div>
-              ))}
-            </div>
-            {/* By Type */}
-            <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '20px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '16px' }}>By Ticket Type</h3>
-              {Object.entries(overview.revenueByType || {}).map(([type, amount]) => (
-                <div key={type} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid ${t.border}` }}>
-                  <span style={{ fontSize: '14px', textTransform: 'capitalize' }}>{type.replace('_', ' ')}</span>
-                  <span style={{ fontWeight: '700', fontSize: '14px' }}>{fmt(amount)}</span>
-                </div>
-              ))}
-            </div>
-            {/* By Customer */}
-            <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '20px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '16px' }}>By Customer Type</h3>
-              {Object.entries(overview.revenueByCustomer || {}).map(([type, amount]) => (
-                <div key={type} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid ${t.border}` }}>
-                  <span style={{ fontSize: '14px', textTransform: 'capitalize' }}>
-                    {type === 'general' ? '👤 General' : type === 'pioneer' ? '🏆 Pioneer' : '🌐 Non-Member'}
-                  </span>
-                  <span style={{ fontWeight: '700', fontSize: '14px' }}>{fmt(amount)}</span>
-                </div>
-              ))}
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: spacing.base, marginBottom: spacing.xl }}>
+            {[
+              { title: 'By Payment Method', data: overview.revenueByMethod || {}, labels: { stripe: '💳 Stripe', cash: '💵 Cash', check: '📝 Check', complimentary: '🎁 Complimentary' } },
+              { title: 'By Ticket Type', data: overview.revenueByType || {}, labels: {} },
+              { title: 'By Customer Type', data: overview.revenueByCustomer || {}, labels: { general: '👤 General', pioneer: '🏆 Pioneer', non_member: '🌐 Non-Member' } },
+            ].map((section, si) => (
+              <div key={si} style={{ ...card(theme), padding: spacing.lg }}>
+                <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>{section.title}</h3>
+                {Object.entries(section.data).map(([key, amount]) => (
+                  <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: `${spacing.sm}px 0`, borderBottom: `1px solid ${c.border}` }}>
+                    <span style={{ ...type.secondary, textTransform: 'capitalize' }}>{section.labels[key] || key.replace('_', ' ')}</span>
+                    <span style={{ ...type.bodyMedium, fontVariantNumeric: 'tabular-nums' }}>{fmt(amount)}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
 
-          {/* Membership Stats */}
-          <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '20px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '16px' }}>👥 Membership Breakdown</h3>
-            <div style={{ display: 'flex', gap: '32px' }}>
-              <div><span style={{ fontSize: '32px', fontWeight: '900', color: t.blue }}>{overview.generalMembers}</span><div style={{ color: t.muted, fontSize: '13px', marginTop: '4px' }}>General Members</div></div>
-              <div><span style={{ fontSize: '32px', fontWeight: '900', color: t.accent }}>{overview.pioneerMembers}</span><div style={{ color: t.muted, fontSize: '13px', marginTop: '4px' }}>Pioneer Members</div></div>
+          {/* Membership */}
+          <div style={{ ...card(theme), padding: spacing.lg }}>
+            <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>👥 Membership Breakdown</h3>
+            <div style={{ display: 'flex', gap: spacing['2xl'] }}>
+              <div>
+                <span style={{ ...type.bigNum, color: c.blue }}>{overview.generalMembers}</span>
+                <div style={{ ...type.caption, color: c.muted, marginTop: spacing.xs }}>General Members</div>
+              </div>
+              <div>
+                <span style={{ ...type.bigNum, color: c.accent }}>{overview.pioneerMembers}</span>
+                <div style={{ ...type.caption, color: c.muted, marginTop: spacing.xs }}>Pioneer Members</div>
+              </div>
             </div>
           </div>
         </>
@@ -210,82 +194,67 @@ export default function NavratriDashboard() {
 
       {/* ── DATES TAB ────────────────────────────────────────────────── */}
       {tab === 'dates' && (
-        <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: `2px solid ${t.border}` }}>
-                {['Date', 'Label', 'Tickets Sold', 'Revenue', 'Refunded', 'Checked In', 'Attendance'].map(h => (
-                  <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '700', color: t.muted, textTransform: 'uppercase' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {dateStats.map((d, i) => (
-                <tr key={d.dateId} style={{ borderBottom: `1px solid ${t.border}`, background: i % 2 === 0 ? 'transparent' : (theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)') }}>
-                  <td style={{ padding: '14px 16px', fontSize: '14px', fontWeight: '600' }}>
-                    {new Date(d.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                  </td>
-                  <td style={{ padding: '14px 16px', fontSize: '14px' }}>{d.label}</td>
-                  <td style={{ padding: '14px 16px', fontSize: '14px', fontWeight: '700' }}>{d.totalTickets}</td>
-                  <td style={{ padding: '14px 16px', fontSize: '14px', fontWeight: '700', color: t.green }}>{fmt(d.totalRevenue)}</td>
-                  <td style={{ padding: '14px 16px', fontSize: '14px', color: d.totalRefunded > 0 ? t.red : t.muted }}>{d.totalRefunded}</td>
-                  <td style={{ padding: '14px 16px', fontSize: '14px', fontWeight: '700' }}>{d.checkedIn}</td>
-                  <td style={{ padding: '14px 16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ flex: 1, height: '8px', background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                        <div style={{ width: `${Math.min(d.attendanceRate, 100)}%`, height: '100%', background: t.green, borderRadius: '4px', transition: 'width 0.3s' }} />
-                      </div>
-                      <span style={{ fontSize: '13px', fontWeight: '700', minWidth: '45px' }}>{d.attendanceRate}%</span>
-                    </div>
-                  </td>
+        <div style={{ ...card(theme), overflow: 'hidden' }}>
+          <div style={t.wrapper}>
+            <table style={t.table}>
+              <thead>
+                <tr>
+                  {['Date', 'Label', 'Tickets', 'Revenue', 'Refunded', 'Checked In', 'Attendance'].map(h => (
+                    <th key={h} style={t.th}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {dateStats.map((d, i) => (
+                  <tr key={d.dateId} style={{ ...t.row, background: i % 2 === 0 ? 'transparent' : c.bgAlt }}>
+                    <td style={{ ...t.td, ...type.bodyMedium }}>
+                      {new Date(d.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                    </td>
+                    <td style={t.td}>{d.label}</td>
+                    <td style={{ ...t.td, ...type.bodyMedium }}>{d.totalTickets}</td>
+                    <td style={{ ...t.td, ...type.bodyMedium, color: c.green }}>{fmt(d.totalRevenue)}</td>
+                    <td style={{ ...t.td, color: d.totalRefunded > 0 ? c.red : c.muted }}>{d.totalRefunded}</td>
+                    <td style={{ ...t.td, ...type.bodyMedium }}>{d.checkedIn}</td>
+                    <td style={t.td}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
+                        <div style={{ flex: 1, height: '6px', background: c.inputBg, borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ width: `${Math.min(d.attendanceRate, 100)}%`, height: '100%', background: c.green, borderRadius: '3px', transition: 'width 0.3s' }} />
+                        </div>
+                        <span style={{ ...type.caption, fontWeight: '600', minWidth: '40px', fontVariantNumeric: 'tabular-nums' }}>{d.attendanceRate}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {/* ── ORDERS TAB (placeholder for now) ──────────────────────────── */}
-      {tab === 'orders' && (
-        <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '40px', textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎫</div>
-          <h3>Orders Management</h3>
-          <p style={{ color: t.muted, marginTop: '8px' }}>Full order search, detail view, manual issue, and refund UI coming in next phase.</p>
-          <p style={{ color: t.muted, marginTop: '4px', fontSize: '13px' }}>API is fully functional — use the reports tab for now.</p>
-        </div>
-      )}
-
-      {/* ── MEMBERS TAB (placeholder) ─────────────────────────────────── */}
-      {tab === 'members' && (
-        <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '40px', textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>👥</div>
-          <h3>Member Management</h3>
-          <p style={{ color: t.muted, marginTop: '8px' }}>Odoo sync, member search, committee management, and entitlement views coming in next phase.</p>
-        </div>
-      )}
-
-      {/* ── ACCOUNTING TAB (placeholder) ──────────────────────────────── */}
-      {tab === 'accounting' && (
-        <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '40px', textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>💰</div>
-          <h3>Accounting & Daily Close</h3>
-          <p style={{ color: t.muted, marginTop: '8px' }}>Daily close, Odoo journal entries, and reconciliation coming in next phase.</p>
+      {/* Placeholder tabs */}
+      {['orders', 'members', 'accounting'].includes(tab) && (
+        <div style={{ ...card(theme), padding: spacing['3xl'], textAlign: 'center' }}>
+          <div style={{ fontSize: '40px', marginBottom: spacing.base, opacity: 0.5 }}>
+            {tab === 'orders' ? '🎫' : tab === 'members' ? '👥' : '💰'}
+          </div>
+          <h3 style={{ ...type.sectionTitle, color: c.text }}>
+            {tab === 'orders' ? 'Orders Management' : tab === 'members' ? 'Member Management' : 'Accounting & Daily Close'}
+          </h3>
+          <p style={{ ...type.secondary, color: c.muted, marginTop: spacing.sm }}>
+            Use the dedicated page from the quick nav above.
+          </p>
         </div>
       )}
 
       {/* System Health */}
       {health && (
-        <div style={{ marginTop: '24px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '20px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '16px' }}>🔧 System Health</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+        <div style={{ ...card(theme), padding: spacing.lg, marginTop: spacing.xl }}>
+          <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>🔧 System Health</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: spacing.md }}>
             {Object.entries(health.checks || {}).map(([name, check]) => (
-              <div key={name} style={{ padding: '12px', borderRadius: '10px', background: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
-                <div style={{ fontSize: '13px', fontWeight: '700', marginBottom: '4px', textTransform: 'capitalize' }}>{name}</div>
-                <span style={{
-                  fontSize: '12px', fontWeight: '700', padding: '2px 8px', borderRadius: '6px',
-                  background: check.status === 'healthy' ? 'rgba(52,211,153,0.1)' : check.status === 'not_configured' ? 'rgba(148,163,184,0.1)' : 'rgba(239,68,68,0.1)',
-                  color: check.status === 'healthy' ? t.green : check.status === 'not_configured' ? t.muted : t.red,
-                }}>
+              <div key={name} style={{ padding: spacing.md, borderRadius: `${radii.sm}px`, background: c.bgAlt }}>
+                <div style={{ ...type.bodyMedium, marginBottom: spacing.xs, textTransform: 'capitalize' }}>{name}</div>
+                <span style={chip(check.status === 'healthy' ? 'active' : check.status === 'not_configured' ? 'pending' : 'invalid', theme)}>
                   {check.status === 'healthy' ? '✅ Healthy' : check.status === 'not_configured' ? '⚙️ Not Configured' : '❌ Error'}
                 </span>
               </div>

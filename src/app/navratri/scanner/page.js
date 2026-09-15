@@ -1,34 +1,19 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { colors, spacing, type, radii, btn, input as inputStyle, card, page as pageStyle, keyframes, alert as alertStyle, chip } from '@/lib/navratri/designSystem';
 
 /**
  * ═══════════════════════════════════════════════════════════════════
- * Navratri Scanner — Mobile-optimized QR check-in + pickup tool
+ * Navratri Scanner — Mobile-optimized QR check-in tool
  * ═══════════════════════════════════════════════════════════════════
- *
- * Flow:
- *   1. Employee enters PIN → authenticates via Odoo
- *   2. Camera scans rolling QR
- *   3. Shows purchaser name → staff verifies verbally
- *   4. Tap "Confirm Check-In" → atomic check-in
- *
- * Also supports manual lookup (fallback) and pickup mode.
+ * Dark-only for event-day dim lighting operations.
+ * All business logic preserved exactly from original.
  */
 
-const C = {
-  bg: '#0a0a0f', card: '#141420', border: 'rgba(139,30,63,0.3)',
-  primary: '#FF6B35', secondary: '#8B1E3F', accent: '#FFD700',
-  text: '#F8FAFC', muted: '#94A3B8', green: '#34D399', red: '#EF4444',
-};
-
-const S = {
-  page: { minHeight: '100dvh', background: C.bg, color: C.text, fontFamily: "'Inter',sans-serif" },
-  input: { width: '100%', padding: '16px', borderRadius: '14px', border: `1px solid ${C.border}`, background: 'rgba(255,255,255,0.05)', color: C.text, fontSize: '18px', textAlign: 'center', outline: 'none', boxSizing: 'border-box' },
-  btn: { width: '100%', padding: '18px', borderRadius: '14px', border: 'none', fontSize: '18px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.15s' },
-};
+const c = colors('dark');
 
 export default function ScannerPage() {
-  const [mode, setMode] = useState('login'); // login, scan, result, lookup, pickup
+  const [mode, setMode] = useState('login');
   const [sessionToken, setSessionToken] = useState('');
   const [employee, setEmployee] = useState(null);
   const [pin, setPin] = useState('');
@@ -58,7 +43,6 @@ export default function ScannerPage() {
           const dRes = await fetch(`/api/navratri/events/${ev.id}`);
           const dData = await dRes.json();
           setDates(dData.dates || []);
-          // Auto-select today's date
           const today = new Date().toISOString().split('T')[0];
           const todayDate = (dData.dates || []).find(d => d.event_date === today);
           if (todayDate) {
@@ -70,7 +54,7 @@ export default function ScannerPage() {
     })();
   }, []);
 
-  // Restore session from localStorage
+  // Restore session
   useEffect(() => {
     const saved = localStorage.getItem('navratri_scanner_session');
     if (saved) {
@@ -149,7 +133,6 @@ export default function ScannerPage() {
     ctx.drawImage(video, 0, 0);
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-    // Use BarcodeDetector API if available
     if ('BarcodeDetector' in window) {
       const detector = new BarcodeDetector({ formats: ['qr_code'] });
       detector.detect(imageData).then(codes => {
@@ -166,7 +149,6 @@ export default function ScannerPage() {
         scannerRef.current = requestAnimationFrame(scanFrame);
       });
     } else {
-      // Fallback: manual entry
       scannerRef.current = requestAnimationFrame(scanFrame);
     }
   };
@@ -211,13 +193,10 @@ export default function ScannerPage() {
       const data = await res.json();
       if (data.success) {
         setScanResult({ ...scanResult, confirmed: true, message: data.message });
-        // Haptic feedback on success
         if (navigator.vibrate) navigator.vibrate(200);
-        // Auto-return to scan after 2.5 seconds
         setTimeout(() => { setScanResult(null); setMode('scan'); }, 2500);
       } else {
         setError(data.reason || data.error || 'Check-in failed');
-        // Haptic feedback on error
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       }
     } catch (err) {
@@ -251,107 +230,124 @@ export default function ScannerPage() {
     setPin('');
   };
 
-  // ── LOGIN SCREEN ───────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LOGIN SCREEN
+  // ═══════════════════════════════════════════════════════════════════════════
   if (mode === 'login') return (
-    <div style={{ ...S.page, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', background: 'linear-gradient(180deg, #0a0a0f 0%, #141420 100%)' }}>
+    <div style={{
+      ...pageStyle('dark'),
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      padding: `${spacing.xl}px`,
+      background: `linear-gradient(180deg, ${c.bg} 0%, ${c.bgAlt} 100%)`,
+    }}>
+      <style>{keyframes}{`
+        select option { background: ${c.card} !important; color: ${c.text} !important; }
+      `}</style>
 
-      {/* Glowing icon */}
-      <div style={{ width: '120px', height: '120px', borderRadius: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: 'linear-gradient(135deg, rgba(255,107,53,0.15), rgba(139,30,63,0.15))', border: '1px solid rgba(255,107,53,0.2)', boxShadow: '0 0 60px rgba(255,107,53,0.1)', marginBottom: '32px' }}>
-        🪔
-      </div>
+      {/* App icon */}
+      <div style={{
+        width: '96px', height: '96px', borderRadius: `${radii.xl}px`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '44px',
+        background: c.primaryBg, border: `1px solid ${c.border}`,
+        marginBottom: spacing['2xl'],
+      }}>🪔</div>
 
-      <h1 style={{ fontSize: '28px', fontWeight: '800', margin: '0 0 4px', letterSpacing: '-0.02em' }}>Gate Scanner</h1>
-      <p style={{ color: C.muted, fontSize: '15px', marginBottom: '36px', fontWeight: '500' }}>Enter your staff PIN to begin</p>
+      <h1 style={{ ...type.pageTitle, color: c.text, margin: `0 0 ${spacing.xs}px` }}>Gate Scanner</h1>
+      <p style={{ ...type.body, color: c.muted, marginBottom: spacing['2xl'] }}>Enter your staff PIN to begin</p>
 
-      {error && <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', padding: '14px 20px', color: C.red, fontSize: '14px', marginBottom: '20px', width: '100%', maxWidth: '340px', textAlign: 'center', backdropFilter: 'blur(10px)' }}>{error}</div>}
+      {error && (
+        <div style={{ ...alertStyle('error', 'dark'), width: '100%', maxWidth: '340px', marginBottom: spacing.lg, justifyContent: 'center' }}>
+          {error}
+        </div>
+      )}
 
       {/* PIN dots */}
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: spacing.base, marginBottom: spacing.xl }}>
         {[0,1,2,3].map(i => (
           <div key={i} style={{
-            width: '18px', height: '18px', borderRadius: '50%',
-            background: pin.length > i ? C.primary : 'rgba(255,255,255,0.08)',
-            border: `2px solid ${pin.length > i ? C.primary : 'rgba(255,255,255,0.15)'}`,
-            boxShadow: pin.length > i ? `0 0 12px ${C.primary}40` : 'none',
+            width: '16px', height: '16px', borderRadius: '50%',
+            background: pin.length > i ? c.primary : 'transparent',
+            border: `2px solid ${pin.length > i ? c.primary : c.borderSolid}`,
             transition: 'all 0.2s ease',
+            boxShadow: pin.length > i ? `0 0 12px ${c.primary}40` : 'none',
           }} />
         ))}
       </div>
 
-      <input style={{ ...S.input, maxWidth: '340px', letterSpacing: '16px', fontSize: '28px', fontWeight: '700', background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)', borderColor: 'rgba(255,255,255,0.08)' }}
-        type="password" maxLength={6} placeholder="" value={pin}
+      <input
+        style={{ ...inputStyle('dark'), maxWidth: '340px', textAlign: 'center', letterSpacing: '12px', fontSize: '24px', fontWeight: '600' }}
+        type="password" inputMode="numeric" maxLength={6} value={pin}
         onChange={e => setPin(e.target.value.replace(/\D/g, ''))}
-        onKeyDown={e => e.key === 'Enter' && handleLogin()} autoFocus />
+        onKeyDown={e => e.key === 'Enter' && handleLogin()} autoFocus
+      />
 
-      {/* Date selector — dark styled */}
-      <div style={{ width: '100%', maxWidth: '340px', marginTop: '20px', position: 'relative' }}>
-        <label style={{ fontSize: '12px', fontWeight: '600', color: C.muted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>Event Date</label>
+      {/* Date selector */}
+      <div style={{ width: '100%', maxWidth: '340px', marginTop: spacing.lg }}>
+        <label style={{ ...type.overline, color: c.muted, display: 'block', marginBottom: spacing.sm }}>Event Date</label>
         <select value={eventDateId || ''} onChange={e => setEventDateId(parseInt(e.target.value))} style={{
-          width: '100%', padding: '16px 20px', borderRadius: '14px',
-          border: '1px solid rgba(255,255,255,0.08)',
-          background: 'rgba(255,255,255,0.04)',
-          color: C.text, fontSize: '15px', fontWeight: '600',
-          outline: 'none', appearance: 'none', cursor: 'pointer',
+          ...inputStyle('dark'), cursor: 'pointer', appearance: 'none',
           WebkitAppearance: 'none', MozAppearance: 'none',
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M2 4l4 4 4-4'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A1A1AA' d='M2 4l4 4 4-4'/%3E%3C/svg%3E")`,
           backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center',
-          boxSizing: 'border-box',
         }}>
-          <option value="" style={{ background: '#141420', color: C.muted }}>Auto-detect today</option>
+          <option value="">Auto-detect today</option>
           {dates.map(d => (
-            <option key={d.id} value={d.id} style={{ background: '#141420', color: C.text }}>
+            <option key={d.id} value={d.id}>
               {d.label} — {new Date(d.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
             </option>
           ))}
         </select>
 
-        {/* Auto-date confirmation */}
         {autoDateLabel && eventDateId && (
-          <div style={{ marginTop: '10px', padding: '10px 16px', borderRadius: '10px', background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px' }}>✅</span>
-            <span style={{ fontSize: '13px', color: C.green, fontWeight: '600' }}>Today's event: {autoDateLabel}</span>
+          <div style={{ ...alertStyle('success', 'dark'), marginTop: spacing.sm }}>
+            ✅ Today: {autoDateLabel}
           </div>
         )}
         {!autoDateLabel && dates.length > 0 && !eventDateId && (
-          <div style={{ marginTop: '10px', padding: '10px 16px', borderRadius: '10px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px' }}>⚠️</span>
-            <span style={{ fontSize: '13px', color: C.accent, fontWeight: '600' }}>No event today — select a date manually</span>
+          <div style={{ ...alertStyle('warning', 'dark'), marginTop: spacing.sm }}>
+            ⚠️ No event today — select a date manually
           </div>
         )}
       </div>
 
-      <button style={{ ...S.btn, maxWidth: '340px', marginTop: '28px', background: 'linear-gradient(135deg, #FF6B35, #D4531F)', color: 'white', borderRadius: '16px', fontSize: '17px', letterSpacing: '-0.01em', boxShadow: loading || !pin ? 'none' : '0 4px 24px rgba(255,107,53,0.3)', opacity: loading || !pin ? 0.4 : 1, transition: 'all 0.3s ease' }}
-        disabled={loading || !pin} onClick={handleLogin}>
-        {loading ? 'Authenticating...' : 'Continue'}
+      <button style={{
+        ...btn('primaryLg', 'dark'), maxWidth: '340px', marginTop: spacing.xl,
+        opacity: loading || !pin ? 0.4 : 1,
+      }} disabled={loading || !pin} onClick={handleLogin}>
+        {loading ? 'Authenticating…' : 'Continue'}
       </button>
 
-      <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: '12px', marginTop: '40px', fontWeight: '500' }}>
-        Navratri 2026 • Hindu Community Center
+      <p style={{ ...type.caption, color: c.placeholder, marginTop: spacing['3xl'] }}>
+        Navratri 2026 · Hindu Community Center
       </p>
-
-      <style>{`
-        select option { background: #141420 !important; color: #F8FAFC !important; }
-        input::placeholder { color: rgba(148,163,184,0.3) !important; }
-      `}</style>
     </div>
   );
 
-  // ── SCAN SCREEN ────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SCAN SCREEN
+  // ═══════════════════════════════════════════════════════════════════════════
   if (mode === 'scan') return (
-    <div style={S.page}>
+    <div style={pageStyle('dark')}>
+      <style>{keyframes}</style>
+
       {/* Top bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: `1px solid ${C.border}` }}>
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: `${spacing.md}px ${spacing.base}px`,
+        borderBottom: `1px solid ${c.border}`,
+        background: c.bgAlt,
+      }}>
         <div>
-          <div style={{ fontSize: '14px', fontWeight: '700' }}>👤 {employee?.name}</div>
-          <div style={{ fontSize: '11px', color: C.muted }}>
-            ✅ {stats.valid} checked in • ❌ {stats.denied} denied
+          <div style={{ ...type.bodyMedium, color: c.text }}>👤 {employee?.name}</div>
+          <div style={{ ...type.caption, color: c.muted }}>
+            ✅ {stats.valid} in · ❌ {stats.denied} denied
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={() => setMode('lookup')} style={{ padding: '8px 14px', borderRadius: '10px', border: `1px solid ${C.border}`, background: 'transparent', color: C.text, fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', gap: spacing.sm }}>
+          <button onClick={() => setMode('lookup')} style={{ ...btn('secondary', 'dark'), padding: `${spacing.sm}px ${spacing.md}px`, ...type.caption }}>
             🔍 Lookup
           </button>
-          <button onClick={handleLogout} style={{ padding: '8px 14px', borderRadius: '10px', border: `1px solid rgba(239,68,68,0.3)`, background: 'transparent', color: C.red, fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
+          <button onClick={handleLogout} style={{ ...btn('destructive', 'dark'), padding: `${spacing.sm}px ${spacing.md}px`, ...type.caption }}>
             Exit
           </button>
         </div>
@@ -365,176 +361,197 @@ export default function ScannerPage() {
         {/* Scan frame overlay */}
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{
-            width: '250px', height: '250px', border: '3px solid rgba(255,107,53,0.7)',
-            borderRadius: '24px', boxShadow: '0 0 0 9999px rgba(0,0,0,0.5)',
+            width: '250px', height: '250px',
+            border: `3px solid rgba(255,107,53,0.7)`,
+            borderRadius: `${radii.xl}px`,
+            boxShadow: '0 0 0 9999px rgba(0,0,0,0.5)',
           }} />
         </div>
 
         {/* Scanning indicator */}
-        <div style={{ position: 'absolute', bottom: '16px', left: '50%', transform: 'translateX(-50%)',
-          padding: '8px 20px', borderRadius: '20px', background: 'rgba(0,0,0,0.7)',
-          color: C.green, fontSize: '14px', fontWeight: '700', backdropFilter: 'blur(8px)',
+        <div style={{
+          position: 'absolute', bottom: spacing.base, left: '50%', transform: 'translateX(-50%)',
+          padding: `${spacing.sm}px ${spacing.lg}px`,
+          borderRadius: radii.full,
+          background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)',
+          ...type.bodyMedium, color: c.green,
         }}>
-          {loading ? '⏳ Validating...' : '📸 Point camera at QR code'}
+          {loading ? '⏳ Validating…' : '📸 Point at QR code'}
         </div>
       </div>
 
-      {/* Manual QR input fallback */}
-      <div style={{ padding: '16px' }}>
-        <p style={{ color: C.muted, fontSize: '12px', textAlign: 'center', marginBottom: '8px' }}>
+      {/* Manual QR input */}
+      <div style={{ padding: spacing.base }}>
+        <p style={{ ...type.caption, color: c.muted, textAlign: 'center', marginBottom: spacing.sm }}>
           Camera not working? Enter QR data manually:
         </p>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <input id="manualQR" style={{ ...S.input, fontSize: '14px', textAlign: 'left', flex: 1 }} placeholder="NV:..." />
+        <div style={{ display: 'flex', gap: spacing.sm }}>
+          <input id="manualQR" style={{ ...inputStyle('dark'), flex: 1, textAlign: 'left' }} placeholder="NV:..." />
           <button onClick={() => {
             const el = document.getElementById('manualQR');
             if (el?.value) handleQRScanned(el.value);
-          }} style={{ ...S.btn, width: 'auto', padding: '16px 24px', background: C.primary, color: 'white' }}>
+          }} style={{ ...btn('primary', 'dark'), width: 'auto', padding: `${spacing.base}px ${spacing.xl}px` }}>
             Scan
           </button>
         </div>
       </div>
 
-      {error && <div style={{ margin: '0 16px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '12px', padding: '12px', color: C.red, fontSize: '14px', textAlign: 'center' }}>{error}</div>}
+      {error && (
+        <div style={{ margin: `0 ${spacing.base}px`, ...alertStyle('error', 'dark') }}>{error}</div>
+      )}
     </div>
   );
 
-  // ── RESULT SCREEN ──────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RESULT SCREEN
+  // ═══════════════════════════════════════════════════════════════════════════
   if (mode === 'result' && scanResult) {
     const isValid = scanResult.valid;
     const isConfirmed = scanResult.confirmed;
 
     return (
-      <div style={{ ...S.page, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        {/* Big status indicator */}
+      <div style={{
+        ...pageStyle('dark'),
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        padding: spacing.xl, minHeight: '100dvh',
+      }}>
+        <style>{keyframes}</style>
+
+        {/* Big status icon */}
         <div style={{
-          width: '160px', height: '160px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '80px', marginBottom: '24px',
-          background: isConfirmed ? 'rgba(52,211,153,0.15)' : isValid ? 'rgba(255,215,0,0.15)' : 'rgba(239,68,68,0.15)',
-          border: `4px solid ${isConfirmed ? C.green : isValid ? C.accent : C.red}`,
-          animation: 'pulse 1.5s infinite',
+          width: '140px', height: '140px', borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '64px',
+          marginBottom: spacing.xl,
+          background: isConfirmed ? c.greenBg : isValid ? c.accentBg : c.redBg,
+          border: `3px solid ${isConfirmed ? c.green : isValid ? c.accent : c.red}`,
         }}>
           {isConfirmed ? '✅' : isValid ? '🎫' : '❌'}
         </div>
 
-        <h1 style={{ fontSize: '28px', fontWeight: '900', color: isConfirmed ? C.green : isValid ? C.accent : C.red, textAlign: 'center' }}>
+        <h1 style={{
+          ...type.pageTitle, textAlign: 'center',
+          color: isConfirmed ? c.green : isValid ? c.accent : c.red,
+        }}>
           {isConfirmed ? 'Checked In!' : isValid ? 'Valid Ticket' : 'Entry Denied'}
         </h1>
 
-        {/* Purchaser name (for verification) */}
+        {/* Purchaser card */}
         {scanResult.purchaserName && (
           <div style={{
-            marginTop: '20px', padding: '20px 32px', borderRadius: '16px',
-            background: 'rgba(255,255,255,0.05)', border: `2px solid ${isValid ? C.accent : C.border}`,
-            textAlign: 'center',
+            marginTop: spacing.lg, padding: `${spacing.lg}px ${spacing['2xl']}px`,
+            ...card('dark'), textAlign: 'center', width: '100%', maxWidth: '360px',
+            borderColor: isValid ? `${c.accent}30` : c.border,
           }}>
-            <div style={{ fontSize: '12px', color: C.muted, marginBottom: '4px' }}>VERIFY NAME</div>
-            <div style={{ fontSize: '28px', fontWeight: '900', letterSpacing: '0.02em' }}>{scanResult.purchaserName}</div>
+            <div style={{ ...type.overline, color: c.muted, marginBottom: spacing.xs }}>VERIFY NAME</div>
+            <div style={{ ...type.pageTitle, fontSize: '26px', color: c.text }}>{scanResult.purchaserName}</div>
             {scanResult.quantity > 1 && (
-              <div style={{ fontSize: '14px', color: C.accent, marginTop: '8px' }}>
+              <div style={{ ...type.bodyMedium, color: c.accent, marginTop: spacing.sm }}>
                 👥 {scanResult.quantity} person(s)
               </div>
             )}
             {scanResult.orderNumber && (
-              <div style={{ fontSize: '12px', color: C.muted, marginTop: '4px' }}>
-                Order: {scanResult.orderNumber} • {scanResult.customerType}
+              <div style={{ ...type.caption, color: c.muted, marginTop: spacing.xs }}>
+                {scanResult.orderNumber} · {scanResult.customerType}
               </div>
             )}
           </div>
         )}
 
-        <p style={{ color: C.muted, fontSize: '15px', marginTop: '16px', textAlign: 'center' }}>
+        <p style={{ ...type.body, color: c.muted, marginTop: spacing.base, textAlign: 'center' }}>
           {scanResult.reason || scanResult.message}
         </p>
 
-        {/* Error display (check-in failures) */}
+        {/* Error banner */}
         {error && (
           <div style={{
-            width: '100%', maxWidth: '360px', marginTop: '16px',
-            background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.4)',
-            borderRadius: '14px', padding: '14px 18px',
-            color: C.red, fontSize: '14px', fontWeight: '600', textAlign: 'center',
-            animation: 'pulse 1.5s infinite',
+            ...alertStyle('error', 'dark'), width: '100%', maxWidth: '360px',
+            marginTop: spacing.base, justifyContent: 'center', fontWeight: '600',
           }}>
             ⚠️ {error}
           </div>
         )}
 
         {/* Action buttons */}
-        <div style={{ width: '100%', maxWidth: '360px', marginTop: '32px' }}>
+        <div style={{ width: '100%', maxWidth: '360px', marginTop: spacing['2xl'] }}>
           {isValid && !isConfirmed && (
-            <button onClick={handleConfirmCheckin} disabled={loading}
-              style={{ ...S.btn, background: C.green, color: '#000', marginBottom: '12px', fontSize: '22px', opacity: loading ? 0.5 : 1 }}>
-              {loading ? 'Processing...' : '✅ Confirm Check-In'}
+            <button onClick={handleConfirmCheckin} disabled={loading} style={{
+              ...btn('success', 'dark'), marginBottom: spacing.md,
+              fontSize: '20px', padding: `${spacing.lg}px`,
+              opacity: loading ? 0.5 : 1,
+            }}>
+              {loading ? 'Processing…' : '✅ Confirm Check-In'}
             </button>
           )}
-          <button onClick={() => { setScanResult(null); setMode('scan'); setError(''); }}
-            style={{ ...S.btn, background: 'rgba(255,255,255,0.1)', color: C.text }}>
+          <button onClick={() => { setScanResult(null); setMode('scan'); setError(''); }} style={{
+            ...btn('secondary', 'dark'), width: '100%', padding: `${spacing.base}px`,
+          }}>
             {isConfirmed ? '📸 Scan Next' : '← Back to Scanner'}
           </button>
         </div>
-
-        <style>{`@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }`}</style>
       </div>
     );
   }
 
-  // ── LOOKUP SCREEN ──────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LOOKUP SCREEN
+  // ═══════════════════════════════════════════════════════════════════════════
   if (mode === 'lookup') return (
-    <div style={S.page}>
-      <div style={{ padding: '16px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button onClick={() => setMode('scan')} style={{ background: 'none', border: 'none', color: C.text, fontSize: '20px', cursor: 'pointer' }}>←</button>
-        <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0 }}>🔍 Manual Lookup</h2>
+    <div style={pageStyle('dark')}>
+      <style>{keyframes}</style>
+
+      <div style={{
+        padding: spacing.base, borderBottom: `1px solid ${c.border}`,
+        display: 'flex', alignItems: 'center', gap: spacing.md,
+        background: c.bgAlt,
+      }}>
+        <button onClick={() => setMode('scan')} style={{
+          ...btn('icon', 'dark'), border: 'none', padding: spacing.sm,
+        }}>←</button>
+        <h2 style={{ ...type.sectionTitle, color: c.text, margin: 0 }}>Manual Lookup</h2>
       </div>
 
-      <div style={{ padding: '16px' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <input style={{ ...S.input, textAlign: 'left', fontSize: '16px', flex: 1 }} placeholder="Phone, name, or order #..."
+      <div style={{ padding: spacing.base }}>
+        <div style={{ display: 'flex', gap: spacing.sm }}>
+          <input
+            style={{ ...inputStyle('dark'), flex: 1, textAlign: 'left' }}
+            placeholder="Phone, name, or order #…"
             value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()} />
-          <button onClick={handleSearch} disabled={loading}
-            style={{ ...S.btn, width: 'auto', padding: '16px 24px', background: C.primary, color: 'white' }}>
-            {loading ? '...' : 'Search'}
+            onKeyDown={e => e.key === 'Enter' && handleSearch()}
+          />
+          <button onClick={handleSearch} disabled={loading} style={{
+            ...btn('primary', 'dark'), width: 'auto', padding: `${spacing.base}px ${spacing.xl}px`,
+          }}>
+            {loading ? '…' : 'Search'}
           </button>
         </div>
 
         {/* Results */}
-        <div style={{ marginTop: '16px' }}>
+        <div style={{ marginTop: spacing.base }}>
           {searchResults.map((r, i) => (
             <div key={i} style={{
-              background: C.card, border: `1px solid ${C.border}`, borderRadius: '14px',
-              padding: '16px', marginBottom: '12px',
+              ...card('dark'), padding: spacing.base, marginBottom: spacing.md,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontWeight: '800', fontSize: '16px' }}>{r.purchaserName}</div>
-                  <div style={{ fontSize: '13px', color: C.muted }}>{r.orderNumber} • {r.customerType}</div>
+                  <div style={{ ...type.bodyMedium, color: c.text }}>{r.purchaserName}</div>
+                  <div style={{ ...type.caption, color: c.muted }}>{r.orderNumber} · {r.customerType}</div>
                 </div>
-                <span style={{
-                  padding: '4px 10px', borderRadius: '8px', fontSize: '12px', fontWeight: '700',
-                  background: r.paymentStatus === 'paid' ? 'rgba(52,211,153,0.1)' : 'rgba(239,68,68,0.1)',
-                  color: r.paymentStatus === 'paid' ? C.green : C.red,
-                }}>
-                  {r.paymentStatus}
-                </span>
+                <span style={chip(r.paymentStatus, 'dark')}>{r.paymentStatus}</span>
               </div>
 
               {r.tickets?.map((ticket, ti) => (
                 <div key={ti} style={{
-                  marginTop: '10px', padding: '10px', borderRadius: '10px',
-                  background: 'rgba(255,255,255,0.03)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  marginTop: spacing.sm, padding: spacing.md,
+                  borderRadius: `${radii.sm}px`, background: c.bgAlt,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
                   <div>
-                    <span style={{ fontSize: '13px', fontWeight: '600' }}>
+                    <span style={{ ...type.bodyMedium, color: c.text }}>
                       {ticket.type === 'daily_entry' ? 'Daily Entry' : ticket.type === 'combo_pass' ? 'Combo Pass' : ticket.type === 'pioneer_pass' ? 'Pioneer Pass' : ticket.type}
                       {ticket.eventDate ? ` — ${new Date(ticket.eventDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}` : ''}
                       {` × ${ticket.quantity}`}
                     </span>
-                    <span style={{
-                      marginLeft: '8px', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700',
-                      background: ticket.status === 'active' ? 'rgba(52,211,153,0.1)' : ticket.status === 'used' ? 'rgba(148,163,184,0.1)' : 'rgba(239,68,68,0.1)',
-                      color: ticket.status === 'active' ? C.green : ticket.status === 'used' ? C.muted : C.red,
-                    }}>
+                    <span style={{ ...chip(ticket.status === 'active' ? 'valid' : ticket.status === 'used' ? 'checked_in' : 'invalid', 'dark'), marginLeft: spacing.sm }}>
                       {ticket.status}
                     </span>
                   </div>
@@ -542,7 +559,7 @@ export default function ScannerPage() {
                     <button onClick={() => {
                       setScanResult({ valid: true, ticketId: ticket.id, purchaserName: r.purchaserName, quantity: ticket.quantity, orderNumber: r.orderNumber, customerType: r.customerType, scanResult: 'valid', reason: 'Manual lookup' });
                       setMode('result');
-                    }} style={{ padding: '8px 16px', borderRadius: '10px', border: 'none', background: C.green, color: '#000', fontSize: '13px', fontWeight: '800', cursor: 'pointer' }}>
+                    }} style={{ ...btn('success', 'dark'), width: 'auto', padding: `${spacing.sm}px ${spacing.base}px`, fontSize: '13px' }}>
                       Check In
                     </button>
                   )}
@@ -551,7 +568,7 @@ export default function ScannerPage() {
             </div>
           ))}
           {searchResults.length === 0 && searchTerm && !loading && (
-            <p style={{ color: C.muted, textAlign: 'center', marginTop: '32px' }}>No results found</p>
+            <p style={{ ...type.body, color: c.muted, textAlign: 'center', marginTop: spacing['2xl'] }}>No results found</p>
           )}
         </div>
       </div>
