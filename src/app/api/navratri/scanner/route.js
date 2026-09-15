@@ -215,6 +215,7 @@ export async function POST(request) {
 
       // Use the ticket's own event_date_id if none provided from scanner
       let resolvedDateId = eventDateId;
+      const wasAutoResolved = !eventDateId;
       if (!resolvedDateId) {
         const ticket = await db.query('navratri_tickets', `id=eq.${ticketId}`, { limit: 1 });
         resolvedDateId = ticket?.[0]?.event_date_id || null;
@@ -224,17 +225,20 @@ export async function POST(request) {
         return NextResponse.json({ success: false, reason: 'No event date selected. Please select a date on the scanner login.' }, { status: 400 });
       }
 
-      // ── Enforce today-only scanning ─────────────────────────────────────────
-      const ticketDate = await db.getEventDateById(resolvedDateId);
-      if (ticketDate) {
-        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // YYYY-MM-DD
-        if (ticketDate.event_date !== today) {
-          const ticketDateFormatted = new Date(ticketDate.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-          const todayFormatted = new Date(today + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-          return NextResponse.json({
-            success: false,
-            reason: `❌ Wrong date! This ticket is for ${ticketDateFormatted} (${ticketDate.label}). Today is ${todayFormatted}. Check-in is only allowed on the day of the event.`,
-          }, { status: 409 });
+      // ── Enforce today-only scanning (only when date was auto-resolved from ticket) ──
+      // If the scanner operator explicitly selected a date on login, trust their selection
+      if (wasAutoResolved) {
+        const ticketDate = await db.getEventDateById(resolvedDateId);
+        if (ticketDate) {
+          const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+          if (ticketDate.event_date !== today) {
+            const ticketDateFormatted = new Date(ticketDate.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            const todayFormatted = new Date(today + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            return NextResponse.json({
+              success: false,
+              reason: `❌ Wrong date! This ticket is for ${ticketDateFormatted} (${ticketDate.label}). Today is ${todayFormatted}. Check-in is only allowed on the day of the event.`,
+            }, { status: 409 });
+          }
         }
       }
 

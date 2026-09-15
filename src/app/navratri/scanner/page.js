@@ -447,6 +447,19 @@ export default function ScannerPage() {
           {scanResult.reason || scanResult.message}
         </p>
 
+        {/* Error display (check-in failures) */}
+        {error && (
+          <div style={{
+            width: '100%', maxWidth: '360px', marginTop: '16px',
+            background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.4)',
+            borderRadius: '14px', padding: '14px 18px',
+            color: C.red, fontSize: '14px', fontWeight: '600', textAlign: 'center',
+            animation: 'pulse 1.5s infinite',
+          }}>
+            ⚠️ {error}
+          </div>
+        )}
+
         {/* Action buttons */}
         <div style={{ width: '100%', maxWidth: '360px', marginTop: '32px' }}>
           {isValid && !isConfirmed && (
