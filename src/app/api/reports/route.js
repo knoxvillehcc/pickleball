@@ -32,7 +32,7 @@ export async function GET(request) {
     });
 
     const grouped = {};
-    const results = [];
+    const allEntries = [];
 
     for (const sub of subscriptions) {
        const lines = orderLines.filter(l => l.order_id[0] === sub.id);
@@ -49,13 +49,10 @@ export async function GET(request) {
                continue;
            }
 
-           if (!grouped[typeName]) grouped[typeName] = { count: 0, revenue: 0 };
-           grouped[typeName].count += 1;
-           grouped[typeName].revenue += line.price_subtotal;
-
-           results.push({
+           allEntries.push({
               id: `${sub.id}-${line.id}`,
               order: sub.name,
+              customerId: sub.partner_id ? sub.partner_id[0] : 0,
               customer: sub.partner_id ? sub.partner_id[1] : 'Unknown',
               type: typeName,
               date: sub.date_order ? sub.date_order.split(' ')[0] : 'Unknown',
@@ -64,6 +61,23 @@ export async function GET(request) {
        }
     }
 
+    // Deduplicate renewals: keep only the latest entry per customer per product type
+    const seen = {};
+    const deduped = [];
+    // Sort by date descending so we keep the newest first
+    allEntries.sort((a, b) => b.date.localeCompare(a.date));
+    for (const entry of allEntries) {
+       const key = `${entry.customerId}::${entry.type}`;
+       if (seen[key]) continue; // Skip older renewal
+       seen[key] = true;
+       deduped.push(entry);
+
+       if (!grouped[entry.type]) grouped[entry.type] = { count: 0, revenue: 0 };
+       grouped[entry.type].count += 1;
+       grouped[entry.type].revenue += entry.amount;
+    }
+
+    const results = deduped;
     results.sort((a,b) => a.type.localeCompare(b.type) || a.customer.localeCompare(b.customer));
 
     return NextResponse.json({ success: true, summary: grouped, results });
