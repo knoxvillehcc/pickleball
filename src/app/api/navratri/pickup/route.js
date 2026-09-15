@@ -226,6 +226,7 @@ export async function POST(request) {
           customerType: order.customer_type,
           orderType: order.order_type,
           paymentStatus: order.payment_status,
+          odooPartnerId: order.odoo_partner_id || null,
           pickups: pickups.map(p => ({
             type: p.pickup_type,
             qty: p.wristband_qty + p.parking_qty,

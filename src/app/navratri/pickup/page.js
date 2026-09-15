@@ -99,9 +99,12 @@ export default function PickupPage() {
     const alreadyPickedW = (order.pickups || []).reduce((s, p) => s + (p.type?.includes('wristband') ? (p.qty || 0) : 0), 0);
     const alreadyPickedP = (order.pickups || []).reduce((s, p) => s + (p.type === 'parking_pass' ? (p.qty || 0) : 0), 0);
     const remainW = Math.max(0, maxW - alreadyPickedW);
+    // Only combo/pioneer WITH an Odoo member ID are eligible for parking
+    const maxP = (isComboOrPioneer && order.odooPartnerId) ? 1 : 0;
+    const remainP = Math.max(0, maxP - alreadyPickedP);
     setWristbandQty(remainW);
     setParkingQty(0);
-    setSelectedOrder({ ...order, maxWristbands: maxW, remainingWristbands: remainW, alreadyPickedW });
+    setSelectedOrder({ ...order, maxWristbands: maxW, remainingWristbands: remainW, alreadyPickedW, maxParking: maxP, remainingParking: remainP, alreadyPickedP });
     setMode('confirm');
   };
 
@@ -242,6 +245,13 @@ export default function PickupPage() {
             </div>
           )}
 
+          {/* Not eligible banner for daily/non-member */}
+          {selectedOrder.maxWristbands === 0 && selectedOrder.maxParking === 0 && (
+            <div style={{ ...alertStyle('error', 'dark'), marginTop: spacing.md }}>
+              ❌ Daily / non-member orders are not eligible for wristband or parking pickup. Only Combo Pass and Pioneer Pass orders qualify.
+            </div>
+          )}
+
           {/* Wristbands */}
           <div style={{ marginTop: spacing.xl }}>
             <label style={{ ...type.label, color: c.accent }}>
@@ -249,6 +259,9 @@ export default function PickupPage() {
                 <span style={{ ...type.caption, color: c.muted, fontWeight: '400' }}>
                   (max {selectedOrder.maxWristbands}, {selectedOrder.remainingWristbands} remaining)
                 </span>
+              )}
+              {selectedOrder.maxWristbands === 0 && (
+                <span style={{ ...type.caption, color: c.muted, fontWeight: '400' }}> — not eligible</span>
               )}
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: spacing.base, marginTop: spacing.sm }}>
@@ -260,11 +273,19 @@ export default function PickupPage() {
 
           {/* Parking */}
           <div style={{ marginTop: spacing.xl }}>
-            <label style={{ ...type.label, color: c.accent }}>Parking Passes</label>
+            <label style={{ ...type.label, color: c.accent }}>
+              Parking Passes
+              {selectedOrder.maxParking === 0 && (
+                <span style={{ ...type.caption, color: c.muted, fontWeight: '400' }}> — not eligible</span>
+              )}
+              {selectedOrder.alreadyPickedP > 0 && (
+                <span style={{ ...type.caption, color: c.muted, fontWeight: '400' }}> (already picked up {selectedOrder.alreadyPickedP})</span>
+              )}
+            </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: spacing.base, marginTop: spacing.sm }}>
               <StepperBtn onClick={() => setParkingQty(Math.max(0, parkingQty - 1))} disabled={parkingQty <= 0}>−</StepperBtn>
               <span style={{ ...type.bigNum, color: c.text, minWidth: '40px', textAlign: 'center' }}>{parkingQty}</span>
-              <StepperBtn onClick={() => setParkingQty(Math.min(1, parkingQty + 1))} disabled={parkingQty >= 1}>+</StepperBtn>
+              <StepperBtn onClick={() => setParkingQty(Math.min(selectedOrder.remainingParking || 0, parkingQty + 1))} disabled={parkingQty >= (selectedOrder.remainingParking || 0)}>+</StepperBtn>
             </div>
           </div>
 
