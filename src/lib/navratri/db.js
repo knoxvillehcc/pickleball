@@ -193,8 +193,8 @@ export async function getMemberByOdooId(eventId, odooPartnerId) {
 }
 
 export async function upsertMember(data) {
-  // Use PostgREST upsert via Prefer header
-  const url = `${baseUrl()}/navratri_members_cache`;
+  // Use PostgREST upsert via Prefer header + on_conflict for unique constraint
+  const url = `${baseUrl()}/navratri_members_cache?on_conflict=event_id,odoo_partner_id`;
   const headers = {
     ...getHeaders(),
     'Prefer': 'return=representation,resolution=merge-duplicates',
