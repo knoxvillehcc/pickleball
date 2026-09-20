@@ -10,6 +10,7 @@ const HCC_PAGES = [
   { key: 'banner',          label: 'Banner In',            desc: 'Banner management' },
   { key: 'pickleball',      label: 'Pickleball',           desc: 'Tournament registrations' },
   { key: 'indiafest',       label: 'India Fest 2026',      desc: 'Vendor booth registrations' },
+  { key: 'led_ads',         label: 'LED Screen Ads',       desc: 'LED advertisement registrations' },
   { key: 'settings',        label: 'Settings',             desc: 'App settings' },
 ];
 
