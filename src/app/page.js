@@ -101,8 +101,29 @@ function PublicLanding() {
   const { theme, toggleTheme, isDark } = useTheme();
 
   const [hovered, setHovered] = useState(null);
+  const [ledAdsLive, setLedAdsLive] = useState(false);
+
+  // Check if LED ads registration is published
+  useEffect(() => {
+    fetch('/api/led-ads/settings')
+      .then(r => r.json())
+      .then(d => setLedAdsLive(d.is_published === true))
+      .catch(() => setLedAdsLive(false));
+  }, []);
 
   const options = [
+    ...(ledAdsLive ? [{
+      title: 'LED Screen Ads — Navratri 2026',
+      desc: 'Advertise your business on our LED screens throughout all 9 nights of Navratri 2026. High-resolution 1080×1920 display.',
+      href: '/register/led-ads',
+      accentColor: '#FF9933',
+      glowColor: 'rgba(255, 153, 51, 0.12)',
+      borderColor: 'rgba(255, 153, 51, 0.3)',
+      icon: '📺',
+      badge: 'Now Open',
+      cta: 'Register Now',
+      isOpen: true,
+    }] : []),
     {
       title: 'Admin & Staff Portal',
       desc: 'Authorized operator access to system configurations, Odoo discrepancy scanner, logs, and report lists.',
