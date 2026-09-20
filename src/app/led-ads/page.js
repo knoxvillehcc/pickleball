@@ -57,9 +57,23 @@ export default function LedAdsAdminPage() {
     } catch (e) { setError(e.message); }
   };
 
+  const toggleGraphicReceived = async (id, current) => {
+    try {
+      const res = await fetch('/api/led-ads/registrations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, graphic_received: !current }),
+      });
+      const data = await res.json();
+      if (data.success) fetchRegistrations();
+      else throw new Error(data.error);
+    } catch (e) { setError(e.message); }
+  };
+
   const filtered = registrations.filter(r => {
     if (filter === 'paid' && r.payment_status !== 'paid') return false;
     if (filter === 'pending' && r.payment_status !== 'pending') return false;
+    if (filter === 'missing_graphic' && (r.graphic_received || r.media_url)) return false;
     if (search) {
       const q = search.toLowerCase();
       return (
@@ -75,6 +89,8 @@ export default function LedAdsAdminPage() {
   const totalRevenue = registrations.filter(r => r.payment_status === 'paid').reduce((s, r) => s + (r.amount_paid || 0), 0);
   const paidCount = registrations.filter(r => r.payment_status === 'paid').length;
   const pendingCount = registrations.filter(r => r.payment_status === 'pending').length;
+  const graphicMissing = registrations.filter(r => r.payment_status === 'paid' && !r.graphic_received && !r.media_url).length;
+  const graphicReceived = registrations.filter(r => r.graphic_received || r.media_url).length;
 
   const exportPDF = (withPrices = true) => {
     // Simple print-based PDF export
@@ -160,6 +176,8 @@ export default function LedAdsAdminPage() {
             { label: 'Total Registrations', value: registrations.length, color: '#FF9933' },
             { label: 'Paid', value: paidCount, color: '#22C55E' },
             { label: 'Pending', value: pendingCount, color: '#F59E0B' },
+            { label: 'Graphics ✅', value: graphicReceived, color: '#10B981' },
+            { label: 'Graphics Missing', value: graphicMissing, color: '#EF4444' },
             { label: 'Revenue', value: `$${(totalRevenue / 100).toLocaleString()}`, color: '#8B5CF6' },
           ].map(kpi => (
             <div key={kpi.label} style={{
@@ -210,13 +228,13 @@ export default function LedAdsAdminPage() {
               color: 'var(--text-primary)', fontSize: '14px', outline: 'none',
             }}
           />
-          {['all', 'paid', 'pending'].map(f => (
+          {[['all', registrations.length], ['paid', paidCount], ['pending', pendingCount], ['missing_graphic', graphicMissing]].map(([f, count]) => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: '10px 16px', borderRadius: '10px', border: '1px solid var(--border)',
-              background: filter === f ? '#FF9933' : 'var(--bg-secondary)',
+              background: filter === f ? (f === 'missing_graphic' ? '#EF4444' : '#FF9933') : 'var(--bg-secondary)',
               color: filter === f ? 'white' : 'var(--text-primary)',
-              fontWeight: '700', fontSize: '13px', cursor: 'pointer', textTransform: 'capitalize',
-            }}>{f} ({f === 'all' ? registrations.length : f === 'paid' ? paidCount : pendingCount})</button>
+              fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+            }}>{f === 'missing_graphic' ? '🖼 Missing' : f.charAt(0).toUpperCase() + f.slice(1)} ({count})</button>
           ))}
           <button onClick={() => exportPDF(true)} style={{
             padding: '10px 16px', borderRadius: '10px', border: '1px solid var(--border)',
@@ -233,26 +251,40 @@ export default function LedAdsAdminPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
             <thead>
               <tr style={{ background: 'var(--bg-secondary)' }}>
-                {['Reg #', 'Business', 'Contact', 'Email', 'Phone', 'Ad Description', 'Status', 'Amount', 'Date', ''].map(h => (
+                {['Reg #', 'Business', 'Contact', 'Email', 'Phone', 'Status', 'Amount', 'Graphic', ''].map(h => (
                   <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '700', color: 'var(--text-secondary)', fontSize: '11px', letterSpacing: '0.5px', textTransform: 'uppercase', borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={10} style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No registrations found.</td></tr>
-              ) : filtered.map(r => (
+                <tr><td colSpan={9} style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No registrations found.</td></tr>
+              ) : filtered.map(r => {
+                const hasGraphic = r.graphic_received || r.media_url;
+                return (
                 <tr key={r.id} style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '12px 14px', fontWeight: '700', color: '#FF9933' }}>{r.registration_number}</td>
                   <td style={{ padding: '12px 14px', fontWeight: '600', color: 'var(--text-primary)' }}>{r.business_name}</td>
                   <td style={{ padding: '12px 14px', color: 'var(--text-primary)' }}>{r.contact_name}</td>
-                  <td style={{ padding: '12px 14px', color: 'var(--text-secondary)' }}>{r.email}</td>
+                  <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', fontSize: '12px' }}>{r.email}</td>
                   <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{r.phone}</td>
-                  <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.ad_description || '—'}</td>
                   <td style={{ padding: '12px 14px' }}><span style={chipStyle(r.payment_status)}>{r.payment_status}</span></td>
                   <td style={{ padding: '12px 14px', fontWeight: '600', color: 'var(--text-primary)' }}>${((r.amount_paid || 0) / 100).toLocaleString()}</td>
-                  <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontSize: '12px' }}>
-                    {r.registration_date ? new Date(r.registration_date).toLocaleDateString() : '—'}
+                  <td style={{ padding: '12px 14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button onClick={() => toggleGraphicReceived(r.id, r.graphic_received)} title={hasGraphic ? 'Mark as missing' : 'Mark as received'} style={{
+                        padding: '4px 8px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: '700',
+                        background: hasGraphic ? '#DCFCE7' : '#FEE2E2',
+                        color: hasGraphic ? '#166534' : '#991B1B',
+                      }}>{hasGraphic ? '✅' : '❌'}</button>
+                      {r.media_url && (
+                        <a href={r.media_url} target="_blank" rel="noreferrer" title="View uploaded media" style={{
+                          padding: '4px 8px', borderRadius: '6px', border: '1px solid var(--border)',
+                          background: 'var(--bg-secondary)', fontSize: '11px', textDecoration: 'none',
+                          color: 'var(--text-primary)', fontWeight: '600',
+                        }}>📥</a>
+                      )}
+                    </div>
                   </td>
                   <td style={{ padding: '12px 14px' }}>
                     <button onClick={() => handleDelete(r.id)} style={{
@@ -261,7 +293,8 @@ export default function LedAdsAdminPage() {
                     }}>🗑</button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

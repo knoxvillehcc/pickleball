@@ -327,7 +327,53 @@ export async function POST(request) {
       }
 
       if (ledReg) {
-        await logWebhook(event.id, regNumber, 'processed: LED ad paid');
+        // Generate upload token and save it
+        const crypto = await import('crypto');
+        const uploadToken = crypto.randomBytes(32).toString('hex');
+        const SUPABASE_URL = process.env.SUPABASE_URL;
+        const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+
+        await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations?id=eq.${ledReg.id}`, {
+          method: 'PATCH',
+          headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ upload_token: uploadToken }),
+        });
+
+        // Send confirmation email with upload link
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://dashboard.knoxvillemandir.org';
+        const uploadLink = `${baseUrl}/register/led-ads/upload?token=${uploadToken}`;
+
+        try {
+          const sgMail = (await import('@sendgrid/mail')).default;
+          sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+          await sgMail.send({
+            to: ledReg.email,
+            from: process.env.SENDGRID_FROM_EMAIL || 'info@knoxvillemandir.org',
+            subject: `✅ LED Ad Payment Confirmed — ${regNumber}`,
+            html: `
+              <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+                <h1 style="color: #FF9933; font-size: 24px;">📺 LED Screen Ad — Payment Confirmed</h1>
+                <p>Dear ${ledReg.contact_name || ledReg.business_name},</p>
+                <p>Your payment of <strong>$${(amountPaid).toLocaleString()}</strong> for Navratri 2026 LED Screen Advertisement has been confirmed.</p>
+                <div style="background: #FFF8F0; border: 1px solid #FFD4A0; border-radius: 12px; padding: 16px; margin: 20px 0;">
+                  <p style="margin: 0 0 4px; font-size: 12px; color: #92400E; font-weight: 700;">REGISTRATION NUMBER</p>
+                  <p style="margin: 0; font-size: 20px; font-weight: 900; color: #FF9933;">${regNumber}</p>
+                </div>
+                <h2 style="font-size: 18px; color: #333;">📤 Upload Your Ad Media</h2>
+                <p>Please upload your advertisement graphic using the link below. Required resolution: <strong>1080 × 1920 pixels</strong> (portrait, high resolution).</p>
+                <a href="${uploadLink}" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #FF9933, #E07C1A); color: white; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; margin: 16px 0;">Upload Your Graphic →</a>
+                <p style="font-size: 13px; color: #666;">Please submit your ad media at least 7 days before the event. Maximum file size: 10 MB.</p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+                <p style="font-size: 12px; color: #999;">Knoxville Hindu Community Center · 8580 Hickory Creek Rd, Lenoir City, TN 37771</p>
+              </div>
+            `,
+          });
+          console.log(`[Webhook] LED ad confirmation + upload link sent to ${ledReg.email}`);
+        } catch (emailErr) {
+          console.error(`[Webhook] LED ad email failed:`, emailErr.message);
+        }
+
+        await logWebhook(event.id, regNumber, 'processed: LED ad paid + upload link sent');
       } else {
         await logWebhook(event.id, regNumber, 'failed: LED ad registration not found');
       }

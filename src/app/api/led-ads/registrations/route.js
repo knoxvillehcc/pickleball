@@ -59,6 +59,7 @@ export async function PUT(request) {
     if (fields.amount_paid !== undefined) updates.amount_paid = Math.round(parseFloat(fields.amount_paid || 0) * 100);
     if (fields.payment_status !== undefined) updates.payment_status = fields.payment_status;
     if (fields.stripe_payment_ref !== undefined) updates.stripe_payment_ref = fields.stripe_payment_ref.trim();
+    if (fields.graphic_received !== undefined) updates.graphic_received = !!fields.graphic_received;
     updates.updated_at = new Date().toISOString();
 
     const result = await updateLedAdRegistration(id, updates);
