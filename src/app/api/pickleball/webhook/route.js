@@ -154,6 +154,34 @@ async function vendorMarkAsPaid(regNumber, sessionId, amountPaid) {
   return { ...record, payment_status: 'paid', amount_paid: amountPaid * 100, stripe_payment_ref: sessionId };
 }
 
+async function ledAdMarkAsPaid(regNumber, sessionId, amountPaid) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+
+  const findRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/led_ad_registrations?registration_number=eq.${encodeURIComponent(regNumber)}&select=*`,
+    { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } }
+  );
+
+  const found = await findRes.json();
+  if (!found?.length) {
+    console.warn(`[Webhook] LED ad registration ${regNumber} not found in Supabase`);
+    return null;
+  }
+
+  const record = found[0];
+  if (record.payment_status === 'paid') return 'already_paid';
+
+  const { updateLedAdRegistration } = await import('@/lib/supabaseClient');
+  await updateLedAdRegistration(record.id, {
+    payment_status: 'paid',
+    amount_paid: amountPaid * 100,
+    stripe_payment_ref: sessionId,
+  });
+
+  return { ...record, payment_status: 'paid', amount_paid: amountPaid * 100, stripe_payment_ref: sessionId };
+}
+
 
 async function isWebhookProcessed(webhookId) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -281,6 +309,27 @@ export async function POST(request) {
         await logWebhook(event.id, regNumber, 'processed: basic sponsor paid + email sent');
       } else {
         await logWebhook(event.id, regNumber, 'failed: basic sponsor registration not found');
+      }
+
+      return NextResponse.json({ received: true });
+    }
+
+    // ── Route: LED Screen Ad ─────────────────────────────────────────────────
+    if (meta.source === 'led_screen_ad') {
+      console.log(`[Webhook] LED Screen Ad payment for ${regNumber} — $${amountPaid}`);
+
+      const ledReg = await ledAdMarkAsPaid(regNumber, stripeRef, amountPaid);
+
+      if (ledReg === 'already_paid') {
+        console.log(`[Webhook] LED ad ${regNumber} already paid. Skipping.`);
+        await logWebhook(event.id, regNumber, 'ignored: LED ad already paid');
+        return NextResponse.json({ received: true, ignored: true, reason: 'LED ad already paid' });
+      }
+
+      if (ledReg) {
+        await logWebhook(event.id, regNumber, 'processed: LED ad paid');
+      } else {
+        await logWebhook(event.id, regNumber, 'failed: LED ad registration not found');
       }
 
       return NextResponse.json({ received: true });

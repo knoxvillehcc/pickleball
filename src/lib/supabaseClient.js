@@ -314,3 +314,37 @@ export async function getAllVendorRegistrations(limit = 5000) {
 
   return res.json();
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// LED Screen Ad Registrations
+// ═══════════════════════════════════════════════════════════════════
+
+export async function insertLedAdRegistration(data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations`, {
+    method:  'POST',
+    headers: getServiceHeaders(),
+    body:    JSON.stringify(data),
+    cache:   'no-store',
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Supabase LED ad insert failed (${res.status}): ${body}`);
+  }
+  const result = await res.json();
+  return Array.isArray(result) ? result[0] : result;
+}
+
+export async function updateLedAdRegistration(id, data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations?id=eq.${id}`, {
+    method:  'PATCH',
+    headers: getServiceHeaders(),
+    body:    JSON.stringify(data),
+    cache:   'no-store',
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Supabase LED ad update failed (${res.status}): ${body}`);
+  }
+  const result = await res.json();
+  return Array.isArray(result) ? result[0] : result;
+}
