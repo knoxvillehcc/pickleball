@@ -237,7 +237,7 @@ function LedAdsFormInner() {
           Navratri 2026 — LED Screen Ads
         </h1>
         <p style={{ color: 'var(--text-secondary)', marginTop: '8px', fontSize: '15px', lineHeight: '1.5', maxWidth: '500px', margin: '8px auto 0' }}>
-          Showcase your business on our LED screens throughout all 9 nights of Navratri 2026.
+          Showcase your business on our LED screens throughout all nights of Navratri 2026.
           High-resolution display (1080×1920).
         </p>
         <div style={{

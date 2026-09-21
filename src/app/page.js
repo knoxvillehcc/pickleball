@@ -114,7 +114,7 @@ function PublicLanding() {
   const options = [
     ...(ledAdsLive ? [{
       title: 'LED Screen Ads — Navratri 2026',
-      desc: 'Advertise your business on our LED screens throughout all 9 nights of Navratri 2026. High-resolution 1080×1920 display.',
+      desc: 'Advertise your business on our LED screens throughout all nights of Navratri 2026. High-resolution 1080×1920 display.',
       href: '/register/led-ads',
       accentColor: '#FF9933',
       glowColor: 'rgba(255, 153, 51, 0.12)',
