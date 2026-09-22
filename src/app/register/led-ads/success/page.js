@@ -45,7 +45,7 @@ function SuccessInner() {
           background: 'rgba(255,153,51,0.06)', border: '1px solid rgba(255,153,51,0.15)',
           fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.6',
         }}>
-          📐 <strong>Media Requirement:</strong> 1080×1920 pixels (portrait, high resolution).
+          📐 <strong>Media Requirement:</strong> 1920×1080 pixels (landscape, high resolution).
           <br />Please submit your ad media at least 7 days before the event.
         </div>
 

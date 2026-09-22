@@ -74,7 +74,7 @@ export async function POST(request) {
           unit_amount: PRICE_CENTS,
           product_data: {
             name: 'Navratri 2026 — LED Screen Advertisement',
-            description: `Reg #${regNumber} · ${body.business_name.trim()} · Full event LED screen ad (1080×1920)`,
+            description: `Reg #${regNumber} · ${body.business_name.trim()} · Full event LED screen ad (1920×1080)`,
           },
         },
       }],

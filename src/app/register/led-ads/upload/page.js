@@ -137,7 +137,7 @@ function UploadInner() {
           border: '1px solid rgba(255,153,51,0.2)',
         }}>
           <div style={{ fontSize: '12px', fontWeight: '700', color: '#FF9933', marginBottom: '4px' }}>📐 MEDIA REQUIREMENT</div>
-          <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: '600' }}>1080 × 1920 pixels (portrait, high resolution)</div>
+          <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: '600' }}>1920 × 1080 pixels (landscape, high resolution)</div>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>Max file size: 10 MB · Any file type accepted</div>
         </div>
 
@@ -210,7 +210,7 @@ function UploadInner() {
                     Drop your file here or click to browse
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                    Max 10 MB · 1080×1920 recommended
+                    Max 10 MB · 1920×1080 recommended
                   </div>
                 </div>
               )}

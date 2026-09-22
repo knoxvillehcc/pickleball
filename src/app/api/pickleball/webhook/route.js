@@ -360,7 +360,7 @@ export async function POST(request) {
                   <p style="margin: 0; font-size: 20px; font-weight: 900; color: #FF9933;">${regNumber}</p>
                 </div>
                 <h2 style="font-size: 18px; color: #333;">📤 Upload Your Ad Media</h2>
-                <p>Please upload your advertisement graphic using the link below. Required resolution: <strong>1080 × 1920 pixels</strong> (portrait, high resolution).</p>
+                <p>Please upload your advertisement graphic using the link below. Required resolution: <strong>1920 × 1080 pixels</strong> (landscape, high resolution).</p>
                 <a href="${uploadLink}" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #FF9933, #E07C1A); color: white; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; margin: 16px 0;">Upload Your Graphic →</a>
                 <p style="font-size: 13px; color: #666;">Please submit your ad media at least 7 days before the event. Maximum file size: 10 MB.</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">

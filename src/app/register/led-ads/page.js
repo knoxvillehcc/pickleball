@@ -10,7 +10,7 @@ const DISCLAIMER_TEXT = `LED SCREEN ADVERTISEMENT AGREEMENT — NAVRATRI 2026
 
 2. PAYMENT & REFUND POLICY: All advertising fees ($1,500 per slot) are non-refundable once payment is processed. In the event of cancellation by HCC due to circumstances beyond its control, HCC will issue a credit toward a future event. No cash refunds will be issued.
 
-3. AD SPECIFICATIONS: All advertisements must be submitted in high resolution (1080×1920 pixels). HCC reserves the right to reject or request modifications to any advertisement that does not meet technical specifications or content guidelines.
+3. AD SPECIFICATIONS: All advertisements must be submitted in high resolution (1920×1080 pixels). HCC reserves the right to reject or request modifications to any advertisement that does not meet technical specifications or content guidelines.
 
 4. CONTENT GUIDELINES: Advertisements must not contain offensive, discriminatory, or inappropriate content. HCC reserves the right to refuse or remove any advertisement that violates community standards, without refund.
 
@@ -238,7 +238,7 @@ function LedAdsFormInner() {
         </h1>
         <p style={{ color: 'var(--text-secondary)', marginTop: '8px', fontSize: '15px', lineHeight: '1.5', maxWidth: '500px', margin: '8px auto 0' }}>
           Showcase your business on our LED screens throughout all nights of Navratri 2026.
-          High-resolution display (1080×1920).
+          High-resolution display (1920×1080).
         </p>
         <div style={{
           display: 'inline-block', marginTop: '16px', padding: '10px 28px', borderRadius: '12px',
@@ -275,7 +275,7 @@ function LedAdsFormInner() {
             <Field label="What are you advertising?" value={adDescription} onChange={e => setAdDescription(e.target.value)} placeholder="Brief description of your ad content" as="textarea" />
             <div style={{ padding: '14px 18px', borderRadius: '10px', background: isDark ? 'rgba(255,153,51,0.08)' : '#FFF8F0', border: '1px solid rgba(255,153,51,0.2)' }}>
               <div style={{ fontSize: '12px', fontWeight: '700', color: '#FF9933', letterSpacing: '0.5px', marginBottom: '6px' }}>📐 MEDIA REQUIREMENT</div>
-              <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: '600' }}>High Resolution: 1080 × 1920 pixels (portrait)</div>
+              <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: '600' }}>High Resolution: 1920 × 1080 pixels (landscape)</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>Submit your ad media at least 7 days before the event.</div>
             </div>
           </div>
