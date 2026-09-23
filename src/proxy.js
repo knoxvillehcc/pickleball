@@ -36,6 +36,7 @@ const PUBLIC_PREFIXES = [
   '/api/navratri/tickets',             // Ticket lookup (public)
   '/api/navratri/scanner',             // Scanner auth + validate
   '/api/navratri/pickup',              // Pickup lookup + confirm
+  '/privacy',                          // Privacy policy (must be public for A2P compliance)
   '/_next', '/favicon',
 ];
 
