@@ -24,7 +24,7 @@ export default function NavratriPublicPage() {
   const theme = usePreferredTheme();
   const c = colors(theme);
 
-  const [step, setStep] = useState('verify');
+  const [step, setStep] = useState('select'); // TEMPORARY: skip OTP for A2P review — revert to 'verify' after approval
   const [event, setEvent] = useState(null);
   const [dates, setDates] = useState([]);
   const [loading, setLoading] = useState(true);
