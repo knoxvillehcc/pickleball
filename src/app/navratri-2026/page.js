@@ -537,7 +537,11 @@ export default function NavratriPublicPage() {
                 <input type="checkbox" checked={termsAccepted} onChange={e => setTermsAccepted(e.target.checked)}
                   style={{ width: '22px', height: '22px', marginTop: '1px', accentColor: c.primary, flexShrink: 0 }} />
                 <span style={{ ...type.secondary, color: c.muted }}>
-                  I accept the terms and conditions, including the refund policy (72-hour refund window). *
+                  I accept the{' '}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer"
+                    style={{ color: c.primary, textDecoration: 'underline' }}>
+                    terms, conditions, and privacy policy
+                  </a>, including the refund policy (72-hour refund window) and SMS messaging policy. *
                 </span>
               </label>
 
