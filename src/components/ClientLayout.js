@@ -37,7 +37,7 @@ const navLinks = [
 ];
 
 // ── Public routes — no sidebar ─────────────────────────────────────────────────────
-const PUBLIC_PREFIXES = ['/register', '/login', '/navratri-2026', '/navratri/scanner', '/navratri/pickup'];
+const PUBLIC_PREFIXES = ['/register', '/login', '/navratri-2026', '/navratri/scanner', '/navratri/pickup', '/privacy'];
 const isPublicRoute = (path) => PUBLIC_PREFIXES.some(p => path.startsWith(p));
 
 // ── Main ClientLayout ──────────────────────────────────────────────────────────
