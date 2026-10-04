@@ -36,3 +36,11 @@ Every event form MUST include an option at the end of the event to post a balanc
   - Before creating any entry in Odoo, check if an `account.move` with the event's unique reference (e.g. `ref: NAVRATRI-2026-VENDORS-FINAL` or `ref: NAVRATRI-2026-LED-ADS-FINAL`) and `state != 'cancel'` already exists.
   - Block duplicate submissions with an explicit warning showing the existing entry name and date.
   - Persist sync status in Supabase settings so the admin dashboard permanently displays a verified badge: `✓ Posted to Odoo: MISC/2026/XXXXX ($XX,XXX.00)`.
+
+## 6. Event Expenses & Settlement Integration
+Whenever a new event or form is created in this repository:
+- **Auto-Registration in Event Expenses**: The event MUST be automatically discoverable in the Universal Expense Hub (`/accounting/expenses`) so volunteers and coordinators can record event expenses without manual code configuration.
+- **Dedicated Permissions**: Access control for `expenses` MUST remain independent from Bank Statements (`stripe`), Membership (`reports`), and Executive P&L (`pnl`), ensuring expense clerks only see receipt entry and cannot access sensitive bank accounts.
+- **Editable with Audit**: All expenses must be editable at any time. If edited after posting to Odoo, they must be flagged with `adjustment_pending` for treasurer review.
+- **Bank Reconciliation Support**: Payment method fields MUST capture Check # (for checks) or Last 4 (for card swipes) credited to Account `101401` so Odoo bank feed reconciliation matches lines automatically.
+

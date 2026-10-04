@@ -13,6 +13,7 @@ const HCC_PAGES = [
   { key: 'navratri',        label: 'Navratri 2026',        desc: 'Navratri ticketing, orders & check-in' },
   { key: 'navratri_vendors',label: 'Navratri Vendors',     desc: 'Vendor booth reservations, reports & refunds' },
   { key: 'led_ads',         label: 'LED Screen Ads',       desc: 'LED advertisement registrations' },
+  { key: 'expenses',        label: 'Expenses & Accounts', desc: 'Enter and manage event expenses & utility bills' },
   { key: 'settings',        label: 'Settings',             desc: 'App settings' },
 ];
 

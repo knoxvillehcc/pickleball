@@ -24,6 +24,7 @@ const TrophyIcon   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill=
 const FestivalIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>;
 const VendorIcon   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M2 9h20"/></svg>;
 const LedIcon      = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="15" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="18" y2="21"/></svg>;
+const ExpenseIcon  = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>;
 
 const navLinks = [
   { href: '/',                   label: 'Dashboard',         icon: <HomeIcon />,       slug: 'dashboard' },
@@ -31,6 +32,7 @@ const navLinks = [
   { href: '/reports/monthly',   label: 'Monthly Report',    icon: <CalIcon />,        slug: 'monthly' },
   { href: '/reports/pnl',       label: 'HCC P&L',           icon: <PnLIcon />,        slug: 'pnl' },
   { href: '/reports/stripe',    label: 'Bank Statement',    icon: <BankIcon />,       slug: 'stripe' },
+  { href: '/accounting/expenses', label: 'Expenses & Accounts', icon: <ExpenseIcon />, slug: 'expenses' },
   { href: '/banner',            label: 'Banner In',         icon: <BannerIcon />,     slug: 'banner' },
   { href: '/pickleball',        label: 'Pickleball',        icon: <PBIcon />,         slug: 'pickleball' },
   { href: '/indiafest',         label: 'India Fest 2026',   icon: <IndiafestIcon />,  slug: 'indiafest' },
