@@ -31,7 +31,7 @@ const navLinks = [
   { href: '/indiafest',         label: 'India Fest 2026',   icon: <IndiafestIcon />,  slug: 'indiafest' },
   { href: '/indiafest/sponsors',label: 'Sponsors Dashboard',icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🏆</span>, slug: 'sponsors' },
   { href: '/navratri',          label: 'Navratri 2026',     icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🪔</span>, slug: 'navratri' },
-  { href: '/navratri/vendors',  label: 'Navratri Vendors',  icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🎪</span>, slug: 'navratri' },
+  { href: '/navratri/vendors',  label: 'Navratri Vendors',  icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🎪</span>, slug: 'navratri_vendors' },
   { href: '/led-ads',            label: 'LED Screen Ads',    icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>📺</span>, slug: 'led_ads' },
   { href: '/settings',          label: 'Settings',          icon: <SettingsIcon />,   slug: 'settings' },
   { href: '/settings/users',    label: 'User Management',   icon: <UsersIcon />,      slug: 'users', adminOnly: true },
@@ -267,7 +267,7 @@ export default function ClientLayout({ children }) {
               if (link.href === '/') return true;
               if (user.role === 'super_admin') return true;
               const pages = user.allowedPages || [];
-              return pages.includes('*') || pages.includes(link.slug);
+              return pages.includes('*') || pages.includes(link.slug) || (link.slug === 'navratri_vendors' && pages.includes('navratri'));
             }).map(({ href, label, icon }) => {
               const active = pathname === href || (href !== '/' && pathname.startsWith(href));
               return (
