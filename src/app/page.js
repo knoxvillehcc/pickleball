@@ -114,7 +114,7 @@ const moduleConfigs = [
   {
     slug: 'navratri_vendors',
     title: 'Navratri 2026 Vendors',
-    desc: 'Manage vendor booth reservations ($201 Sun-Thu / $351 Fri-Sat), spot assignments, reports, and refunds.',
+    desc: 'Manage vendor booth reservations ($201 Standard / $351 Peak & Weekends), spot assignments, reports, and refunds.',
     icon: SvgIcons.vendor,
     color: 'linear-gradient(135deg, #FF6B35, #FFB800)',
     borderColor: 'rgba(255, 107, 53, 0.3)',
@@ -165,7 +165,7 @@ function PublicLanding() {
   const options = [
     ...(vendorLive ? [{
       title: 'Navratri 2026 — Vendor Booths',
-      desc: 'Reserve your booth space for Navratri 2026. Daily slots ($201 Sun–Thu / $351 Fri–Sat) with high community attendance.',
+      desc: 'Reserve your booth space for Navratri 2026. Daily slots ($201 Standard / $351 Peak & Weekends) with high community attendance.',
       href: '/register/navratri/vendor',
       accentColor: '#FF6B35',
       glowColor: 'rgba(255, 107, 53, 0.12)',

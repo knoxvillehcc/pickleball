@@ -14,10 +14,10 @@ const FESTIVAL_DATES = [
   { date: '2026-10-13', dateFormatted: '10-13-2026', label: 'Day 3 — Tue, 10-13-2026',      isWeekend: false, rate: 201 },
   { date: '2026-10-14', dateFormatted: '10-14-2026', label: 'Day 4 — Wed, 10-14-2026',      isWeekend: false, rate: 201 },
   { date: '2026-10-15', dateFormatted: '10-15-2026', label: 'Day 5 — Thu, 10-15-2026',      isWeekend: false, rate: 201 },
-  { date: '2026-10-16', dateFormatted: '10-16-2026', label: 'Day 6 — Fri, 10-16-2026 (Grand Garba)', isWeekend: true, rate: 351 },
-  { date: '2026-10-17', dateFormatted: '10-17-2026', label: 'Day 7 — Sat, 10-17-2026 (Grand Garba)', isWeekend: true, rate: 351 },
-  { date: '2026-10-18', dateFormatted: '10-18-2026', label: 'Day 8 — Sun, 10-18-2026 (Dandiya Night)', isWeekend: false, rate: 201 },
-  { date: '2026-10-19', dateFormatted: '10-19-2026', label: 'Day 9 — Mon, 10-19-2026 (Maha Aarti)',   isWeekend: false, rate: 201 },
+  { date: '2026-10-16', dateFormatted: '10-16-2026', label: 'Day 6 — Fri, 10-16-2026', isWeekend: true,  rate: 351 },
+  { date: '2026-10-17', dateFormatted: '10-17-2026', label: 'Day 7 — Sat, 10-17-2026', isWeekend: true,  rate: 351 },
+  { date: '2026-10-18', dateFormatted: '10-18-2026', label: 'Day 8 — Sun, 10-18-2026', isWeekend: true,  rate: 351 },
+  { date: '2026-10-19', dateFormatted: '10-19-2026', label: 'Day 9 — Mon, 10-19-2026', isWeekend: false, rate: 201 },
   { date: '2026-10-20', dateFormatted: '10-20-2026', label: 'Day 10 — Tue, 10-20-2026 (Vijayadashami)', isWeekend: false, rate: 201 },
   { date: '2026-10-25', dateFormatted: '10-25-2026', label: 'Special — Sun, 10-25-2026 (Sharad Purnima)', isWeekend: false, rate: 201 },
 ];
@@ -641,7 +641,7 @@ export default function NavratriVendorsDashboard() {
             </h1>
           </div>
           <p style={{ margin: '6px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Manage daily booth reservations ($201 Sun–Thu / $351 Fri–Sat), spot assignments, reports, and refunds.
+            Manage daily booth reservations ($201 Standard / $351 Peak & Weekends), spot assignments, reports, and refunds.
           </p>
         </div>
 
