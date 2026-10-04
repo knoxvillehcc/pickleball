@@ -19,20 +19,25 @@ const SettingsIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill=
 const UsersIcon    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
 const SunIcon      = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>;
 const MoonIcon     = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
+const BankIcon     = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18"/><line x1="10" x2="10" y1="18"/><line x1="14" x2="14" y1="18"/><line x1="18" x2="18" y1="18"/><polygon points="12 2 20 7 4 7"/></svg>;
+const TrophyIcon   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H7"/><path d="M14 14.66V17c0 .55.45 1 1 1h2"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>;
+const FestivalIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>;
+const VendorIcon   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M2 9h20"/></svg>;
+const LedIcon      = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="15" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="18" y2="21"/></svg>;
 
 const navLinks = [
   { href: '/',                   label: 'Dashboard',         icon: <HomeIcon />,       slug: 'dashboard' },
   { href: '/reports',           label: 'Membership',        icon: <ReportsIcon />,    slug: 'reports' },
   { href: '/reports/monthly',   label: 'Monthly Report',    icon: <CalIcon />,        slug: 'monthly' },
   { href: '/reports/pnl',       label: 'HCC P&L',           icon: <PnLIcon />,        slug: 'pnl' },
-  { href: '/reports/stripe',    label: 'Bank Statement',    icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🏦</span>, slug: 'stripe' },
+  { href: '/reports/stripe',    label: 'Bank Statement',    icon: <BankIcon />,       slug: 'stripe' },
   { href: '/banner',            label: 'Banner In',         icon: <BannerIcon />,     slug: 'banner' },
   { href: '/pickleball',        label: 'Pickleball',        icon: <PBIcon />,         slug: 'pickleball' },
   { href: '/indiafest',         label: 'India Fest 2026',   icon: <IndiafestIcon />,  slug: 'indiafest' },
-  { href: '/indiafest/sponsors',label: 'Sponsors Dashboard',icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🏆</span>, slug: 'sponsors' },
-  { href: '/navratri',          label: 'Navratri 2026',     icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🪔</span>, slug: 'navratri' },
-  { href: '/navratri/vendors',  label: 'Navratri Vendors',  icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>🎪</span>, slug: 'navratri_vendors' },
-  { href: '/led-ads',            label: 'LED Screen Ads',    icon: <span style={{ fontSize: '16px', lineHeight: 1 }}>📺</span>, slug: 'led_ads' },
+  { href: '/indiafest/sponsors',label: 'Sponsors Dashboard',icon: <TrophyIcon />,     slug: 'sponsors' },
+  { href: '/navratri',          label: 'Navratri 2026',     icon: <FestivalIcon />,   slug: 'navratri' },
+  { href: '/navratri/vendors',  label: 'Navratri Vendors',  icon: <VendorIcon />,     slug: 'navratri_vendors' },
+  { href: '/led-ads',            label: 'LED Screen Ads',    icon: <LedIcon />,        slug: 'led_ads' },
   { href: '/settings',          label: 'Settings',          icon: <SettingsIcon />,   slug: 'settings' },
   { href: '/settings/users',    label: 'User Management',   icon: <UsersIcon />,      slug: 'users', adminOnly: true },
 ];

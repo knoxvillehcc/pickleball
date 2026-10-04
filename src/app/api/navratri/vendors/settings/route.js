@@ -12,16 +12,25 @@ export async function GET(request) {
 
     const settings = await getVendorSettings();
 
+    const cutoff = new Date('2026-10-25T23:59:59-04:00').getTime();
+    const isPastCutoff = Date.now() > cutoff;
+
     if (key) {
+      const isPub = !isPastCutoff && settings[key] === 'true';
       return NextResponse.json({
         success: true,
         key,
-        value: settings[key],
-        is_published: settings[key] === 'true',
+        value: isPastCutoff ? 'false' : settings[key],
+        is_published: isPub,
+        is_past_cutoff: isPastCutoff,
       });
     }
 
-    return NextResponse.json({ success: true, settings });
+    if (isPastCutoff) {
+      settings.is_published = 'false';
+    }
+
+    return NextResponse.json({ success: true, settings, is_past_cutoff: isPastCutoff });
   } catch (err) {
     console.error('[Vendor Settings GET] Error:', err.message);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

@@ -12,12 +12,29 @@ const cardStyle = {
 };
 
 // ── Admin module configs ───────────────────────────────────────────────────────
+// ── SVG Icon Helpers ─────────────────────────────────────────────────────────
+const SvgIcons = {
+  pickleball: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>,
+  reports: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg>,
+  monthly: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>,
+  banner: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>,
+  users: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  indiafest: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>,
+  sponsors: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H7"/><path d="M14 14.66V17c0 .55.45 1 1 1h2"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>,
+  navratri: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>,
+  vendor: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M2 9h20"/></svg>,
+  screen: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="20" height="15" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="18" y2="21"/></svg>,
+  key: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21 2-2 2m-1.5 1.5L14 9l-4.5 4.5a5 5 0 1 1-2.5-2.5L11.5 6.5l3.5-3.5 6 6-1.5 1.5"/><circle cx="7.5" cy="16.5" r="1.5"/></svg>,
+  settings: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+};
+
+// ── Admin module configs ───────────────────────────────────────────────────────
 const moduleConfigs = [
   {
     slug: 'pickleball',
     title: 'Tournament Registrations',
     desc: 'Manage tournament registrants, track payment status, generate secure links, and export player lists.',
-    icon: '🏓',
+    icon: SvgIcons.pickleball,
     color: 'linear-gradient(135deg, #F4A40B, #D4AF37)',
     borderColor: 'rgba(244, 164, 11, 0.3)',
     hoverGlow: 'rgba(244, 164, 11, 0.08)',
@@ -27,7 +44,7 @@ const moduleConfigs = [
     slug: 'reports',
     title: 'Membership Reports',
     desc: 'View active subscriptions, total revenue collection breakdown, and download full PDF reports.',
-    icon: '📊',
+    icon: SvgIcons.reports,
     color: 'linear-gradient(135deg, #10B981, #059669)',
     borderColor: 'rgba(16, 185, 129, 0.3)',
     hoverGlow: 'rgba(16, 185, 129, 0.08)',
@@ -37,7 +54,7 @@ const moduleConfigs = [
     slug: 'monthly',
     title: 'Monthly Activity',
     desc: 'Track monthly membership sign-ups, activity trends, and subscription revenue streams.',
-    icon: '📅',
+    icon: SvgIcons.monthly,
     color: 'linear-gradient(135deg, #38BDF8, #0284C7)',
     borderColor: 'rgba(56, 189, 248, 0.3)',
     hoverGlow: 'rgba(56, 189, 248, 0.08)',
@@ -47,7 +64,7 @@ const moduleConfigs = [
     slug: 'banner',
     title: 'Banner Management',
     desc: 'Review advertising sponsor banners, verify invoice lines, and handle banner status updates.',
-    icon: '🎏',
+    icon: SvgIcons.banner,
     color: 'linear-gradient(135deg, #818CF8, #4F46E5)',
     borderColor: 'rgba(129, 140, 248, 0.3)',
     hoverGlow: 'rgba(129, 140, 248, 0.08)',
@@ -57,7 +74,7 @@ const moduleConfigs = [
     slug: 'users',
     title: 'User Management',
     desc: 'Administer system accounts, assign individual page access, toggle active states, and reset login PINs.',
-    icon: '👥',
+    icon: SvgIcons.users,
     color: 'linear-gradient(135deg, #A78BFA, #7C3AED)',
     borderColor: 'rgba(167, 139, 250, 0.3)',
     hoverGlow: 'rgba(167, 139, 250, 0.08)',
@@ -68,7 +85,7 @@ const moduleConfigs = [
     slug: 'indiafest',
     title: 'India Fest 2026 Vendors',
     desc: 'Manage vendor booth registrations, track payment status, and export vendor lists for India Fest 2026.',
-    icon: '🪔',
+    icon: SvgIcons.indiafest,
     color: 'linear-gradient(135deg, #FF9933, #E07C1A)',
     borderColor: 'rgba(255, 153, 51, 0.3)',
     hoverGlow: 'rgba(255, 153, 51, 0.08)',
@@ -78,7 +95,7 @@ const moduleConfigs = [
     slug: 'sponsors',
     title: 'India Fest 2026 Sponsors',
     desc: 'Manage Grand Sponsor registrations, track $5,000 payments, publish/unpublish the sponsor form, and export sponsor lists.',
-    icon: '🏆',
+    icon: SvgIcons.sponsors,
     color: 'linear-gradient(135deg, #D4AF37, #B8960C)',
     borderColor: 'rgba(212, 175, 55, 0.3)',
     hoverGlow: 'rgba(212, 175, 55, 0.08)',
@@ -88,7 +105,7 @@ const moduleConfigs = [
     slug: 'navratri',
     title: 'Navratri 2026 Ticketing',
     desc: 'Manage festival ticketing, member wristbands, daily attendance, scanner, and pickup stations.',
-    icon: '🪔',
+    icon: SvgIcons.navratri,
     color: 'linear-gradient(135deg, #FF6B35, #8B1E3F)',
     borderColor: 'rgba(255, 107, 53, 0.3)',
     hoverGlow: 'rgba(255, 107, 53, 0.08)',
@@ -98,7 +115,7 @@ const moduleConfigs = [
     slug: 'navratri_vendors',
     title: 'Navratri 2026 Vendors',
     desc: 'Manage vendor booth reservations ($201 Sun-Thu / $351 Fri-Sat), spot assignments, reports, and refunds.',
-    icon: '🎪',
+    icon: SvgIcons.vendor,
     color: 'linear-gradient(135deg, #FF6B35, #FFB800)',
     borderColor: 'rgba(255, 107, 53, 0.3)',
     hoverGlow: 'rgba(255, 107, 53, 0.08)',
@@ -108,7 +125,7 @@ const moduleConfigs = [
     slug: 'settings',
     title: 'App Settings',
     desc: 'Adjust portal configuration settings, check health endpoints, and toggle registration availability.',
-    icon: '⚙️',
+    icon: SvgIcons.settings,
     color: 'linear-gradient(135deg, #94A3B8, #475569)',
     borderColor: 'rgba(148, 163, 184, 0.3)',
     hoverGlow: 'rgba(148, 163, 184, 0.08)',
@@ -122,16 +139,42 @@ function PublicLanding() {
 
   const [hovered, setHovered] = useState(null);
   const [ledAdsLive, setLedAdsLive] = useState(false);
+  const [vendorLive, setVendorLive] = useState(false);
 
-  // Check if LED ads registration is published
+  // Check if LED ads and Vendor registration are live AND before event last day cutoff (10-25-2026 11:59:59 PM EST)
   useEffect(() => {
-    fetch('/api/led-ads/settings')
-      .then(r => r.json())
-      .then(d => setLedAdsLive(d.is_published === true))
-      .catch(() => setLedAdsLive(false));
+    const festivalCutoff = new Date('2026-10-25T23:59:59-04:00').getTime();
+    const isPastCutoff = Date.now() > festivalCutoff;
+
+    if (!isPastCutoff) {
+      fetch('/api/led-ads/settings')
+        .then(r => r.json())
+        .then(d => setLedAdsLive(d.is_published === true && !d.is_past_cutoff))
+        .catch(() => setLedAdsLive(false));
+
+      fetch('/api/navratri/vendors/settings?key=is_published')
+        .then(r => r.json())
+        .then(d => setVendorLive(d.is_published === true && !d.is_past_cutoff))
+        .catch(() => setVendorLive(false));
+    } else {
+      setLedAdsLive(false);
+      setVendorLive(false);
+    }
   }, []);
 
   const options = [
+    ...(vendorLive ? [{
+      title: 'Navratri 2026 — Vendor Booths',
+      desc: 'Reserve your booth space for Navratri 2026. Daily slots ($201 Sun–Thu / $351 Fri–Sat) with high community attendance.',
+      href: '/register/navratri/vendor',
+      accentColor: '#FF6B35',
+      glowColor: 'rgba(255, 107, 53, 0.12)',
+      borderColor: 'rgba(255, 107, 53, 0.3)',
+      icon: SvgIcons.vendor,
+      badge: 'Now Open',
+      cta: 'Reserve Booth',
+      isOpen: true,
+    }] : []),
     ...(ledAdsLive ? [{
       title: 'LED Screen Ads — Navratri 2026',
       desc: 'Advertise your business on our LED screens throughout all nights of Navratri 2026. High-resolution 1920×1080 display.',
@@ -139,7 +182,7 @@ function PublicLanding() {
       accentColor: '#FF9933',
       glowColor: 'rgba(255, 153, 51, 0.12)',
       borderColor: 'rgba(255, 153, 51, 0.3)',
-      icon: '📺',
+      icon: SvgIcons.screen,
       badge: 'Now Open',
       cta: 'Register Now',
       isOpen: true,
@@ -151,7 +194,7 @@ function PublicLanding() {
       accentColor: '#8B1E3F',
       glowColor: 'rgba(139, 30, 63, 0.12)',
       borderColor: 'var(--border)',
-      icon: '🔑',
+      icon: SvgIcons.key,
       badge: 'Staff Only',
       cta: 'Operator Login',
       isOpen: true,

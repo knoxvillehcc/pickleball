@@ -11,24 +11,35 @@ import {
 export const dynamic = 'force-dynamic';
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Master festival dates & daily rates
+// Master festival dates & daily rates (MM-DD-YYYY display format)
 const FESTIVAL_DATES = {
-  '2026-10-11': { date: '2026-10-11', label: 'Day 1 — Sun, Oct 11', isWeekend: false, rate: 20100 },
-  '2026-10-12': { date: '2026-10-12', label: 'Day 2 — Mon, Oct 12', isWeekend: false, rate: 20100 },
-  '2026-10-13': { date: '2026-10-13', label: 'Day 3 — Tue, Oct 13', isWeekend: false, rate: 20100 },
-  '2026-10-14': { date: '2026-10-14', label: 'Day 4 — Wed, Oct 14', isWeekend: false, rate: 20100 },
-  '2026-10-15': { date: '2026-10-15', label: 'Day 5 — Thu, Oct 15', isWeekend: false, rate: 20100 },
-  '2026-10-16': { date: '2026-10-16', label: 'Day 6 — Fri, Oct 16', isWeekend: true,  rate: 35100 },
-  '2026-10-17': { date: '2026-10-17', label: 'Day 7 — Sat, Oct 17', isWeekend: true,  rate: 35100 },
-  '2026-10-18': { date: '2026-10-18', label: 'Day 8 — Sun, Oct 18', isWeekend: false, rate: 20100 },
-  '2026-10-19': { date: '2026-10-19', label: 'Day 9 — Mon, Oct 19', isWeekend: false, rate: 20100 },
-  '2026-10-20': { date: '2026-10-20', label: 'Day 10 — Tue, Oct 20', isWeekend: false, rate: 20100 },
-  '2026-10-25': { date: '2026-10-25', label: 'Day 11 — Sun, Oct 25 (Sharad Purnima)', isWeekend: false, rate: 20100 },
+  '2026-10-09': { date: '2026-10-09', label: 'Extra Day — Fri, 10-09-2026', isWeekend: true,  rate: 35100 },
+  '2026-10-10': { date: '2026-10-10', label: 'Extra Day — Sat, 10-10-2026', isWeekend: true,  rate: 35100 },
+  '2026-10-11': { date: '2026-10-11', label: 'Day 1 — Sun, 10-11-2026',      isWeekend: false, rate: 20100 },
+  '2026-10-12': { date: '2026-10-12', label: 'Day 2 — Mon, 10-12-2026',      isWeekend: false, rate: 20100 },
+  '2026-10-13': { date: '2026-10-13', label: 'Day 3 — Tue, 10-13-2026',      isWeekend: false, rate: 20100 },
+  '2026-10-14': { date: '2026-10-14', label: 'Day 4 — Wed, 10-14-2026',      isWeekend: false, rate: 20100 },
+  '2026-10-15': { date: '2026-10-15', label: 'Day 5 — Thu, 10-15-2026',      isWeekend: false, rate: 20100 },
+  '2026-10-16': { date: '2026-10-16', label: 'Day 6 — Fri, 10-16-2026 (Grand Garba)', isWeekend: true, rate: 35100 },
+  '2026-10-17': { date: '2026-10-17', label: 'Day 7 — Sat, 10-17-2026 (Grand Garba)', isWeekend: true, rate: 35100 },
+  '2026-10-18': { date: '2026-10-18', label: 'Day 8 — Sun, 10-18-2026 (Dandiya Night)', isWeekend: false, rate: 20100 },
+  '2026-10-19': { date: '2026-10-19', label: 'Day 9 — Mon, 10-19-2026 (Maha Aarti)',   isWeekend: false, rate: 20100 },
+  '2026-10-20': { date: '2026-10-20', label: 'Day 10 — Tue, 10-20-2026 (Vijayadashami)', isWeekend: false, rate: 20100 },
+  '2026-10-25': { date: '2026-10-25', label: 'Special — Sun, 10-25-2026 (Sharad Purnima)', isWeekend: false, rate: 20100 },
 };
 
 export async function POST(request) {
   try {
     const body = await request.json();
+
+    // 0. Auto-unpublish after final festival day (10-25-2026 11:59:59 PM EST)
+    const festivalCutoff = new Date('2026-10-25T23:59:59-04:00').getTime();
+    if (Date.now() > festivalCutoff) {
+      return NextResponse.json(
+        { success: false, error: 'Navratri 2026 vendor registrations have ended.' },
+        { status: 400 }
+      );
+    }
 
     // 1. Check if registrations are open in settings
     let settings = {};

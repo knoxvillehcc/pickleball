@@ -5,39 +5,57 @@ const SAFFRON = '#FF6B35';
 const GOLD = '#FFB800';
 const MAROON = '#500E2B';
 
-// ── Festival Dates ─────────────────────────────────────────────────────────────
+// ── Festival Dates (13 Dates — Format MM-DD-YYYY) ──────────────────────────────
 const FESTIVAL_DATES = [
-  { date: '2026-10-11', label: 'Day 1 — Sun, Oct 11', isWeekend: false, rate: 201 },
-  { date: '2026-10-12', label: 'Day 2 — Mon, Oct 12', isWeekend: false, rate: 201 },
-  { date: '2026-10-13', label: 'Day 3 — Tue, Oct 13', isWeekend: false, rate: 201 },
-  { date: '2026-10-14', label: 'Day 4 — Wed, Oct 14', isWeekend: false, rate: 201 },
-  { date: '2026-10-15', label: 'Day 5 — Thu, Oct 15', isWeekend: false, rate: 201 },
-  { date: '2026-10-16', label: 'Day 6 — Fri, Oct 16', isWeekend: true,  rate: 351 },
-  { date: '2026-10-17', label: 'Day 7 — Sat, Oct 17', isWeekend: true,  rate: 351 },
-  { date: '2026-10-18', label: 'Day 8 — Sun, Oct 18', isWeekend: false, rate: 201 },
-  { date: '2026-10-19', label: 'Day 9 — Mon, Oct 19', isWeekend: false, rate: 201 },
-  { date: '2026-10-20', label: 'Day 10 — Tue, Oct 20', isWeekend: false, rate: 201 },
-  { date: '2026-10-25', label: 'Day 11 — Sun, Oct 25 (Sharad Purnima)', isWeekend: false, rate: 201 },
+  { date: '2026-10-09', dateFormatted: '10-09-2026', label: 'Extra Day — Fri, 10-09-2026', isWeekend: true,  rate: 351 },
+  { date: '2026-10-10', dateFormatted: '10-10-2026', label: 'Extra Day — Sat, 10-10-2026', isWeekend: true,  rate: 351 },
+  { date: '2026-10-11', dateFormatted: '10-11-2026', label: 'Day 1 — Sun, 10-11-2026',      isWeekend: false, rate: 201 },
+  { date: '2026-10-12', dateFormatted: '10-12-2026', label: 'Day 2 — Mon, 10-12-2026',      isWeekend: false, rate: 201 },
+  { date: '2026-10-13', dateFormatted: '10-13-2026', label: 'Day 3 — Tue, 10-13-2026',      isWeekend: false, rate: 201 },
+  { date: '2026-10-14', dateFormatted: '10-14-2026', label: 'Day 4 — Wed, 10-14-2026',      isWeekend: false, rate: 201 },
+  { date: '2026-10-15', dateFormatted: '10-15-2026', label: 'Day 5 — Thu, 10-15-2026',      isWeekend: false, rate: 201 },
+  { date: '2026-10-16', dateFormatted: '10-16-2026', label: 'Day 6 — Fri, 10-16-2026 (Grand Garba)', isWeekend: true, rate: 351 },
+  { date: '2026-10-17', dateFormatted: '10-17-2026', label: 'Day 7 — Sat, 10-17-2026 (Grand Garba)', isWeekend: true, rate: 351 },
+  { date: '2026-10-18', dateFormatted: '10-18-2026', label: 'Day 8 — Sun, 10-18-2026 (Dandiya Night)', isWeekend: false, rate: 201 },
+  { date: '2026-10-19', dateFormatted: '10-19-2026', label: 'Day 9 — Mon, 10-19-2026 (Maha Aarti)',   isWeekend: false, rate: 201 },
+  { date: '2026-10-20', dateFormatted: '10-20-2026', label: 'Day 10 — Tue, 10-20-2026 (Vijayadashami)', isWeekend: false, rate: 201 },
+  { date: '2026-10-25', dateFormatted: '10-25-2026', label: 'Special — Sun, 10-25-2026 (Sharad Purnima)', isWeekend: false, rate: 201 },
 ];
 
-// ── Status Badges ──────────────────────────────────────────────────────────────
+function formatMMDDYYYY(d) {
+  if (!d) return '—';
+  const str = String(d).slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const [y, m, day] = str.split('-');
+    return `${m}-${day}-${y}`;
+  }
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return String(d);
+  const m = String(dt.getMonth() + 1).padStart(2, '0');
+  const day = String(dt.getDate()).padStart(2, '0');
+  return `${m}-${day}-${dt.getFullYear()}`;
+}
+
+// ── Status Badges (Clean Professional UI) ─────────────────────────────────────
 function Badge({ status }) {
   const map = {
-    paid:               { bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)', color: '#10B981', label: '✓ Paid' },
-    pending:            { bg: 'rgba(255,184,0,0.15)',  border: 'rgba(255,184,0,0.4)',  color: GOLD,      label: '⏳ Pending' },
-    partially_refunded: { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', color: '#F59E0B', label: '↩ Partial Refund' },
-    refunded:           { bg: 'rgba(148,163,184,0.15)',border: 'rgba(148,163,184,0.4)',color: '#94A3B8', label: '↩ Refunded' },
-    failed:             { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.4)',  color: '#EF4444', label: '✗ Failed' },
-    cancelled:          { bg: 'rgba(148,163,184,0.15)',border: 'rgba(148,163,184,0.4)',color: '#94A3B8', label: 'Cancelled' },
+    paid:               { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.35)', color: '#10B981', label: 'Paid' },
+    pending:            { bg: 'rgba(255,184,0,0.12)',  border: 'rgba(255,184,0,0.35)',  color: '#D97706', label: 'Pending' },
+    partially_refunded: { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.35)', color: '#F59E0B', label: 'Partial Refund' },
+    refunded:           { bg: 'rgba(148,163,184,0.12)',border: 'rgba(148,163,184,0.35)',color: '#64748B', label: 'Refunded' },
+    failed:             { bg: 'rgba(239,68,68,0.12)',  border: 'rgba(239,68,68,0.35)',  color: '#EF4444', label: 'Failed' },
+    cancelled:          { bg: 'rgba(148,163,184,0.12)',border: 'rgba(148,163,184,0.35)',color: '#64748B', label: 'Cancelled' },
   };
   const s = map[status] || map.pending;
   return (
     <span style={{
-      display: 'inline-block', padding: '4px 12px', borderRadius: '99px',
+      display: 'inline-flex', alignItems: 'center', gap: '5px',
+      padding: '3px 10px', borderRadius: '99px',
       fontSize: '11px', fontWeight: '800',
       backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.color,
       whiteSpace: 'nowrap',
     }}>
+      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: s.color }} />
       {s.label}
     </span>
   );
@@ -45,23 +63,23 @@ function Badge({ status }) {
 
 // ── Category Badges ────────────────────────────────────────────────────────────
 function CategoryBadge({ category }) {
-  const icons = {
-    clothing: '👗 Clothing',
-    jewelry: '💎 Jewelry',
-    food: '🍲 Food',
-    henna: '🎨 Henna',
-    handicrafts: '🪔 Handicrafts',
-    services: '💼 Services',
-    other: '🛍️ Retail',
+  const labels = {
+    clothing: 'Clothing & Apparel',
+    jewelry: 'Jewelry & Accessories',
+    food: 'Food & Refreshments',
+    henna: 'Henna & Beauty',
+    handicrafts: 'Handicrafts & Decor',
+    services: 'Community Services',
+    other: 'Retail & Merchandise',
   };
   return (
     <span style={{
-      display: 'inline-block', padding: '3px 10px', borderRadius: '8px',
+      display: 'inline-block', padding: '3px 9px', borderRadius: '6px',
       fontSize: '11px', fontWeight: '700',
-      backgroundColor: 'rgba(255,107,53,0.1)', border: '1px solid rgba(255,107,53,0.25)',
+      backgroundColor: 'rgba(255,107,53,0.08)', border: '1px solid rgba(255,107,53,0.22)',
       color: SAFFRON,
     }}>
-      {icons[category] || category || 'Vendor'}
+      {labels[category] || category || 'Vendor'}
     </span>
   );
 }
@@ -112,6 +130,13 @@ export default function NavratriVendorsDashboard() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [capacityInput, setCapacityInput] = useState('10');
 
+  // Odoo General Entry Sync
+  const [odooSyncStatus, setOdooSyncStatus] = useState(null);
+  const [showOdooModal, setShowOdooModal] = useState(false);
+  const [isSyncingOdoo, setIsSyncingOdoo] = useState(false);
+  const [odooSyncMsg, setOdooSyncMsg] = useState('');
+  const [forceOdooSync, setForceOdooSync] = useState(false);
+
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/navratri/vendor`
     : '/register/navratri/vendor';
@@ -125,6 +150,12 @@ export default function NavratriVendorsDashboard() {
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Failed to load registrations');
       setRegistrations(data.registrations || []);
+
+      // Fetch Odoo sync status
+      fetch('/api/navratri/vendors/sync-odoo')
+        .then(r => r.json())
+        .then(d => { if (d.success && d.syncInfo) setOdooSyncStatus(d.syncInfo); })
+        .catch(() => {});
       setBookedCounts(data.bookedCounts || {});
       if (data.settings) {
         setSettings(data.settings);
@@ -260,13 +291,38 @@ export default function NavratriVendorsDashboard() {
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Refund failed');
-      alert(`✅ ${data.message}`);
+      alert(data.message || 'Refund processed successfully');
       setRefundingReg(null);
       loadData(); // reload fresh state
     } catch (e) {
       alert('Refund failed: ' + e.message);
     } finally {
       setIsRefunding(false);
+    }
+  };
+
+  // Post General Entry to Odoo
+  const handlePostToOdoo = async (isForced = false) => {
+    setIsSyncingOdoo(true);
+    setOdooSyncMsg('');
+    try {
+      const res = await fetch('/api/navratri/vendors/sync-odoo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ force: isForced }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOdooSyncStatus(data.syncInfo);
+        setOdooSyncMsg(`Success: General Entry ${data.syncInfo.moveName} posted to Odoo.`);
+        setForceOdooSync(false);
+      } else {
+        setOdooSyncMsg(data.message || data.error || 'Failed to post General Entry to Odoo');
+      }
+    } catch (err) {
+      setOdooSyncMsg(`Error: ${err.message}`);
+    } finally {
+      setIsSyncingOdoo(false);
     }
   };
 
@@ -379,7 +435,7 @@ export default function NavratriVendorsDashboard() {
         datesStr,
         spotsStr,
         r.electrical_needed ? 'Yes' : 'No',
-        r.registration_date ? new Date(r.registration_date).toLocaleDateString() : '',
+        r.registration_date ? formatMMDDYYYY(r.registration_date) : '',
       ];
     });
 
@@ -390,7 +446,7 @@ export default function NavratriVendorsDashboard() {
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `navratri-vendors-${dateFilter === 'all' ? 'all-dates' : dateFilter}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `navratri-vendors-${dateFilter === 'all' ? 'all-dates' : dateFilter}-${formatMMDDYYYY(new Date())}.csv`;
     a.click();
   };
 
@@ -407,7 +463,7 @@ export default function NavratriVendorsDashboard() {
           <td><span style="font-size:11px;padding:2px 6px;background:#FFF3EB;color:#FF6B35;border-radius:4px;font-weight:700;">${r.category.toUpperCase()}</span></td>
           <td>${r.email}<br/><span style="font-size:11px;color:#64748B;">${r.phone || '—'}</span></td>
           <td style="font-size:11px;">${datesDetail || 'No active dates'}</td>
-          <td>${r.electrical_needed ? '⚡ Yes' : 'No'}</td>
+          <td>${r.electrical_needed ? 'Yes (110V)' : 'No'}</td>
           <td>$${((r.amount_paid || 0) / 100).toFixed(2)}</td>
           <td><span style="color:${statusColor};font-weight:800;">${r.payment_status.toUpperCase()}</span></td>
         </tr>
@@ -433,11 +489,11 @@ export default function NavratriVendorsDashboard() {
       <body>
         <div class="header">
           <div>
-            <h1 style="margin:0;font-size:22px;color:#0F172A;">🪔 Navratri 2026 — Master Vendor Report</h1>
+            <h1 style="margin:0;font-size:22px;color:#0F172A;">Navratri 2026 — Master Vendor Report</h1>
             <p style="margin:4px 0 0;color:#64748B;font-size:12px;">Knoxville Hindu Community Center · 8580 Hickory Creek Rd, Lenoir City, TN 37771</p>
           </div>
           <div style="text-align:right;font-size:11px;color:#64748B;">
-            Generated: ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}<br/>
+            Generated: ${formatMMDDYYYY(new Date())}<br/>
             Total Records: ${filtered.length}
           </div>
         </div>
@@ -468,7 +524,7 @@ export default function NavratriVendorsDashboard() {
   // Print Individual Day Report (Management Roster for Event Day)
   const printDayReport = (selectedDateStr) => {
     const dateObj = FESTIVAL_DATES.find(d => d.date === selectedDateStr);
-    const dateTitle = dateObj ? dateObj.label : selectedDateStr;
+    const dateTitle = dateObj ? dateObj.label : formatMMDDYYYY(selectedDateStr);
 
     // Gather all vendors who have a booth on this date
     const dayVendors = [];
@@ -493,8 +549,8 @@ export default function NavratriVendorsDashboard() {
           <td>${reg.contact_name}<br/><strong>${reg.phone || '—'}</strong></td>
           <td>${reg.email}</td>
           <td style="text-align:center;font-weight:800;">${dateInfo.booth_count} Booth(s)</td>
-          <td>${reg.electrical_needed ? '⚡ 110V Needed' : 'Standard'}</td>
-          <td><span style="color:${isPaid ? '#10B981' : '#F59E0B'};font-weight:800;">${isPaid ? '✓ PAID' : '⏳ PENDING'}</span></td>
+          <td>${reg.electrical_needed ? '110V Needed' : 'Standard'}</td>
+          <td><span style="color:${isPaid ? '#10B981' : '#F59E0B'};font-weight:800;">${isPaid ? 'PAID' : 'PENDING'}</span></td>
           <td style="border:1px dashed #CBD5E1;width:120px;"></td>
         </tr>
       `;
@@ -518,12 +574,12 @@ export default function NavratriVendorsDashboard() {
       <body>
         <div class="header">
           <div>
-            <h1 style="margin:0;font-size:20px;color:#0F172A;">🪔 Event Day Vendor Roster: ${dateTitle}</h1>
+            <h1 style="margin:0;font-size:20px;color:#0F172A;">Event Day Vendor Roster: ${dateTitle}</h1>
             <p style="margin:3px 0 0;color:#64748B;font-size:12px;">Knoxville Hindu Community Center · Setup: 5:30 PM – 6:45 PM · Event: 7:00 PM – 11:00 PM</p>
           </div>
           <div style="text-align:right;font-size:11px;color:#64748B;">
             <strong>Gate / Check-in Copy</strong><br/>
-            Printed: ${new Date().toLocaleTimeString()}
+            Printed: ${formatMMDDYYYY(new Date())}
           </div>
         </div>
 
@@ -572,9 +628,15 @@ export default function NavratriVendorsDashboard() {
       {/* ── TOP HEADER BAR ───────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '28px' }}>🪔</span>
-            <h1 style={{ fontSize: '26px', fontWeight: '950', margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '10px',
+              background: 'rgba(255,107,53,0.12)', border: '1px solid rgba(255,107,53,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', color: SAFFRON,
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M2 9h20"/></svg>
+            </div>
+            <h1 style={{ fontSize: '24px', fontWeight: '950', margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
               Navratri 2026 — Vendor Booths
             </h1>
           </div>
@@ -589,15 +651,16 @@ export default function NavratriVendorsDashboard() {
           <button
             onClick={copyPublicUrl}
             style={{
-              padding: '10px 16px', borderRadius: '10px',
+              padding: '9px 15px', borderRadius: '10px',
               border: '1px solid var(--border)', background: 'var(--bg-card)',
               color: urlCopied ? '#10B981' : 'var(--text-primary)',
-              fontWeight: '800', fontSize: '13px', cursor: 'pointer',
+              fontWeight: '700', fontSize: '13px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '8px',
               boxShadow: 'var(--shadow)',
             }}
           >
-            <span>{urlCopied ? '✓ Copied!' : '🔗 Public Link'}</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>{urlCopied ? 'Link Copied!' : 'Public Link'}</span>
           </button>
 
           {/* Toggle Public Registration */}
@@ -605,42 +668,80 @@ export default function NavratriVendorsDashboard() {
             onClick={handleTogglePublish}
             disabled={isPublishing}
             style={{
-              padding: '10px 16px', borderRadius: '10px',
+              padding: '9px 15px', borderRadius: '10px',
               border: `1.5px solid ${settings.is_published === 'true' ? '#10B981' : '#EF4444'}`,
               background: settings.is_published === 'true' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
               color: settings.is_published === 'true' ? '#10B981' : '#EF4444',
-              fontWeight: '800', fontSize: '13px', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: '6px',
+              fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '8px',
             }}
           >
-            <span>{settings.is_published === 'true' ? '🟢 Registration Open' : '🔴 Registration Closed'}</span>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: settings.is_published === 'true' ? '#10B981' : '#EF4444' }} />
+            <span>{settings.is_published === 'true' ? 'Registration Open' : 'Registration Closed'}</span>
           </button>
 
-          {/* Settings Modal Toggle */}
+          {/* Capacity Settings */}
           <button
             onClick={() => setShowSettingsModal(true)}
             style={{
-              padding: '10px 14px', borderRadius: '10px',
+              padding: '9px 14px', borderRadius: '10px',
               border: '1px solid var(--border)', background: 'var(--bg-card)',
-              color: 'var(--text-primary)', fontWeight: '800', fontSize: '13px', cursor: 'pointer',
+              color: 'var(--text-primary)', fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '7px',
             }}
           >
-            ⚙️ Capacity Settings
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Capacity Settings</span>
+          </button>
+
+          {/* Post General Entry to Odoo */}
+          <button
+            onClick={() => { setOdooSyncMsg(''); setForceOdooSync(false); setShowOdooModal(true); }}
+            style={{
+              padding: '9px 15px', borderRadius: '10px',
+              border: odooSyncStatus ? '1.5px solid rgba(16,185,129,0.5)' : '1px solid rgba(14,165,233,0.4)',
+              background: odooSyncStatus ? 'rgba(16,185,129,0.1)' : 'rgba(14,165,233,0.08)',
+              color: odooSyncStatus ? '#10B981' : '#0284C7',
+              fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '7px',
+              boxShadow: 'var(--shadow)',
+            }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
+            <span>{odooSyncStatus ? `Posted to Odoo (${odooSyncStatus.moveName || 'Synced'})` : 'Post General Entry to Odoo'}</span>
           </button>
 
           {/* Refresh Button */}
           <button
             onClick={loadData}
             style={{
-              padding: '10px 14px', borderRadius: '10px',
+              padding: '9px 14px', borderRadius: '10px',
               border: '1px solid var(--border)', background: 'var(--bg-card)',
-              color: 'var(--text-primary)', fontWeight: '800', fontSize: '13px', cursor: 'pointer',
+              color: 'var(--text-primary)', fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '7px',
             }}
           >
-            🔄 Refresh
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            <span>Refresh</span>
           </button>
         </div>
       </div>
+
+      {/* Odoo Synced Notice Pill */}
+      {odooSyncStatus && (
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '8px 16px', borderRadius: '12px',
+          background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)',
+          color: '#10B981', fontSize: '12.5px', fontWeight: '700', marginBottom: '20px',
+        }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Odoo General Entry Confirmed:</span>
+          <span style={{ fontFamily: 'monospace', fontWeight: '800' }}>{odooSyncStatus.moveName}</span>
+          <span>· Gross: ${Number(odooSyncStatus.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+          <span>· Analytic: Navratri 2026</span>
+          {odooSyncStatus.date && <span>· Date: {formatMMDDYYYY(odooSyncStatus.date)}</span>}
+        </div>
+      )}
 
       {/* ── STATS ROW ────────────────────────────────────────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '28px' }}>
@@ -660,7 +761,7 @@ export default function NavratriVendorsDashboard() {
           label="Booths Booked"
           value={totalBoothsBooked}
           accent={GOLD}
-          sub="Across all 11 festival dates"
+          sub="Across all 13 festival dates"
         />
         <StatCard
           label="Confirmed (Paid)"
@@ -678,18 +779,19 @@ export default function NavratriVendorsDashboard() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '18px' }}>
           {/* Search Input */}
-          <div style={{ flex: 1, minWidth: '260px' }}>
+          <div style={{ flex: 1, minWidth: '260px', position: 'relative' }}>
             <input
               type="text"
-              placeholder="🔍 Search vendor, contact, email, phone, spot #, reg number…"
+              placeholder="Search vendor, contact, email, phone, spot #, reg number…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
-                width: '100%', padding: '10px 14px', borderRadius: '10px',
+                width: '100%', padding: '10px 14px 10px 38px', borderRadius: '10px',
                 border: '1.5px solid var(--border)', background: 'var(--bg-input)',
-                color: 'var(--text-primary)', fontSize: '14px', boxSizing: 'border-box',
+                color: 'var(--text-primary)', fontSize: '13px', boxSizing: 'border-box',
               }}
             />
+            <svg style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
 
           {/* Date Filter Dropdown */}
@@ -704,7 +806,7 @@ export default function NavratriVendorsDashboard() {
                 fontWeight: '700', fontSize: '13px', cursor: 'pointer',
               }}
             >
-              <option value="all">📅 All Dates (Master View)</option>
+              <option value="all">All Dates (Master View)</option>
               {FESTIVAL_DATES.map(d => (
                 <option key={d.date} value={d.date}>
                   {d.label} {d.isWeekend ? '($351)' : '($201)'}
@@ -718,40 +820,43 @@ export default function NavratriVendorsDashboard() {
             <button
               onClick={exportCSV}
               style={{
-                padding: '9px 16px', borderRadius: '10px', border: '1px solid var(--border)',
+                padding: '9px 15px', borderRadius: '10px', border: '1px solid var(--border)',
                 background: 'var(--bg-input)', color: 'var(--text-primary)',
-                fontWeight: '800', fontSize: '13px', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: '6px',
+                fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: '7px',
               }}
             >
-              📥 Export CSV
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Export CSV</span>
             </button>
 
             {dateFilter === 'all' ? (
               <button
                 onClick={printFullReport}
                 style={{
-                  padding: '9px 18px', borderRadius: '10px', border: 'none',
+                  padding: '9px 17px', borderRadius: '10px', border: 'none',
                   background: SAFFRON, color: '#FFFFFF',
-                  fontWeight: '800', fontSize: '13px', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: '6px',
+                  fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: '7px',
                   boxShadow: '0 4px 12px rgba(255,107,53,0.3)',
                 }}
               >
-                🖨️ Print Master Report
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                <span>Print Master Report</span>
               </button>
             ) : (
               <button
                 onClick={() => printDayReport(dateFilter)}
                 style={{
-                  padding: '9px 18px', borderRadius: '10px', border: 'none',
+                  padding: '9px 17px', borderRadius: '10px', border: 'none',
                   background: `linear-gradient(135deg, ${SAFFRON} 0%, #D4501F 100%)`, color: '#FFFFFF',
-                  fontWeight: '800', fontSize: '13px', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: '6px',
+                  fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: '7px',
                   boxShadow: '0 4px 12px rgba(255,107,53,0.3)',
                 }}
               >
-                📋 Print Day Roster ({FESTIVAL_DATES.find(d => d.date === dateFilter)?.label.split('—')[0].trim() || 'Day'})
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                <span>Print Day Roster ({FESTIVAL_DATES.find(d => d.date === dateFilter)?.label.split('—')[0].trim() || 'Day'})</span>
               </button>
             )}
           </div>
@@ -807,13 +912,19 @@ export default function NavratriVendorsDashboard() {
         borderRadius: '16px', overflow: 'hidden', boxShadow: 'var(--shadow)',
       }}>
         {loading ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: SAFFRON, fontSize: '16px', fontWeight: '800' }}>
+          <div style={{ padding: '60px', textAlign: 'center', color: SAFFRON, fontSize: '15px', fontWeight: '700' }}>
             Loading Navratri registrations…
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</div>
-            <h3 style={{ fontSize: '18px', fontWeight: '800', margin: '0 0 6px' }}>No registrations match your search</h3>
+            <div style={{
+              width: '48px', height: '48px', borderRadius: '50%', background: 'var(--bg-input)',
+              border: '1px solid var(--border)', margin: '0 auto 12px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)'
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <h3 style={{ fontSize: '17px', fontWeight: '800', margin: '0 0 6px' }}>No registrations match your search</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: 0 }}>Try clearing filters or search terms</p>
           </div>
         ) : (
@@ -851,7 +962,7 @@ export default function NavratriVendorsDashboard() {
                           {reg.registration_number}
                         </div>
                         <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                          {reg.registration_date ? new Date(reg.registration_date).toLocaleDateString() : ''}
+                          {reg.registration_date ? formatMMDDYYYY(reg.registration_date) : ''}
                         </div>
                       </td>
 
@@ -865,7 +976,7 @@ export default function NavratriVendorsDashboard() {
                         </div>
                         {reg.electrical_needed && (
                           <div style={{ fontSize: '11px', fontWeight: '700', color: GOLD, marginTop: '4px' }}>
-                            ⚡ 110V Power Required
+                            110V Power Required
                           </div>
                         )}
                       </td>
@@ -901,7 +1012,7 @@ export default function NavratriVendorsDashboard() {
                               }}
                             >
                               <div>
-                                <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{d.day_label || d.event_date}</span>
+                                <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{d.day_label || formatMMDDYYYY(d.event_date)}</span>
                                 <span style={{ color: 'var(--text-muted)', marginLeft: '4px' }}>({d.booth_count} booth)</span>
                               </div>
                               {/* Inline spot editor */}
@@ -924,7 +1035,7 @@ export default function NavratriVendorsDashboard() {
 
                           {refundedDates.length > 0 && (
                             <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '2px' }}>
-                              ↩ {refundedDates.length} date(s) cancelled/refunded
+                              {refundedDates.length} date(s) cancelled/refunded
                             </div>
                           )}
                         </div>
@@ -956,13 +1067,13 @@ export default function NavratriVendorsDashboard() {
                             disabled={resendingId === reg.registration_number}
                             title="Resend Confirmation Email"
                             style={{
-                              padding: '6px 10px', borderRadius: '8px',
+                              padding: '6px 11px', borderRadius: '8px',
                               border: '1px solid var(--border)', background: 'var(--bg-input)',
                               color: resendStatus[reg.registration_number] ? '#10B981' : 'var(--text-primary)',
                               fontSize: '12px', fontWeight: '700', cursor: 'pointer',
                             }}
                           >
-                            {resendingId === reg.registration_number ? '⏳' : resendStatus[reg.registration_number] ? '✓ Sent' : '📧 Resend'}
+                            {resendingId === reg.registration_number ? 'Sending…' : resendStatus[reg.registration_number] ? 'Sent' : 'Resend'}
                           </button>
 
                           {/* Edit Details */}
@@ -970,12 +1081,12 @@ export default function NavratriVendorsDashboard() {
                             onClick={() => setEditingReg(JSON.parse(JSON.stringify(reg)))}
                             title="Edit Vendor Details & Spots"
                             style={{
-                              padding: '6px 10px', borderRadius: '8px',
+                              padding: '6px 11px', borderRadius: '8px',
                               border: '1px solid var(--border)', background: 'var(--bg-input)',
                               color: 'var(--text-primary)', fontSize: '12px', fontWeight: '700', cursor: 'pointer',
                             }}
                           >
-                            ✏️ Edit
+                            Edit
                           </button>
 
                           {/* Refund Button (if paid) */}
@@ -984,12 +1095,12 @@ export default function NavratriVendorsDashboard() {
                               onClick={() => handleOpenRefundModal(reg)}
                               title="Process Refund (Full or Partial)"
                               style={{
-                                padding: '6px 10px', borderRadius: '8px',
+                                padding: '6px 11px', borderRadius: '8px',
                                 border: '1px solid rgba(245,158,11,0.4)', background: 'rgba(245,158,11,0.1)',
                                 color: '#F59E0B', fontSize: '12px', fontWeight: '700', cursor: 'pointer',
                               }}
                             >
-                              ↩️ Refund
+                              Refund
                             </button>
                           )}
 
@@ -1003,7 +1114,7 @@ export default function NavratriVendorsDashboard() {
                               color: '#EF4444', fontSize: '12px', fontWeight: '700', cursor: 'pointer',
                             }}
                           >
-                            🗑️
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                           </button>
                         </div>
                       </td>
@@ -1239,9 +1350,12 @@ export default function NavratriVendorsDashboard() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div style={{ maxWidth: '440px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
-                ⚙️ Booth Capacity Settings
-              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={SAFFRON} strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+                  Booth Capacity Settings
+                </h2>
+              </div>
               <button onClick={() => setShowSettingsModal(false)} style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
             </div>
 
@@ -1278,6 +1392,124 @@ export default function NavratriVendorsDashboard() {
                 Save Settings
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: ODOO GENERAL ENTRY SYNC ───────────────────────────────────── */}
+      {showOdooModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+          <div style={{ maxWidth: '540px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'rgba(14,165,233,0.1)', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+                    Odoo General Entry
+                  </h3>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500' }}>
+                    Navratri 2026 Vendor Booths Final Settlement
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => setShowOdooModal(false)} style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
+            </div>
+
+            {/* Already Synced Warning */}
+            {odooSyncStatus && !forceOdooSync ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#D97706', fontWeight: '800', fontSize: '14px', marginBottom: '8px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span>Duplicate Blocked: Already Posted to Odoo</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
+                    Event revenue was previously posted to Odoo under journal entry:
+                  </p>
+                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'monospace', fontWeight: '800', fontSize: '13.5px', color: '#0284C7' }}>
+                    <span>{odooSyncStatus.moveName}</span>
+                    <span>${Number(odooSyncStatus.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div style={{ marginTop: '8px', fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                    Reference: {odooSyncStatus.ref || 'NAVRATRI-2026-VENDORS-FINAL'} · Date: {odooSyncStatus.date ? formatMMDDYYYY(odooSyncStatus.date) : 'N/A'}
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+                  To avoid double-counting revenue, posting again is restricted. If you made corrections and strictly require re-posting, use Force Re-sync below.
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
+                    Close
+                  </button>
+                  <button onClick={() => setForceOdooSync(true)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid #D97706', background: 'rgba(245,158,11,0.1)', color: '#D97706', fontWeight: '800', cursor: 'pointer' }}>
+                    Force Re-sync
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {forceOdooSync && (
+                  <div style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(245,158,11,0.1)', border: '1px solid #F59E0B', color: '#D97706', fontSize: '12px', fontWeight: '700' }}>
+                    Force Re-sync mode active. A new General Entry will be created.
+                  </div>
+                )}
+
+                <div style={{ background: 'var(--bg-input)', borderRadius: '14px', padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Event / Analytic Account:</span>
+                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>Navratri 2026</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Odoo Journal:</span>
+                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>MISC (General Operations)</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Paid Vendors:</span>
+                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>{paidRegs.length} vendors</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Credit Revenue (Acct 2007):</span>
+                    <span style={{ fontWeight: '800', color: '#10B981' }}>+${(totalRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Debit CC Fees (Acct 950):</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-muted)' }}>+${(totalRevenue / 100 * 0.029 + paidRegs.length * 0.30).toFixed(2)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Debit HCC Bank (Acct 101401):</span>
+                    <span style={{ fontWeight: '950', color: '#0284C7' }}>${((totalRevenue / 100) - (totalRevenue / 100 * 0.029 + paidRegs.length * 0.30)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.45' }}>
+                  This creates and confirms a balanced General Journal Entry in Odoo tagged with the <strong>Navratri 2026</strong> analytic account. Strict duplicate checks ensure this reference can only be submitted once.
+                </div>
+
+                {odooSyncMsg && (
+                  <div style={{
+                    padding: '10px 14px', borderRadius: '10px', fontSize: '12.5px', fontWeight: '700',
+                    background: odooSyncMsg.startsWith('Success') ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                    color: odooSyncMsg.startsWith('Success') ? '#10B981' : '#EF4444',
+                    border: `1px solid ${odooSyncMsg.startsWith('Success') ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                  }}>
+                    {odooSyncMsg}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
+                    Cancel
+                  </button>
+                  <button onClick={() => handlePostToOdoo(forceOdooSync)} disabled={isSyncingOdoo || paidRegs.length === 0} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: 'none', background: isSyncingOdoo ? 'rgba(14,165,233,0.5)' : 'linear-gradient(135deg, #0284C7, #0369A1)', color: '#FFFFFF', fontWeight: '800', cursor: isSyncingOdoo || paidRegs.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    {isSyncingOdoo ? 'Posting to Odoo...' : 'Confirm & Post General Entry'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,12 +1,6 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
-
 # HCC Standard Form & Registration Architecture Specifications
 
-Every new registration form, admin portal, or event management tool created in this repository MUST strictly follow these standard rules without needing the user to repeat them:
+Every new registration form, admin portal, or event management tool created in this repository MUST strictly follow these standard rules:
 
 ## 1. Date & Time Standards
 - **Strict Format**: Every user-facing date (public forms, date selector cards, admin tables, CSV/PDF/Excel exports, email receipts, and reports) MUST use `MM-DD-YYYY` format (e.g., `10-11-2026`).

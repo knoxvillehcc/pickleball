@@ -902,7 +902,7 @@ export async function sendNavratriVendorConfirmationEmail(reg, dates = []) {
   `).join('');
 
   const htmlBody = `
-    <h2 style="margin:0 0 8px;font-size:22px;color:#FFFFFF;">Namaste, ${reg.contact_name || reg.first_name || 'Vendor'}! 🙏</h2>
+    <h2 style="margin:0 0 8px;font-size:22px;color:#FFFFFF;">Namaste, ${reg.contact_name || reg.first_name || 'Vendor'}!</h2>
     <p style="color:#94A3B8;font-size:14px;margin:0 0 24px;line-height:1.6;">
       Your vendor booth reservation for Navratri 2026 is confirmed. We are excited to welcome <strong style="color:#FFB800;">${reg.business_name || reg.company_name}</strong> to our celebration!
     </p>
@@ -923,7 +923,7 @@ export async function sendNavratriVendorConfirmationEmail(reg, dates = []) {
         ['Email', reg.email],
         ['Phone', reg.phone || '—'],
         ['Address', `${reg.address || ''}, ${reg.city || ''} ${reg.state || ''} ${reg.zip || ''}`.trim() || '—'],
-        ['Electrical Needed', reg.electrical_needed ? '⚡ Yes (110V standard)' : 'No'],
+        ['Electrical Needed', reg.electrical_needed ? 'Yes (110V standard)' : 'No'],
         ['Total Amount Paid', `$${((reg.amount_paid || reg.amount_due || 0) / 100).toFixed(2)}`],
       ].map(([label, value], i) => `
         <tr style="background:${i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'};">
@@ -935,7 +935,7 @@ export async function sendNavratriVendorConfirmationEmail(reg, dates = []) {
 
     <!-- Booked Dates Table -->
     <div style="margin-bottom:24px;">
-      <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#FFB800;text-transform:uppercase;margin-bottom:10px;">📅 Booked Festival Dates (${dates.length} Days)</div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#FFB800;text-transform:uppercase;margin-bottom:10px;">Booked Festival Dates (${dates.length} Days)</div>
       <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:rgba(0,0,0,0.2);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
         <thead>
           <tr style="background:rgba(255,107,53,0.15);border-bottom:1px solid rgba(255,107,53,0.3);">
@@ -964,7 +964,7 @@ export async function sendNavratriVendorConfirmationEmail(reg, dates = []) {
     </div>
   `;
 
-  const subject = `🪔 Navratri 2026 Vendor Booth Confirmed — ${reg.registration_number}`;
+  const subject = `Navratri 2026 Vendor Booth Confirmed — ${reg.registration_number}`;
 
   // Log in email_queue
   try {

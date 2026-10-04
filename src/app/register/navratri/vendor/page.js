@@ -13,28 +13,30 @@ const US_STATES = [
 
 // ── Categories ─────────────────────────────────────────────────────────────────
 const VENDOR_CATEGORIES = [
-  { key: 'clothing',    label: 'Traditional Clothing & Apparel', icon: '👗' },
-  { key: 'jewelry',     label: 'Jewelry & Accessories',          icon: '💎' },
-  { key: 'food',        label: 'Food & Refreshments',             icon: '🍲' },
-  { key: 'henna',       label: 'Henna & Beauty',                 icon: '🎨' },
-  { key: 'handicrafts', label: 'Handicrafts, Puja & Home Decor',  icon: '🪔' },
-  { key: 'services',    label: 'Community Services / Business',   icon: '💼' },
-  { key: 'other',       label: 'Other Merchandise',               icon: '🛍️' },
+  { key: 'clothing',    label: 'Traditional Clothing & Apparel' },
+  { key: 'jewelry',     label: 'Jewelry & Accessories' },
+  { key: 'food',        label: 'Food & Refreshments' },
+  { key: 'henna',       label: 'Henna & Beauty' },
+  { key: 'handicrafts', label: 'Handicrafts, Puja & Home Decor' },
+  { key: 'services',    label: 'Community Services / Business' },
+  { key: 'other',       label: 'Other Merchandise & Retail' },
 ];
 
-// ── Festival Dates ─────────────────────────────────────────────────────────────
+// ── Festival Dates (13 Dates — Format MM-DD-YYYY) ──────────────────────────────
 const FESTIVAL_DATES = [
-  { date: '2026-10-11', dayNum: 1,  name: 'Day 1 — Pratipada',             dayOfWeek: 'Sunday',    isWeekend: false, rate: 201 },
-  { date: '2026-10-12', dayNum: 2,  name: 'Day 2 — Dwitiya',               dayOfWeek: 'Monday',    isWeekend: false, rate: 201 },
-  { date: '2026-10-13', dayNum: 3,  name: 'Day 3 — Tritiya',               dayOfWeek: 'Tuesday',   isWeekend: false, rate: 201 },
-  { date: '2026-10-14', dayNum: 4,  name: 'Day 4 — Chaturthi',             dayOfWeek: 'Wednesday', isWeekend: false, rate: 201 },
-  { date: '2026-10-15', dayNum: 5,  name: 'Day 5 — Panchami',              dayOfWeek: 'Thursday',  isWeekend: false, rate: 201 },
-  { date: '2026-10-16', dayNum: 6,  name: 'Day 6 — Shashthi (Grand Garba)',dayOfWeek: 'Friday',    isWeekend: true,  rate: 351 },
-  { date: '2026-10-17', dayNum: 7,  name: 'Day 7 — Saptami (Grand Garba)', dayOfWeek: 'Saturday',  isWeekend: true,  rate: 351 },
-  { date: '2026-10-18', dayNum: 8,  name: 'Day 8 — Ashtami (Dandiya Night)',dayOfWeek: 'Sunday',   isWeekend: false, rate: 201 },
-  { date: '2026-10-19', dayNum: 9,  name: 'Day 9 — Navami (Maha Aarti)',   dayOfWeek: 'Monday',    isWeekend: false, rate: 201 },
-  { date: '2026-10-20', dayNum: 10, name: 'Day 10 — Vijayadashami',        dayOfWeek: 'Tuesday',   isWeekend: false, rate: 201 },
-  { date: '2026-10-25', dayNum: 11, name: 'Special — Sharad Purnima',      dayOfWeek: 'Sunday',    isWeekend: false, rate: 201 },
+  { date: '2026-10-09', dateFormatted: '10-09-2026', dayNum: 'Extra 1', name: 'Extra Day — Pre-Navratri Garba', dayOfWeek: 'Friday',    isWeekend: true,  rate: 351 },
+  { date: '2026-10-10', dateFormatted: '10-10-2026', dayNum: 'Extra 2', name: 'Extra Day — Pre-Navratri Garba', dayOfWeek: 'Saturday',  isWeekend: true,  rate: 351 },
+  { date: '2026-10-11', dateFormatted: '10-11-2026', dayNum: 1,        name: 'Day 1 — Pratipada',                dayOfWeek: 'Sunday',    isWeekend: false, rate: 201 },
+  { date: '2026-10-12', dateFormatted: '10-12-2026', dayNum: 2,        name: 'Day 2 — Dwitiya',                  dayOfWeek: 'Monday',    isWeekend: false, rate: 201 },
+  { date: '2026-10-13', dateFormatted: '10-13-2026', dayNum: 3,        name: 'Day 3 — Tritiya',                  dayOfWeek: 'Tuesday',   isWeekend: false, rate: 201 },
+  { date: '2026-10-14', dateFormatted: '10-14-2026', dayNum: 4,        name: 'Day 4 — Chaturthi',                dayOfWeek: 'Wednesday', isWeekend: false, rate: 201 },
+  { date: '2026-10-15', dateFormatted: '10-15-2026', dayNum: 5,        name: 'Day 5 — Panchami',                 dayOfWeek: 'Thursday',  isWeekend: false, rate: 201 },
+  { date: '2026-10-16', dateFormatted: '10-16-2026', dayNum: 6,        name: 'Day 6 — Shashthi (Grand Garba)',   dayOfWeek: 'Friday',    isWeekend: true,  rate: 351 },
+  { date: '2026-10-17', dateFormatted: '10-17-2026', dayNum: 7,        name: 'Day 7 — Saptami (Grand Garba)',    dayOfWeek: 'Saturday',  isWeekend: true,  rate: 351 },
+  { date: '2026-10-18', dateFormatted: '10-18-2026', dayNum: 8,        name: 'Day 8 — Ashtami (Dandiya Night)',  dayOfWeek: 'Sunday',    isWeekend: false, rate: 201 },
+  { date: '2026-10-19', dateFormatted: '10-19-2026', dayNum: 9,        name: 'Day 9 — Navami (Maha Aarti)',      dayOfWeek: 'Monday',    isWeekend: false, rate: 201 },
+  { date: '2026-10-20', dateFormatted: '10-20-2026', dayNum: 10,       name: 'Day 10 — Vijayadashami',           dayOfWeek: 'Tuesday',   isWeekend: false, rate: 201 },
+  { date: '2026-10-25', dateFormatted: '10-25-2026', dayNum: 11,       name: 'Special — Sharad Purnima',         dayOfWeek: 'Sunday',    isWeekend: false, rate: 201 },
 ];
 
 const TERMS_AND_CONDITIONS = `HINDU COMMUNITY CENTER OF KNOXVILLE (HCC)
@@ -254,15 +256,29 @@ function NavratriVendorFormContent() {
   const inputBg = isDark ? '#0D0917' : '#F8FAFC';
   const inputBorder = isDark ? '#2D2342' : '#CBD5E1';
 
-  if (!loadingConfig && settings.is_published === false) {
+  const cutoff = new Date('2026-10-25T23:59:59-04:00').getTime();
+  const isPastCutoff = Date.now() > cutoff;
+
+  if (!loadingConfig && (settings.is_published === false || isPastCutoff)) {
     return (
       <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center', color: textPrimary }}>
-        <div style={{ maxWidth: '500px', background: cardBg, padding: '40px', borderRadius: '20px', border: `1px solid ${cardBorder}`, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🪔</div>
-          <h1 style={{ fontSize: '24px', fontWeight: '900', color: saffron, marginBottom: '8px' }}>Vendor Registration Closed</h1>
+        <div style={{ maxWidth: '520px', background: cardBg, padding: '44px 36px', borderRadius: '20px', border: `1px solid ${cardBorder}`, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+          <div style={{
+            width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,107,53,0.15)',
+            border: `1.5px solid ${saffron}`, margin: '0 auto 20px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: saffron,
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          </div>
+          <h1 style={{ fontSize: '24px', fontWeight: '900', color: saffron, marginBottom: '10px' }}>Vendor Registration Closed</h1>
           <p style={{ color: textMuted, fontSize: '15px', lineHeight: 1.6 }}>
-            Navratri 2026 Vendor Booth registrations are currently closed or under maintenance. For inquiries or booth availability, please contact <a href="mailto:knoxvillehcc@gmail.com" style={{ color: gold, fontWeight: '700' }}>knoxvillehcc@gmail.com</a>.
+            {isPastCutoff
+              ? 'Navratri 2026 vendor registrations have concluded for this season. Thank you for your support!'
+              : 'Navratri 2026 Vendor Booth registrations are currently closed. For inquiries or waitlist questions, please contact our temple management.'}
           </p>
+          <div style={{ marginTop: '24px', padding: '14px', background: inputBg, borderRadius: '12px', border: `1px solid ${inputBorder}`, fontSize: '13px', color: textPrimary }}>
+            Email: <a href="mailto:knoxvillehcc@gmail.com" style={{ color: saffron, fontWeight: '700', textDecoration: 'none' }}>knoxvillehcc@gmail.com</a>
+          </div>
         </div>
       </div>
     );
@@ -282,13 +298,13 @@ function NavratriVendorFormContent() {
       }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,184,0,0.15)', border: '1px solid rgba(255,184,0,0.3)', padding: '6px 16px', borderRadius: '99px', fontSize: '12px', fontWeight: '800', color: gold, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '16px' }}>
-            🪔 Knoxville Hindu Community Center
+            Knoxville Hindu Community Center
           </div>
           <h1 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: '950', letterSpacing: '-0.5px', margin: '0 0 10px', lineHeight: 1.2 }}>
             Navratri 2026 Vendor Booths
           </h1>
-          <p style={{ fontSize: '16px', color: '#CBD5E1', maxWidth: '620px', margin: '0 auto 20px', lineHeight: 1.6 }}>
-            Showcase your business, clothing, jewelry, food, or services to over 5,000 community attendees across 11 vibrant festival nights!
+          <p style={{ fontSize: '16px', color: '#CBD5E1', maxWidth: '640px', margin: '0 auto 20px', lineHeight: 1.6 }}>
+            Showcase your business, clothing, jewelry, food, or services to over 5,000 community attendees across all 13 festival dates (Oct 9–20 & Oct 25 Sharad Purnima)!
           </p>
 
           {/* Pricing Highlight Pill */}
@@ -341,16 +357,20 @@ function NavratriVendorFormContent() {
 
         {errorMessage && (
           <div style={{
-            background: 'rgba(239,68,68,0.15)',
-            border: '1px solid rgba(239,68,68,0.4)',
+            background: 'rgba(239,68,68,0.12)',
+            border: '1px solid rgba(239,68,68,0.3)',
             color: '#EF4444',
             borderRadius: '12px',
-            padding: '16px',
+            padding: '14px 18px',
             marginBottom: '24px',
             fontSize: '14px',
             fontWeight: '700',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
           }}>
-            ❌ {errorMessage}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+            <span>{errorMessage}</span>
           </div>
         )}
 
@@ -479,7 +499,7 @@ function NavratriVendorFormContent() {
               <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', color: textMuted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
                 Vendor Category <span style={{ color: saffron }}>*</span>
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
                 {VENDOR_CATEGORIES.map(cat => {
                   const active = formData.category === cat.key;
                   return (
@@ -497,13 +517,19 @@ function NavratriVendorFormContent() {
                         textAlign: 'left',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
+                        gap: '10px',
                         fontWeight: active ? '800' : '600',
                         fontSize: '13px',
                         transition: 'all 0.15s ease',
                       }}
                     >
-                      <span>{cat.icon}</span>
+                      <span style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: active ? saffron : (isDark ? '#6B7280' : '#CBD5E1'),
+                        flexShrink: 0,
+                      }} />
                       <span>{cat.label}</span>
                     </button>
                   );
@@ -534,7 +560,7 @@ function NavratriVendorFormContent() {
                     onChange={e => setFormData({ ...formData, electrical_needed: e.target.checked })}
                     style={{ width: '18px', height: '18px', accentColor: saffron }}
                   />
-                  <span style={{ fontSize: '13px', fontWeight: '700', color: textPrimary }}>⚡ Electrical outlet needed (110V)</span>
+                  <span style={{ fontSize: '13px', fontWeight: '700', color: textPrimary }}>Electrical outlet required (110V Standard)</span>
                 </label>
               </div>
             </div>
@@ -609,14 +635,14 @@ function NavratriVendorFormContent() {
                             {dateItem.dayOfWeek}
                           </span>
                           {dateItem.isWeekend && (
-                            <span style={{ fontSize: '10px', fontWeight: '800', color: saffron, letterSpacing: '0.5px' }}>★ HIGH ATTENDANCE</span>
+                            <span style={{ fontSize: '10px', fontWeight: '800', color: saffron, letterSpacing: '0.5px' }}>PEAK ATTENDANCE</span>
                           )}
                         </div>
                         <div style={{ fontSize: '15px', fontWeight: '900', color: textPrimary }}>
                           {dateItem.name}
                         </div>
-                        <div style={{ fontSize: '12px', color: textMuted }}>
-                          {dateItem.date}
+                        <div style={{ fontSize: '12px', color: textMuted, fontWeight: '700', letterSpacing: '0.3px', marginTop: '2px' }}>
+                          {dateItem.dateFormatted}
                         </div>
                       </div>
 
@@ -630,8 +656,14 @@ function NavratriVendorFormContent() {
 
                     {/* Capacity Badge */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', paddingTop: '10px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#E2E8F0'}` }}>
-                      <div style={{ fontSize: '11px', color: isSoldOut ? '#EF4444' : textMuted, fontWeight: '700' }}>
-                        {isSoldOut ? '🔴 SOLD OUT' : isDisabled ? '⚪ Unavailable' : `Spots: ${Math.max(0, capacity - currentBooked)} remaining`}
+                      <div style={{ fontSize: '11px', fontWeight: '700' }}>
+                        {isSoldOut ? (
+                          <span style={{ color: '#EF4444', background: 'rgba(239,68,68,0.1)', padding: '2px 8px', borderRadius: '4px' }}>Sold Out</span>
+                        ) : isDisabled ? (
+                          <span style={{ color: '#94A3B8', background: 'rgba(148,163,184,0.1)', padding: '2px 8px', borderRadius: '4px' }}>Unavailable</span>
+                        ) : (
+                          <span style={{ color: textMuted }}>{Math.max(0, capacity - currentBooked)} spots remaining</span>
+                        )}
                       </div>
 
                       {!isSoldOut && !isDisabled && (
@@ -650,7 +682,7 @@ function NavratriVendorFormContent() {
                             transition: 'all 0.15s ease',
                           }}
                         >
-                          {isSelected ? '✓ Selected' : '+ Select'}
+                          {isSelected ? 'Selected' : 'Select'}
                         </button>
                       )}
                     </div>

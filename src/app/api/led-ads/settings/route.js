@@ -17,6 +17,11 @@ const SETTINGS_KEY = 'led_ads_is_published';
 let memoryFallback = 'false';
 
 export async function GET() {
+  const cutoff = new Date('2026-10-25T23:59:59-04:00').getTime();
+  if (Date.now() > cutoff) {
+    return NextResponse.json({ success: true, is_published: false, is_past_cutoff: true });
+  }
+
   try {
     const res = await fetch(
       `${URL_()}/rest/v1/indiafest_settings?key=eq.${encodeURIComponent(SETTINGS_KEY)}&select=key,value&limit=1`,
