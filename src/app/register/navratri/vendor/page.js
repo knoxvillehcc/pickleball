@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from '@/components/ClientLayout';
 
@@ -65,7 +65,7 @@ The vendor agrees to indemnify, defend, and hold harmless the Knoxville Hindu Co
 
 By checking the confirmation box below, you certify that you have read, understood, and agreed to adhere to all terms and guidelines outlined above.`;
 
-export default function NavratriVendorRegistrationPage() {
+function NavratriVendorFormContent() {
   const { isDark } = useTheme();
   const searchParams = useSearchParams();
   const wasCancelled = searchParams.get('cancelled') === '1';
@@ -820,5 +820,17 @@ export default function NavratriVendorRegistrationPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function NavratriVendorRegistrationPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', background: '#0B0714', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#FF6B35', fontSize: '18px', fontWeight: '800' }}>Loading…</div>
+      </div>
+    }>
+      <NavratriVendorFormContent />
+    </Suspense>
   );
 }

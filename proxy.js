@@ -47,6 +47,8 @@ function getPageSlug(pathname) {
   if (pathname.startsWith('/pickleball'))       return 'pickleball';
   if (pathname.startsWith('/indiafest/sponsors'))return 'sponsors';
   if (pathname.startsWith('/indiafest'))        return 'indiafest';
+  if (pathname.startsWith('/navratri/vendors')) return 'navratri_vendors';
+  if (pathname.startsWith('/navratri'))         return 'navratri';
   if (pathname.startsWith('/settings/users'))   return 'users';
   if (pathname.startsWith('/settings'))         return 'settings';
   if (pathname.startsWith('/api/auth/users'))   return 'users';
@@ -56,7 +58,7 @@ function getPageSlug(pathname) {
 function hasAccess(allowedPages, slug) {
   if (!allowedPages) return false;
   const pages = Array.isArray(allowedPages) ? allowedPages : JSON.parse(allowedPages);
-  return pages.includes('*') || pages.includes(slug);
+  return pages.includes('*') || pages.includes(slug) || (slug === 'navratri_vendors' && pages.includes('navratri'));
 }
 
 // ── Next.js 16: exported function MUST be named 'proxy' ──────────────────────
