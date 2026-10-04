@@ -840,3 +840,168 @@ export async function sendSponsorConfirmationEmail(reg) {
     }
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Navratri 2026 — Vendor Booth Confirmation Email
+// ─────────────────────────────────────────────────────────────────────────────
+
+function buildNavratriVendorEmail(htmlBody) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Navratri 2026 Vendor Booth Confirmation</title>
+</head>
+<body style="margin:0;padding:0;background:#0F0B1E;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <div style="max-width:640px;margin:32px auto;background:#18122B;border-radius:18px;overflow:hidden;border:1px solid rgba(255,107,53,0.3);box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <!-- Festive Header -->
+    <div style="background:linear-gradient(135deg,#3A0D28 0%,#240A2E 50%,#180820 100%);padding:36px 30px;text-align:center;border-bottom:2px solid #FF6B35;">
+      <div style="font-size:12px;font-weight:800;letter-spacing:3px;color:#FFB800;text-transform:uppercase;margin-bottom:8px;">🪔 Knoxville Hindu Community Center</div>
+      <div style="font-size:36px;font-weight:900;color:#FFFFFF;letter-spacing:-0.5px;line-height:1.15;">Navratri 2026</div>
+      <div style="font-size:18px;font-weight:800;color:#FF6B35;letter-spacing:1px;margin-top:4px;">Vendor Booth Confirmation</div>
+      <div style="margin-top:14px;display:inline-block;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);border-radius:20px;padding:6px 18px;">
+        <span style="font-size:12px;font-weight:800;color:#10B981;letter-spacing:1px;">✓ PAYMENT CONFIRMED</span>
+      </div>
+    </div>
+    <!-- Body -->
+    <div style="padding:32px;">
+      ${htmlBody}
+    </div>
+    <!-- Footer -->
+    <div style="background:rgba(255,107,53,0.06);border-top:1px solid rgba(255,107,53,0.18);padding:22px 30px;text-align:center;">
+      <div style="font-size:12px;color:#94A3B8;margin-bottom:6px;">Questions? Contact the Navratri Committee at</div>
+      <a href="mailto:knoxvillehcc@gmail.com" style="color:#FFB800;font-weight:700;font-size:13px;text-decoration:none;">knoxvillehcc@gmail.com</a>
+      <div style="font-size:11px;color:#64748B;margin-top:12px;">Knoxville Hindu Community Center · 8580 Hickory Creek Rd, Lenoir City, TN 37771</div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Send a vendor booth confirmation email for Navratri 2026.
+ * @param {object} reg - master vendor registration record
+ * @param {Array} dates - array of booked date objects
+ */
+export async function sendNavratriVendorConfirmationEmail(reg, dates = []) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+
+  const dateRows = (dates || []).map((d, i) => `
+    <tr style="background:${i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'transparent'};border-bottom:1px solid rgba(255,255,255,0.06);">
+      <td style="padding:10px 12px;font-size:13px;color:#FFFFFF;font-weight:700;">
+        ${d.day_label || d.event_date}
+        ${d.is_weekend ? '<span style="margin-left:6px;font-size:10px;background:rgba(255,107,53,0.2);color:#FF6B35;padding:2px 6px;border-radius:4px;">Weekend</span>' : '<span style="margin-left:6px;font-size:10px;background:rgba(255,184,0,0.2);color:#FFB800;padding:2px 6px;border-radius:4px;">Weekday</span>'}
+      </td>
+      <td style="padding:10px 12px;font-size:13px;color:#CBD5E1;text-align:center;font-weight:700;">${d.booth_count || 1}</td>
+      <td style="padding:10px 12px;font-size:13px;color:#CBD5E1;text-align:right;">$${((d.rate_cents || 0) / 100).toFixed(0)}</td>
+      <td style="padding:10px 12px;font-size:13px;color:#10B981;font-weight:800;text-align:right;">$${((d.total_cents || 0) / 100).toFixed(0)}</td>
+      <td style="padding:10px 12px;font-size:12px;color:#FFB800;font-weight:700;text-align:right;">${d.booth_spot_number || 'TBD'}</td>
+    </tr>
+  `).join('');
+
+  const htmlBody = `
+    <h2 style="margin:0 0 8px;font-size:22px;color:#FFFFFF;">Namaste, ${reg.contact_name || reg.first_name || 'Vendor'}! 🙏</h2>
+    <p style="color:#94A3B8;font-size:14px;margin:0 0 24px;line-height:1.6;">
+      Your vendor booth reservation for Navratri 2026 is confirmed. We are excited to welcome <strong style="color:#FFB800;">${reg.business_name || reg.company_name}</strong> to our celebration!
+    </p>
+
+    <!-- Reg Number Box -->
+    <div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.35);border-radius:12px;padding:18px;text-align:center;margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#94A3B8;text-transform:uppercase;margin-bottom:6px;">Vendor Registration Number</div>
+      <div style="font-family:monospace;font-size:26px;font-weight:900;color:#FF6B35;letter-spacing:3px;">${reg.registration_number}</div>
+      <div style="font-size:12px;color:#64748B;margin-top:6px;">Please present this number at check-in on each scheduled event day</div>
+    </div>
+
+    <!-- Vendor Information -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px;">
+      ${[
+        ['Business Name', reg.business_name || reg.company_name || '—'],
+        ['Contact Person', reg.contact_name || `${reg.first_name || ''} ${reg.last_name || ''}`.trim() || '—'],
+        ['Category', (reg.category || 'Merchandise').toUpperCase()],
+        ['Email', reg.email],
+        ['Phone', reg.phone || '—'],
+        ['Address', `${reg.address || ''}, ${reg.city || ''} ${reg.state || ''} ${reg.zip || ''}`.trim() || '—'],
+        ['Electrical Needed', reg.electrical_needed ? '⚡ Yes (110V standard)' : 'No'],
+        ['Total Amount Paid', `$${((reg.amount_paid || reg.amount_due || 0) / 100).toFixed(2)}`],
+      ].map(([label, value], i) => `
+        <tr style="background:${i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'};">
+          <td style="padding:9px 12px;font-size:11px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.7px;width:38%;border-bottom:1px solid rgba(255,255,255,0.05);">${label}</td>
+          <td style="padding:9px 12px;font-size:13px;color:#F1F5F9;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);">${value}</td>
+        </tr>
+      `).join('')}
+    </table>
+
+    <!-- Booked Dates Table -->
+    <div style="margin-bottom:24px;">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#FFB800;text-transform:uppercase;margin-bottom:10px;">📅 Booked Festival Dates (${dates.length} Days)</div>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:rgba(0,0,0,0.2);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
+        <thead>
+          <tr style="background:rgba(255,107,53,0.15);border-bottom:1px solid rgba(255,107,53,0.3);">
+            <th style="padding:10px 12px;text-align:left;font-size:11px;color:#FFB800;font-weight:800;text-transform:uppercase;">Date</th>
+            <th style="padding:10px 12px;text-align:center;font-size:11px;color:#FFB800;font-weight:800;text-transform:uppercase;">Booths</th>
+            <th style="padding:10px 12px;text-align:right;font-size:11px;color:#FFB800;font-weight:800;text-transform:uppercase;">Rate</th>
+            <th style="padding:10px 12px;text-align:right;font-size:11px;color:#FFB800;font-weight:800;text-transform:uppercase;">Total</th>
+            <th style="padding:10px 12px;text-align:right;font-size:11px;color:#FFB800;font-weight:800;text-transform:uppercase;">Spot #</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${dateRows}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Event Day Instructions -->
+    <div style="background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.2);border-radius:12px;padding:18px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#FFB800;text-transform:uppercase;margin-bottom:10px;">Event Day Information</div>
+      <div style="font-size:12px;color:#CBD5E1;line-height:1.6;margin-bottom:8px;">
+        • <strong>Setup Time:</strong> 5:30 PM – 6:45 PM on your booked event days.<br/>
+        • <strong>Event Hours:</strong> 7:00 PM – 11:00 PM.<br/>
+        • <strong>Check-in:</strong> Check in at the entrance desk with Registration #${reg.registration_number}.<br/>
+        • <strong>Cleanup:</strong> Vendors are responsible for cleaning their booth space at the end of each evening.
+      </div>
+    </div>
+  `;
+
+  const subject = `🪔 Navratri 2026 Vendor Booth Confirmed — ${reg.registration_number}`;
+
+  // Log in email_queue
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/email_queue`, {
+      method: 'POST',
+      headers: {
+        'apikey': KEY,
+        'Authorization': `Bearer ${KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        registration_id: reg.id || null,
+        to_email: reg.email,
+        subject,
+        body_html: htmlBody,
+        status: 'pending',
+        attempts: 0,
+      }),
+    });
+  } catch (err) {
+    console.error('[Navratri Vendor Email Queue] Failed to queue:', err.message);
+  }
+
+  // Attempt direct dispatch
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `"HCC Navratri 2026" <${process.env.GMAIL_USER}>`,
+      to: reg.email,
+      subject,
+      html: buildNavratriVendorEmail(htmlBody),
+    });
+    console.log(`[Navratri Vendor Email] ✅ Confirmation sent to ${reg.email}`);
+    return { success: true };
+  } catch (err) {
+    console.error(`[Navratri Vendor Email] ❌ Failed to send to ${reg.email}:`, err.message);
+    return { success: false, error: err.message };
+  }
+}
+

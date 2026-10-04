@@ -86,6 +86,7 @@ export default function NavratriDashboard() {
       <div style={{ display: 'flex', gap: spacing.sm, marginBottom: spacing.lg, flexWrap: 'wrap' }}>
         {[
           { href: '/navratri/orders', icon: '🎫', label: 'Orders' },
+          { href: '/navratri/vendors', icon: '🎪', label: 'Vendor Booths' },
           { href: '/navratri/members', icon: '👥', label: 'Members' },
           { href: '/navratri/manual', icon: '📝', label: 'Manual Issue' },
           { href: '/navratri/accounting', icon: '💰', label: 'Accounting' },

@@ -81,7 +81,37 @@ export async function POST(request) {
       const session = event.data.object;
       const meta = session.metadata || {};
 
-      // Only process navratri events
+      // Handle Navratri Vendor Booths
+      if (meta.source === 'navratri_vendor') {
+        const regNumber = meta.registration_number;
+        const amountPaid = (session.amount_total || 0) / 100;
+        const stripeRef = session.id;
+
+        if (await isProcessed(event.id)) {
+          return NextResponse.json({ received: true, status: 'already_processed' });
+        }
+
+        const { getVendorRegistrationByNumber, updateVendorRegistration } = await import('@/lib/navratriVendorDb');
+        const reg = await getVendorRegistrationByNumber(regNumber);
+        if (reg && reg.payment_status !== 'paid') {
+          await updateVendorRegistration(reg.id, {
+            payment_status: 'paid',
+            amount_paid: Math.round(amountPaid * 100),
+            stripe_payment_ref: stripeRef,
+            updated_at: new Date().toISOString(),
+          });
+          try {
+            const { sendNavratriVendorConfirmationEmail } = await import('@/lib/emailService');
+            await sendNavratriVendorConfirmationEmail(reg, reg.dates || []);
+          } catch (e) {
+            console.error('[navratri/webhook] Vendor email error:', e.message);
+          }
+          await logWebhook(event.id, regNumber, 'processed: vendor paid');
+        }
+        return NextResponse.json({ received: true });
+      }
+
+      // Only process navratri ticketing orders
       if (meta.source !== 'navratri') {
         return NextResponse.json({ received: true, status: 'not_navratri' });
       }

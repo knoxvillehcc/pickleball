@@ -182,6 +182,25 @@ async function ledAdMarkAsPaid(regNumber, sessionId, amountPaid) {
   return { ...record, payment_status: 'paid', amount_paid: amountPaid * 100, stripe_payment_ref: sessionId };
 }
 
+async function navratriVendorMarkAsPaid(regNumber, sessionId, amountPaid) {
+  const { getVendorRegistrationByNumber, updateVendorRegistration } = await import('@/lib/navratriVendorDb');
+  const reg = await getVendorRegistrationByNumber(regNumber);
+  if (!reg) {
+    console.warn(`[Webhook] Navratri vendor registration ${regNumber} not found`);
+    return null;
+  }
+  if (reg.payment_status === 'paid') return 'already_paid';
+
+  const updated = await updateVendorRegistration(reg.id, {
+    payment_status: 'paid',
+    amount_paid: Math.round(amountPaid * 100),
+    stripe_payment_ref: sessionId,
+    updated_at: new Date().toISOString(),
+  });
+
+  return { ...reg, ...updated, dates: reg.dates };
+}
+
 
 async function isWebhookProcessed(webhookId) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -376,6 +395,33 @@ export async function POST(request) {
         await logWebhook(event.id, regNumber, 'processed: LED ad paid + upload link sent');
       } else {
         await logWebhook(event.id, regNumber, 'failed: LED ad registration not found');
+      }
+
+      return NextResponse.json({ received: true });
+    }
+
+    // ── Route: Navratri 2026 Vendor Booth ─────────────────────────────────────
+    if (meta.source === 'navratri_vendor') {
+      console.log(`[Webhook] Navratri Vendor payment for ${regNumber} — $${amountPaid}`);
+
+      const vendorReg = await navratriVendorMarkAsPaid(regNumber, stripeRef, amountPaid);
+
+      if (vendorReg === 'already_paid') {
+        console.log(`[Webhook] Navratri Vendor ${regNumber} already paid. Skipping.`);
+        await logWebhook(event.id, regNumber, 'ignored: navratri vendor already paid');
+        return NextResponse.json({ received: true, ignored: true, reason: 'Vendor already paid' });
+      }
+
+      if (vendorReg) {
+        try {
+          const { sendNavratriVendorConfirmationEmail } = await import('@/lib/emailService');
+          await sendNavratriVendorConfirmationEmail(vendorReg, vendorReg.dates || []);
+        } catch (emailErr) {
+          console.error('[Webhook] Failed to send Navratri vendor confirmation email:', emailErr.message);
+        }
+        await logWebhook(event.id, regNumber, 'processed: navratri vendor paid + email sent');
+      } else {
+        await logWebhook(event.id, regNumber, 'failed: navratri vendor registration not found');
       }
 
       return NextResponse.json({ received: true });
