@@ -364,8 +364,8 @@ export async function manualAdjustment(eventId, odooPartnerId, adjustment, reaso
  */
 export function getPrice(event, ticketType) {
   const prices = {
-    daily_member:    (event.price_general_daily || 2000) / 100,
-    daily_guest:     (event.price_pioneer_guest_daily || 2000) / 100,
+    daily_member:    (event.price_general_daily || 3000) / 100,
+    daily_guest:     (event.price_pioneer_guest_daily || 3000) / 100,
     daily_nonmember: (event.price_nonmember_daily || 3000) / 100,
     combo:           (event.price_combo || 35000) / 100,
     pioneer_free:    0,
@@ -379,8 +379,8 @@ export function getPrice(event, ticketType) {
 export function lockPrices(event) {
   return {
     locked_at: new Date().toISOString(),
-    daily_member:    (event.price_general_daily || 2000) / 100,
-    daily_guest:     (event.price_pioneer_guest_daily || 2000) / 100,
+    daily_member:    (event.price_general_daily || 3000) / 100,
+    daily_guest:     (event.price_pioneer_guest_daily || 3000) / 100,
     daily_nonmember: (event.price_nonmember_daily || 3000) / 100,
     combo:           (event.price_combo || 35000) / 100,
     pioneer_free:    0,

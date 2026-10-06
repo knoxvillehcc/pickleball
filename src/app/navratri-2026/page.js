@@ -151,8 +151,8 @@ export default function NavratriPublicPage() {
     let total = 0;
     for (const [dateId, qty] of Object.entries(selectedDates)) {
       let price;
-      if (customerType === 'general') price = (event.price_general_daily || 2000) / 100;
-      else if (customerType === 'pioneer') price = (event.price_pioneer_guest_daily || 2000) / 100;
+      if (customerType === 'general') price = (event.price_general_daily || 3000) / 100;
+      else if (customerType === 'pioneer') price = (event.price_pioneer_guest_daily || 3000) / 100;
       else price = (event.price_nonmember_daily || 3000) / 100;
       total += price * qty;
     }
@@ -413,7 +413,7 @@ export default function NavratriPublicPage() {
                     <div style={{ ...type.caption, color: c.muted, marginTop: '2px' }}>Up to 2 per event date</div>
                   </div>
                   <div style={{ ...type.tabletNum, color: c.accent }}>
-                    ${customerType === 'non_member' ? ((event?.price_nonmember_daily || 3000) / 100) : ((event?.price_general_daily || 2000) / 100)}<span style={{ ...type.caption, color: c.muted }}>/ea</span>
+                    ${customerType === 'non_member' ? ((event?.price_nonmember_daily || 3000) / 100) : ((event?.price_general_daily || 3000) / 100)}<span style={{ ...type.caption, color: c.muted }}>/ea</span>
                   </div>
                 </div>
 
@@ -518,7 +518,7 @@ export default function NavratriPublicPage() {
                 const d = dates.find(dd => dd.id === parseInt(dateId));
                 const price = customerType === 'non_member'
                   ? (event?.price_nonmember_daily || 3000) / 100
-                  : (event?.price_general_daily || 2000) / 100;
+                  : (event?.price_general_daily || 3000) / 100;
                 return (
                   <div key={dateId} style={{ display: 'flex', justifyContent: 'space-between', padding: `${spacing.md}px 0`, borderBottom: `1px solid ${c.border}` }}>
                     <span style={type.body}>{d?.label} × {qty}</span>

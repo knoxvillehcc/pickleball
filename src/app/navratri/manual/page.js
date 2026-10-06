@@ -48,7 +48,7 @@ export default function ManualIssuePage() {
     if (!event || form.paymentMethod === 'complimentary') return 0;
     if (form.orderType === 'combo') return (event.price_combo || 35000) / 100;
     let total = 0;
-    const price = form.customerType === 'non_member' ? (event.price_nonmember_daily || 3000) / 100 : (event.price_general_daily || 2000) / 100;
+    const price = form.customerType === 'non_member' ? (event.price_nonmember_daily || 3000) / 100 : (event.price_general_daily || 3000) / 100;
     Object.values(form.selectedDates).forEach(qty => { total += price * qty; });
     return total;
   };
