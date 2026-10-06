@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 const card = {
   backgroundColor: 'var(--bg-card)',
@@ -49,7 +50,7 @@ export default function BannerPage() {
     finally { setLoading(false); }
   };
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     if (!results || !results.length) return;
     try {
       const doc     = new jsPDF('landscape');
@@ -109,7 +110,7 @@ export default function BannerPage() {
         },
       });
 
-      doc.save('Banner_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Banner_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 

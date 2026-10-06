@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const C = {
@@ -242,7 +243,7 @@ export default function IndiafestVendorDashboard() {
   }
 
   // ── PDF export (client-side) ──────────────────────────────────────────────
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     try {
       const doc = new jsPDF('landscape');
       const dateStr = new Date().toLocaleDateString();
@@ -288,7 +289,7 @@ export default function IndiafestVendorDashboard() {
         margin: { top: 10, bottom: 10, left: 14, right: 14 },
       });
 
-      doc.save(`IndiaFest_Vendors_${new Date().toISOString().split('T')[0]}.pdf`);
+      await exportPdfWithNativeShare(doc, `IndiaFest_Vendors_${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (err) {
       alert('PDF generation error: ' + err.message);
     }

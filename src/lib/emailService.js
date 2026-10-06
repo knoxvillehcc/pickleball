@@ -1005,3 +1005,120 @@ export async function sendNavratriVendorConfirmationEmail(reg, dates = []) {
   }
 }
 
+/**
+ * Send an LED Ad registration confirmation email after successful payment.
+ */
+export async function sendLedAdConfirmationEmail(reg) {
+  const htmlBody = `
+    <h2 style="margin:0 0 8px;font-size:24px;color:#FFFFFF;">Registration Confirmed! 🎉</h2>
+    <p style="color:#CBD5E1;font-size:15px;margin:0 0 24px;line-height:1.6;">
+      Thank you for registering <strong style="color:#FF9933;">${reg.business_name}</strong> for LED Screen Advertising during Navratri 2026 at the Knoxville Hindu Community Center!
+    </p>
+
+    <div style="background:rgba(255,153,51,0.08);border:1px solid rgba(255,153,51,0.3);border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#94A3B8;text-transform:uppercase;margin-bottom:8px;">Registration Number</div>
+      <div style="font-family:monospace;font-size:28px;font-weight:900;color:#FF9933;letter-spacing:3px;">${reg.registration_number}</div>
+      <div style="font-size:12px;color:#94A3B8;margin-top:6px;">Amount Paid: $${((reg.amount_paid || 0) / 100).toFixed(2)}</div>
+    </div>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px;">
+      ${[
+        ['Business Name', reg.business_name],
+        ['Contact Name',  reg.contact_name],
+        ['Email',         reg.email],
+        ['Phone',         reg.phone || '—'],
+        ['Ad Description',reg.ad_description || '—'],
+        ['Graphic Status',reg.graphic_received || reg.media_url ? 'Received ✅' : 'Pending upload / artwork'],
+      ].map(([label, value], i) => `
+      <tr style="background:${i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'transparent'};">
+        <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;width:40%;border-bottom:1px solid rgba(255,255,255,0.06);">${label}</td>
+        <td style="padding:10px 14px;font-size:14px;color:#F1F5F9;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">${value}</td>
+      </tr>`).join('')}
+    </table>
+
+    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;color:#CBD5E1;font-size:13px;line-height:1.6;">
+      <strong style="color:#FFFFFF;">Next Steps:</strong> If you haven't uploaded your final digital ad graphics yet, please email your 1920x1080 banner or video clip to <a href="mailto:knoxvillehcc@gmail.com" style="color:#FF9933;">knoxvillehcc@gmail.com</a>.
+    </div>
+  `;
+
+  const subject = `📺 LED Screen Ad Confirmed — ${reg.business_name} (${reg.registration_number})`;
+
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `"HCC Navratri 2026" <${process.env.GMAIL_USER}>`,
+      to: reg.email,
+      subject,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <body style="margin:0;padding:24px;background:#0F172A;font-family:Arial,sans-serif;color:#F8FAFC;">
+          <div style="max-width:600px;margin:0 auto;background:#1E293B;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);padding:32px;">
+            <div style="text-align:center;margin-bottom:24px;">
+              <div style="font-size:12px;font-weight:800;color:#FF9933;letter-spacing:2px;text-transform:uppercase;">Knoxville Hindu Community Center</div>
+              <h1 style="margin:8px 0 0;font-size:24px;color:#FFFFFF;">📺 LED Screen Advertising</h1>
+            </div>
+            ${htmlBody}
+          </div>
+        </body>
+        </html>
+      `,
+    });
+    console.log(`[LED Ad Email] ✅ Confirmation sent to ${reg.email}`);
+    return { success: true };
+  } catch (err) {
+    console.error(`[LED Ad Email] ❌ Failed to send to ${reg.email}:`, err.message);
+    throw err;
+  }
+}
+
+/**
+ * Send an LED Ad payment link reminder email for pending registrations.
+ */
+export async function sendLedAdPaymentLinkEmail(reg, paymentUrl) {
+  const subject = `⏳ Complete Your LED Screen Ad Registration — ${reg.business_name} (${reg.registration_number})`;
+  const payLink = paymentUrl || `${process.env.NEXT_PUBLIC_BASE_URL || 'https://knoxvillehcc.org'}/register/led-ads?reg=${reg.registration_number}`;
+
+  const htmlBody = `
+    <h2 style="margin:0 0 8px;font-size:24px;color:#FFFFFF;">Complete Your Payment ⏳</h2>
+    <p style="color:#CBD5E1;font-size:15px;margin:0 0 24px;line-height:1.6;">
+      Dear ${reg.contact_name || reg.business_name},<br/><br/>
+      Thank you for your interest in LED Screen Advertising for Navratri 2026. Your spot has been reserved under registration number <strong style="color:#FF9933;">${reg.registration_number}</strong>.
+    </p>
+
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${payLink}" style="display:inline-block;background:#FF9933;color:#000000;font-weight:800;font-size:16px;padding:14px 32px;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(255,153,51,0.4);">
+        💳 Complete Payment ($${((reg.amount_due || 150000) / 100).toFixed(2)})
+      </a>
+    </div>
+
+    <p style="font-size:13px;color:#94A3B8;text-align:center;">
+      If the button above does not work, copy and paste this link in your browser:<br/>
+      <a href="${payLink}" style="color:#FF9933;">${payLink}</a>
+    </p>
+  `;
+
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `"HCC Navratri 2026" <${process.env.GMAIL_USER}>`,
+      to: reg.email,
+      subject,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <body style="margin:0;padding:24px;background:#0F172A;font-family:Arial,sans-serif;color:#F8FAFC;">
+          <div style="max-width:600px;margin:0 auto;background:#1E293B;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);padding:32px;">
+            ${htmlBody}
+          </div>
+        </body>
+        </html>
+      `,
+    });
+    console.log(`[LED Ad Email] ✅ Payment link sent to ${reg.email}`);
+    return { success: true };
+  } catch (err) {
+    console.error(`[LED Ad Email] ❌ Failed to send to ${reg.email}:`, err.message);
+    throw err;
+  }
+}

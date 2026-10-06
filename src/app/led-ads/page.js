@@ -1,5 +1,8 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 function formatMMDDYYYY(d) {
   if (!d) return '—';
@@ -31,6 +34,9 @@ export default function LedAdsAdminPage() {
   const [isSyncingOdoo, setIsSyncingOdoo] = useState(false);
   const [odooSyncMsg, setOdooSyncMsg] = useState('');
   const [forceOdooSync, setForceOdooSync] = useState(false);
+  const [editingReg, setEditingReg] = useState(null);
+  const [resendingId, setResendingId] = useState(null);
+  const [resendDone, setResendDone] = useState({});
 
   const fetchRegistrations = useCallback(async () => {
     try {
@@ -136,6 +142,28 @@ export default function LedAdsAdminPage() {
     }
   };
 
+  const handleResendEmail = async (reg) => {
+    setResendingId(reg.registration_number);
+    try {
+      const res = await fetch('/api/led-ads/resend-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registration_number: reg.registration_number }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setResendDone(prev => ({ ...prev, [reg.registration_number]: true }));
+        setTimeout(() => setResendDone(prev => ({ ...prev, [reg.registration_number]: false })), 3000);
+      } else {
+        alert('Failed to send email: ' + (data.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert('Error sending email: ' + e.message);
+    } finally {
+      setResendingId(null);
+    }
+  };
+
   const filtered = registrations.filter(r => {
     if (filter === 'paid' && r.payment_status !== 'paid') return false;
     if (filter === 'pending' && r.payment_status !== 'pending') return false;
@@ -158,35 +186,56 @@ export default function LedAdsAdminPage() {
   const graphicMissing = registrations.filter(r => r.payment_status === 'paid' && !r.graphic_received && !r.media_url).length;
   const graphicReceived = registrations.filter(r => r.graphic_received || r.media_url).length;
 
-  const exportPDF = (withPrices = true) => {
-    const rows = filtered.map((r, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${r.registration_number}</td>
-        <td>${r.business_name}</td>
-        <td>${r.contact_name}</td>
-        <td>${r.email}</td>
-        <td>${r.phone}</td>
-        <td>${formatMMDDYYYY(r.registration_date)}</td>
-        <td>${r.ad_description || '—'}</td>
-        <td style="text-transform:capitalize">${r.payment_status}</td>
-        ${withPrices ? `<td>$${((r.amount_paid || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>` : ''}
-      </tr>
-    `).join('');
+  const exportPDF = async (withPrices = true) => {
+    try {
+      const doc = new jsPDF('landscape');
+      const dateStr = new Date().toLocaleDateString();
+      const timeStr = new Date().toLocaleTimeString();
 
-    const html = `<!DOCTYPE html><html><head><title>LED Screen Ads Report</title>
-    <style>body{font-family:'Inter',system-ui,sans-serif;margin:24px;color:#0F172A}table{width:100%;border-collapse:collapse;font-size:11px}
-    th,td{border:1px solid #CBD5E1;padding:7px 9px;text-align:left}th{background:#F8FAFC;color:#475569;font-weight:700;font-size:10px;text-transform:uppercase}
-    h1{font-size:18px;margin-bottom:4px;color:#0F172A}p{color:#64748B;font-size:12px;margin-bottom:16px}</style></head>
-    <body><h1>LED Screen Ads — Navratri 2026</h1>
-    <p>Generated: ${formatMMDDYYYY(new Date())} · ${filtered.length} registrations${withPrices ? ` · Total Revenue: $${(totalRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ''}</p>
-    <table><thead><tr><th>#</th><th>Reg #</th><th>Business</th><th>Contact</th><th>Email</th><th>Phone</th><th>Date</th><th>Ad Description</th><th>Status</th>
-    ${withPrices ? '<th>Amount</th>' : ''}</tr></thead><tbody>${rows}</tbody></table></body></html>`;
+      doc.setFontSize(18);
+      doc.setTextColor(255, 153, 51); // #FF9933
+      doc.text('HCC Navratri 2026 — LED Screen Advertisements', 14, 15);
 
-    const win = window.open('', '_blank');
-    win.document.write(html);
-    win.document.close();
-    win.print();
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(`Generated: ${dateStr} ${timeStr}  |  Total Registrations: ${filtered.length}  |  Revenue: $${(totalRevenue / 100).toLocaleString()}`, 14, 22);
+
+      const headRow = withPrices
+        ? ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date', 'Description', 'Status', 'Amount']
+        : ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date', 'Description', 'Status'];
+
+      const tableBody = filtered.map((r, i) => {
+        const row = [
+          (i + 1).toString(),
+          r.registration_number || '',
+          r.business_name || '',
+          r.contact_name || '',
+          r.email || '',
+          r.phone || '',
+          formatMMDDYYYY(r.registration_date),
+          r.ad_description || '—',
+          (r.payment_status || '').toUpperCase(),
+        ];
+        if (withPrices) {
+          row.push(`$${((r.amount_paid || 0) / 100).toFixed(2)}`);
+        }
+        return row;
+      });
+
+      autoTable(doc, {
+        startY: 28,
+        head: [headRow],
+        body: tableBody,
+        theme: 'striped',
+        headStyles: { fillColor: [255, 153, 51] },
+        styles: { fontSize: 8, cellPadding: 2.5 },
+        margin: { top: 10, bottom: 10, left: 14, right: 14 },
+      });
+
+      await exportPdfWithNativeShare(doc, `LED_Ads_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (err) {
+      alert('PDF generation error: ' + err.message);
+    }
   };
 
   const copyPublicUrl = () => {
@@ -425,14 +474,50 @@ export default function LedAdsAdminPage() {
                       </div>
                     </td>
                     <td style={{ padding: '12px 14px' }}>
-                      <button onClick={() => handleDelete(r.id)} style={{
-                        padding: '5px 10px', borderRadius: '6px', border: '1px solid rgba(239,68,68,0.3)',
-                        background: 'rgba(239,68,68,0.06)', color: '#EF4444', fontSize: '11px', fontWeight: '700', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', gap: '4px',
-                      }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        <span>Delete</span>
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                        {/* Edit Button */}
+                        <button
+                          onClick={() => setEditingReg(r)}
+                          title="Edit registration details"
+                          style={{
+                            padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(129,140,248,0.4)',
+                            background: 'rgba(129,140,248,0.08)', color: '#818CF8',
+                            fontWeight: '700', fontSize: '12px', cursor: 'pointer',
+                          }}
+                        >
+                          ✏️ Edit
+                        </button>
+
+                        {/* Resend Button */}
+                        <button
+                          onClick={() => handleResendEmail(r)}
+                          disabled={resendingId === r.registration_number}
+                          title={r.payment_status === 'paid' ? 'Resend confirmation email' : 'Send payment link reminder'}
+                          style={{
+                            padding: '6px 12px', borderRadius: '8px', cursor: resendingId === r.registration_number ? 'not-allowed' : 'pointer',
+                            border: `1px solid ${resendDone[r.registration_number] ? 'rgba(16,185,129,0.5)' : 'rgba(255,153,51,0.4)'}`,
+                            background: resendDone[r.registration_number] ? 'rgba(16,185,129,0.15)' : 'rgba(255,153,51,0.08)',
+                            color: resendDone[r.registration_number] ? '#10B981' : '#FF9933',
+                            fontWeight: '700', fontSize: '12px',
+                          }}
+                        >
+                          {resendingId === r.registration_number
+                            ? '⏳ Sending...'
+                            : resendDone[r.registration_number]
+                            ? '✅ Sent!'
+                            : r.payment_status === 'paid' ? '📧 Resend Receipt' : '💳 Send Link'}
+                        </button>
+
+                        {/* Delete Button */}
+                        <button onClick={() => handleDelete(r.id)} style={{
+                          padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.3)',
+                          background: 'rgba(239,68,68,0.06)', color: '#EF4444', fontSize: '11px', fontWeight: '700', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', gap: '4px',
+                        }}>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -559,6 +644,178 @@ export default function LedAdsAdminPage() {
           </div>
         </div>
       )}
+      {/* Edit Registration Modal */}
+      {editingReg && (
+        <EditLedAdModal
+          reg={editingReg}
+          onClose={() => setEditingReg(null)}
+          onSave={(updated) => {
+            setRegistrations(prev => prev.map(item => item.id === updated.id ? { ...item, ...updated } : item));
+            fetchRegistrations();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function EditLedAdModal({ reg, onClose, onSave }) {
+  const [form, setForm] = useState({
+    business_name: reg.business_name || '',
+    contact_name:  reg.contact_name || '',
+    email:         reg.email || '',
+    phone:         reg.phone || '',
+    address:       reg.address || '',
+    city:          reg.city || '',
+    state:         reg.state || '',
+    zip:           reg.zip || '',
+    ad_description:reg.ad_description || '',
+    payment_status:reg.payment_status || 'pending',
+    amount_paid:   ((reg.amount_paid || 0) / 100).toFixed(2),
+    graphic_received: !!reg.graphic_received,
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError]   = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      const res = await fetch('/api/led-ads/registrations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: reg.id,
+          ...form,
+          amount_paid: parseFloat(form.amount_paid || 0),
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to update registration');
+      onSave(data.record);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputStyle = {
+    width: '100%', padding: '10px 14px', borderRadius: '10px',
+    border: '1px solid var(--border)', background: 'var(--bg-input, #0F172A)',
+    color: 'var(--text-primary)', fontSize: '13px', outline: 'none',
+  };
+  const labelStyle = {
+    display: 'block', fontSize: '11px', fontWeight: '800',
+    color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px'
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 9999, padding: '20px', backdropFilter: 'blur(4px)',
+    }} onClick={onClose}>
+      <div style={{
+        background: 'var(--bg-modal, #1E293B)', border: '1px solid var(--border-modal, rgba(255,255,255,0.1))',
+        borderRadius: '20px', padding: '32px', maxWidth: '600px', width: '100%',
+        maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
+              ✏️ Edit LED Ad Registration
+            </h2>
+            <div style={{ fontSize: '12px', color: '#FF9933', fontFamily: 'monospace', marginTop: '4px' }}>
+              {reg.registration_number}
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
+        </div>
+
+        {error && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', marginBottom: '20px', color: '#FCA5A5', fontSize: '13px' }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={labelStyle}>Business Name</label>
+            <input value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} required style={inputStyle} />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Contact Name</label>
+              <input value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))} required style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Phone</label>
+              <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} required style={inputStyle} />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Email</label>
+            <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required style={inputStyle} />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 2 }}>
+              <label style={labelStyle}>City</label>
+              <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} style={inputStyle} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>State</label>
+              <input value={form.state} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} style={inputStyle} />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Ad Description / Notes</label>
+            <textarea value={form.ad_description} onChange={e => setForm(f => ({ ...f, ad_description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Payment Status</label>
+              <select value={form.payment_status} onChange={e => setForm(f => ({ ...f, payment_status: e.target.value }))} style={inputStyle}>
+                <option value="pending">⏳ Pending</option>
+                <option value="paid">✓ Paid</option>
+                <option value="failed">✗ Failed</option>
+                <option value="refunded">↩ Refunded</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Amount Paid ($)</label>
+              <input type="number" step="0.01" value={form.amount_paid} onChange={e => setForm(f => ({ ...f, amount_paid: e.target.value }))} style={inputStyle} />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0' }}>
+            <input type="checkbox" id="graphic_rcvd" checked={form.graphic_received} onChange={e => setForm(f => ({ ...f, graphic_received: e.target.checked }))} />
+            <label htmlFor="graphic_rcvd" style={{ fontSize: '13px', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: '600' }}>
+              Digital Artwork / Graphic Received
+            </label>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid var(--border)',
+              background: 'transparent', color: 'var(--text-secondary)', fontWeight: '700', cursor: 'pointer',
+            }}>Cancel</button>
+            <button type="submit" disabled={saving} style={{
+              flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
+              background: '#FF9933', color: '#000000', fontWeight: '800', cursor: saving ? 'not-allowed' : 'pointer',
+            }}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

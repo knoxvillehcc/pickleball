@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 // ── Color tokens ──────────────────────────────────────────────────────────────
 const C = {
@@ -385,7 +386,7 @@ export default function PickleballDashboard() {
     }
   };
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     try {
       const doc = new jsPDF('landscape');
       const dateStr = new Date().toLocaleDateString();
@@ -421,7 +422,7 @@ export default function PickleballDashboard() {
         margin: { top: 10, bottom: 10, left: 10, right: 10 },
       });
 
-      doc.save('Pickleball_Registrations_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Pickleball_Registrations_' + dateStr.replace(/\//g, '-') + '.pdf');
     } catch (err) {
       alert('PDF generation error: ' + err.message);
     }

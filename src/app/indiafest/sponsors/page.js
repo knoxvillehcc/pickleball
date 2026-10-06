@@ -1,5 +1,8 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 const GOLD = '#D4AF37';
 
@@ -211,6 +214,50 @@ export default function SponsorDashboard() {
     a.download = `sponsors-${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
   }
+
+  // ── PDF export (client-side) with iPhone native file share ─────────────────
+  const downloadPDF = async () => {
+    try {
+      const doc = new jsPDF('landscape');
+      const dateStr = new Date().toLocaleDateString();
+      const timeStr = new Date().toLocaleTimeString();
+      const userName = currentUser?.name || currentUser?.email || 'Admin';
+
+      doc.setFontSize(18);
+      doc.setTextColor(212, 175, 55); // Gold (#D4AF37)
+      doc.text('India Fest 2026 — Sponsor Registrations', 14, 15);
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(`Printed by: ${userName}  |  Date: ${dateStr} ${timeStr}  |  Total Sponsors: ${filtered.length}`, 14, 22);
+
+      const tableBody = filtered.map(r => [
+        r.registration_number || '',
+        r.tier === 'grand_sponsor' ? 'Grand Sponsor' : 'Basic Sponsor',
+        `${r.first_name || ''} ${r.last_name || ''}`.trim(),
+        r.company_name || '—',
+        r.email || '',
+        r.phone || '—',
+        '$' + ((r.amount_paid || 0) / 100).toFixed(2),
+        (r.payment_status || '').toUpperCase(),
+        r.registration_date ? r.registration_date.split('T')[0] : '—',
+      ]);
+
+      autoTable(doc, {
+        startY: 28,
+        head: [['Reg #', 'Tier', 'Sponsor Name', 'Company', 'Email', 'Phone', 'Amount Paid', 'Status', 'Date']],
+        body: tableBody,
+        theme: 'striped',
+        headStyles: { fillColor: [212, 175, 55], textColor: [26, 18, 0] },
+        styles: { fontSize: 8, cellPadding: 2.5 },
+        margin: { top: 10, bottom: 10, left: 14, right: 14 },
+      });
+
+      await exportPdfWithNativeShare(doc, `IndiaFest_Sponsors_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (err) {
+      alert('PDF generation error: ' + err.message);
+    }
+  };
 
   // ── PDF / Print report ────────────────────────────────────────────────────
   function printReport() {
@@ -434,6 +481,15 @@ export default function SponsorDashboard() {
             fontFamily: 'inherit',
           }}>
             📄 Export CSV
+          </button>
+          <button onClick={downloadPDF} style={{
+            background: 'transparent', border: `1px solid rgba(212,175,55,0.4)`,
+            color: GOLD, fontWeight: '700', fontSize: '13px',
+            padding: '12px 18px', borderRadius: '10px', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+            fontFamily: 'inherit',
+          }}>
+            📄 Export PDF
           </button>
           <button onClick={printReport} style={{
             background: 'transparent', border: `1px solid rgba(99,102,241,0.4)`,
