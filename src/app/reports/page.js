@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 const card = {
   backgroundColor: 'var(--bg-card)',
@@ -27,7 +28,7 @@ export default function ReportsPage() {
       .catch(() => {});
   }, []);
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     try {
       const doc     = new jsPDF('landscape');
       const dateStr = new Date().toLocaleDateString();
@@ -76,11 +77,11 @@ export default function ReportsPage() {
         columnStyles: { 0:{cellWidth:60}, 1:{cellWidth:100}, 2:{cellWidth:40}, 3:{cellWidth:35}, 4:{cellWidth:30,halign:'right'} },
       });
 
-      doc.save('Membership_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Membership_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 
-  const downloadPDFNoPrice = () => {
+  const downloadPDFNoPrice = async () => {
     try {
       const doc     = new jsPDF('landscape');
       const dateStr = new Date().toLocaleDateString();
@@ -129,7 +130,7 @@ export default function ReportsPage() {
         columnStyles: { 0:{cellWidth:70}, 1:{cellWidth:100}, 2:{cellWidth:45}, 3:{cellWidth:40} },
       });
 
-      doc.save('Member_Directory_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Member_Directory_' + dateStr.replace(/\//g, '-') + '.pdf');
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 

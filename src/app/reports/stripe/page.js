@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 const card = {
   backgroundColor: 'var(--bg-card)',
@@ -138,7 +139,7 @@ export default function StripeStatementPage() {
   };
 
   // ── Invoice PDF ───────────────────────────────────────────────────────────
-  const downloadInvoicePDF = () => {
+  const downloadInvoicePDF = async () => {
     if (!invoiceData) return;
     const doc = new jsPDF('landscape');
 
@@ -206,7 +207,7 @@ export default function StripeStatementPage() {
       columnStyles: { 2: { cellWidth: 50 } },
     });
 
-    doc.save(`invoices-${startDate}-to-${endDate}.pdf`);
+    await exportPdfWithNativeShare(doc, `invoices-${startDate}-to-${endDate}.pdf`);
   };
 
   // ── Invoice CSV ───────────────────────────────────────────────────────────
@@ -317,7 +318,7 @@ export default function StripeStatementPage() {
     }
   };
 
-  const downloadFullReportPDF = () => {
+  const downloadFullReportPDF = async () => {
     if (!fullReport) return;
     const doc = new jsPDF('landscape');
     const t = fullReport.totals;
@@ -434,10 +435,10 @@ export default function StripeStatementPage() {
       });
     }
 
-    doc.save(`full-monthly-report-${startDate}-to-${endDate}.pdf`);
+    await exportPdfWithNativeShare(doc, `full-monthly-report-${startDate}-to-${endDate}.pdf`);
   };
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     if (topTab === 'cashcheck' && cashCheckData) return downloadCashCheckPDF();
     if (topTab === 'deposits' && depositData) return downloadDepositPDF();
     if (topTab === 'invoices' && invoiceData) return downloadInvoicePDF();
@@ -480,11 +481,11 @@ export default function StripeStatementPage() {
       headStyles: { fillColor: [15, 23, 42] },
     });
 
-    doc.save(`bank-statement-${startDate}-to-${endDate}.pdf`);
+    await exportPdfWithNativeShare(doc, `bank-statement-${startDate}-to-${endDate}.pdf`);
   };
 
   // ── Deposit Breakdown PDF ─────────────────────────────────────────────────
-  const downloadDepositPDF = () => {
+  const downloadDepositPDF = async () => {
     if (!depositData) return;
     const doc = new jsPDF('landscape');
     const dateStr = fmtDate(new Date().toISOString().split('T')[0]);
@@ -531,7 +532,7 @@ export default function StripeStatementPage() {
       });
     }
 
-    doc.save(`stripe-deposits-${startDate}-to-${endDate}.pdf`);
+    await exportPdfWithNativeShare(doc, `stripe-deposits-${startDate}-to-${endDate}.pdf`);
   };
 
   // ── Deposit Breakdown CSV ─────────────────────────────────────────────────
@@ -594,7 +595,7 @@ export default function StripeStatementPage() {
   };
 
   // ── Cash/Check PDF ─────────────────────────────────────────────────────────
-  const downloadCashCheckPDF = () => {
+  const downloadCashCheckPDF = async () => {
     if (!cashCheckData) return;
     const doc = new jsPDF('landscape');
 
@@ -756,7 +757,7 @@ export default function StripeStatementPage() {
       });
     }
 
-    doc.save(`cash-check-report-${startDate}-to-${endDate}.pdf`);
+    await exportPdfWithNativeShare(doc, `cash-check-report-${startDate}-to-${endDate}.pdf`);
   };
 
   // ── Cash/Check CSV ─────────────────────────────────────────────────────────

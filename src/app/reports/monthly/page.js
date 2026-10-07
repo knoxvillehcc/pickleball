@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 const card = {
   backgroundColor: 'var(--bg-card)',
@@ -53,7 +54,7 @@ export default function MonthlyReportPage() {
   const totalRevenue = Object.values(data.summary).reduce((s, x) => s + x.revenue, 0);
   const monthCount   = Object.keys(data.months).length;
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     try {
       const doc     = new jsPDF('landscape');
       const dateStr = new Date().toLocaleDateString();
@@ -121,7 +122,7 @@ export default function MonthlyReportPage() {
         startY = doc.lastAutoTable.finalY + 10;
       }
 
-      doc.save('Monthly_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Monthly_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 

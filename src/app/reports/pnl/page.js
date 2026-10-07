@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const PERMISSIONS = {
@@ -740,7 +741,7 @@ export default function PnLPage() {
         ? '_' + (data.categories[0]?.catName || '').replace(/[^a-zA-Z0-9]/g, '_').slice(0, 20)
         : '';
       const filename = `HCC_PNL${catFilter}_${startDate}_to_${endDate}.pdf`;
-      doc.save(filename);
+      await exportPdfWithNativeShare(doc, filename);
 
       setPdfModal(false);
       logAudit('export_pdf', { exportType: 'pdf', detailLevel: pdfOptions.detailLevel, fileName: filename });
