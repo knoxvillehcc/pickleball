@@ -97,7 +97,12 @@ export default function OrdersPage() {
   const downloadPDF = async () => {
     try {
       const doc = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
+      const now = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+
+      // Strictly filter out pending or unpaid orders
+      const paidOrders = orders.filter(o => o.payment_status === 'paid');
+      const totalPaidRev = paidOrders.reduce((sum, o) => sum + (parseFloat(o.total_amount) || 0), 0);
 
       doc.setFontSize(18);
       doc.setTextColor(255, 107, 53); // #FF6B35
@@ -105,31 +110,40 @@ export default function OrdersPage() {
 
       doc.setFontSize(9);
       doc.setTextColor(100);
-      doc.text(`Generated: ${dateStr}  |  Total Orders: ${orders.length}`, 14, 22);
+      doc.text(`Generated: ${dateStr}  |  Paid Orders: ${paidOrders.length}  |  Total Revenue: $${totalPaidRev.toFixed(2)}`, 14, 22);
 
-      const tableBody = orders.map(o => [
-        o.order_number || '',
-        o.purchaser_name || '',
-        o.purchaser_phone || '',
-        o.purchaser_email || '',
-        (o.order_type || '').replace('_', ' ').toUpperCase(),
-        (o.payment_method || '').toUpperCase(),
-        '$' + (parseFloat(o.total_amount) || 0).toFixed(2),
-        (o.payment_status || '').toUpperCase(),
-        o.created_at ? new Date(o.created_at).toLocaleDateString() : '',
-      ]);
+      const tableBody = paidOrders.map(o => {
+        let orderDate = '';
+        if (o.created_at) {
+          const d = new Date(o.created_at);
+          if (!isNaN(d.getTime())) {
+            orderDate = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
+          }
+        }
+        return [
+          o.order_number || '',
+          o.purchaser_name || '',
+          o.purchaser_phone || '',
+          o.purchaser_email || '',
+          (o.order_type || '').replace('_', ' ').toUpperCase(),
+          (o.payment_method || '').toUpperCase(),
+          '$' + (parseFloat(o.total_amount) || 0).toFixed(2),
+          'PAID',
+          orderDate,
+        ];
+      });
 
       autoTable(doc, {
         startY: 28,
-        head: [['Order #', 'Name', 'Phone', 'Email', 'Type', 'Method', 'Amount', 'Status', 'Date']],
-        body: tableBody,
+        head: [['Order #', 'Name', 'Phone', 'Email', 'Type', 'Method', 'Amount', 'Status', 'Date (MM-DD-YYYY)']],
+        body: tableBody.length ? tableBody : [['', 'No paid orders found', '', '', '', '', '', '', '']],
         theme: 'striped',
         headStyles: { fillColor: [255, 107, 53] },
         styles: { fontSize: 8, cellPadding: 2.5 },
         margin: { top: 10, bottom: 10, left: 14, right: 14 },
       });
 
-      await exportPdfWithNativeShare(doc, `Navratri_Orders_${new Date().toISOString().split('T')[0]}.pdf`);
+      await exportPdfWithNativeShare(doc, `Navratri_Orders_${dateStr}.pdf`);
     } catch (err) {
       alert('PDF generation error: ' + err.message);
     }

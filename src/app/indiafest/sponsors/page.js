@@ -219,9 +219,13 @@ export default function SponsorDashboard() {
   const downloadPDF = async () => {
     try {
       const doc = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
-      const timeStr = new Date().toLocaleTimeString();
+      const now = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
       const userName = currentUser?.name || currentUser?.email || 'Admin';
+
+      // Strictly filter out pending or unpaid registrations
+      const paidRecords = filtered.filter(r => r.payment_status === 'paid');
 
       doc.setFontSize(18);
       doc.setTextColor(212, 175, 55); // Gold (#D4AF37)
@@ -229,31 +233,43 @@ export default function SponsorDashboard() {
 
       doc.setFontSize(9);
       doc.setTextColor(100);
-      doc.text(`Printed by: ${userName}  |  Date: ${dateStr} ${timeStr}  |  Total Sponsors: ${filtered.length}`, 14, 22);
+      doc.text(`Printed by: ${userName}  |  Date: ${dateStr} ${timeStr}  |  Paid Sponsors: ${paidRecords.length}`, 14, 22);
 
-      const tableBody = filtered.map(r => [
-        r.registration_number || '',
-        r.tier === 'grand_sponsor' ? 'Grand Sponsor' : 'Basic Sponsor',
-        `${r.first_name || ''} ${r.last_name || ''}`.trim(),
-        r.company_name || '—',
-        r.email || '',
-        r.phone || '—',
-        '$' + ((r.amount_paid || 0) / 100).toFixed(2),
-        (r.payment_status || '').toUpperCase(),
-        r.registration_date ? r.registration_date.split('T')[0] : '—',
-      ]);
+      const tableBody = paidRecords.map(r => {
+        let formattedDate = '—';
+        if (r.registration_date) {
+          const d = new Date(r.registration_date);
+          if (!isNaN(d.getTime())) {
+            formattedDate = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
+          } else {
+            const parts = r.registration_date.split('T')[0].split('-');
+            if (parts.length === 3) formattedDate = `${parts[1]}-${parts[2]}-${parts[0]}`;
+          }
+        }
+        return [
+          r.registration_number || '',
+          r.tier === 'grand_sponsor' ? 'Grand Sponsor' : 'Basic Sponsor',
+          `${r.first_name || ''} ${r.last_name || ''}`.trim(),
+          r.company_name || '—',
+          r.email || '',
+          r.phone || '—',
+          '$' + ((r.amount_paid || 0) / 100).toFixed(2),
+          'PAID',
+          formattedDate,
+        ];
+      });
 
       autoTable(doc, {
         startY: 28,
-        head: [['Reg #', 'Tier', 'Sponsor Name', 'Company', 'Email', 'Phone', 'Amount Paid', 'Status', 'Date']],
-        body: tableBody,
+        head: [['Reg #', 'Tier', 'Sponsor Name', 'Company', 'Email', 'Phone', 'Amount Paid', 'Status', 'Date (MM-DD-YYYY)']],
+        body: tableBody.length ? tableBody : [['', 'No paid sponsor registrations found', '', '', '', '', '', '', '']],
         theme: 'striped',
         headStyles: { fillColor: [212, 175, 55], textColor: [26, 18, 0] },
         styles: { fontSize: 8, cellPadding: 2.5 },
         margin: { top: 10, bottom: 10, left: 14, right: 14 },
       });
 
-      await exportPdfWithNativeShare(doc, `IndiaFest_Sponsors_${new Date().toISOString().split('T')[0]}.pdf`);
+      await exportPdfWithNativeShare(doc, `IndiaFest_Sponsors_${dateStr}.pdf`);
     } catch (err) {
       alert('PDF generation error: ' + err.message);
     }
@@ -261,17 +277,28 @@ export default function SponsorDashboard() {
 
   // ── PDF / Print report ────────────────────────────────────────────────────
   function printReport() {
-    const grandPaid = grandRegs.filter(r => r.payment_status === 'paid');
-    const basicPaid = basicRegs.filter(r => r.payment_status === 'paid');
+    // Strictly filter out pending or unpaid registrations for printable report
+    const paidRecords = filtered.filter(r => r.payment_status === 'paid');
+    const grandPaid = paidRecords.filter(r => r.tier === 'grand_sponsor' || r.space_type === 'grand_sponsor');
+    const basicPaid = paidRecords.filter(r => r.tier === 'basic_sponsor' || r.space_type === 'basic_sponsor');
     const grandRevenue = grandPaid.reduce((s, r) => s + (r.amount_paid || 0), 0);
     const basicRevenue = basicPaid.reduce((s, r) => s + (r.amount_paid || 0), 0);
+    const totalPaidRevenue = paidRecords.reduce((s, r) => s + (r.amount_paid || 0), 0);
 
-    const rows = filtered.map(r => {
-      const isBasic = r.space_type === 'basic_sponsor';
+    const now = new Date();
+    const dateFormatted = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+
+    const rows = paidRecords.map(r => {
+      const isBasic = r.space_type === 'basic_sponsor' || r.tier === 'basic_sponsor';
       const tierColor = isBasic ? '#2D7A3A' : '#B8960C';
-      const tierLabel = isBasic ? '🌟 Basic' : '🏆 Grand';
-      const statusColor = r.payment_status === 'paid' ? '#059669' : r.payment_status === 'failed' ? '#DC2626' : '#D97706';
-      const statusLabel = r.payment_status === 'paid' ? '✓ Paid' : r.payment_status === 'failed' ? '✗ Failed' : '⏳ Pending';
+      const tierLabel = isBasic ? 'Basic' : 'Grand';
+      let dateDisplay = '—';
+      if (r.registration_date) {
+        const d = new Date(r.registration_date);
+        if (!isNaN(d.getTime())) {
+          dateDisplay = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
+        }
+      }
       return `
         <tr>
           <td>${r.registration_number || '—'}</td>
@@ -281,8 +308,8 @@ export default function SponsorDashboard() {
           <td>${r.email || '—'}</td>
           <td>${r.phone || '—'}</td>
           <td>$${((r.amount_paid || 0) / 100).toFixed(2)}</td>
-          <td><span style="color:${statusColor};font-weight:700;">${statusLabel}</span></td>
-          <td>${r.registration_date ? new Date(r.registration_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
+          <td><span style="color:#059669;font-weight:700;">✓ Paid</span></td>
+          <td>${dateDisplay}</td>
         </tr>`;
     }).join('');
 
@@ -300,7 +327,7 @@ export default function SponsorDashboard() {
           .header-left p  { font-size: 12px; color: #64748B; margin-top: 3px; }
           .header-right   { text-align: right; font-size: 11px; color: #64748B; }
           .flag { height: 4px; background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); margin-bottom: 24px; border-radius: 2px; }
-          .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+          .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
           .stat { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 12px 14px; border-top: 3px solid #D4AF37; }
           .stat.green { border-top-color: #10B981; }
           .stat.dark-gold { border-top-color: #B8960C; }
@@ -325,30 +352,24 @@ export default function SponsorDashboard() {
         <div class="flag"></div>
         <div class="header">
           <div class="header-left">
-            <h1>🏆 India Fest 2026 — Sponsor Report</h1>
+            <h1>India Fest 2026 — Sponsor Report</h1>
             <p>Knoxville Hindu Community Center · 8580 Hickory Creek Rd, Lenoir City, TN 37771</p>
           </div>
           <div class="header-right">
-            <div style="font-weight:700;font-size:12px;color:#0F172A;">Generated</div>
-            <div>${new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}</div>
-            <div style="margin-top:4px;">${new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</div>
+            <div style="font-weight:700;font-size:12px;color:#0F172A;">Generated: ${dateFormatted}</div>
+            <div style="margin-top:4px;">${now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</div>
           </div>
         </div>
 
         <div class="stats">
-          <div class="stat">
-            <div class="stat-label">Total Sponsors</div>
-            <div class="stat-value">${registrations.length}</div>
-            <div class="stat-sub">${grandRegs.length} grand · ${basicRegs.length} basic</div>
-          </div>
           <div class="stat green">
             <div class="stat-label">Confirmed (Paid)</div>
-            <div class="stat-value">${paid.length}</div>
-            <div class="stat-sub">${pending.length} pending</div>
+            <div class="stat-value">${paidRecords.length}</div>
+            <div class="stat-sub">${grandPaid.length} grand · ${basicPaid.length} basic</div>
           </div>
           <div class="stat">
             <div class="stat-label">Revenue Collected</div>
-            <div class="stat-value">$${(revenue / 100).toLocaleString()}</div>
+            <div class="stat-value">$${(totalPaidRevenue / 100).toLocaleString()}</div>
             <div class="stat-sub">from confirmed sponsors</div>
           </div>
           <div class="stat dark-gold">
@@ -363,15 +384,15 @@ export default function SponsorDashboard() {
           </div>
         </div>
 
-        <div style="font-size:10px;color:#94A3B8;font-weight:600;margin-bottom:8px;">SHOWING ${filtered.length} OF ${registrations.length} REGISTRATIONS${tierFilter !== 'all' ? ` · FILTERED: ${tierFilter === 'grand_sponsor' ? 'GRAND ONLY' : 'BASIC ONLY'}` : ''}${filter !== 'all' ? ` · STATUS: ${filter.toUpperCase()}` : ''}</div>
+        <div style="font-size:10px;color:#94A3B8;font-weight:600;margin-bottom:8px;">SHOWING ${paidRecords.length} CONFIRMED PAID SPONSORS</div>
 
         <table>
           <thead>
             <tr>
-              <th>Reg #</th><th>Tier</th><th>Sponsor Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Amount</th><th>Status</th><th>Date</th>
+              <th>Reg #</th><th>Tier</th><th>Sponsor Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Amount</th><th>Status</th><th>Date (MM-DD-YYYY)</th>
             </tr>
           </thead>
-          <tbody>${rows}</tbody>
+          <tbody>${rows || '<tr><td colspan="9" style="text-align:center;padding:24px;color:#64748B;">No paid sponsor registrations found.</td></tr>'}</tbody>
         </table>
 
         <div class="footer">

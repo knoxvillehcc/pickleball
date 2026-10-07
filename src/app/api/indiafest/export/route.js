@@ -122,17 +122,32 @@ export async function GET(request) {
 
     // ── PDF (print-styled HTML) ────────────────────────────────────────────
     if (format === 'pdf') {
-      const today     = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-      const printTime = new Date().toLocaleTimeString('en-US');
+      const now = new Date();
+      const todayFormatted = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const printTime = now.toLocaleTimeString('en-US');
       const userName  = auth.user?.name || auth.user?.email || 'Admin';
 
-      const tableRows = records.map((r, i) => {
+      // Strictly filter out pending or unpaid registrations for printable report
+      const paidRecords = records.filter(r => r.payment_status === 'paid');
+
+      const tableRows = paidRecords.map((r, i) => {
         const amountPaid = ((r.amount_paid || 0) / 100).toFixed(2);
         const vendorLabel = r.space_type === 'home_business'
           ? 'Small Business from Home'
           : r.space_type === 'established_business'
           ? 'Established Business/Stores'
           : r.space_type || '';
+
+        let formattedDate = '';
+        if (r.registration_date) {
+          const d = new Date(r.registration_date);
+          if (!isNaN(d.getTime())) {
+            formattedDate = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
+          } else {
+            const parts = r.registration_date.split('T')[0].split('-');
+            if (parts.length === 3) formattedDate = `${parts[1]}-${parts[2]}-${parts[0]}`;
+          }
+        }
 
         return `
         <tr style="background:${i % 2 === 0 ? '#FFF8F0' : '#fff'}">
@@ -143,27 +158,23 @@ export async function GET(request) {
           <td>${r.phone || ''}</td>
           <td>${vendorLabel}</td>
           <td style="text-align:center">${r.quantity || 1}</td>
-          <td>${r.registration_date ? r.registration_date.split('T')[0] : ''}</td>
+          <td>${formattedDate}</td>
           <td>
-            <span style="padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;
-              background:${r.payment_status === 'paid' ? '#D1FAE5' : '#FEF3C7'};
-              color:${r.payment_status === 'paid' ? '#065F46' : '#92400E'}">
-              ${r.payment_status || ''}
+            <span style="padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;background:#D1FAE5;color:#065F46">
+              PAID
             </span>
           </td>
           <td style="font-weight:700;color:#059669">$${amountPaid}</td>
         </tr>`;
       }).join('');
 
-      const totalRevenue = records
-        .filter(r => r.payment_status === 'paid')
-        .reduce((s, r) => s + ((r.amount_paid || 0) / 100), 0);
+      const totalRevenue = paidRecords.reduce((s, r) => s + ((r.amount_paid || 0) / 100), 0);
 
       const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8"/>
-  <title>India Fest 2026 Vendor Registrations – ${today}</title>
+  <title>India Fest 2026 Vendor Registrations – ${todayFormatted}</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 40px; color: #1f2937; font-size: 13px; }
     .header { background: linear-gradient(135deg, #FF9933, #E07C1A); color: white; padding: 24px; border-radius: 8px; margin-bottom: 24px; }
@@ -182,23 +193,21 @@ export async function GET(request) {
 </head>
 <body>
   <div class="header">
-    <h1>🇮🇳 India Fest 2026 — Vendor Registrations</h1>
-    <p>Knoxville Hindu Community Center &nbsp;|&nbsp; Printed by: ${userName} on ${today} at ${printTime}</p>
+    <h1>India Fest 2026 — Vendor Registrations</h1>
+    <p>Knoxville Hindu Community Center &nbsp;|&nbsp; Printed by: ${userName} on ${todayFormatted} at ${printTime}</p>
   </div>
   <div class="stats">
-    <div class="stat-box"><div class="label">Total Vendors</div><div class="value">${records.length}</div></div>
-    <div class="stat-box"><div class="label">Paid</div><div class="value">${records.filter(r => r.payment_status === 'paid').length}</div></div>
-    <div class="stat-box"><div class="label">Pending</div><div class="value">${records.filter(r => r.payment_status === 'pending').length}</div></div>
-    <div class="stat-box"><div class="label">Revenue</div><div class="value">$${totalRevenue.toFixed(2)}</div></div>
+    <div class="stat-box"><div class="label">Total Paid Vendors</div><div class="value">${paidRecords.length}</div></div>
+    <div class="stat-box"><div class="label">Total Revenue Collected</div><div class="value">$${totalRevenue.toFixed(2)}</div></div>
   </div>
   <table>
     <thead>
       <tr>
         <th>Reg #</th><th>Name</th><th>Company</th><th>Email</th><th>Phone</th>
-        <th>Vendor Type</th><th>Qty</th><th>Date</th><th>Status</th><th>Amount Paid</th>
+        <th>Vendor Type</th><th>Qty</th><th>Date (MM-DD-YYYY)</th><th>Status</th><th>Amount Paid</th>
       </tr>
     </thead>
-    <tbody>${tableRows}</tbody>
+    <tbody>${tableRows || '<tr><td colspan="10" style="text-align:center;padding:24px;">No paid vendor registrations found.</td></tr>'}</tbody>
   </table>
 </body>
 </html>`;

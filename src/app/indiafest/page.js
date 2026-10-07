@@ -246,9 +246,13 @@ export default function IndiafestVendorDashboard() {
   const downloadPDF = async () => {
     try {
       const doc = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
-      const timeStr = new Date().toLocaleTimeString();
+      const now = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
       const userName = currentUser?.name || currentUser?.email || 'Admin';
+
+      // Strictly filter out pending or unpaid registrations
+      const paidRecords = filtered.filter(r => r.payment_status === 'paid');
 
       doc.setFontSize(18);
       doc.setTextColor(224, 124, 26); // Saffron (#E07C1A)
@@ -256,14 +260,25 @@ export default function IndiafestVendorDashboard() {
 
       doc.setFontSize(9);
       doc.setTextColor(100);
-      doc.text(`Printed by: ${userName}  |  Date: ${dateStr}  |  Time: ${timeStr}  |  Total Vendors: ${filtered.length}`, 14, 22);
+      doc.text(`Printed by: ${userName}  |  Date: ${dateStr}  |  Time: ${timeStr}  |  Paid Vendors: ${paidRecords.length}`, 14, 22);
 
-      const tableBody = filtered.map(r => {
+      const tableBody = paidRecords.map(r => {
         const vendorLabel = r.space_type === 'home_business'
           ? 'Home Business'
           : r.space_type === 'established_business'
           ? 'Established Store'
           : r.space_type || '';
+
+        let formattedDate = '';
+        if (r.registration_date) {
+          const d = new Date(r.registration_date);
+          if (!isNaN(d.getTime())) {
+            formattedDate = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
+          } else {
+            const parts = r.registration_date.split('T')[0].split('-');
+            if (parts.length === 3) formattedDate = `${parts[1]}-${parts[2]}-${parts[0]}`;
+          }
+        }
 
         return [
           r.registration_number || '',
@@ -273,23 +288,23 @@ export default function IndiafestVendorDashboard() {
           r.phone || '',
           vendorLabel,
           r.quantity || 1,
-          r.registration_date ? r.registration_date.split('T')[0] : '',
-          (r.payment_status || '').toUpperCase(),
+          formattedDate,
+          'PAID',
           '$' + ((r.amount_paid || 0) / 100).toFixed(2),
         ];
       });
 
       autoTable(doc, {
         startY: 28,
-        head: [['Reg #', 'Name', 'Company', 'Email', 'Phone', 'Vendor Type', 'Qty', 'Date', 'Status', 'Amount Paid']],
-        body: tableBody,
+        head: [['Reg #', 'Name', 'Company', 'Email', 'Phone', 'Vendor Type', 'Qty', 'Date (MM-DD-YYYY)', 'Status', 'Amount Paid']],
+        body: tableBody.length ? tableBody : [['', 'No paid vendor registrations found', '', '', '', '', '', '', '', '']],
         theme: 'striped',
         headStyles: { fillColor: [224, 124, 26] },
         styles: { fontSize: 8, cellPadding: 2.5 },
         margin: { top: 10, bottom: 10, left: 14, right: 14 },
       });
 
-      await exportPdfWithNativeShare(doc, `IndiaFest_Vendors_${new Date().toISOString().split('T')[0]}.pdf`);
+      await exportPdfWithNativeShare(doc, `IndiaFest_Vendors_${dateStr}.pdf`);
     } catch (err) {
       alert('PDF generation error: ' + err.message);
     }

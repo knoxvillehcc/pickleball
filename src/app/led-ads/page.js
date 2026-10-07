@@ -189,8 +189,13 @@ export default function LedAdsAdminPage() {
   const exportPDF = async (withPrices = true) => {
     try {
       const doc = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
-      const timeStr = new Date().toLocaleTimeString();
+      const now = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
+
+      // Strictly filter out pending or unpaid registrations
+      const paidRecords = filtered.filter(r => r.payment_status === 'paid');
+      const paidRevenue = paidRecords.reduce((s, r) => s + (r.amount_paid || 0), 0);
 
       doc.setFontSize(18);
       doc.setTextColor(255, 153, 51); // #FF9933
@@ -198,13 +203,13 @@ export default function LedAdsAdminPage() {
 
       doc.setFontSize(9);
       doc.setTextColor(100);
-      doc.text(`Generated: ${dateStr} ${timeStr}  |  Total Registrations: ${filtered.length}  |  Revenue: $${(totalRevenue / 100).toLocaleString()}`, 14, 22);
+      doc.text(`Generated: ${dateStr} ${timeStr}  |  Paid Registrations: ${paidRecords.length}  |  Revenue: $${(paidRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 14, 22);
 
       const headRow = withPrices
-        ? ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date', 'Description', 'Status', 'Amount']
-        : ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date', 'Description', 'Status'];
+        ? ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Description', 'Status', 'Amount']
+        : ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Description', 'Status'];
 
-      const tableBody = filtered.map((r, i) => {
+      const tableBody = paidRecords.map((r, i) => {
         const row = [
           (i + 1).toString(),
           r.registration_number || '',
@@ -214,7 +219,7 @@ export default function LedAdsAdminPage() {
           r.phone || '',
           formatMMDDYYYY(r.registration_date),
           r.ad_description || '—',
-          (r.payment_status || '').toUpperCase(),
+          'PAID',
         ];
         if (withPrices) {
           row.push(`$${((r.amount_paid || 0) / 100).toFixed(2)}`);
@@ -225,14 +230,14 @@ export default function LedAdsAdminPage() {
       autoTable(doc, {
         startY: 28,
         head: [headRow],
-        body: tableBody,
+        body: tableBody.length ? tableBody : [['', 'No paid registrations found', '', '', '', '', '', '', ...(withPrices ? ['', ''] : [''])]],
         theme: 'striped',
         headStyles: { fillColor: [255, 153, 51] },
         styles: { fontSize: 8, cellPadding: 2.5 },
         margin: { top: 10, bottom: 10, left: 14, right: 14 },
       });
 
-      await exportPdfWithNativeShare(doc, `LED_Ads_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+      await exportPdfWithNativeShare(doc, `LED_Ads_Report_${dateStr}.pdf`);
     } catch (err) {
       alert('PDF generation error: ' + err.message);
     }

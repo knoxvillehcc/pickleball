@@ -389,40 +389,56 @@ export default function PickleballDashboard() {
   const downloadPDF = async () => {
     try {
       const doc = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
-      const timeStr = new Date().toLocaleTimeString();
+      const now = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
       const userName = currentUser?.name || currentUser?.email || 'Admin';
+
+      // Strictly filter out pending or unpaid registrations
+      const paidRecords = sorted.filter(r => r.payment_status === 'paid');
 
       doc.setFontSize(20);
       doc.text('HCC Pickleball Tournament Registrations', 10, 15);
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Printed by: ${userName}  |  Date: ${dateStr}  |  Time: ${timeStr}`, 10, 22);
+      doc.text(`Printed by: ${userName}  |  Date: ${dateStr}  |  Time: ${timeStr}  |  Paid Registrations: ${paidRecords.length}`, 10, 22);
 
-      const tableBody = sorted.map(r => [
-        r.registration_number || '',
-        r.full_name || '',
-        r.team_name || '',
-        r.partner_name || '',
-        r.email || '',
-        r.phone || '',
-        r.player_type === 'middle_high_school' ? 'Middle School & High School' : 'Adults (18+)',
-        r.registration_date ? r.registration_date.split('T')[0] : '',
-        r.payment_status ? r.payment_status.toUpperCase() : '',
-        '$' + (r.amount_paid || 0).toFixed(2)
-      ]);
+      const tableBody = paidRecords.map(r => {
+        let formattedDate = '';
+        if (r.registration_date) {
+          const d = new Date(r.registration_date);
+          if (!isNaN(d.getTime())) {
+            formattedDate = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
+          } else {
+            const parts = r.registration_date.split('T')[0].split('-');
+            if (parts.length === 3) formattedDate = `${parts[1]}-${parts[2]}-${parts[0]}`;
+          }
+        }
+        return [
+          r.registration_number || '',
+          r.full_name || '',
+          r.team_name || '',
+          r.partner_name || '',
+          r.email || '',
+          r.phone || '',
+          r.player_type === 'middle_high_school' ? 'Middle School & High School' : 'Adults (18+)',
+          formattedDate,
+          'PAID',
+          '$' + (r.amount_paid || 0).toFixed(2)
+        ];
+      });
 
       autoTable(doc, {
         startY: 30,
-        head: [['Reg #', 'Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Category', 'Date', 'Status', 'Amount']],
-        body: tableBody,
+        head: [['Reg #', 'Name', 'Team Name', 'Partner Name', 'Email', 'Phone', 'Category', 'Date (MM-DD-YYYY)', 'Status', 'Amount']],
+        body: tableBody.length ? tableBody : [['', 'No paid registrations found', '', '', '', '', '', '', '', '']],
         theme: 'striped',
         headStyles: { fillColor: [123, 28, 28] }, // Maroon (#7B1C1C)
         styles: { fontSize: 8, cellPadding: 2 },
         margin: { top: 10, bottom: 10, left: 10, right: 10 },
       });
 
-      await exportPdfWithNativeShare(doc, 'Pickleball_Registrations_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Pickleball_Registrations_' + dateStr + '.pdf');
     } catch (err) {
       alert('PDF generation error: ' + err.message);
     }

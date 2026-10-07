@@ -54,17 +54,21 @@ export default function BannerPage() {
     if (!results || !results.length) return;
     try {
       const doc     = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
+      const now     = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+
+      // Strictly filter out unpaid or pending registrations
+      const paidResults = results.filter(r => r.paymentState === 'paid' || r.paymentState === 'in_payment' || r.statusColor === 'green');
 
       doc.setFontSize(20);
-      doc.text('Banner Check-In Report', 10, 15);
+      doc.text('Banner Check-In Report (Paid)', 10, 15);
       doc.setFontSize(11);
       doc.setTextColor(100);
-      doc.text('Generated on: ' + dateStr, 10, 22);
+      doc.text(`Generated on: ${dateStr}  |  Paid Registrations: ${paidResults.length}`, 10, 22);
 
-      const banner2026    = results.filter(r => !r.product.includes('Any'));
-      const bannerAnyStar = results.filter(r =>  r.product.includes('Any'));
-      const totalRev      = results.reduce((s, r) => s + (r.amount || 0), 0);
+      const banner2026    = paidResults.filter(r => !r.product.includes('Any'));
+      const bannerAnyStar = paidResults.filter(r =>  r.product.includes('Any'));
+      const totalRev      = paidResults.reduce((s, r) => s + (r.amount || 0), 0);
 
       autoTable(doc, {
         startY: 30,
@@ -72,7 +76,7 @@ export default function BannerPage() {
         body: [
           ['Yearly Banner 2026',        banner2026.length.toString(),    '$' + banner2026.reduce((s,r)    => s+(r.amount||0),0).toFixed(2)],
           ['Yearly Banner 2026 (Any$)', bannerAnyStar.length.toString(), '$' + bannerAnyStar.reduce((s,r) => s+(r.amount||0),0).toFixed(2)],
-          ['TOTAL COLLECTED',           results.length.toString(),       '$' + totalRev.toFixed(2)],
+          ['TOTAL COLLECTED (PAID)',    paidResults.length.toString(),   '$' + totalRev.toFixed(2)],
         ],
         theme: 'grid',
         headStyles: { fillColor: [15, 23, 42] },
@@ -88,12 +92,19 @@ export default function BannerPage() {
 
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 10,
-        head: [['Customer Name', 'Date', 'Product', 'Amount', 'Payment Taken By', 'Status', 'Invoice Ref']],
-        body: results.map(r => [
-          r.customerName, r.date, r.product,
-          '$' + (r.amount||0).toFixed(2),
-          r.takenBy, r.statusLabel, r.orderId
-        ]),
+        head: [['Customer Name', 'Date (MM-DD-YYYY)', 'Product', 'Amount', 'Payment Taken By', 'Status', 'Invoice Ref']],
+        body: paidResults.length ? paidResults.map(r => {
+          let fDate = r.date || '';
+          if (r.date && r.date.includes('-')) {
+            const parts = r.date.split('-');
+            if (parts.length === 3) fDate = `${parts[1]}-${parts[2]}-${parts[0]}`;
+          }
+          return [
+            r.customerName, fDate, r.product,
+            '$' + (r.amount||0).toFixed(2),
+            r.takenBy, 'Paid', r.orderId
+          ];
+        }) : [['', 'No paid registrations found', '', '', '', '', '']],
         theme: 'striped',
         headStyles: { fillColor: [15, 23, 42] },
         styles: { fontSize: 8, cellPadding: 1.5 },
@@ -110,7 +121,7 @@ export default function BannerPage() {
         },
       });
 
-      await exportPdfWithNativeShare(doc, 'Banner_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Banner_Report_' + dateStr + '.pdf');
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 

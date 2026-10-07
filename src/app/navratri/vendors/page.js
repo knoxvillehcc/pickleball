@@ -452,10 +452,12 @@ export default function NavratriVendorsDashboard() {
 
   // Print Full Festival Report
   const printFullReport = () => {
-    const rowsHtml = filtered.map(r => {
+    // Strictly filter out pending or unpaid registrations
+    const paidOnly = filtered.filter(r => (r.payment_status === 'paid' || r.payment_status === 'partially_refunded') && r.payment_status !== 'pending' && r.payment_status !== 'unpaid');
+    const rowsHtml = paidOnly.map(r => {
       const activeDates = (r.dates || []).filter(d => d.status !== 'refunded');
       const datesDetail = activeDates.map(d => `<div>• <strong>${d.day_label}:</strong> ${d.booth_count} booth(s) ${d.booth_spot_number ? `[Spot: ${d.booth_spot_number}]` : ''}</div>`).join('');
-      const statusColor = r.payment_status === 'paid' ? '#10B981' : r.payment_status === 'partially_refunded' ? '#F59E0B' : '#EF4444';
+      const statusColor = r.payment_status === 'paid' ? '#10B981' : '#F59E0B';
       return `
         <tr>
           <td><strong>${r.registration_number}</strong></td>
@@ -470,6 +472,12 @@ export default function NavratriVendorsDashboard() {
       `;
     }).join('');
 
+    const paidReportBooths = paidOnly
+      .flatMap(r => r.dates || [])
+      .filter(d => d.status !== 'refunded' && d.status !== 'cancelled')
+      .reduce((sum, d) => sum + (d.booth_count || 1), 0);
+    const paidReportRevenue = paidOnly.reduce((sum, r) => sum + (r.amount_paid || 0), 0);
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -478,7 +486,7 @@ export default function NavratriVendorsDashboard() {
         <style>
           body { font-family: 'Inter', system-ui, sans-serif; color: #0F172A; padding: 32px; font-size: 12px; }
           .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #FF6B35; padding-bottom: 16px; margin-bottom: 24px; }
-          .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+          .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
           .stat { background: #F8FAFC; border: 1px solid #E2E8F0; border-top: 3px solid #FF6B35; border-radius: 8px; padding: 12px; }
           table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11px; }
           th { background: #FFF6EE; padding: 8px 10px; text-align: left; border-bottom: 2px solid #FF6B35; color: #64748B; font-size: 10px; text-transform: uppercase; }
@@ -494,14 +502,13 @@ export default function NavratriVendorsDashboard() {
           </div>
           <div style="text-align:right;font-size:11px;color:#64748B;">
             Generated: ${formatMMDDYYYY(new Date())}<br/>
-            Total Records: ${filtered.length}
+            Total Paid Records: ${paidOnly.length}
           </div>
         </div>
         <div class="stats">
-          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">TOTAL VENDORS</div><div style="font-size:20px;font-weight:900;">${registrations.length}</div></div>
-          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">CONFIRMED PAID</div><div style="font-size:20px;font-weight:900;color:#10B981;">${paidRegs.length}</div></div>
-          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">TOTAL BOOTHS BOOKED</div><div style="font-size:20px;font-weight:900;color:#FFB800;">${totalBoothsBooked}</div></div>
-          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">TOTAL REVENUE</div><div style="font-size:20px;font-weight:900;color:#FF6B35;">$${(totalRevenue / 100).toLocaleString()}</div></div>
+          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">CONFIRMED PAID VENDORS</div><div style="font-size:20px;font-weight:900;color:#10B981;">${paidOnly.length}</div></div>
+          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">TOTAL BOOTHS BOOKED</div><div style="font-size:20px;font-weight:900;color:#FFB800;">${paidReportBooths}</div></div>
+          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">TOTAL REVENUE COLLECTED</div><div style="font-size:20px;font-weight:900;color:#FF6B35;">$${(paidReportRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
         </div>
         <table>
           <thead>
@@ -509,7 +516,7 @@ export default function NavratriVendorsDashboard() {
               <th>Reg #</th><th>Business & Contact</th><th>Category</th><th>Contact Info</th><th>Booked Dates & Spots</th><th>Power</th><th>Amount</th><th>Status</th>
             </tr>
           </thead>
-          <tbody>${rowsHtml}</tbody>
+          <tbody>${rowsHtml || '<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748B;">No paid vendor registrations found.</td></tr>'}</tbody>
         </table>
       </body>
       </html>
@@ -526,9 +533,10 @@ export default function NavratriVendorsDashboard() {
     const dateObj = FESTIVAL_DATES.find(d => d.date === selectedDateStr);
     const dateTitle = dateObj ? dateObj.label : formatMMDDYYYY(selectedDateStr);
 
-    // Gather all vendors who have a booth on this date
+    // Gather all paid vendors who have a booth on this date (skip pending/unpaid)
     const dayVendors = [];
     for (const r of registrations) {
+      if (r.payment_status !== 'paid' && r.payment_status !== 'partially_refunded') continue;
       const matchDate = (r.dates || []).find(d => d.event_date === selectedDateStr && d.status !== 'refunded');
       if (matchDate) {
         dayVendors.push({
@@ -540,7 +548,6 @@ export default function NavratriVendorsDashboard() {
 
     const dayRows = dayVendors.map((item, idx) => {
       const { reg, dateInfo } = item;
-      const isPaid = reg.payment_status === 'paid' || reg.payment_status === 'partially_refunded';
       return `
         <tr>
           <td style="text-align:center;font-weight:900;font-size:13px;color:#FF6B35;">${dateInfo.booth_spot_number || `Spot #${idx + 1}`}</td>
@@ -550,7 +557,7 @@ export default function NavratriVendorsDashboard() {
           <td>${reg.email}</td>
           <td style="text-align:center;font-weight:800;">${dateInfo.booth_count} Booth(s)</td>
           <td>${reg.electrical_needed ? '110V Needed' : 'Standard'}</td>
-          <td><span style="color:${isPaid ? '#10B981' : '#F59E0B'};font-weight:800;">${isPaid ? 'PAID' : 'PENDING'}</span></td>
+          <td><span style="color:#10B981;font-weight:800;">${reg.payment_status === 'partially_refunded' ? 'PARTIAL' : 'PAID'}</span></td>
           <td style="border:1px dashed #CBD5E1;width:120px;"></td>
         </tr>
       `;
@@ -584,7 +591,7 @@ export default function NavratriVendorsDashboard() {
         </div>
 
         <div class="summary-box">
-          <div><strong>Total Vendors:</strong> ${dayVendors.length}</div>
+          <div><strong>Total Paid Vendors:</strong> ${dayVendors.length}</div>
           <div><strong>Total Booths Assigned:</strong> ${dayVendors.reduce((s, v) => s + (v.dateInfo.booth_count || 1), 0)}</div>
           <div><strong>Electrical Outlets:</strong> ${dayVendors.filter(v => v.reg.electrical_needed).length} required</div>
         </div>
@@ -603,7 +610,7 @@ export default function NavratriVendorsDashboard() {
               <th>Check-in Signature</th>
             </tr>
           </thead>
-          <tbody>${dayRows || '<tr><td colspan="9" style="text-align:center;padding:20px;">No vendors registered for this date.</td></tr>'}</tbody>
+          <tbody>${dayRows || '<tr><td colspan="9" style="text-align:center;padding:20px;">No paid vendors registered for this date.</td></tr>'}</tbody>
         </table>
       </body>
       </html>
