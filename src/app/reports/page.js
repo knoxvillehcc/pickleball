@@ -11,6 +11,20 @@ const card = {
   transition: 'all 0.3s',
 };
 
+function formatMMDDYYYY(d) {
+  if (!d) return '—';
+  const str = String(d).slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const [y, m, day] = str.split('-');
+    return `${m}-${day}-${y}`;
+  }
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return String(d);
+  const m = String(dt.getMonth() + 1).padStart(2, '0');
+  const day = String(dt.getDate()).padStart(2, '0');
+  return `${m}-${day}-${dt.getFullYear()}`;
+}
+
 export default function ReportsPage() {
   const [data,    setData]    = useState({ summary: {}, results: [] });
   const [loading, setLoading] = useState(true);
@@ -31,8 +45,9 @@ export default function ReportsPage() {
   const downloadPDF = async () => {
     try {
       const doc     = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
-      const timeStr = new Date().toLocaleTimeString();
+      const now     = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
       const userName = currentUser?.name || currentUser?.email || 'Admin';
 
       doc.setFontSize(20);
@@ -67,8 +82,8 @@ export default function ReportsPage() {
 
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 10,
-        head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Start Date', 'Amount']],
-        body: data.results.map(r => [r.customer, r.type, r.order, r.date, '$' + (r.amount||0).toFixed(2)]),
+        head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Start Date (MM-DD-YYYY)', 'Amount']],
+        body: data.results.map(r => [r.customer, r.type, r.order, formatMMDDYYYY(r.date), '$' + (r.amount||0).toFixed(2)]),
         theme: 'striped',
         headStyles: { fillColor: [15, 23, 42] },
         styles: { fontSize: 8, cellPadding: 1.2 },
@@ -77,15 +92,16 @@ export default function ReportsPage() {
         columnStyles: { 0:{cellWidth:60}, 1:{cellWidth:100}, 2:{cellWidth:40}, 3:{cellWidth:35}, 4:{cellWidth:30,halign:'right'} },
       });
 
-      await exportPdfWithNativeShare(doc, 'Membership_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Membership_Report_' + dateStr + '.pdf');
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 
   const downloadPDFNoPrice = async () => {
     try {
       const doc     = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
-      const timeStr = new Date().toLocaleTimeString();
+      const now     = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
       const userName = currentUser?.name || currentUser?.email || 'Admin';
 
       doc.setFontSize(20);
@@ -120,8 +136,8 @@ export default function ReportsPage() {
       // Detail without amount column
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 10,
-        head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Start Date']],
-        body: data.results.map(r => [r.customer, r.type, r.order, r.date]),
+        head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Start Date (MM-DD-YYYY)']],
+        body: data.results.map(r => [r.customer, r.type, r.order, formatMMDDYYYY(r.date)]),
         theme: 'striped',
         headStyles: { fillColor: [15, 23, 42] },
         styles: { fontSize: 8, cellPadding: 1.2 },
@@ -130,7 +146,7 @@ export default function ReportsPage() {
         columnStyles: { 0:{cellWidth:70}, 1:{cellWidth:100}, 2:{cellWidth:45}, 3:{cellWidth:40} },
       });
 
-      await exportPdfWithNativeShare(doc, 'Member_Directory_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Member_Directory_' + dateStr + '.pdf');
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 

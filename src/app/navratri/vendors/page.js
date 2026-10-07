@@ -1,5 +1,8 @@
 'use client';
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 const SAFFRON = '#FF6B35';
 const GOLD = '#FFB800';
@@ -136,6 +139,7 @@ export default function NavratriVendorsDashboard() {
   const [isSyncingOdoo, setIsSyncingOdoo] = useState(false);
   const [odooSyncMsg, setOdooSyncMsg] = useState('');
   const [forceOdooSync, setForceOdooSync] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/navratri/vendor`
@@ -189,6 +193,10 @@ export default function NavratriVendorsDashboard() {
       }
     }
     init();
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => setCurrentUser(d.user || null))
+      .catch(() => {});
     return () => { ignore = true; };
   }, []);
 
@@ -450,176 +458,140 @@ export default function NavratriVendorsDashboard() {
     a.click();
   };
 
-  // Print Full Festival Report
-  const printFullReport = () => {
-    // Strictly filter out pending or unpaid registrations
-    const paidOnly = filtered.filter(r => (r.payment_status === 'paid' || r.payment_status === 'partially_refunded') && r.payment_status !== 'pending' && r.payment_status !== 'unpaid');
-    const rowsHtml = paidOnly.map(r => {
-      const activeDates = (r.dates || []).filter(d => d.status !== 'refunded');
-      const datesDetail = activeDates.map(d => `<div>• <strong>${d.day_label}:</strong> ${d.booth_count} booth(s) ${d.booth_spot_number ? `[Spot: ${d.booth_spot_number}]` : ''}</div>`).join('');
-      const statusColor = r.payment_status === 'paid' ? '#10B981' : '#F59E0B';
-      return `
-        <tr>
-          <td><strong>${r.registration_number}</strong></td>
-          <td><strong>${r.business_name}</strong><br/><span style="color:#64748B;font-size:11px;">${r.contact_name}</span></td>
-          <td><span style="font-size:11px;padding:2px 6px;background:#FFF3EB;color:#FF6B35;border-radius:4px;font-weight:700;">${r.category.toUpperCase()}</span></td>
-          <td>${r.email}<br/><span style="font-size:11px;color:#64748B;">${r.phone || '—'}</span></td>
-          <td style="font-size:11px;">${datesDetail || 'No active dates'}</td>
-          <td>${r.electrical_needed ? 'Yes (110V)' : 'No'}</td>
-          <td>$${((r.amount_paid || 0) / 100).toFixed(2)}</td>
-          <td><span style="color:${statusColor};font-weight:800;">${r.payment_status.toUpperCase()}</span></td>
-        </tr>
-      `;
-    }).join('');
+  // Print / Export Full Festival Report
+  const printFullReport = async () => {
+    try {
+      const doc = new jsPDF('landscape');
+      const now = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
+      const userName = currentUser?.name || currentUser?.email || 'Admin';
 
-    const paidReportBooths = paidOnly
-      .flatMap(r => r.dates || [])
-      .filter(d => d.status !== 'refunded' && d.status !== 'cancelled')
-      .reduce((sum, d) => sum + (d.booth_count || 1), 0);
-    const paidReportRevenue = paidOnly.reduce((sum, r) => sum + (r.amount_paid || 0), 0);
+      // Strictly filter out pending or unpaid registrations
+      const paidOnly = filtered.filter(r => (r.payment_status === 'paid' || r.payment_status === 'partially_refunded') && r.payment_status !== 'pending' && r.payment_status !== 'unpaid');
 
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Navratri 2026 — Master Vendor Report</title>
-        <style>
-          body { font-family: 'Inter', system-ui, sans-serif; color: #0F172A; padding: 32px; font-size: 12px; }
-          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #FF6B35; padding-bottom: 16px; margin-bottom: 24px; }
-          .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
-          .stat { background: #F8FAFC; border: 1px solid #E2E8F0; border-top: 3px solid #FF6B35; border-radius: 8px; padding: 12px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11px; }
-          th { background: #FFF6EE; padding: 8px 10px; text-align: left; border-bottom: 2px solid #FF6B35; color: #64748B; font-size: 10px; text-transform: uppercase; }
-          td { padding: 8px 10px; border-bottom: 1px solid #E2E8F0; vertical-align: top; }
-          tr:nth-child(even) { background: #FAFCFF; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div>
-            <h1 style="margin:0;font-size:22px;color:#0F172A;">Navratri 2026 — Master Vendor Report</h1>
-            <p style="margin:4px 0 0;color:#64748B;font-size:12px;">Knoxville Hindu Community Center · 8580 Hickory Creek Rd, Lenoir City, TN 37771</p>
-          </div>
-          <div style="text-align:right;font-size:11px;color:#64748B;">
-            Generated: ${formatMMDDYYYY(new Date())}<br/>
-            Total Paid Records: ${paidOnly.length}
-          </div>
-        </div>
-        <div class="stats">
-          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">CONFIRMED PAID VENDORS</div><div style="font-size:20px;font-weight:900;color:#10B981;">${paidOnly.length}</div></div>
-          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">TOTAL BOOTHS BOOKED</div><div style="font-size:20px;font-weight:900;color:#FFB800;">${paidReportBooths}</div></div>
-          <div class="stat"><div style="color:#64748B;font-size:10px;font-weight:700;">TOTAL REVENUE COLLECTED</div><div style="font-size:20px;font-weight:900;color:#FF6B35;">$${(paidReportRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Reg #</th><th>Business & Contact</th><th>Category</th><th>Contact Info</th><th>Booked Dates & Spots</th><th>Power</th><th>Amount</th><th>Status</th>
-            </tr>
-          </thead>
-          <tbody>${rowsHtml || '<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748B;">No paid vendor registrations found.</td></tr>'}</tbody>
-        </table>
-      </body>
-      </html>
-    `;
-    const w = window.open('', '_blank');
-    w.document.write(html);
-    w.document.close();
-    w.focus();
-    setTimeout(() => w.print(), 350);
+      const paidReportBooths = paidOnly
+        .flatMap(r => r.dates || [])
+        .filter(d => d.status !== 'refunded' && d.status !== 'cancelled')
+        .reduce((sum, d) => sum + (d.booth_count || 1), 0);
+      const paidReportRevenue = paidOnly.reduce((sum, r) => sum + (r.amount_paid || 0), 0);
+
+      doc.setFontSize(18);
+      doc.setTextColor(255, 107, 53); // SAFFRON #FF6B35
+      doc.text('Navratri 2026 — Master Vendor Space Registrations', 14, 15);
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(
+        `Printed by: ${userName}  |  Date: ${dateStr} ${timeStr}  |  Paid Vendors: ${paidOnly.length}  |  Total Booths: ${paidReportBooths}  |  Revenue: $${(paidReportRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        14, 22
+      );
+
+      const tableBody = paidOnly.map(r => {
+        const activeDates = (r.dates || []).filter(d => d.status !== 'refunded');
+        const datesDetail = activeDates.map(d => `${d.day_label || d.event_date} (${d.booth_count}b${d.booth_spot_number ? `, Spot ${d.booth_spot_number}` : ''})`).join('; ');
+        return [
+          r.registration_number || '',
+          r.business_name || '',
+          r.contact_name || '',
+          (r.category || '').toUpperCase(),
+          r.email || '',
+          r.phone || '—',
+          datesDetail || 'No active dates',
+          r.electrical_needed ? '110V Yes' : 'No',
+          `$${((r.amount_paid || 0) / 100).toFixed(2)}`,
+          r.payment_status === 'partially_refunded' ? 'PARTIAL' : 'PAID',
+        ];
+      });
+
+      autoTable(doc, {
+        startY: 28,
+        head: [['Reg #', 'Business Name', 'Contact Name', 'Category', 'Email', 'Phone', 'Booked Dates & Spots', 'Power', 'Amount Paid', 'Status']],
+        body: tableBody.length ? tableBody : [['', 'No paid vendor registrations found', '', '', '', '', '', '', '', '']],
+        theme: 'striped',
+        headStyles: { fillColor: [255, 107, 53], textColor: [255, 255, 255] },
+        styles: { fontSize: 8, cellPadding: 2.5 },
+        margin: { top: 10, bottom: 10, left: 14, right: 14 },
+      });
+
+      await exportPdfWithNativeShare(doc, `Navratri_Vendors_Master_${dateStr}.pdf`);
+    } catch (err) {
+      alert('PDF generation error: ' + err.message);
+    }
   };
 
-  // Print Individual Day Report (Management Roster for Event Day)
-  const printDayReport = (selectedDateStr) => {
-    const dateObj = FESTIVAL_DATES.find(d => d.date === selectedDateStr);
-    const dateTitle = dateObj ? dateObj.label : formatMMDDYYYY(selectedDateStr);
+  // Print / Export Individual Day Report (Management Roster for Event Day)
+  const printDayReport = async (selectedDateStr) => {
+    try {
+      const doc = new jsPDF('landscape');
+      const now = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
+      const userName = currentUser?.name || currentUser?.email || 'Admin';
 
-    // Gather all paid vendors who have a booth on this date (skip pending/unpaid)
-    const dayVendors = [];
-    for (const r of registrations) {
-      if (r.payment_status !== 'paid' && r.payment_status !== 'partially_refunded') continue;
-      const matchDate = (r.dates || []).find(d => d.event_date === selectedDateStr && d.status !== 'refunded');
-      if (matchDate) {
-        dayVendors.push({
-          reg: r,
-          dateInfo: matchDate,
-        });
+      const dateObj = FESTIVAL_DATES.find(d => d.date === selectedDateStr);
+      const dateTitle = dateObj ? dateObj.label : formatMMDDYYYY(selectedDateStr);
+
+      // Gather all paid vendors who have a booth on this date (skip pending/unpaid)
+      const dayVendors = [];
+      for (const r of registrations) {
+        if (r.payment_status !== 'paid' && r.payment_status !== 'partially_refunded') continue;
+        const matchDate = (r.dates || []).find(d => d.event_date === selectedDateStr && d.status !== 'refunded');
+        if (matchDate) {
+          dayVendors.push({
+            reg: r,
+            dateInfo: matchDate,
+          });
+        }
       }
+
+      const totalBoothsOnDay = dayVendors.reduce((s, v) => s + (v.dateInfo.booth_count || 1), 0);
+      const powerCount = dayVendors.filter(v => v.reg.electrical_needed).length;
+
+      doc.setFontSize(18);
+      doc.setTextColor(255, 107, 53); // SAFFRON #FF6B35
+      doc.text(`Navratri 2026 — Day Vendor Roster: ${dateTitle}`, 14, 15);
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(
+        `Printed by: ${userName}  |  Setup: 5:30 PM - 6:45 PM  |  Event: 7:00 PM - 11:00 PM  |  Paid Vendors: ${dayVendors.length}  |  Booths: ${totalBoothsOnDay}  |  Power Required: ${powerCount}`,
+        14, 22
+      );
+
+      const tableBody = dayVendors.map((item, idx) => {
+        const { reg, dateInfo } = item;
+        return [
+          dateInfo.booth_spot_number || `Spot #${idx + 1}`,
+          reg.registration_number || '',
+          reg.business_name || '',
+          (reg.category || '').toUpperCase(),
+          `${reg.contact_name || ''}\n${reg.phone || '—'}`,
+          reg.email || '',
+          `${dateInfo.booth_count || 1} Booth(s)`,
+          reg.electrical_needed ? '110V Yes' : 'Standard',
+          reg.payment_status === 'partially_refunded' ? 'PARTIAL' : 'PAID',
+          '', // Signature box
+        ];
+      });
+
+      autoTable(doc, {
+        startY: 28,
+        head: [['Spot', 'Reg #', 'Business Name', 'Category', 'Contact & Phone', 'Email', 'Booths', 'Power', 'Status', 'Check-In Signature']],
+        body: tableBody.length ? tableBody : [['', 'No paid vendors registered for this date', '', '', '', '', '', '', '', '']],
+        theme: 'striped',
+        headStyles: { fillColor: [255, 107, 53], textColor: [255, 255, 255] },
+        styles: { fontSize: 8, cellPadding: 3 },
+        columnStyles: {
+          9: { cellWidth: 35 }, // signature box
+        },
+        margin: { top: 10, bottom: 10, left: 14, right: 14 },
+      });
+
+      await exportPdfWithNativeShare(doc, `Navratri_Vendors_Roster_${selectedDateStr}_${dateStr}.pdf`);
+    } catch (err) {
+      alert('PDF generation error: ' + err.message);
     }
-
-    const dayRows = dayVendors.map((item, idx) => {
-      const { reg, dateInfo } = item;
-      return `
-        <tr>
-          <td style="text-align:center;font-weight:900;font-size:13px;color:#FF6B35;">${dateInfo.booth_spot_number || `Spot #${idx + 1}`}</td>
-          <td><strong>${reg.business_name}</strong><br/><span style="font-size:10px;color:#64748B;">Reg #${reg.registration_number}</span></td>
-          <td><span style="font-size:10px;font-weight:700;padding:2px 6px;background:#FFF3EB;color:#FF6B35;border-radius:4px;">${reg.category.toUpperCase()}</span></td>
-          <td>${reg.contact_name}<br/><strong>${reg.phone || '—'}</strong></td>
-          <td>${reg.email}</td>
-          <td style="text-align:center;font-weight:800;">${dateInfo.booth_count} Booth(s)</td>
-          <td>${reg.electrical_needed ? '110V Needed' : 'Standard'}</td>
-          <td><span style="color:#10B981;font-weight:800;">${reg.payment_status === 'partially_refunded' ? 'PARTIAL' : 'PAID'}</span></td>
-          <td style="border:1px dashed #CBD5E1;width:120px;"></td>
-        </tr>
-      `;
-    }).join('');
-
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Navratri 2026 — Day Vendor Roster (${dateTitle})</title>
-        <style>
-          body { font-family: 'Inter', system-ui, sans-serif; color: #0F172A; padding: 28px; font-size: 11px; }
-          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #FF6B35; padding-bottom: 14px; margin-bottom: 20px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 14px; }
-          th { background: #FFF6EE; padding: 8px 10px; text-align: left; border-bottom: 2px solid #FF6B35; color: #64748B; font-size: 10px; text-transform: uppercase; }
-          td { padding: 9px 10px; border-bottom: 1px solid #E2E8F0; vertical-align: middle; }
-          tr:nth-child(even) { background: #FAFCFF; }
-          .summary-box { display: flex; gap: 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div>
-            <h1 style="margin:0;font-size:20px;color:#0F172A;">Event Day Vendor Roster: ${dateTitle}</h1>
-            <p style="margin:3px 0 0;color:#64748B;font-size:12px;">Knoxville Hindu Community Center · Setup: 5:30 PM – 6:45 PM · Event: 7:00 PM – 11:00 PM</p>
-          </div>
-          <div style="text-align:right;font-size:11px;color:#64748B;">
-            <strong>Gate / Check-in Copy</strong><br/>
-            Printed: ${formatMMDDYYYY(new Date())}
-          </div>
-        </div>
-
-        <div class="summary-box">
-          <div><strong>Total Paid Vendors:</strong> ${dayVendors.length}</div>
-          <div><strong>Total Booths Assigned:</strong> ${dayVendors.reduce((s, v) => s + (v.dateInfo.booth_count || 1), 0)}</div>
-          <div><strong>Electrical Outlets:</strong> ${dayVendors.filter(v => v.reg.electrical_needed).length} required</div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th style="width:70px;text-align:center;">Assigned Spot</th>
-              <th>Business / Vendor</th>
-              <th>Category</th>
-              <th>Contact Person & Phone</th>
-              <th>Email</th>
-              <th style="text-align:center;">Count</th>
-              <th>Power</th>
-              <th>Payment</th>
-              <th>Check-in Signature</th>
-            </tr>
-          </thead>
-          <tbody>${dayRows || '<tr><td colspan="9" style="text-align:center;padding:20px;">No paid vendors registered for this date.</td></tr>'}</tbody>
-        </table>
-      </body>
-      </html>
-    `;
-    const w = window.open('', '_blank');
-    w.document.write(html);
-    w.document.close();
-    w.focus();
-    setTimeout(() => w.print(), 350);
   };
 
   // Open refund modal

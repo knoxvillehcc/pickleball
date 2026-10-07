@@ -19,6 +19,20 @@ function getColor(idx) {
   return MONTH_COLORS[0];
 }
 
+function formatMMDDYYYY(d) {
+  if (!d) return '—';
+  const str = String(d).slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const [y, m, day] = str.split('-');
+    return `${m}-${day}-${y}`;
+  }
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return String(d);
+  const m = String(dt.getMonth() + 1).padStart(2, '0');
+  const day = String(dt.getDate()).padStart(2, '0');
+  return `${m}-${day}-${dt.getFullYear()}`;
+}
+
 export default function MonthlyReportPage() {
   const [data, setData]         = useState({ months: {}, summary: {}, results: [] });
   const [loading, setLoading]   = useState(true);
@@ -57,8 +71,9 @@ export default function MonthlyReportPage() {
   const downloadPDF = async () => {
     try {
       const doc     = new jsPDF('landscape');
-      const dateStr = new Date().toLocaleDateString();
-      const timeStr = new Date().toLocaleTimeString();
+      const now     = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
       const userName = currentUser?.name || currentUser?.email || 'Admin';
 
       doc.setFontSize(20);
@@ -104,8 +119,8 @@ export default function MonthlyReportPage() {
 
         autoTable(doc, {
           startY,
-          head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Date', 'Amount']],
-          body: month.members.map(m => [m.customer, m.type, m.order, m.date, '$' + m.amount.toFixed(2)]),
+          head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Date (MM-DD-YYYY)', 'Amount']],
+          body: month.members.map(m => [m.customer, m.type, m.order, formatMMDDYYYY(m.date), '$' + m.amount.toFixed(2)]),
           theme: 'striped',
           headStyles: { fillColor: [15, 23, 42] },
           styles: { fontSize: 8, cellPadding: 1.2 },
@@ -122,7 +137,7 @@ export default function MonthlyReportPage() {
         startY = doc.lastAutoTable.finalY + 10;
       }
 
-      await exportPdfWithNativeShare(doc, 'Monthly_Report_' + dateStr.replace(/\//g, '-') + '.pdf');
+      await exportPdfWithNativeShare(doc, 'Monthly_Report_' + dateStr + '.pdf');
     } catch (err) { alert('PDF error: ' + err.message); }
   };
 

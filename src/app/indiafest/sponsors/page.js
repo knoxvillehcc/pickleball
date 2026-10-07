@@ -275,138 +275,9 @@ export default function SponsorDashboard() {
     }
   };
 
-  // ── PDF / Print report ────────────────────────────────────────────────────
+  // ── PDF / Print report (Universal Review Modal with Save to Desktop & Share) ─
   function printReport() {
-    // Strictly filter out pending or unpaid registrations for printable report
-    const paidRecords = filtered.filter(r => r.payment_status === 'paid');
-    const grandPaid = paidRecords.filter(r => r.tier === 'grand_sponsor' || r.space_type === 'grand_sponsor');
-    const basicPaid = paidRecords.filter(r => r.tier === 'basic_sponsor' || r.space_type === 'basic_sponsor');
-    const grandRevenue = grandPaid.reduce((s, r) => s + (r.amount_paid || 0), 0);
-    const basicRevenue = basicPaid.reduce((s, r) => s + (r.amount_paid || 0), 0);
-    const totalPaidRevenue = paidRecords.reduce((s, r) => s + (r.amount_paid || 0), 0);
-
-    const now = new Date();
-    const dateFormatted = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
-
-    const rows = paidRecords.map(r => {
-      const isBasic = r.space_type === 'basic_sponsor' || r.tier === 'basic_sponsor';
-      const tierColor = isBasic ? '#2D7A3A' : '#B8960C';
-      const tierLabel = isBasic ? 'Basic' : 'Grand';
-      let dateDisplay = '—';
-      if (r.registration_date) {
-        const d = new Date(r.registration_date);
-        if (!isNaN(d.getTime())) {
-          dateDisplay = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`;
-        }
-      }
-      return `
-        <tr>
-          <td>${r.registration_number || '—'}</td>
-          <td><span style="color:${tierColor};font-weight:700;font-size:11px;">${tierLabel}</span></td>
-          <td>${r.first_name || ''} ${r.last_name || ''}</td>
-          <td>${r.company_name || '—'}</td>
-          <td>${r.email || '—'}</td>
-          <td>${r.phone || '—'}</td>
-          <td>$${((r.amount_paid || 0) / 100).toFixed(2)}</td>
-          <td><span style="color:#059669;font-weight:700;">✓ Paid</span></td>
-          <td>${dateDisplay}</td>
-        </tr>`;
-    }).join('');
-
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>India Fest 2026 — Sponsor Report</title>
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-          * { box-sizing: border-box; margin: 0; padding: 0; }
-          body { font-family: 'Inter', sans-serif; color: #0F172A; background: #fff; padding: 32px; font-size: 13px; }
-          .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid #D4AF37; }
-          .header-left h1 { font-size: 22px; font-weight: 900; color: #0F172A; letter-spacing: -0.5px; }
-          .header-left p  { font-size: 12px; color: #64748B; margin-top: 3px; }
-          .header-right   { text-align: right; font-size: 11px; color: #64748B; }
-          .flag { height: 4px; background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); margin-bottom: 24px; border-radius: 2px; }
-          .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-          .stat { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 12px 14px; border-top: 3px solid #D4AF37; }
-          .stat.green { border-top-color: #10B981; }
-          .stat.dark-gold { border-top-color: #B8960C; }
-          .stat.sponsor-green { border-top-color: #2D7A3A; }
-          .stat-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #94A3B8; margin-bottom: 4px; }
-          .stat-value { font-size: 22px; font-weight: 900; color: #0F172A; }
-          .stat-sub { font-size: 10px; color: #94A3B8; margin-top: 3px; font-weight: 600; }
-          table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
-          thead tr { background: #FEF9EC; }
-          th { padding: 10px 10px; text-align: left; font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.8px; color: #64748B; border-bottom: 2px solid #D4AF37; white-space: nowrap; }
-          td { padding: 9px 10px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; color: #0F172A; }
-          tr:nth-child(even) td { background: #FAFCFF; }
-          tr:hover td { background: #FEF9EC; }
-          .footer { margin-top: 24px; padding-top: 14px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; font-size: 10px; color: #94A3B8; }
-          @media print {
-            body { padding: 16px; }
-            .no-print { display: none; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="flag"></div>
-        <div class="header">
-          <div class="header-left">
-            <h1>India Fest 2026 — Sponsor Report</h1>
-            <p>Knoxville Hindu Community Center · 8580 Hickory Creek Rd, Lenoir City, TN 37771</p>
-          </div>
-          <div class="header-right">
-            <div style="font-weight:700;font-size:12px;color:#0F172A;">Generated: ${dateFormatted}</div>
-            <div style="margin-top:4px;">${now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</div>
-          </div>
-        </div>
-
-        <div class="stats">
-          <div class="stat green">
-            <div class="stat-label">Confirmed (Paid)</div>
-            <div class="stat-value">${paidRecords.length}</div>
-            <div class="stat-sub">${grandPaid.length} grand · ${basicPaid.length} basic</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">Revenue Collected</div>
-            <div class="stat-value">$${(totalPaidRevenue / 100).toLocaleString()}</div>
-            <div class="stat-sub">from confirmed sponsors</div>
-          </div>
-          <div class="stat dark-gold">
-            <div class="stat-label">Grand Revenue</div>
-            <div class="stat-value">$${(grandRevenue / 100).toLocaleString()}</div>
-            <div class="stat-sub">${grandPaid.length} paid grand</div>
-          </div>
-          <div class="stat sponsor-green">
-            <div class="stat-label">Basic Revenue</div>
-            <div class="stat-value">$${(basicRevenue / 100).toLocaleString()}</div>
-            <div class="stat-sub">${basicPaid.length} paid basic</div>
-          </div>
-        </div>
-
-        <div style="font-size:10px;color:#94A3B8;font-weight:600;margin-bottom:8px;">SHOWING ${paidRecords.length} CONFIRMED PAID SPONSORS</div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Reg #</th><th>Tier</th><th>Sponsor Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Amount</th><th>Status</th><th>Date (MM-DD-YYYY)</th>
-            </tr>
-          </thead>
-          <tbody>${rows || '<tr><td colspan="9" style="text-align:center;padding:24px;color:#64748B;">No paid sponsor registrations found.</td></tr>'}</tbody>
-        </table>
-
-        <div class="footer">
-          <span>India Fest 2026 Sponsor Report · HCC Portal</span>
-          <span>knoxvillehcc@gmail.com · +1 865-988-3820</span>
-        </div>
-      </body>
-      </html>`;
-
-    const win = window.open('', '_blank', 'width=1100,height=800');
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-    setTimeout(() => win.print(), 600);
+    downloadPDF();
   }
 
   const tdStyle = { padding: '14px 16px', fontSize: '13px', borderBottom: '1px solid var(--border)', verticalAlign: 'middle' };
@@ -498,28 +369,31 @@ export default function SponsorDashboard() {
             background: 'transparent', border: `1px solid rgba(212,175,55,0.4)`,
             color: GOLD, fontWeight: '600', fontSize: '13px',
             padding: '12px 18px', borderRadius: '10px', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+            display: 'flex', alignItems: 'center', gap: '7px', transition: 'all 0.2s',
             fontFamily: 'inherit',
           }}>
-            📄 Export CSV
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export CSV</span>
           </button>
           <button onClick={downloadPDF} style={{
             background: 'transparent', border: `1px solid rgba(212,175,55,0.4)`,
             color: GOLD, fontWeight: '700', fontSize: '13px',
             padding: '12px 18px', borderRadius: '10px', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+            display: 'flex', alignItems: 'center', gap: '7px', transition: 'all 0.2s',
             fontFamily: 'inherit',
           }}>
-            📄 Export PDF
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Export PDF</span>
           </button>
           <button onClick={printReport} style={{
             background: 'transparent', border: `1px solid rgba(99,102,241,0.4)`,
             color: '#6366F1', fontWeight: '600', fontSize: '13px',
             padding: '12px 18px', borderRadius: '10px', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
+            display: 'flex', alignItems: 'center', gap: '7px', transition: 'all 0.2s',
             fontFamily: 'inherit',
           }}>
-            🖨️ Print Report
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span>Print Report</span>
           </button>
         </div>
       </div>

@@ -1,5 +1,8 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 import { useTheme } from '@/components/ClientLayout';
 import { colors, spacing, type, radii, btn, card, chip, table as tableStyle, emptyState as emptyStateStyle, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
 
@@ -51,6 +54,82 @@ export default function NavratriDashboard() {
 
   const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n || 0);
 
+  const handleExportPDF = async () => {
+    try {
+      const doc = new jsPDF('landscape');
+      const now = new Date();
+      const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+      const timeStr = now.toLocaleTimeString();
+
+      doc.setFontSize(18);
+      doc.setTextColor(255, 107, 53); // Navratri Saffron
+      doc.text('Navratri 2026 — Festival Management Summary', 14, 15);
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(
+        `Generated: ${dateStr} ${timeStr}  |  Event: ${activeEvent?.title || 'Navratri 2026'}  |  Status: ${activeEvent?.status?.toUpperCase() || 'ACTIVE'}`,
+        14, 22
+      );
+
+      // KPI Summary Table
+      if (overview) {
+        autoTable(doc, {
+          startY: 28,
+          head: [['Total Revenue', 'Net Revenue', 'Stripe Fees', 'Refunds', 'Total Orders', 'Pending Orders', 'General Members', 'Pioneer Members']],
+          body: [[
+            fmt(overview.totalRevenue),
+            fmt(overview.netRevenue),
+            fmt(overview.totalFees),
+            fmt(overview.totalRefunds),
+            String(overview.totalOrders || 0),
+            String(overview.pendingOrders || 0),
+            String(overview.generalMembers || 0),
+            String(overview.pioneerMembers || 0),
+          ]],
+          theme: 'grid',
+          headStyles: { fillColor: [255, 107, 53], textColor: [255, 255, 255] },
+          styles: { fontSize: 8.5, cellPadding: 3, halign: 'center' },
+          margin: { top: 10, bottom: 6, left: 14, right: 14 },
+        });
+      }
+
+      // Date breakdown table
+      if (dateStats && dateStats.length > 0) {
+        const tableBody = dateStats.map(d => {
+          let dateFmt = '—';
+          if (d.date) {
+            const parts = d.date.split('T')[0].split('-');
+            if (parts.length === 3) dateFmt = `${parts[1]}-${parts[2]}-${parts[0]}`;
+          }
+          return [
+            dateFmt,
+            d.label || '—',
+            String(d.totalTickets || 0),
+            fmt(d.totalRevenue || 0),
+            String(d.totalRefunded || 0),
+            String(d.checkedIn || 0),
+            `${d.attendanceRate || 0}%`,
+          ];
+        });
+
+        autoTable(doc, {
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 30,
+          head: [['Date (MM-DD-YYYY)', 'Day Description', 'Tickets Sold', 'Revenue', 'Refunded', 'Checked In', 'Attendance Rate']],
+          body: tableBody,
+          theme: 'striped',
+          headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+          styles: { fontSize: 8, cellPadding: 2.5 },
+          margin: { top: 10, bottom: 10, left: 14, right: 14 },
+        });
+      }
+
+      await exportPdfWithNativeShare(doc, `Navratri_Festival_Summary_${dateStr}.pdf`);
+    } catch (err) {
+      alert('PDF generation error: ' + err.message);
+    }
+  };
+
   const t = tableStyle(theme);
 
   if (loading) return (
@@ -68,18 +147,32 @@ export default function NavratriDashboard() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xl, flexWrap: 'wrap', gap: spacing.base }}>
         <div>
-          <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>🪔 Navratri 2026</h1>
+          <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>Navratri 2026</h1>
           <p style={{ ...type.secondary, color: c.muted, marginTop: spacing.xs }}>
-            {activeEvent?.status === 'active' ? '🟢 Event Active' :
-              activeEvent?.status === 'published' ? '🟡 Published' :
-              activeEvent?.status === 'draft' ? '⚪ Draft' : activeEvent?.status || 'No events'}
+            {activeEvent?.status === 'active' ? 'Event Active' :
+              activeEvent?.status === 'published' ? 'Published' :
+              activeEvent?.status === 'draft' ? 'Draft' : activeEvent?.status || 'No events'}
           </p>
         </div>
-        {health && (
-          <span style={chip(health.status === 'healthy' ? 'active' : 'invalid', theme)}>
-            {health.status === 'healthy' ? '✅ All Systems OK' : '⚠️ System Degraded'}
-          </span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={handleExportPDF}
+            style={{
+              padding: '9px 16px', borderRadius: `${radii.md}px`,
+              border: `1.5px solid ${c.primary}`, background: 'rgba(255,107,53,0.1)',
+              color: c.primary, fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '7px',
+            }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Export Festival PDF</span>
+          </button>
+          {health && (
+            <span style={chip(health.status === 'healthy' ? 'active' : 'invalid', theme)}>
+              {health.status === 'healthy' ? 'All Systems OK' : 'System Degraded'}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Quick Nav */}
