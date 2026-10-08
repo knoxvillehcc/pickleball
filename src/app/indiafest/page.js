@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -7,7 +8,7 @@ import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const C = {
   saffron: 'var(--accent)',
-  gold:    '#FF9933',
+  gold:    'var(--accent)',
   bg:      'var(--bg-card)',
   border:  'var(--border)',
 };
@@ -21,7 +22,7 @@ const SPACE_LABELS = {
 function Badge({ status }) {
   const map = {
     paid:     { bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)', color: 'var(--text-success)', label: '✓ Paid' },
-    pending:  { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', color: 'var(--accent)', label: '⏳ Pending' },
+    pending:  { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', color: 'var(--accent)', label: 'Pending' },
     failed:   { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.4)',  color: 'var(--text-error)', label: '✗ Failed' },
     refunded: { bg: 'rgba(148,163,184,0.15)',border: 'rgba(148,163,184,0.4)',color: 'var(--text-muted)', label: '↩ Refunded' },
   };
@@ -29,7 +30,7 @@ function Badge({ status }) {
   return (
     <span style={{
       display: 'inline-block', padding: '4px 12px', borderRadius: '99px',
-      fontSize: '11px', fontWeight: '800',
+      fontSize: '11px', fontWeight: '700',
       backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.color,
     }}>
       {s.label}
@@ -41,17 +42,17 @@ function Badge({ status }) {
 function SpaceBadge({ type }) {
   const s = SPACE_LABELS[type] || { label: type, size: '', price: '' };
   const colors = {
-    home_business:        { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.3)', color: '#FF9933' },
-    established_business: { bg: 'rgba(139,30,63,0.12)',  border: 'rgba(139,30,63,0.3)',  color: '#8B1E3F' },
+    home_business:        { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.3)', color: 'var(--accent)' },
+    established_business: { bg: 'rgba(139,30,63,0.12)',  border: 'rgba(139,30,63,0.3)',  color: 'var(--maroon)' },
   };
   const c = colors[type] || { bg: 'var(--accent-glow)', border: 'var(--border)', color: 'var(--accent)' };
   return (
     <span style={{
       display: 'inline-block', padding: '4px 12px', borderRadius: '99px',
-      fontSize: '11px', fontWeight: '800',
+      fontSize: '11px', fontWeight: '700',
       backgroundColor: c.bg, border: `1px solid ${c.border}`, color: c.color,
     }}>
-      🏪 {s.label} ({s.price})
+      {s.label} ({s.price})
     </span>
   );
 }
@@ -61,13 +62,13 @@ function StatCard({ label, value, accent, sub }) {
   return (
     <div style={{
       backgroundColor: C.bg, border: `1px solid ${C.border}`,
-      borderRadius: '16px', padding: '24px', borderTop: `3.5px solid ${accent}`,
+      borderRadius: '14px', padding: '16px 18px', borderTop: `3.5px solid ${accent}`,
       width: '100%', boxShadow: 'var(--shadow)',
     }}>
-      <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
         {label}
       </div>
-      <div style={{ fontSize: '36px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '36px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{value}</div>
       {sub && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', fontWeight: '600' }}>{sub}</div>}
     </div>
   );
@@ -81,7 +82,7 @@ function FilterBtn({ active, children, onClick }) {
       border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
       backgroundColor: active ? 'var(--accent-glow)' : 'var(--bg-card)',
       color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-      fontWeight: '800', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s',
+      fontWeight: '700', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s',
       fontFamily: 'inherit',
     }}>
       {children}
@@ -349,7 +350,7 @@ export default function IndiafestVendorDashboard() {
       {/* ── Publish Banner — super_admin only ────────────────────────────── */}
       {currentUser?.role === 'super_admin' && (
         <div style={{
-          borderRadius: '16px', padding: '18px 24px', marginBottom: '24px',
+          borderRadius: '14px', padding: '18px 24px', marginBottom: '24px',
           background: isPublished
             ? 'rgba(16,185,129,0.08)'
             : 'rgba(245,158,11,0.08)',
@@ -364,8 +365,8 @@ export default function IndiafestVendorDashboard() {
               backgroundColor: isPublished ? 'var(--text-success)' : 'var(--accent)',
               boxShadow: isPublished ? '0 0 8px var(--text-success)' : '0 0 8px var(--accent)',
             }}/>
-            <span style={{ fontWeight: '800', fontSize: '15px', color: isPublished ? 'var(--text-success)' : 'var(--accent)' }}>
-              Registration Page: {isPublished ? '🌐 LIVE' : '🔒 CLOSED'}
+            <span style={{ fontWeight: '700', fontSize: '15px', color: isPublished ? 'var(--text-success)' : 'var(--accent)' }}>
+              Registration Page: {isPublished ? 'LIVE' : 'CLOSED'}
             </span>
           </div>
 
@@ -380,7 +381,7 @@ export default function IndiafestVendorDashboard() {
                 background: urlCopied ? 'rgba(16,185,129,0.15)' : 'transparent',
                 color: 'var(--text-success)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap',
               }}>
-                {urlCopied ? '✅ Copied!' : '📋 Copy URL'}
+                {urlCopied ? 'Copied!' : 'Copy URL'}
               </button>
               <a href={PUBLIC_URL} target="_blank" rel="noreferrer" style={{
                 padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)',
@@ -397,12 +398,12 @@ export default function IndiafestVendorDashboard() {
               ? 'linear-gradient(135deg, #EF4444, #DC2626)'
               : 'var(--accent)',
             color: publishing ? '#475569' : 'white',
-            fontWeight: '800', fontSize: '14px', cursor: publishing ? 'not-allowed' : 'pointer',
+            fontWeight: '700', fontSize: '14px', cursor: publishing ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap',
             boxShadow: publishing ? 'none' : isPublished ? '0 0 20px rgba(239,68,68,0.3)' : '0 4px 14px var(--accent-glow)',
             transition: 'all 0.3s', fontFamily: 'inherit',
           }}>
-            {publishing ? '⏳ Saving...' : isPublished ? '🔒 Unpublish Page' : '🌐 Publish Page'}
+            {publishing ? 'Saving...' : isPublished ? 'Unpublish Page' : 'Publish Page'}
           </button>
         </div>
       )}
@@ -411,7 +412,7 @@ export default function IndiafestVendorDashboard() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '32px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '950', letterSpacing: '-0.5px' }}>
+            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', letterSpacing: '-0.5px' }}>
               IndiaFest{' '}
               <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 Booth Manager
@@ -423,7 +424,7 @@ export default function IndiafestVendorDashboard() {
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button onClick={load} style={{
             background: loading ? 'rgba(255,153,51,0.3)' : 'var(--accent)',
-            color: 'white', fontWeight: '800', fontSize: '14px', padding: '12px 24px',
+            color: 'white', fontWeight: '700', fontSize: '14px', padding: '12px 24px',
             borderRadius: '10px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s',
             boxShadow: '0 4px 12px var(--accent-glow)',
@@ -446,7 +447,7 @@ export default function IndiafestVendorDashboard() {
             }}>
               {exporting === fmt
                 ? <><span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,153,51,0.3)', borderTop: `2px solid ${C.saffron}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Exporting...</>
-                : <>{fmt === 'csv' ? '📄' : fmt === 'excel' ? '📊' : '🖨️'} {fmt.toUpperCase()}</>
+                : <>{fmt === 'csv' ? <Icon name="file" /> : fmt === 'excel' ? <Icon name="chart" /> : <Icon name="printer" />} {fmt.toUpperCase()}</>
               }
             </button>
           ))}
@@ -468,24 +469,24 @@ export default function IndiafestVendorDashboard() {
                 const newResults = {};
                 for (const r of (data.results || [])) newResults[r.id] = r.status;
                 setSyncResults(prev => ({ ...prev, ...newResults }));
-                alert(`✅ Sync complete!\n\nCreated: ${data.summary.created}\nAlready exists: ${data.summary.existing}\nErrors: ${data.summary.errors}${data.feeResults?.length ? `\nFees tracked: ${data.feeResults.filter(f => f.status === 'created').length}` : ''}`);
+                alert(`Sync complete!\n\nCreated: ${data.summary.created}\nAlready exists: ${data.summary.existing}\nErrors: ${data.summary.errors}${data.feeResults?.length ? `\nFees tracked: ${data.feeResults.filter(f => f.status === 'created').length}` : ''}`);
               } else {
-                alert('❌ Sync failed: ' + data.error);
+                alert('Sync failed: ' + data.error);
               }
             } catch (err) {
-              alert('❌ Sync error: ' + err.message);
+              alert('Sync error: ' + err.message);
             } finally {
               setSyncingAll(false);
             }
           }} disabled={syncingAll} style={{
             background: syncingAll ? 'rgba(99,102,241,0.3)' : 'linear-gradient(135deg, #6366F1, #4F46E5)',
-            color: 'white', fontWeight: '800', fontSize: '13px',
+            color: 'white', fontWeight: '700', fontSize: '13px',
             padding: '12px 20px', borderRadius: '10px', border: 'none',
             cursor: syncingAll ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s',
             boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
           }}>
-            {syncingAll ? '⏳ Syncing All...' : '📤 Sync All to Odoo'}
+            {syncingAll ? 'Syncing All...' : 'Sync All to Odoo'}
           </button>
         </div>
       </div>
@@ -495,13 +496,13 @@ export default function IndiafestVendorDashboard() {
         <StatCard label="Total Vendors"    value={registrations.length} accent={C.saffron} sub="all registrations" />
         <StatCard label="Confirmed (Paid)" value={paid.length}          accent="#10B981"   sub={`${pending.length} pending`} />
         <StatCard label="Revenue Collected" value={`$${(revenue / 100).toFixed(0)}`} accent={C.gold} sub="from paid vendors" />
-        <StatCard label="Home Business"    value={paid.filter(r => r.space_type === 'home_business').length}        accent="#FF9933" sub="$351/spot" />
+        <StatCard label="Home Business"    value={paid.filter(r => r.space_type === 'home_business').length}        accent="var(--accent)" sub="$351/spot" />
         <StatCard label="Established Biz"  value={paid.filter(r => r.space_type === 'established_business').length} accent="#FFD700" sub="$1,001/spot" />
       </div>
 
       {error && (
         <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '12px', padding: '14px 18px', marginBottom: '20px', color: '#F87171', fontSize: '14px' }}>
-          ❌ {error}
+          {error}
         </div>
       )}
 
@@ -509,7 +510,7 @@ export default function IndiafestVendorDashboard() {
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px', alignItems: 'center' }}>
         {/* Search */}
         <input
-          type="text" placeholder="🔍  Search name, company, email, reg #..."
+          type="text" placeholder=" Search name, company, email, reg #..."
           value={search} onChange={e => setSearch(e.target.value)}
           style={{
             flex: '1 1 260px', padding: '9px 14px', borderRadius: '10px',
@@ -529,13 +530,13 @@ export default function IndiafestVendorDashboard() {
             {s === 'all' ? 'All Categories' : s === 'home_business' ? 'Home Business' : 'Established Store'}
           </FilterBtn>
         ))}
-        <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginLeft: '4px', fontWeight: '750' }}>
+        <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginLeft: '4px', fontWeight: '600' }}>
           {filtered.length} of {registrations.length}
         </span>
       </div>
 
       {/* ── Table ── */}
-      <div style={{ backgroundColor: C.bg, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden' }}>
+      <div style={{ backgroundColor: C.bg, border: `1px solid ${C.border}`, borderRadius: '14px', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#64748B' }}>Loading vendors…</div>
         ) : filtered.length === 0 ? (
@@ -572,7 +573,7 @@ export default function IndiafestVendorDashboard() {
                         <div style={{ fontSize: '12px', color: '#64748B' }}>{r.city}, {r.state}</div>
                       </td>
                       <td style={tdStyle}><SpaceBadge type={r.space_type} /></td>
-                      <td style={{ ...tdStyle, fontWeight: '800', color: r.payment_status === 'paid' ? '#10B981' : '#64748B' }}>
+                      <td style={{ ...tdStyle, fontWeight: '700', color: r.payment_status === 'paid' ? '#10B981' : '#64748B' }}>
                         ${((r.amount_paid || 0) / 100).toFixed(2)}
                       </td>
                       <td style={tdStyle}><Badge status={r.payment_status} /></td>
@@ -592,7 +593,7 @@ export default function IndiafestVendorDashboard() {
                               { label: 'Full Address', value: `${r.address}, ${r.city}, ${r.state} ${r.zip}` },
                               { label: 'Phone',        value: r.phone || '—' },
                               { label: 'Stripe Ref',   value: r.stripe_payment_ref || '—' },
-                              { label: 'Disclaimer',   value: r.disclaimer_accepted ? '✅ Accepted' : '❌ Not accepted' },
+                              { label: 'Disclaimer',   value: r.disclaimer_accepted ? 'Accepted' : 'Not accepted' },
                               { label: 'Reg Date',     value: r.registration_date ? new Date(r.registration_date).toLocaleString() : '—' },
                               { label: 'Amount Due',   value: `$${((r.amount_due || 0) / 100).toFixed(2)}` },
                             ].map((item, i) => (
@@ -614,7 +615,7 @@ export default function IndiafestVendorDashboard() {
                                 display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
                               }}
                             >
-                              ✏️ Edit Details
+                              Edit Details
                             </button>
                             <button
                               onClick={() => handleResendEmail(r)}
@@ -627,10 +628,10 @@ export default function IndiafestVendorDashboard() {
                               }}
                             >
                               {resendingId === r.registration_number
-                                ? '⏳ Resending...'
+                                ? 'Resending...'
                                 : resendDone[r.registration_number]
-                                ? '✅ Confirmation Sent!'
-                                : '✉️ Resend Confirmation'}
+                                ? 'Confirmation Sent!'
+                                : 'Resend Confirmation'}
                             </button>
                             {r.payment_status === 'paid' && (
                               <button
@@ -648,15 +649,15 @@ export default function IndiafestVendorDashboard() {
                                       const result = data.results[0];
                                       setSyncResults(prev => ({ ...prev, [r.id]: result.status }));
                                       alert(result.status === 'created'
-                                        ? `✅ Invoice created in Odoo!\nInvoice ID: ${result.invoiceId}\nAmount: $${result.amount}`
+                                        ? `Invoice created in Odoo!\nInvoice ID: ${result.invoiceId}\nAmount: $${result.amount}`
                                         : result.status === 'already_exists'
                                         ? `ℹ️ Invoice already exists in Odoo (ID: ${result.invoiceId})`
-                                        : `❌ Error: ${result.error}`);
+                                        : `Error: ${result.error}`);
                                     } else {
-                                      alert('❌ Sync failed: ' + (data.error || 'Unknown error'));
+                                      alert('Sync failed: ' + (data.error || 'Unknown error'));
                                     }
                                   } catch (err) {
-                                    alert('❌ Sync error: ' + err.message);
+                                    alert('Sync error: ' + err.message);
                                   } finally {
                                     setSyncingId(null);
                                   }
@@ -672,7 +673,7 @@ export default function IndiafestVendorDashboard() {
                                   display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
                                 }}
                               >
-                                {syncingId === r.id ? '⏳ Syncing...' : syncResults[r.id] === 'created' ? '✅ Synced to Odoo' : syncResults[r.id] === 'already_exists' ? '✅ Already in Odoo' : '📤 Sync to Odoo'}
+                                {syncingId === r.id ? 'Syncing...' : syncResults[r.id] === 'created' ? 'Synced to Odoo' : syncResults[r.id] === 'already_exists' ? 'Already in Odoo' : 'Sync to Odoo'}
                               </button>
                             )}
                             {r.payment_status === 'paid' && r.stripe_payment_ref && (
@@ -680,7 +681,7 @@ export default function IndiafestVendorDashboard() {
                                 onClick={async () => {
                                   const amt = ((r.amount_paid || 0) / 100).toFixed(2);
                                   const ok = window.confirm(
-                                    `⚠️ REFUND CONFIRMATION\n\nYou are about to issue a FULL REFUND of $${amt} to:\n\n` +
+                                    `REFUND CONFIRMATION\n\nYou are about to issue a FULL REFUND of $${amt} to:\n\n` +
                                     `${r.first_name} ${r.last_name}\n${r.email}\nReg #${r.registration_number}\n\n` +
                                     `This will refund the full amount back to their card via Stripe and update the status to "Refunded".\n\n` +
                                     `This action CANNOT be undone. Continue?`
@@ -695,13 +696,13 @@ export default function IndiafestVendorDashboard() {
                                     });
                                     const data = await res.json();
                                     if (data.success) {
-                                      alert(`✅ Refund successful!\n\n$${data.amount_refunded.toFixed(2)} refunded to ${r.first_name} ${r.last_name}.\nStripe Refund ID: ${data.refund_id}`);
+                                      alert(`Refund successful!\n\n$${data.amount_refunded.toFixed(2)} refunded to ${r.first_name} ${r.last_name}.\nStripe Refund ID: ${data.refund_id}`);
                                       load();
                                     } else {
-                                      alert('❌ Refund failed: ' + data.error);
+                                      alert('Refund failed: ' + data.error);
                                     }
                                   } catch (err) {
-                                    alert('❌ Refund error: ' + err.message);
+                                    alert('Refund error: ' + err.message);
                                   } finally {
                                     setRefundingId(null);
                                   }
@@ -717,7 +718,7 @@ export default function IndiafestVendorDashboard() {
                                   display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
                                 }}
                               >
-                                {refundingId === r.id ? '⏳ Processing Refund...' : '↩ Refund via Stripe'}
+                                {refundingId === r.id ? 'Processing Refund...' : '↩ Refund via Stripe'}
                               </button>
                             )}
                             <button
@@ -729,7 +730,7 @@ export default function IndiafestVendorDashboard() {
                                 display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
                               }}
                             >
-                              🗑️ Delete Registration
+                              Delete Registration
                             </button>
                           </div>
                         </td>
@@ -808,7 +809,7 @@ function EditVendorModal({ reg, onClose, onSave }) {
     setForm(prev => ({ ...prev, [field]: val }));
   };
 
-  const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' };
+  const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' };
   const inputStyle = { width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input, #0A0A1A)', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' };
 
   return (
@@ -819,21 +820,21 @@ function EditVendorModal({ reg, onClose, onSave }) {
     }} onClick={onClose}>
       <div style={{
         background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: '20px', padding: '32px', maxWidth: '640px', width: '100%',
+        borderRadius: '14px', padding: '22px 24px', maxWidth: '640px', width: '100%',
         maxHeight: '90vh', overflowY: 'auto',
         boxShadow: 'var(--shadow)',
       }} onClick={e => e.stopPropagation()}>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
-            ✏️ Edit Vendor Registration
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)' }}>
+            Edit Vendor Registration
           </h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
         </div>
 
         {error && (
           <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', marginBottom: '20px', color: '#FCA5A5', fontSize: '13px' }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -910,7 +911,7 @@ function EditVendorModal({ reg, onClose, onSave }) {
             <div style={{ flex: 1 }}>
               <label style={labelStyle}>Payment Status</label>
               <select value={form.payment_status} onChange={e => handleChange('payment_status', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                <option value="pending">⏳ Pending</option>
+                <option value="pending">Pending</option>
                 <option value="paid">✓ Paid</option>
                 <option value="failed">✗ Failed</option>
                 <option value="refunded">↩ Refunded</option>
@@ -938,14 +939,14 @@ function EditVendorModal({ reg, onClose, onSave }) {
           <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
             <button type="button" onClick={onClose} style={{
               flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid var(--border)',
-              backgroundColor: 'transparent', color: 'var(--text-secondary)', fontWeight: '750',
+              backgroundColor: 'transparent', color: 'var(--text-secondary)', fontWeight: '600',
               fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit',
             }}>
               Cancel
             </button>
             <button type="submit" disabled={saving} style={{
               flex: 1.5, padding: '12px', borderRadius: '10px', border: 'none',
-              backgroundColor: 'var(--accent)', color: '#FFFFFF', fontWeight: '850',
+              backgroundColor: 'var(--accent)', color: '#FFFFFF', fontWeight: '700',
               fontSize: '13px', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1,
               transition: 'all 0.2s', fontFamily: 'inherit',
             }}>

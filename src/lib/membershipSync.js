@@ -67,13 +67,26 @@ export async function buildMembershipSnapshot(odoo) {
     : [];
   const invById = Object.fromEntries(invoices.map((i) => [i.id, i]));
 
+  // Completed online payments (Stripe etc.) recorded against the order. These prove money was
+  // received even when the invoice was later cancelled (for example during a membership upgrade).
+  const soIds = orders.map((o) => o.id);
+  const txs = soIds.length
+    ? await odoo('payment.transaction', 'search_read', [[['sale_order_ids', 'in', soIds], ['state', '=', 'done']]], {
+        fields: ['sale_order_ids', 'amount', 'provider_reference'],
+      })
+    : [];
+  const paidTxBySo = {};
+  for (const t of txs) for (const sid of t.sale_order_ids || []) paidTxBySo[sid] = t;
+
   const rows = history.map((h) => {
     const inv = invById[m2oId(h.invoice_id)] || null;
     const so = orderByHist[h.id] || null;
     const amount = so && so.state !== 'cancel' ? so.amount_total : inv ? inv.amount_total : so ? so.amount_total : 0;
-    const refunded = !!inv && (inv.payment_state === 'reversed' || inv.state === 'cancel');
-    // Revenue counts money actually invoiced/received: not refunded, and invoice (if any) is paid/in payment.
-    const invPaid = !inv || ['paid', 'in_payment', 'partial'].includes(inv.payment_state);
+    const paidTx = so ? paidTxBySo[so.id] : null;
+    const refunded = !!inv && !paidTx && (inv.payment_state === 'reversed' || inv.state === 'cancel');
+    // Revenue counts money actually received: not refunded, and invoice (if any) is paid/in payment,
+    // or a completed online payment exists on the order.
+    const invPaid = !inv || !!paidTx || ['paid', 'in_payment', 'partial'].includes(inv.payment_state);
     const soOk = !so || so.state !== 'cancel' || (inv && invPaid);
     const counts = !refunded && invPaid && soOk;
     return {
@@ -88,7 +101,7 @@ export async function buildMembershipSnapshot(odoo) {
       order_name: so ? so.name : null,
       order_state: so ? so.state : null,
       invoice_name: inv ? inv.name : null,
-      invoice_payment_state: inv ? inv.payment_state : null,
+      invoice_payment_state: inv ? (paidTx && !['paid', 'in_payment', 'partial'].includes(inv.payment_state) ? 'paid_online' : inv.payment_state) : null,
       invoice_state: inv ? inv.state : null,
       pos_order_name: m2oName(h.pos_order_id),
       amount: Number(amount || 0),

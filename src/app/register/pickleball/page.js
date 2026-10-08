@@ -55,12 +55,12 @@ function Field({ label, required, hint, type = 'text', value, onChange, placehol
 
 function Card({ title, icon, accent = T.lime, children }) {
   return (
-    <div style={{ background: T.navyCard, border: `1px solid ${accent}22`, borderRadius: '18px', overflow: 'hidden', backdropFilter: 'blur(12px)', boxShadow: '0 8px 40px rgba(0,0,0,0.35)' }}>
+    <div style={{ background: T.navyCard, border: `1px solid ${accent}22`, borderRadius: '14px', overflow: 'hidden', backdropFilter: 'blur(12px)', boxShadow: '0 8px 40px rgba(0,0,0,0.35)' }}>
       <div style={{ padding: '16px 24px', borderBottom: `1px solid ${accent}18`, display: 'flex', alignItems: 'center', gap: '12px', background: `${accent}08` }}>
         <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: `${accent}20`, border: `1px solid ${accent}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: accent, flexShrink: 0 }}>{icon}</div>
-        <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: T.white, letterSpacing: '0.2px' }}>{title}</h2>
+        <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: T.white, letterSpacing: '0.2px' }}>{title}</h2>
       </div>
-      <div style={{ padding: '24px' }}>{children}</div>
+      <div style={{ padding: '16px 18px' }}>{children}</div>
     </div>
   );
 }
@@ -76,14 +76,14 @@ function BracketPill({ icon, label, selected, onClick }) {
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', justifyContent: 'center'
     }}>
       <div style={{ color: selected ? T.teal : T.muted, transition: 'color 0.2s' }}>{icon}</div>
-      <div style={{ fontSize: '13px', fontWeight: '800', color: selected ? T.teal : T.light, lineHeight: 1.3 }}>{label}</div>
+      <div style={{ fontSize: '13px', fontWeight: '700', color: selected ? T.teal : T.light, lineHeight: 1.3 }}>{label}</div>
     </button>
   );
 }
 
 function LoadingScreen() {
   return (
-    <div style={{ minHeight: '100vh', background: T.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: T.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)' }}>
       <div style={{ textAlign: 'center' }}>
         <div style={{ width: '52px', height: '52px', border: `3px solid rgba(168,214,46,0.2)`, borderTop: `3px solid ${T.lime}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }}/>
         <p style={{ color: T.muted, fontSize: '14px' }}>Loading registration...</p>
@@ -95,16 +95,16 @@ function LoadingScreen() {
 
 function RegistrationClosed() {
   return (
-    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${T.navy}, ${T.navyMid})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', padding: '24px' }}>
+    <div style={{ minHeight: '100vh', background: `linear-gradient(160deg, ${T.navy}, ${T.navyMid})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)', padding: '16px 18px' }}>
       <div style={{ maxWidth: '440px', width: '100%', textAlign: 'center' }}>
-        <div style={{ width: '90px', height: '90px', borderRadius: '24px', background: `linear-gradient(135deg, ${T.teal}, ${T.tealDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: `0 0 50px ${T.teal}40` }}>
+        <div style={{ width: '90px', height: '90px', borderRadius: '14px', background: `linear-gradient(135deg, ${T.teal}, ${T.tealDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: `0 0 50px ${T.teal}40` }}>
           <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={T.white} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="10" cy="10" r="7" fill="currentColor" fillOpacity="0.1" />
             <path d="m15 15 5 5" />
             <circle cx="18" cy="8" r="2" fill="currentColor" />
           </svg>
         </div>
-        <h1 style={{ margin: '0 0 12px', fontSize: '32px', fontWeight: '900', color: T.white, letterSpacing: '-0.5px' }}>Registration Closed</h1>
+        <h1 style={{ margin: '0 0 12px', fontSize: '32px', fontWeight: '700', color: T.white, letterSpacing: '-0.5px' }}>Registration Closed</h1>
         <p style={{ color: T.muted, fontSize: '15px', lineHeight: '1.7', margin: '0 0 32px' }}>The HCC Pickleball Tournament registration is not currently open. Contact us to be notified when it opens.</p>
         <a href="mailto:knoxvillehcc@gmail.com?subject=Pickleball Registration Inquiry" style={{ display: 'inline-flex', alignItems: 'center', color: T.lime, fontWeight: '700', fontSize: '15px', textDecoration: 'none', padding: '12px 24px', borderRadius: '12px', background: `${T.lime}12`, border: `1px solid ${T.lime}30` }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
@@ -113,7 +113,7 @@ function RegistrationClosed() {
           </svg>
           knoxvillehcc@gmail.com
         </a>
-        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
+        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
           <a href="tel:8659249286" style={{ color: T.muted, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}><span style={{ color: T.lime }}>Love</span> · 865-924-9286</a>
           <a href="tel:8653154494" style={{ color: T.muted, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}><span style={{ color: T.lime }}>Om</span> · 865-315-4494</a>
         </div>
@@ -183,7 +183,7 @@ function RegistrationForm() {
   if (publishStatus === 'closed')  return <RegistrationClosed />;
 
   return (
-    <div style={{ minHeight: '100vh', background: T.navy, fontFamily: "'Inter', sans-serif", color: T.white }}>
+    <div style={{ minHeight: '100vh', background: T.navy, fontFamily: 'var(--font-sans)', color: T.white }}>
 
       {/* Animated background */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
@@ -203,13 +203,13 @@ function RegistrationForm() {
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: '900', color: T.white }}>HCC Youth Club</div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: T.white }}>HCC Youth Club</div>
               <div style={{ fontSize: '11px', color: T.muted, fontWeight: '600' }}>Pickleball Tournament · July 26, 2026</div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: `${T.lime}12`, border: `1px solid ${T.lime}30`, padding: '6px 14px', borderRadius: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: `${T.lime}12`, border: `1px solid ${T.lime}30`, padding: '6px 14px', borderRadius: '14px' }}>
             <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: T.lime, display: 'inline-block', boxShadow: `0 0 8px ${T.lime}` }}/>
-            <span style={{ fontSize: '12px', fontWeight: '800', color: T.lime }}>Registration Open</span>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: T.lime }}>Registration Open</span>
           </div>
         </div>
       </div>
@@ -218,11 +218,11 @@ function RegistrationForm() {
 
         {/* Hero */}
         <div style={{ paddingTop: '52px', paddingBottom: '48px', textAlign: 'center' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: `${T.teal}18`, border: `1px solid ${T.teal}35`, padding: '6px 16px', borderRadius: '20px', marginBottom: '22px' }}>
-            <span style={{ fontSize: '13px', fontWeight: '800', color: T.teal, letterSpacing: '1px' }}>HCC YOUTH CLUB PRESENTS</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: `${T.teal}18`, border: `1px solid ${T.teal}35`, padding: '6px 16px', borderRadius: '14px', marginBottom: '22px' }}>
+            <span style={{ fontSize: '13px', fontWeight: '700', color: T.teal, letterSpacing: '1px' }}>HCC YOUTH CLUB PRESENTS</span>
           </div>
-          <h1 style={{ margin: '0 0 4px', fontSize: 'clamp(40px,8vw,72px)', fontWeight: '900', letterSpacing: '-2px', lineHeight: 0.95, textTransform: 'uppercase', color: T.white }}>Pickleball</h1>
-          <h1 style={{ margin: '0 0 28px', fontSize: 'clamp(40px,8vw,72px)', fontWeight: '900', letterSpacing: '-2px', lineHeight: 0.95, textTransform: 'uppercase', color: T.lime }}>Tournament</h1>
+          <h1 style={{ margin: '0 0 4px', fontSize: 'clamp(40px,8vw,72px)', fontWeight: '700', letterSpacing: '-2px', lineHeight: 0.95, textTransform: 'uppercase', color: T.white }}>Pickleball</h1>
+          <h1 style={{ margin: '0 0 28px', fontSize: 'clamp(40px,8vw,72px)', fontWeight: '700', letterSpacing: '-2px', lineHeight: 0.95, textTransform: 'uppercase', color: T.lime }}>Tournament</h1>
 
           {/* Info cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '12px', marginBottom: '28px' }}>
@@ -301,8 +301,8 @@ function RegistrationForm() {
                 }}>
                   {info.icon}
                 </div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '4px' }}>{info.label}</div>
-                <div style={{ fontSize: '16px', fontWeight: '900', color: T.white, letterSpacing: '-0.3px' }}>{info.value}</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>{info.label}</div>
+                <div style={{ fontSize: '16px', fontWeight: '700', color: T.white, letterSpacing: '-0.3px' }}>{info.value}</div>
                 <div style={{ fontSize: '11px', color: T.muted, marginTop: '2px', lineHeight: '1.3' }}>{info.sub}</div>
               </div>
             ))}
@@ -311,14 +311,14 @@ function RegistrationForm() {
           {/* Brackets */}
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
             {[{ bg: T.teal, text: 'Middle School & High School' }, { bg: T.lime, text: 'Adults (18+)' }].map(b => (
-              <div key={b.text} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: `${b.bg}20`, border: `1px solid ${b.bg}40`, padding: '7px 16px', borderRadius: '20px' }}>
-                <span style={{ fontSize: '13px', fontWeight: '800', color: b.bg }}>{b.text}</span>
+              <div key={b.text} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: `${b.bg}20`, border: `1px solid ${b.bg}40`, padding: '7px 16px', borderRadius: '14px' }}>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: b.bg }}>{b.text}</span>
               </div>
             ))}
           </div>
 
           {/* Tag line */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '12px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', flexWrap: 'wrap', fontSize: '12px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px' }}>
             <span>Compete. Have Fun. Build Community.</span>
             <span style={{ color: 'rgba(255,255,255,0.15)' }}>|</span>
             <span>All Skill Levels Welcome</span>
@@ -328,7 +328,7 @@ function RegistrationForm() {
 
           {/* Contact */}
           <div style={{ marginTop: '20px', padding: '14px 20px', background: T.navyCard, border: `1px solid rgba(255,255,255,0.08)`, borderRadius: '14px', display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: '800', color: T.teal, textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: '700', color: T.teal, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
               </svg>
@@ -354,7 +354,7 @@ function RegistrationForm() {
               <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
             <div>
-              <div style={{ fontWeight: '800', color: '#FCA5A5', fontSize: '14px' }}>Payment Cancelled</div>
+              <div style={{ fontWeight: '700', color: '#FCA5A5', fontSize: '14px' }}>Payment Cancelled</div>
               <div style={{ color: T.muted, fontSize: '13px', marginTop: '2px' }}>Your registration was not completed. Fill out the form again to proceed.</div>
             </div>
           </div>
@@ -367,7 +367,7 @@ function RegistrationForm() {
               <line x1="9" y1="9" x2="15" y2="15" />
             </svg>
             <div>
-              <div style={{ fontWeight: '800', color: '#FCA5A5', fontSize: '14px' }}>Registration Error</div>
+              <div style={{ fontWeight: '700', color: '#FCA5A5', fontSize: '14px' }}>Registration Error</div>
               <div style={{ color: T.muted, fontSize: '13px', marginTop: '2px' }}>{error}</div>
             </div>
           </div>
@@ -442,7 +442,7 @@ function RegistrationForm() {
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Registration Type</div>
                 <div style={{ padding: '18px 20px', borderRadius: '14px', border: `2px solid ${T.lime}`, background: `${T.lime}12`, boxShadow: `0 0 28px ${T.lime}18`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', top: '8px', right: '10px', fontSize: '9px', fontWeight: '900', color: '#000', background: T.lime, padding: '2px 8px', borderRadius: '20px' }}>ONLY</div>
+                  <div style={{ position: 'absolute', top: '8px', right: '10px', fontSize: '9px', fontWeight: '700', color: '#000', background: T.lime, padding: '2px 8px', borderRadius: '14px' }}>ONLY</div>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
                       <div style={{ color: T.lime }}>
@@ -453,11 +453,11 @@ function RegistrationForm() {
                           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                         </svg>
                       </div>
-                      <span style={{ fontWeight: '900', fontSize: '18px', color: T.lime }}>Doubles</span>
+                      <span style={{ fontWeight: '700', fontSize: '18px', color: T.lime }}>Doubles</span>
                     </div>
                     <div style={{ fontSize: '12px', color: T.muted }}>2 players · $25.00 per player</div>
                   </div>
-                  <div style={{ fontWeight: '900', fontSize: '28px', color: T.lime }}>$50</div>
+                  <div style={{ fontWeight: '700', fontSize: '28px', color: T.lime }}>$50</div>
                 </div>
                 <div style={{ marginTop: '8px', fontSize: '12px', color: T.muted }}>
                   This tournament is <strong style={{ color: T.white }}>doubles format only</strong>. Add your partner details in Step 3 below.
@@ -475,7 +475,7 @@ function RegistrationForm() {
             } accent={T.teal}>
               {/* Player 1 */}
               <div style={{ background: `${T.lime}08`, border: `1px solid ${T.lime}20`, borderRadius: '12px', padding: '16px 18px', marginBottom: '16px' }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: T.lime, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: T.lime, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
                   Player 1 (You — auto-filled from Step 1)
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -493,7 +493,7 @@ function RegistrationForm() {
 
               {/* Player 2 — always required */}
               <div style={{ background: `${T.teal}08`, border: `2px solid ${T.teal}40`, borderRadius: '12px', padding: '18px' }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: T.teal, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: T.teal, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>
                   Player 2 — Your Doubles Partner <span style={{ color: '#EF4444' }}>*</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
@@ -546,13 +546,13 @@ function RegistrationForm() {
             } accent={T.lime}>
               {/* Order summary */}
               <div style={{ background: T.navyMid, border: `1px solid ${T.lime}18`, borderRadius: '14px', padding: '20px', marginBottom: '20px' }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '16px' }}>Order Summary</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '16px' }}>Order Summary</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: `1px solid rgba(255,255,255,0.07)` }}>
                   <div>
                     <div style={{ fontSize: '15px', fontWeight: '700', color: T.white }}>Doubles Registration</div>
                     <div style={{ fontSize: '12px', color: T.muted, marginTop: '3px' }}>2 players × $25.00 per player</div>
                   </div>
-                  <div style={{ fontSize: '20px', fontWeight: '900', color: T.white }}>${TOTAL}.00</div>
+                  <div style={{ fontSize: '20px', fontWeight: '700', color: T.white }}>${TOTAL}.00</div>
                 </div>
                 {form.team_name && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid rgba(255,255,255,0.07)` }}>
@@ -569,8 +569,8 @@ function RegistrationForm() {
                   <span style={{ fontSize: '13px', fontWeight: '700', color: T.white }}>Sunday, July 26, 2026</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: '800', color: T.white }}>Total Due</span>
-                  <span style={{ fontSize: '40px', fontWeight: '900', color: T.lime, letterSpacing: '-2px' }}>${TOTAL}.00</span>
+                  <span style={{ fontSize: '16px', fontWeight: '700', color: T.white }}>Total Due</span>
+                  <span style={{ fontSize: '40px', fontWeight: '700', color: T.lime, letterSpacing: '-2px' }}>${TOTAL}.00</span>
                 </div>
                 <div style={{ marginTop: '14px', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '12px', color: T.muted, display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }}>
@@ -584,7 +584,7 @@ function RegistrationForm() {
               {/* Checklist */}
               {!isValid && (
                 <div style={{ background: `${T.lime}06`, border: `1px solid ${T.lime}18`, borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: '800', color: T.lime, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Complete to continue:</div>
+                  <div style={{ fontSize: '12px', fontWeight: '700', color: T.lime, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Complete to continue:</div>
                   {[
                     { done: !!(form.first_name && form.last_name && form.email && form.phone), label: 'Contact information' },
                     { done: !!(form.address && form.city && form.zip),                         label: 'Address' },
@@ -618,7 +618,7 @@ function RegistrationForm() {
                   ? 'rgba(255,255,255,0.06)'
                   : `linear-gradient(135deg, ${T.lime} 0%, ${T.limeDark} 100%)`,
                 color: loading || !isValid ? T.muted : '#06130A',
-                fontSize: '18px', fontWeight: '900', cursor: loading || !isValid ? 'not-allowed' : 'pointer',
+                fontSize: '18px', fontWeight: '700', cursor: loading || !isValid ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
                 transition: 'all 0.3s', letterSpacing: '0.3px', fontFamily: 'inherit',
                 boxShadow: !loading && isValid ? `0 0 50px ${T.lime}35, 0 4px 24px rgba(0,0,0,0.3)` : 'none',
@@ -642,7 +642,7 @@ function RegistrationForm() {
         <div style={{ textAlign: 'center', marginTop: '48px', padding: '28px 0', borderTop: `1px solid rgba(255,255,255,0.06)` }}>
           <div style={{ fontSize: '13px', color: T.muted, marginBottom: '6px' }}>Knoxville Hindu Community Center · HCC Youth Club Presents</div>
           <a href="mailto:knoxvillehcc@gmail.com" style={{ color: T.lime, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>knoxvillehcc@gmail.com</a>
-          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
+          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <a href="tel:8659249286" style={{ color: T.muted, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}><span style={{ color: T.teal }}>Love</span> · 865-924-9286</a>
             <a href="tel:8653154494" style={{ color: T.muted, textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}><span style={{ color: T.teal }}>Om</span> · 865-315-4494</a>
           </div>

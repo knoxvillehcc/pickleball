@@ -12,9 +12,9 @@ export default function NavratriVendorSuccessPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: 'Inter, sans-serif',
+        fontFamily: 'var(--font-sans)',
       }}>
-        <div style={{ color: '#FF6B35', fontSize: '18px', fontWeight: '800' }}>Loading…</div>
+        <div style={{ color: '#FF6B35', fontSize: '18px', fontWeight: '700' }}>Loading…</div>
       </div>
     }>
       <NavratriVendorSuccessClient />

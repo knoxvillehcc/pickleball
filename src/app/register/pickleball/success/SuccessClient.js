@@ -45,8 +45,8 @@ export default function SuccessClient() {
       }}>
 
         {/* Top badge */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: `${T.teal}18`, border: `1px solid ${T.teal}35`, padding: '6px 16px', borderRadius: '20px', marginBottom: '24px' }}>
-          <span style={{ fontSize: '13px', fontWeight: '800', color: T.teal, letterSpacing: '1px' }}>HCC YOUTH CLUB PRESENTS</span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: `${T.teal}18`, border: `1px solid ${T.teal}35`, padding: '6px 16px', borderRadius: '14px', marginBottom: '24px' }}>
+          <span style={{ fontSize: '13px', fontWeight: '700', color: T.teal, letterSpacing: '1px' }}>HCC YOUTH CLUB PRESENTS</span>
         </div>
 
         {/* Success icon */}
@@ -67,10 +67,10 @@ export default function SuccessClient() {
         </div>
 
         {/* Heading */}
-        <h1 style={{ margin: '0 0 8px', fontSize: 'clamp(34px, 6vw, 52px)', fontWeight: '900', letterSpacing: '-1.5px', lineHeight: 0.95, textTransform: 'uppercase', color: T.white }}>
+        <h1 style={{ margin: '0 0 8px', fontSize: 'clamp(34px, 6vw, 52px)', fontWeight: '700', letterSpacing: '-1.5px', lineHeight: 0.95, textTransform: 'uppercase', color: T.white }}>
           You're In!
         </h1>
-        <h2 style={{ margin: '0 0 12px', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: '900', letterSpacing: '-1px', lineHeight: 1, textTransform: 'uppercase', color: T.lime }}>
+        <h2 style={{ margin: '0 0 12px', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: '700', letterSpacing: '-1px', lineHeight: 1, textTransform: 'uppercase', color: T.lime }}>
           Registration Confirmed
         </h2>
         <p style={{ margin: '0 0 36px', color: T.muted, fontSize: '16px', lineHeight: '1.6' }}>
@@ -81,15 +81,15 @@ export default function SuccessClient() {
         {/* Registration number card */}
         {regNumber && (
           <div style={{
-            background: T.navyCard, border: `1px solid ${T.lime}25`, borderRadius: '18px',
-            padding: '28px', marginBottom: '20px',
+            background: T.navyCard, border: `1px solid ${T.lime}25`, borderRadius: '14px',
+            padding: '20px 22px', marginBottom: '20px',
             backdropFilter: 'blur(12px)',
             boxShadow: `0 0 40px ${T.lime}12`,
           }}>
-            <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px' }}>
               Your Registration Number
             </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '34px', fontWeight: '900', color: T.lime, letterSpacing: '4px' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '34px', fontWeight: '700', color: T.lime, letterSpacing: '4px' }}>
               {regNumber}
             </div>
             <div style={{ fontSize: '13px', color: T.muted, marginTop: '10px' }}>
@@ -100,11 +100,11 @@ export default function SuccessClient() {
 
         {/* Event details */}
         <div style={{
-          background: T.navyCard, border: `1px solid rgba(255,255,255,0.06)`, borderRadius: '18px',
-          padding: '24px', marginBottom: '20px', textAlign: 'left',
+          background: T.navyCard, border: `1px solid rgba(255,255,255,0.06)`, borderRadius: '14px',
+          padding: '16px 18px', marginBottom: '20px', textAlign: 'left',
           backdropFilter: 'blur(12px)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '18px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '18px' }}>
             Event Details
           </div>
           {[
@@ -164,11 +164,11 @@ export default function SuccessClient() {
 
         {/* What's next */}
         <div style={{
-          background: T.navyCard, border: `1px solid ${T.teal}20`, borderRadius: '18px',
-          padding: '24px', marginBottom: '32px', textAlign: 'left',
+          background: T.navyCard, border: `1px solid ${T.teal}20`, borderRadius: '14px',
+          padding: '16px 18px', marginBottom: '32px', textAlign: 'left',
           backdropFilter: 'blur(12px)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '18px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '18px' }}>
             What Happens Next
           </div>
           {[
@@ -218,7 +218,7 @@ export default function SuccessClient() {
         </div>
 
         {/* CTA tag line */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '12px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap', fontSize: '12px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '32px' }}>
           <span>All Skill Levels Welcome</span>
           <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
           <span>Doubles Tournament</span>

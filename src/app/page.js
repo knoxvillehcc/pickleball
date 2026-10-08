@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTheme } from '@/components/ClientLayout';
@@ -7,7 +8,7 @@ import { useTheme } from '@/components/ClientLayout';
 const cardStyle = {
   backgroundColor: 'var(--bg-card)',
   border: '1px solid var(--border)',
-  borderRadius: '16px',
+  borderRadius: '14px',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 };
 
@@ -179,7 +180,7 @@ function PublicLanding() {
       title: 'LED Screen Ads — Navratri 2026',
       desc: 'Advertise your business on our LED screens throughout all nights of Navratri 2026. High-resolution 1920×1080 display.',
       href: '/register/led-ads',
-      accentColor: '#FF9933',
+      accentColor: 'var(--accent)',
       glowColor: 'rgba(255, 153, 51, 0.12)',
       borderColor: 'rgba(255, 153, 51, 0.3)',
       icon: SvgIcons.screen,
@@ -191,7 +192,7 @@ function PublicLanding() {
       title: 'Admin & Staff Portal',
       desc: 'Authorized operator access to system configurations, Odoo discrepancy scanner, logs, and report lists.',
       href: '/login',
-      accentColor: '#8B1E3F',
+      accentColor: 'var(--maroon)',
       glowColor: 'rgba(139, 30, 63, 0.12)',
       borderColor: 'var(--border)',
       icon: SvgIcons.key,
@@ -228,7 +229,7 @@ function PublicLanding() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img src="/hcc_logo.png" alt="HCC Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
             <div style={{ borderLeft: '1.5px solid var(--border)', paddingLeft: '12px' }}>
-              <div style={{ fontSize: '14px', fontWeight: '850', color: 'var(--text-primary)', letterSpacing: '0.2px' }}>Hindu Community Center</div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '0.2px' }}>Hindu Community Center</div>
               <div style={{ fontSize: '10px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Knoxville, TN</div>
             </div>
           </div>
@@ -247,7 +248,7 @@ function PublicLanding() {
                 transition: 'all 0.25s ease', fontSize: '16px',
               }}
             >
-              {isDark ? '☀️' : '🌙'}
+              {isDark ? <Icon name="sun" /> : <Icon name="moon" />}
             </button>
           </div>
         </div>
@@ -258,7 +259,7 @@ function PublicLanding() {
         
         {/* Welcome Hero */}
         <div style={{ textAlign: 'center', marginBottom: '44px', maxWidth: '640px' }}>
-          <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(32px, 5.5vw, 56px)', fontWeight: '950', color: 'var(--text-primary)', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+          <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(32px, 5.5vw, 56px)', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
             HCC Registrations & Portal
           </h1>
           <p style={{ margin: 0, fontSize: '16px', color: 'var(--text-secondary)', lineHeight: 1.5, fontWeight: '500' }}>
@@ -270,7 +271,7 @@ function PublicLanding() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
-          gap: '24px',
+          gap: '16px',
           width: '100%',
           maxWidth: '1000px',
         }}>
@@ -288,7 +289,7 @@ function PublicLanding() {
                     border: active && opt.isOpen
                       ? `2px solid ${opt.accentColor}`
                       : '2px solid var(--border)',
-                    borderRadius: '20px',
+                    borderRadius: '14px',
                     padding: '36px 28px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -311,7 +312,7 @@ function PublicLanding() {
                       borderRadius: '99px', padding: '4px 10px',
                       border: '1px solid var(--border)',
                     }}>
-                      <span style={{ fontSize: '10px', fontWeight: '850', color: active && opt.isOpen ? opt.accentColor : 'var(--text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: '10px', fontWeight: '700', color: active && opt.isOpen ? opt.accentColor : 'var(--text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
                         {opt.badge}
                       </span>
                     </div>
@@ -339,7 +340,7 @@ function PublicLanding() {
                   </div>
 
                   {/* Title & Desc */}
-                  <h2 style={{ margin: '0 0 10px', fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
+                  <h2 style={{ margin: '0 0 10px', fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
                     {opt.title}
                   </h2>
                   <p style={{ margin: '0 0 28px', fontSize: '13.5px', lineHeight: '1.6', color: 'var(--text-secondary)', flex: 1 }}>
@@ -349,7 +350,7 @@ function PublicLanding() {
                   {/* Action Link Indicator */}
                   <div style={{
                     display: 'inline-flex', alignItems: 'center', gap: '6px',
-                    fontSize: '13.5px', fontWeight: '800',
+                    fontSize: '13.5px', fontWeight: '700',
                     color: opt.isOpen ? opt.accentColor : 'var(--text-muted)',
                     transition: 'all 0.25s',
                   }}>
@@ -487,11 +488,11 @@ export default function Home() {
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '60px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
 
       {/* --- Page Navigation Header / Tabs --- */}
       {hasDashboardAccess && (
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', paddingBottom: '2px', gap: '24px' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', paddingBottom: '2px', gap: '16px' }}>
           <button
             onClick={() => setActiveTab('overview')}
             style={{
@@ -515,7 +516,7 @@ export default function Home() {
               position: 'relative', transition: 'color 0.2s',
             }}
           >
-            🔍 Odoo System Scanner
+            Odoo System Scanner
             {activeTab === 'scanner' && (
               <span style={{ position: 'absolute', bottom: '-2px', left: 0, right: 0, height: '3px', background: 'var(--accent)', borderRadius: '99px' }} />
             )}
@@ -540,11 +541,11 @@ export default function Home() {
             <div style={{ position: 'relative' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '99px', background: 'var(--accent-glow)', border: '1px solid var(--border)', marginBottom: '20px' }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--text-success)', boxShadow: '0 0 6px var(--text-success)' }} />
-                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                   {user?.role === 'super_admin' ? 'Super Admin Session' : 'Staff Session'}
                 </span>
               </div>
-              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
                 Welcome to the{' '}
                 <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                   HCC Admin Portal
@@ -558,14 +559,14 @@ export default function Home() {
 
           {/* Quick Access Card Grid */}
           <div>
-            <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>
+            <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '16px' }}>
               Your Allowed Modules ({allowedModules.length})
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '14px' }}>
               {allowedModules.map((mod) => (
                 <Link key={mod.slug} href={mod.href} style={{ textDecoration: 'none' }}>
                   <div
-                    style={{ ...cardStyle, padding: '24px', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', position: 'relative' }}
+                    style={{ ...cardStyle, padding: '16px 18px', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', position: 'relative' }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-4px)';
                       e.currentTarget.style.borderColor = mod.borderColor;
@@ -580,7 +581,7 @@ export default function Home() {
                     <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: mod.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', marginBottom: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
                       {mod.icon}
                     </div>
-                    <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)' }}>{mod.title}</h3>
+                    <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: '700', color: 'var(--text-primary)' }}>{mod.title}</h3>
                     <p style={{ margin: '0 0 24px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, flex: 1 }}>{mod.desc}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '700', color: 'var(--accent)' }}>
                       Manage Module <span>→</span>
@@ -593,7 +594,7 @@ export default function Home() {
               {hasDashboardAccess && (
                 <div
                   onClick={() => setActiveTab('scanner')}
-                  style={{ ...cardStyle, padding: '28px', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', position: 'relative' }}
+                  style={{ ...cardStyle, padding: '20px 22px', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', position: 'relative' }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
                     e.currentTarget.style.borderColor = 'rgba(236, 72, 153, 0.3)';
@@ -606,9 +607,9 @@ export default function Home() {
                   }}
                 >
                   <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, #EC4899, #F43F5E)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', marginBottom: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
-                    🔍
+                    
                   </div>
-                  <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)' }}>Odoo Diagnostics Scanner</h3>
+                  <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: '700', color: 'var(--text-primary)' }}>Odoo Diagnostics Scanner</h3>
                   <p style={{ margin: '0 0 24px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, flex: 1 }}>
                     Identify missing Pos recurring subscriptions and run instant database diagnostics on Odoo live.
                   </p>
@@ -624,7 +625,7 @@ export default function Home() {
 
       {/* --- SCANNER TAB --- */}
       {activeTab === 'scanner' && hasDashboardAccess && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }} className="animate-in">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }} className="animate-in">
           <div className="mobile-p-4" style={{
             ...cardStyle,
             background: 'var(--bg-banner-scanner)',
@@ -632,10 +633,10 @@ export default function Home() {
             padding: 'clamp(20px, 4vw, 32px)',
             boxShadow: 'var(--shadow)',
             position: 'relative', overflow: 'hidden',
-            display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
+            display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px',
           }}>
             <div style={{ position: 'relative' }}>
-              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
                 System{' '}
                 <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Scanner</span>
               </h1>
@@ -645,7 +646,7 @@ export default function Home() {
             </div>
             <button onClick={runScan} disabled={loading} style={{
               background: loading ? 'rgba(51,65,85,0.5)' : 'var(--accent)',
-              color: 'white', fontWeight: '800', fontSize: '14.5px',
+              color: 'white', fontWeight: '700', fontSize: '14.5px',
               padding: '12px 28px', borderRadius: '12px', border: 'none',
               cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px',
@@ -661,16 +662,16 @@ export default function Home() {
           </div>
 
           {summary && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
               {[
                 { label: 'Active Subs',       value: summary.totalActiveSubscriptions, color: 'var(--accent)', glow: false },
                 { label: 'POS Sub Orders',    value: summary.posOrdersWithSubs,        color: 'var(--accent)', glow: false },
                 { label: 'Valid (Skipped)',    value: summary.skipped,                  color: 'var(--text-success)', glow: false },
                 { label: 'Missing Subs',      value: summary.wouldFix,                 color: 'var(--text-error)', glow: true  },
               ].map(({ label, value, color, glow }) => (
-                <div key={label} style={{ ...cardStyle, padding: '24px', borderTop: '3.5px solid ' + color, boxShadow: glow ? '0 4px 12px var(--accent-glow)' : 'var(--shadow)' }}>
-                  <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px' }}>{label}</div>
-                  <div style={{ fontSize: '36px', fontWeight: '950', color: color, lineHeight: 1 }}>{value}</div>
+                <div key={label} style={{ ...cardStyle, padding: '16px 18px', borderTop: '3.5px solid ' + color, boxShadow: glow ? '0 4px 12px var(--accent-glow)' : 'var(--shadow)' }}>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px' }}>{label}</div>
+                  <div style={{ fontSize: '36px', fontWeight: '700', color: color, lineHeight: 1 }}>{value}</div>
                 </div>
               ))}
             </div>
@@ -694,7 +695,7 @@ export default function Home() {
                   <thead>
                     <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>
                       {[['Order Ref','left'],['Customer','left'],['Product','left'],['Amount','right'],['Status','center']].map(([h, align]) => (
-                        <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: align }}>{h}</th>
+                        <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '0.6px', textAlign: align }}>{h}</th>
                       ))}
                     </tr>
                   </thead>

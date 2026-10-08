@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from '@/components/ClientLayout';
@@ -26,15 +27,15 @@ By checking the box below, you acknowledge that you have read, understood, and a
 
 const PRICE = 1500;
 const STEPS = [
-  { id: 1, label: 'Business Info', icon: '📺' },
-  { id: 2, label: 'Contact', icon: '📞' },
-  { id: 3, label: 'Agreement', icon: '📋' },
+  { id: 1, label: 'Business Info', icon: <Icon name="tv" /> },
+  { id: 2, label: 'Contact', icon: <Icon name="phone" /> },
+  { id: 3, label: 'Agreement', icon: <Icon name="clipboard" /> },
 ];
 
 // ── Progress Bar ───────────────────────────────────────────────────────────────
 function ProgressBar({ active }) {
   const { isDark } = useTheme();
-  const activeColor = isDark ? '#FFD700' : '#8B1E3F';
+  const activeColor = isDark ? '#FFD700' : 'var(--maroon)';
   return (
     <div style={{
       position: 'sticky', top: 0, zIndex: 100,
@@ -51,17 +52,17 @@ function ProgressBar({ active }) {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                 <div style={{
                   width: '34px', height: '34px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: done ? '#FF9933' : current ? activeColor : 'var(--bg-secondary)',
-                  border: `2px solid ${done ? '#FF9933' : current ? activeColor : 'var(--border)'}`,
+                  background: done ? 'var(--accent)' : current ? activeColor : 'var(--bg-secondary)',
+                  border: `2px solid ${done ? 'var(--accent)' : current ? activeColor : 'var(--border)'}`,
                   fontSize: done ? '14px' : '13px', color: done || current ? 'white' : 'var(--text-secondary)',
-                  fontWeight: '800', transition: 'all 0.3s ease', flexShrink: 0,
+                  fontWeight: '700', transition: 'all 0.3s ease', flexShrink: 0,
                 }}>{done ? '✓' : step.id}</div>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: done ? '#FF9933' : current ? activeColor : 'var(--text-secondary)', letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: done ? 'var(--accent)' : current ? activeColor : 'var(--text-secondary)', letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>
                   {step.label}
                 </span>
               </div>
               {i < STEPS.length - 1 && (
-                <div style={{ flex: 1, height: '2px', margin: '0 8px', marginBottom: '18px', background: done ? '#FF9933' : 'var(--border)', borderRadius: '2px', transition: 'background 0.3s ease' }} />
+                <div style={{ flex: 1, height: '2px', margin: '0 8px', marginBottom: '18px', background: done ? 'var(--accent)' : 'var(--border)', borderRadius: '2px', transition: 'background 0.3s ease' }} />
               )}
             </div>
           );
@@ -76,7 +77,7 @@ function Field({ label, required, hint, type = 'text', value, onChange, placehol
   const [focused, setFocused] = useState(false);
   const inputStyle = {
     width: '100%', padding: '13px 16px', borderRadius: '10px', boxSizing: 'border-box',
-    border: `1.5px solid ${focused ? '#FF9933' : 'var(--border)'}`,
+    border: `1.5px solid ${focused ? 'var(--accent)' : 'var(--border)'}`,
     background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '15px',
     outline: 'none', fontFamily: 'inherit',
     boxShadow: focused ? '0 0 0 3px rgba(255,153,51,0.12)' : 'none',
@@ -86,7 +87,7 @@ function Field({ label, required, hint, type = 'text', value, onChange, placehol
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
         <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-          {label}{required && <span style={{ color: '#FF9933', marginLeft: '3px' }}>*</span>}
+          {label}{required && <span style={{ color: 'var(--accent)', marginLeft: '3px' }}>*</span>}
         </label>
       )}
       {as === 'textarea'
@@ -106,7 +107,7 @@ function Section({ title, icon, step, children, active }) {
   return (
     <div style={{
       background: 'var(--bg-primary)', border: `1px solid var(--border)`,
-      borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', overflow: 'hidden',
+      borderRadius: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', overflow: 'hidden',
       transition: 'all 0.3s ease',
     }}>
       <div style={{
@@ -120,20 +121,20 @@ function Section({ title, icon, step, children, active }) {
           boxShadow: '0 4px 12px rgba(255,153,51,0.25)',
         }}>{icon}</div>
         <div>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: '#FF9933', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: '2px' }}>
             Step {step} of 3
           </div>
-          <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)' }}>{title}</div>
+          <div style={{ fontSize: '17px', fontWeight: '700', color: 'var(--text-primary)' }}>{title}</div>
         </div>
         <div style={{
           marginLeft: 'auto', width: '28px', height: '28px', borderRadius: '50%',
-          background: active > step ? '#FF9933' : 'var(--bg-secondary)',
-          border: `2px solid ${active > step ? '#FF9933' : 'var(--border)'}`,
+          background: active > step ? 'var(--accent)' : 'var(--bg-secondary)',
+          border: `2px solid ${active > step ? 'var(--accent)' : 'var(--border)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '12px', color: active > step ? 'white' : 'var(--text-secondary)', fontWeight: '800',
+          fontSize: '12px', color: active > step ? 'white' : 'var(--text-secondary)', fontWeight: '700',
         }}>{active > step ? '✓' : ''}</div>
       </div>
-      <div style={{ padding: '28px' }}>{children}</div>
+      <div style={{ padding: '20px 22px' }}>{children}</div>
     </div>
   );
 }
@@ -213,10 +214,10 @@ function LedAdsFormInner() {
 
   // Unpublished state
   if (!isPublished) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: '24px' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: '16px 18px' }}>
       <div style={{ textAlign: 'center', maxWidth: '480px' }}>
-        <div style={{ fontSize: '60px', marginBottom: '16px' }}>📺</div>
-        <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '12px' }}>
+        <div style={{ fontSize: '60px', marginBottom: '16px' }}><Icon name="tv" /></div>
+        <h1 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '12px' }}>
           LED Screen Ads — Coming Soon
         </h1>
         <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
@@ -232,8 +233,8 @@ function LedAdsFormInner() {
 
       {/* Hero */}
       <div style={{ textAlign: 'center', padding: '40px 24px 24px' }}>
-        <div style={{ fontSize: '48px', marginBottom: '12px' }}>📺</div>
-        <h1 style={{ fontSize: '26px', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+        <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon name="tv" /></div>
+        <h1 style={{ fontSize: '26px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
           Navratri 2026 — LED Screen Ads
         </h1>
         <p style={{ color: 'var(--text-secondary)', marginTop: '8px', fontSize: '15px', lineHeight: '1.5', maxWidth: '500px', margin: '8px auto 0' }}>
@@ -243,7 +244,7 @@ function LedAdsFormInner() {
         <div style={{
           display: 'inline-block', marginTop: '16px', padding: '10px 28px', borderRadius: '12px',
           background: 'linear-gradient(135deg, #FF9933, #E07C1A)',
-          color: 'white', fontWeight: '800', fontSize: '20px',
+          color: 'white', fontWeight: '700', fontSize: '20px',
           boxShadow: '0 4px 16px rgba(255,153,51,0.3)',
         }}>
           $1,500 per ad slot
@@ -253,7 +254,7 @@ function LedAdsFormInner() {
       {cancelled && (
         <div style={{ maxWidth: '660px', margin: '0 auto 16px', padding: '0 24px' }}>
           <div style={{ padding: '14px 20px', borderRadius: '12px', background: '#FEF3C7', border: '1px solid #FCD34D', color: '#92400E', fontSize: '14px', fontWeight: '600' }}>
-            ⚠️ Payment was cancelled. Your information has been saved — you can try again.
+            Payment was cancelled. Your information has been saved — you can try again.
           </div>
         </div>
       )}
@@ -261,20 +262,20 @@ function LedAdsFormInner() {
       {error && (
         <div style={{ maxWidth: '660px', margin: '0 auto 16px', padding: '0 24px' }}>
           <div style={{ padding: '14px 20px', borderRadius: '12px', background: '#FEE2E2', border: '1px solid #FCA5A5', color: '#991B1B', fontSize: '14px', fontWeight: '600' }}>
-            ❌ {error}
+            {error}
           </div>
         </div>
       )}
 
-      <div style={{ maxWidth: '660px', margin: '0 auto', padding: '0 24px 80px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ maxWidth: '660px', margin: '0 auto', padding: '0 24px 80px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
         {/* Step 1: Business Info */}
-        <Section title="Business Information" icon="📺" step={1} active={step}>
+        <Section title="Business Information" icon={<Icon name="tv" />} step={1} active={step}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <Field label="Business / Advertiser Name" required value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Your company or brand name" />
             <Field label="What are you advertising?" value={adDescription} onChange={e => setAdDescription(e.target.value)} placeholder="Brief description of your ad content" as="textarea" />
             <div style={{ padding: '14px 18px', borderRadius: '10px', background: isDark ? 'rgba(255,153,51,0.08)' : '#FFF8F0', border: '1px solid rgba(255,153,51,0.2)' }}>
-              <div style={{ fontSize: '12px', fontWeight: '700', color: '#FF9933', letterSpacing: '0.5px', marginBottom: '6px' }}>📐 MEDIA REQUIREMENT</div>
+              <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '0.5px', marginBottom: '6px' }}><Icon name="ruler" />MEDIA REQUIREMENT</div>
               <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: '600' }}>High Resolution: 1920 × 1080 pixels (landscape)</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>Submit your ad media at least 7 days before the event.</div>
             </div>
@@ -291,7 +292,7 @@ function LedAdsFormInner() {
 
         {/* Step 2: Contact */}
         {step >= 2 && (
-          <Section title="Contact Details" icon="📞" step={2} active={step}>
+          <Section title="Contact Details" icon={<Icon name="phone" />} step={2} active={step}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <Field label="Contact Person Name" required value={contactName} onChange={e => setContactName(e.target.value)} placeholder="Full name" />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -325,7 +326,7 @@ function LedAdsFormInner() {
 
         {/* Step 3: Agreement */}
         {step >= 3 && (
-          <Section title="Agreement & Payment" icon="📋" step={3} active={step}>
+          <Section title="Agreement & Payment" icon={<Icon name="clipboard" />} step={3} active={step}>
             <div style={{
               maxHeight: '250px', overflowY: 'auto', padding: '16px', borderRadius: '10px',
               background: 'var(--bg-secondary)', border: '1px solid var(--border)',
@@ -346,7 +347,7 @@ function LedAdsFormInner() {
                 border: `2px solid ${agreed ? '#22C55E' : 'var(--border)'}`,
                 background: agreed ? '#22C55E' : 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'white', fontSize: '14px', fontWeight: '800',
+                color: 'white', fontSize: '14px', fontWeight: '700',
                 transition: 'all 0.2s ease',
               }}>{agreed ? '✓' : ''}</div>
               <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', lineHeight: '1.5' }}>
@@ -360,14 +361,14 @@ function LedAdsFormInner() {
               background: isDark ? 'rgba(255,153,51,0.06)' : '#FFF8F0',
               border: '1px solid rgba(255,153,51,0.2)',
             }}>
-              <div style={{ fontSize: '12px', fontWeight: '700', color: '#FF9933', letterSpacing: '1px', marginBottom: '12px' }}>ORDER SUMMARY</div>
+              <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '1px', marginBottom: '12px' }}>ORDER SUMMARY</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>LED Screen Ad — Navratri 2026</span>
                 <span style={{ color: 'var(--text-primary)', fontWeight: '700' }}>${PRICE.toLocaleString()}</span>
               </div>
               <div style={{ borderTop: '1px solid rgba(255,153,51,0.2)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>Total</span>
-                <span style={{ fontWeight: '900', fontSize: '20px', color: '#FF9933' }}>${PRICE.toLocaleString()}</span>
+                <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Total</span>
+                <span style={{ fontWeight: '700', fontSize: '20px', color: 'var(--accent)' }}>${PRICE.toLocaleString()}</span>
               </div>
             </div>
 
@@ -379,11 +380,11 @@ function LedAdsFormInner() {
               <button onClick={handleSubmit} disabled={!agreed || loading} style={{
                 flex: 2, padding: '16px', borderRadius: '14px', border: 'none', cursor: agreed && !loading ? 'pointer' : 'not-allowed',
                 background: agreed ? 'linear-gradient(135deg, #22C55E, #16A34A)' : '#ccc',
-                color: 'white', fontWeight: '800', fontSize: '16px',
+                color: 'white', fontWeight: '700', fontSize: '16px',
                 boxShadow: agreed ? '0 4px 16px rgba(34,197,94,0.3)' : 'none',
                 opacity: loading ? 0.6 : 1, transition: 'all 0.2s ease',
               }}>
-                {loading ? '⏳ Processing...' : `💳 Pay $${PRICE.toLocaleString()} — Proceed to Checkout`}
+                {loading ? 'Processing...' : `Pay $${PRICE.toLocaleString()} — Proceed to Checkout`}
               </button>
             </div>
           </Section>

@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from '@/components/ClientLayout';
@@ -19,8 +20,8 @@ const VENDOR_TYPES = [
     desc:  'Perfect for home-based businesses, crafters, and artisan sellers.',
     price: 351,
     cents: 35100,
-    emoji: '🏡',
-    color: '#FF9933',
+    emoji: <Icon name="home" />,
+    color: 'var(--accent)',
     bg:    '#FFF8F0',
     border:'#FFD4A0',
   },
@@ -30,8 +31,8 @@ const VENDOR_TYPES = [
     desc:  'For established retail shops, restaurants, and brand businesses.',
     price: 1001,
     cents: 100100,
-    emoji: '🏪',
-    color: '#8B1E3F',
+    emoji: <Icon name="store" />,
+    color: 'var(--maroon)',
     bg:    '#FFF0F4',
     border:'#F4B8C8',
   },
@@ -62,15 +63,15 @@ By checking the box below, you acknowledge that you have read, understood, and a
 
 // ── Step progress indicator ────────────────────────────────────────────────────
 const STEPS = [
-  { id: 1, label: 'Business Info',  icon: '🏢' },
-  { id: 2, label: 'Contact',        icon: '📞' },
-  { id: 3, label: 'Booth',          icon: '🏪' },
-  { id: 4, label: 'Agreement',      icon: '📋' },
+  { id: 1, label: 'Business Info',  icon: <Icon name="building" /> },
+  { id: 2, label: 'Contact',        icon: <Icon name="phone" /> },
+  { id: 3, label: 'Booth',          icon: <Icon name="store" /> },
+  { id: 4, label: 'Agreement',      icon: <Icon name="clipboard" /> },
 ];
 
 function ProgressBar({ active }) {
   const { isDark } = useTheme();
-  const activeColor = isDark ? 'var(--if-secondary)' : '#8B1E3F';
+  const activeColor = isDark ? 'var(--if-secondary)' : 'var(--maroon)';
   const inactiveBg = 'var(--bg-input)';
   const inactiveBorder = 'var(--border)';
 
@@ -96,7 +97,7 @@ function ProgressBar({ active }) {
                   border: `2px solid ${done ? 'var(--if-primary)' : current ? activeColor : inactiveBorder}`,
                   fontSize: done ? '14px' : '13px',
                   color: done || current ? 'white' : 'var(--if-text-muted)',
-                  fontWeight: '800',
+                  fontWeight: '700',
                   transition: 'all 0.3s ease',
                   flexShrink: 0,
                 }}>
@@ -167,7 +168,7 @@ function Section({ title, icon, step, children, active }) {
     <div id={`section-${step}`} style={{
       background: 'var(--if-card-bg)',
       border: `1px solid ${isActive ? 'var(--if-border)' : 'var(--border)'}`,
-      borderRadius: '20px',
+      borderRadius: '14px',
       boxShadow: 'var(--shadow)',
       overflow: 'hidden',
       transition: 'all 0.3s ease',
@@ -187,23 +188,23 @@ function Section({ title, icon, step, children, active }) {
           boxShadow: '0 4px 12px rgba(255,153,51,0.25)',
         }}>{icon}</div>
         <div>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--if-primary)', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--if-primary)', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: '2px' }}>
             Step {step} of 4
           </div>
-          <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--if-text)' }}>{title}</div>
+          <div style={{ fontSize: '17px', fontWeight: '700', color: 'var(--if-text)' }}>{title}</div>
         </div>
         <div style={{
           marginLeft: 'auto', width: '28px', height: '28px', borderRadius: '50%',
           background: active > step ? 'var(--if-primary)' : active === step ? 'var(--accent-glow)' : 'var(--bg-input)',
           border: `2px solid ${active > step ? 'var(--if-primary)' : active === step ? 'var(--if-border)' : 'var(--border)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '12px', color: active > step ? 'white' : 'var(--if-text-muted)', fontWeight: '800',
+          fontSize: '12px', color: active > step ? 'white' : 'var(--if-text-muted)', fontWeight: '700',
           flexShrink: 0,
         }}>
           {active > step ? '✓' : step}
         </div>
       </div>
-      <div style={{ padding: '28px' }}>{children}</div>
+      <div style={{ padding: '20px 22px' }}>{children}</div>
     </div>
   );
 }
@@ -231,7 +232,7 @@ function VendorTypeCard({ vendor, selected, quantity, onSelect, onQuantity }) {
     <div onClick={onSelect} style={{
       cursor: 'pointer',
       border: `2px solid ${cardBorder}`,
-      borderRadius: '16px',
+      borderRadius: '14px',
       background: cardBg,
       boxShadow: selected
         ? `0 0 0 1px ${vendor.color}30, var(--shadow)`
@@ -257,13 +258,13 @@ function VendorTypeCard({ vendor, selected, quantity, onSelect, onQuantity }) {
         </div>
         <span style={{ fontSize: '26px' }}>{vendor.emoji}</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '15px', fontWeight: '800', color: selected ? vendor.color : 'var(--if-text)', marginBottom: '2px' }}>
+          <div style={{ fontSize: '15px', fontWeight: '700', color: selected ? vendor.color : 'var(--if-text)', marginBottom: '2px' }}>
             {vendor.label}
           </div>
           <div style={{ fontSize: '12px', color: 'var(--if-text-muted)', fontWeight: '500' }}>{vendor.desc}</div>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: '24px', fontWeight: '900', color: selected ? vendor.color : 'var(--if-text)' }}>
+          <div style={{ fontSize: '24px', fontWeight: '700', color: selected ? vendor.color : 'var(--if-text)' }}>
             ${vendor.price.toLocaleString()}
           </div>
           <div style={{ fontSize: '11px', color: 'var(--if-text-muted)' }}>per spot</div>
@@ -298,7 +299,7 @@ function VendorTypeCard({ vendor, selected, quantity, onSelect, onQuantity }) {
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: '11px', color: 'var(--if-text-muted)', marginBottom: '1px' }}>Subtotal</div>
-          <div style={{ fontSize: '20px', fontWeight: '900', color: selected ? vendor.color : 'var(--if-text-muted)' }}>
+          <div style={{ fontSize: '20px', fontWeight: '700', color: selected ? vendor.color : 'var(--if-text-muted)' }}>
             ${subtotal.toLocaleString()}.00
           </div>
         </div>
@@ -347,7 +348,7 @@ function VendorFormContent() {
       <div style={{ minHeight: '100vh', background: '#FFF8F2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '48px', height: '48px', border: '4px solid #FFE0B8', borderTop: '4px solid #FF9933', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }}/>
-          <div style={{ color: '#FF9933', fontSize: '15px', fontWeight: '700', fontFamily: 'Inter, sans-serif' }}>Loading…</div>
+          <div style={{ color: 'var(--accent)', fontSize: '15px', fontWeight: '700', fontFamily: 'var(--font-sans)' }}>Loading…</div>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
@@ -357,19 +358,19 @@ function VendorFormContent() {
   // ── Closed ─────────────────────────────────────────────────────────────────
   if (publishStatus === 'closed') {
     return (
-      <div style={{ minHeight: '100vh', background: 'var(--if-bg-grad)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', padding: '40px 20px' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--if-bg-grad)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)', padding: '40px 20px' }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
           {/* Flag bar */}
           <div style={{ height: '5px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', borderRadius: '99px', marginBottom: '40px', width: '200px', margin: '0 auto 40px' }}/>
-          <div style={{ fontSize: '56px', marginBottom: '20px' }}>🔒</div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--bg-input)', border: '1px solid var(--border)', padding: '6px 18px', borderRadius: '20px', marginBottom: '24px' }}>
+          <div style={{ fontSize: '56px', marginBottom: '20px' }}><Icon name="lock" /></div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--bg-input)', border: '1px solid var(--border)', padding: '6px 18px', borderRadius: '14px', marginBottom: '24px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--if-primary)', display: 'inline-block', flexShrink: 0 }}/>
-            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--if-primary)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--if-primary)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
           </div>
-          <h1 style={{ margin: '0 0 6px', fontSize: '40px', fontWeight: '900', color: 'var(--if-text)', letterSpacing: '-1px' }}>India Fest 2026</h1>
+          <h1 style={{ margin: '0 0 6px', fontSize: '40px', fontWeight: '700', color: 'var(--if-text)', letterSpacing: '-1px' }}>India Fest 2026</h1>
           <h2 style={{ margin: '0 0 10px', fontSize: '18px', fontWeight: '700', color: 'var(--if-secondary)' }}>Vendor Registration Closed</h2>
           <div style={{ display: 'inline-block', background: 'var(--accent-glow)', border: '1.5px solid var(--if-border)', padding: '8px 16px', borderRadius: '10px', marginBottom: '20px', fontSize: '14px', fontWeight: '700', color: 'var(--if-primary)' }}>
-            📅 Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM
+            Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM
           </div>
           <p style={{ color: 'var(--if-text-muted)', fontSize: '15px', lineHeight: '1.8', margin: '0' }}>
             Vendor registration is not currently open.<br/>
@@ -424,14 +425,14 @@ function VendorFormContent() {
 
         {/* HCC badge */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '6px 18px', borderRadius: '99px', marginBottom: '24px', position: 'relative' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF9933', display: 'inline-block', flexShrink: 0, boxShadow: '0 0 8px rgba(255,153,51,0.6)' }}/>
-          <span style={{ fontSize: '11px', fontWeight: '800', color: 'rgba(255,255,255,0.9)', letterSpacing: '2px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)', display: 'inline-block', flexShrink: 0, boxShadow: '0 0 8px rgba(255,153,51,0.6)' }}/>
+          <span style={{ fontSize: '11px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
         </div>
 
         {/* Title */}
         <h1 style={{ margin: '0 0 10px', lineHeight: '1', position: 'relative' }}>
-          <div style={{ fontSize: 'clamp(44px, 9vw, 80px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-2px' }}>IndiaFest</div>
-          <div style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: '900', color: '#FFD700', letterSpacing: '8px', marginTop: '4px' }}>2026</div>
+          <div style={{ fontSize: 'clamp(44px, 9vw, 80px)', fontWeight: '700', color: '#FFFFFF', letterSpacing: '-2px' }}>IndiaFest</div>
+          <div style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: '700', color: '#FFD700', letterSpacing: '8px', marginTop: '4px' }}>2026</div>
         </h1>
 
         {/* Tagline */}
@@ -446,14 +447,14 @@ function VendorFormContent() {
         {/* Stats row */}
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '32px', flexWrap: 'wrap', position: 'relative' }}>
           {[
-            { icon: '📅', val: 'Aug 23, 2026', label: '11am to 5pm' },
-            { icon: '👥', val: '2,000+', label: 'Expected Guests' },
-            { icon: '🎪', val: '2 Tiers', label: 'Vendor Packages' },
-            { icon: '📍', val: 'Knoxville, TN', label: 'Location' },
+            { icon: <Icon name="calendar" />, val: 'Aug 23, 2026', label: '11am to 5pm' },
+            { icon: <Icon name="users" />, val: '2,000+', label: 'Expected Guests' },
+            { icon: <Icon name="tent" />, val: '2 Tiers', label: 'Vendor Packages' },
+            { icon: <Icon name="pin" />, val: 'Knoxville, TN', label: 'Location' },
           ].map((s, i) => (
             <div key={i} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', padding: '12px 18px', minWidth: '120px' }}>
               <div style={{ fontSize: '18px', marginBottom: '4px' }}>{s.icon}</div>
-              <div style={{ fontSize: '14px', fontWeight: '800', color: '#FFD700', marginBottom: '1px' }}>{s.val}</div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: '#FFD700', marginBottom: '1px' }}>{s.val}</div>
               <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', fontWeight: '600' }}>{s.label}</div>
             </div>
           ))}
@@ -466,21 +467,21 @@ function VendorFormContent() {
         {/* Alerts */}
         {cancelled && (
           <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', color: 'var(--text-error)', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '18px' }}>⚠️</span>
+            <span style={{ fontSize: '18px' }}><Icon name="alert" /></span>
             Your payment was cancelled — registration is not complete. Please try again below.
           </div>
         )}
         {error && (
           <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', color: 'var(--text-error)', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '18px' }}>❌</span>
+            <span style={{ fontSize: '18px' }}><Icon name="x" /></span>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', opacity: mounted ? 1 : 0, transition: 'opacity 0.5s ease 0.15s' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px', opacity: mounted ? 1 : 0, transition: 'opacity 0.5s ease 0.15s' }}>
 
           {/* ── Step 1: Business Information ── */}
-          <Section title="Business Information" icon="🏢" step={1} active={activeStep}>
+          <Section title="Business Information" icon={<Icon name="building" />} step={1} active={activeStep}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <Field label="First Name" required value={form.first_name} onChange={setField('first_name')} placeholder="Jane" />
@@ -491,7 +492,7 @@ function VendorFormContent() {
           </Section>
 
           {/* ── Step 2: Contact Information ── */}
-          <Section title="Contact Information" icon="📞" step={2} active={activeStep}>
+          <Section title="Contact Information" icon={<Icon name="phone" />} step={2} active={activeStep}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <Field label="Email Address" required type="email" value={form.email} onChange={setField('email')} placeholder="jane@example.com" />
@@ -510,7 +511,7 @@ function VendorFormContent() {
           </Section>
 
           {/* ── Step 3: Booth Selection ── */}
-          <Section title="Select Your Booth Package" icon="🏪" step={3} active={activeStep}>
+          <Section title="Select Your Booth Package" icon={<Icon name="store" />} step={3} active={activeStep}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {VENDOR_TYPES.map(vendor => (
                 <VendorTypeCard
@@ -535,14 +536,14 @@ function VendorFormContent() {
                     <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--if-text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Grand Total</div>
                     <div style={{ fontSize: '13px', color: 'var(--if-text-muted)', marginTop: '2px' }}>{form.quantity} spot{form.quantity > 1 ? 's' : ''} selected</div>
                   </div>
-                  <div style={{ fontSize: '34px', fontWeight: '900', color: 'var(--if-primary)' }}>${grandTotal.toLocaleString()}.00</div>
+                  <div style={{ fontSize: '34px', fontWeight: '700', color: 'var(--if-primary)' }}>${grandTotal.toLocaleString()}.00</div>
                 </div>
               )}
             </div>
           </Section>
 
           {/* ── Step 4: Vendor Agreement ── */}
-          <Section title="Vendor Agreement & Disclaimer" icon="📋" step={4} active={activeStep}>
+          <Section title="Vendor Agreement & Disclaimer" icon={<Icon name="clipboard" />} step={4} active={activeStep}>
             {/* Scrollable text */}
             <div style={{
               background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: '12px',
@@ -594,11 +595,11 @@ function VendorFormContent() {
             {/* Order card */}
             {selectedVendor && (
               <div style={{
-                background: 'var(--if-card-bg)', border: '1px solid var(--border)', borderRadius: '16px',
+                background: 'var(--if-card-bg)', border: '1px solid var(--border)', borderRadius: '14px',
                 padding: '22px 24px', marginBottom: '16px',
                 boxShadow: 'var(--shadow)',
               }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--if-text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Order Summary</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--if-text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px' }}>Order Summary</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', paddingBottom: '14px', borderBottom: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <div style={{
@@ -608,7 +609,7 @@ function VendorFormContent() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px',
                     }}>{selectedVendor.emoji}</div>
                     <div>
-                      <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--if-text)' }}>{selectedVendor.label}</div>
+                      <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--if-text)' }}>{selectedVendor.label}</div>
                       <div style={{ fontSize: '12px', color: 'var(--if-text-muted)', marginTop: '2px' }}>
                         India Fest 2026 · Knoxville, TN · {form.quantity} spot{form.quantity > 1 ? 's' : ''}
                       </div>
@@ -620,7 +621,7 @@ function VendorFormContent() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px' }}>
                   <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--if-text-muted)' }}>Total Due</div>
-                  <div style={{ fontSize: '32px', fontWeight: '900', color: 'var(--if-primary)' }}>${grandTotal.toLocaleString()}.00</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--if-primary)' }}>${grandTotal.toLocaleString()}.00</div>
                 </div>
               </div>
             )}
@@ -636,7 +637,7 @@ function VendorFormContent() {
                   ? 'var(--bg-input)'
                   : 'linear-gradient(135deg, #FF9933 0%, #E07C1A 60%, #CC6600 100%)',
                 color: loading || !canSubmit ? 'var(--text-muted)' : '#FFFFFF',
-                fontWeight: '800', fontSize: '17px', letterSpacing: '0.2px',
+                fontWeight: '700', fontSize: '17px', letterSpacing: '0.2px',
                 cursor: loading || !canSubmit ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
                 boxShadow: loading || !canSubmit
@@ -664,12 +665,12 @@ function VendorFormContent() {
             </button>
 
             {/* Trust badges */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '18px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '18px', flexWrap: 'wrap' }}>
               {[
-                { icon: '🔒', text: 'Secured by Stripe' },
-                { icon: '🇮🇳', text: 'HCC Verified Event' },
-                { icon: '📧', text: 'Instant Confirmation' },
-                { icon: '🔐', text: 'SSL Encrypted' },
+                { icon: <Icon name="lock" />, text: 'Secured by Stripe' },
+                { icon: <Icon name="flag" />, text: 'HCC Verified Event' },
+                { icon: <Icon name="mail" />, text: 'Instant Confirmation' },
+                { icon: <Icon name="key" />, text: 'SSL Encrypted' },
               ].map((b, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--if-text-muted)', fontWeight: '600' }}>
                   <span>{b.icon}</span><span>{b.text}</span>
@@ -715,7 +716,7 @@ export default function IndiafestVendorPage() {
       <div style={{ minHeight: '100vh', background: 'var(--if-bg-grad)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '48px', height: '48px', border: '4px solid var(--border)', borderTop: '4px solid var(--if-primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }}/>
-          <div style={{ color: 'var(--if-primary)', fontSize: '15px', fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>Loading…</div>
+          <div style={{ color: 'var(--if-primary)', fontSize: '15px', fontFamily: 'var(--font-sans)', fontWeight: '700' }}>Loading…</div>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>

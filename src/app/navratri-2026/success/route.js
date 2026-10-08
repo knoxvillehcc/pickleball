@@ -42,7 +42,7 @@ export async function GET(request) {
 <body>
   <div class="card">
     <div class="header">
-      <div class="check">✅</div>
+      <div class="check"></div>
       <h1>Order Confirmed!</h1>
       <p class="sub">Your Navratri 2026 tickets are ready</p>
     </div>

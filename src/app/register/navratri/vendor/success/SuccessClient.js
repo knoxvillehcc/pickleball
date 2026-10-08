@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -39,7 +40,7 @@ export default function NavratriVendorSuccessClient() {
         width: '100%',
         background: '#161124',
         border: '1px solid rgba(255,107,53,0.3)',
-        borderRadius: '24px',
+        borderRadius: '14px',
         padding: '40px 32px',
         textAlign: 'center',
         position: 'relative',
@@ -54,11 +55,11 @@ export default function NavratriVendorSuccessClient() {
           ✓
         </div>
 
-        <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '2px', color: gold, textTransform: 'uppercase', marginBottom: '8px' }}>
-          🪔 Navratri 2026 · Knoxville Hindu Community Center
+        <div style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.6px', color: gold, textTransform: 'uppercase', marginBottom: '8px' }}>
+          Navratri 2026 · Knoxville Hindu Community Center
         </div>
 
-        <h1 style={{ fontSize: '28px', fontWeight: '950', margin: '0 0 10px', color: '#FFFFFF' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: '700', margin: '0 0 10px', color: '#FFFFFF' }}>
           Vendor Booth Confirmed!
         </h1>
 
@@ -70,14 +71,14 @@ export default function NavratriVendorSuccessClient() {
         <div style={{
           background: 'rgba(255,107,53,0.1)',
           border: '1px solid rgba(255,107,53,0.35)',
-          borderRadius: '16px',
+          borderRadius: '14px',
           padding: '20px',
           marginBottom: '28px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#94A3B8', marginBottom: '6px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px', color: '#94A3B8', marginBottom: '6px' }}>
             Vendor Registration Number
           </div>
-          <div style={{ fontFamily: 'monospace', fontSize: '26px', fontWeight: '900', color: saffron, letterSpacing: '3px' }}>
+          <div style={{ fontFamily: 'monospace', fontSize: '26px', fontWeight: '700', color: saffron, letterSpacing: '0.6px' }}>
             {regNumber || 'NVV-2026-CONFIRMED'}
           </div>
           <div style={{ fontSize: '12px', color: '#64748B', marginTop: '6px' }}>
@@ -86,15 +87,15 @@ export default function NavratriVendorSuccessClient() {
         </div>
 
         {/* What to Expect */}
-        <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '20px', marginBottom: '28px' }}>
-          <div style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', color: gold, marginBottom: '12px' }}>
+        <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '20px', marginBottom: '28px' }}>
+          <div style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: gold, marginBottom: '12px' }}>
             What to Expect Next
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: '#CBD5E1', lineHeight: 1.5 }}>
-            <div>📧 <strong>Receipt & Pass:</strong> Check your inbox for your complete confirmation receipt and date breakdown.</div>
-            <div>📍 <strong>Setup Window:</strong> 5:30 PM to 6:45 PM on each registered evening. All doors clear by 6:45 PM.</div>
-            <div>🕒 <strong>Event Hours:</strong> 7:00 PM to 11:00 PM nightly.</div>
-            <div>🏢 <strong>Venue:</strong> Hindu Community Center, 8580 Hickory Creek Rd, Lenoir City, TN 37771.</div>
+            <div><Icon name="mail" /><strong>Receipt & Pass:</strong> Check your inbox for your complete confirmation receipt and date breakdown.</div>
+            <div><Icon name="pin" /><strong>Setup Window:</strong> 5:30 PM to 6:45 PM on each registered evening. All doors clear by 6:45 PM.</div>
+            <div><Icon name="clock" /><strong>Event Hours:</strong> 7:00 PM to 11:00 PM nightly.</div>
+            <div><Icon name="building" /><strong>Venue:</strong> Hindu Community Center, 8580 Hickory Creek Rd, Lenoir City, TN 37771.</div>
           </div>
         </div>
 
@@ -106,7 +107,7 @@ export default function NavratriVendorSuccessClient() {
               borderRadius: '12px',
               background: saffron,
               color: '#FFFFFF',
-              fontWeight: '800',
+              fontWeight: '700',
               fontSize: '14px',
               textDecoration: 'none',
             }}
@@ -121,7 +122,7 @@ export default function NavratriVendorSuccessClient() {
               background: 'rgba(255,255,255,0.08)',
               border: '1px solid rgba(255,255,255,0.15)',
               color: '#CBD5E1',
-              fontWeight: '800',
+              fontWeight: '700',
               fontSize: '14px',
               textDecoration: 'none',
             }}

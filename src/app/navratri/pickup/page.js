@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect } from 'react';
 import { colors, spacing, type, radii, btn, input as dsInput, card, page as pageStyle, keyframes, alert as alertStyle, chip } from '@/lib/navratri/designSystem';
 
@@ -163,7 +164,7 @@ export default function PickupPage() {
         width: '96px', height: '96px', borderRadius: `${radii.xl}px`,
         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '44px',
         background: c.accentBg, border: `1px solid ${c.border}`, marginBottom: spacing['2xl'],
-      }}>🎫</div>
+      }}><Icon name="ticket" /></div>
 
       <h1 style={{ ...type.pageTitle, color: c.text, margin: `0 0 ${spacing.xs}px` }}>Pickup Station</h1>
       <p style={{ ...type.body, color: c.muted, marginBottom: spacing['2xl'] }}>Enter your staff PIN to begin</p>
@@ -222,7 +223,7 @@ export default function PickupPage() {
             width: '100px', height: '100px', borderRadius: '50%',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px',
             background: c.greenBg, border: `3px solid ${c.green}`, marginBottom: spacing.xl,
-          }}>✅</div>
+          }}><Icon name="check" /></div>
           <h2 style={{ ...type.sectionTitle, color: c.green }}>Pickup Complete!</h2>
           <p style={{ ...type.body, color: c.muted, marginTop: spacing.sm }}>{pickupResult.message}</p>
         </div>
@@ -235,20 +236,20 @@ export default function PickupPage() {
 
           {selectedOrder.alreadyPickedW > 0 && (
             <div style={{ ...alertStyle('warning', 'dark'), marginTop: spacing.md }}>
-              ⚠️ Already picked up: {selectedOrder.alreadyPickedW} wristband(s)
+              Already picked up: {selectedOrder.alreadyPickedW} wristband(s)
             </div>
           )}
 
           {selectedOrder.remainingWristbands <= 0 && selectedOrder.maxWristbands > 0 && (
             <div style={{ ...alertStyle('error', 'dark'), marginTop: spacing.md }}>
-              ❌ All wristbands already picked up for this order
+              All wristbands already picked up for this order
             </div>
           )}
 
           {/* Not eligible banner for daily/non-member */}
           {selectedOrder.maxWristbands === 0 && selectedOrder.maxParking === 0 && (
             <div style={{ ...alertStyle('error', 'dark'), marginTop: spacing.md }}>
-              ❌ Daily / non-member orders are not eligible for wristband or parking pickup. Only Combo Pass and Pioneer Pass orders qualify.
+              Daily / non-member orders are not eligible for wristband or parking pickup. Only Combo Pass and Pioneer Pass orders qualify.
             </div>
           )}
 
@@ -302,7 +303,7 @@ export default function PickupPage() {
               fontSize: '18px', padding: `${spacing.lg}px`,
               opacity: loading || (wristbandQty === 0 && parkingQty === 0) ? 0.5 : 1,
             }}>
-            {loading ? 'Processing…' : `✅ Confirm Pickup (${wristbandQty}W + ${parkingQty}P)`}
+            {loading ? 'Processing…' : `Confirm Pickup (${wristbandQty}W + ${parkingQty}P)`}
           </button>
         </div>
       )}
@@ -323,7 +324,7 @@ export default function PickupPage() {
         borderBottom: `1px solid ${c.border}`, background: c.bgAlt,
       }}>
         <div>
-          <div style={{ ...type.bodyMedium, color: c.text }}>🎫 Pickup — {employee?.name}</div>
+          <div style={{ ...type.bodyMedium, color: c.text }}><Icon name="ticket" />Pickup — {employee?.name}</div>
           <div style={{ ...type.caption, color: c.muted }}>
             Issued: {stats.wristbands}W / {stats.parking}P ({stats.total} pickups)
           </div>
@@ -345,7 +346,7 @@ export default function PickupPage() {
           <button onClick={handleSearch} disabled={loading} style={{
             ...btn('primary', 'dark'), width: 'auto', padding: `${spacing.base}px ${spacing.xl}px`,
           }}>
-            {loading ? '…' : '🔍'}
+            {loading ? '…' : <Icon name="search" />}
           </button>
         </div>
 

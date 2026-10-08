@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from '@/components/ClientLayout';
@@ -19,15 +20,15 @@ const PACKAGES = {
     tagline:  'MAX VISIBILITY & COMMUNITY IMPACT',
     price:    5001,
     cents:    500100,
-    emoji:    '🏆',
+    emoji:    <Icon name="trophy" />,
     color:    '#D4AF37',
     border:   '#C09B2C',
     glow:     'rgba(212,175,55,0.15)',
     benefits: [
-      { icon: '📢', text: 'Logo Advertising on Marketing Materials (Flyers, Web, Social)' },
-      { icon: '🏠', text: 'Dedicated Booth Space (10×10) to showcase your brand' },
-      { icon: '🎤', text: 'On-Stage Announcement (Recognition & Shout-out)' },
-      { icon: '🏳️', text: 'Banner Display' },
+      { icon: <Icon name="megaphone" />, text: 'Logo Advertising on Marketing Materials (Flyers, Web, Social)' },
+      { icon: <Icon name="home" />, text: 'Dedicated Booth Space (10×10) to showcase your brand' },
+      { icon: <Icon name="mic" />, text: 'On-Stage Announcement (Recognition & Shout-out)' },
+      { icon: <Icon name="flag" />, text: 'Banner Display' },
     ],
   },
   basic_sponsor: {
@@ -36,13 +37,13 @@ const PACKAGES = {
     tagline:  'SUPPORT OUR COMMUNITY!',
     price:    1001,
     cents:    100100,
-    emoji:    '🌟',
+    emoji:    <Icon name="star" />,
     color:    '#2D7A3A',
     border:   '#1E5C2A',
     glow:     'rgba(45,122,58,0.15)',
     benefits: [
-      { icon: '🏳️', text: 'Banner Display (Placement Under the Main Stage)' },
-      { icon: '🌐', text: 'Recognition on Event Website' },
+      { icon: <Icon name="flag" />, text: 'Banner Display (Placement Under the Main Stage)' },
+      { icon: <Icon name="globe" />, text: 'Recognition on Event Website' },
     ],
   },
 };
@@ -72,10 +73,10 @@ By checking the box below, you acknowledge that you have read, understood, and a
 
 // ── Steps ──────────────────────────────────────────────────────────────────────
 const STEPS = [
-  { id: 1, label: 'Organization', icon: '🏢' },
-  { id: 2, label: 'Contact',      icon: '📞' },
-  { id: 3, label: 'Tier',         icon: '🎯' },
-  { id: 4, label: 'Agreement',    icon: '📋' },
+  { id: 1, label: 'Organization', icon: <Icon name="building" /> },
+  { id: 2, label: 'Contact',      icon: <Icon name="phone" /> },
+  { id: 3, label: 'Tier',         icon: <Icon name="target" /> },
+  { id: 4, label: 'Agreement',    icon: <Icon name="clipboard" /> },
 ];
 
 // ── Progress bar ───────────────────────────────────────────────────────────────
@@ -105,7 +106,7 @@ function ProgressBar({ active }) {
                   border: `2px solid ${done || current ? activeColor : 'var(--border)'}`,
                   fontSize: '13px',
                   color: done || current ? '#1A1200' : 'var(--text-muted)',
-                  fontWeight: '800',
+                  fontWeight: '700',
                   transition: 'all 0.3s ease',
                   flexShrink: 0,
                 }}>
@@ -177,7 +178,7 @@ function Section({ title, icon, step, children, active }) {
     <div id={`section-${step}`} style={{
       background: 'var(--bg-card)',
       border: `1px solid ${isActive ? 'rgba(212,175,55,0.3)' : 'var(--border)'}`,
-      borderRadius: '20px',
+      borderRadius: '14px',
       boxShadow: 'var(--shadow)',
       overflow: 'hidden',
       transition: 'all 0.3s ease',
@@ -196,23 +197,23 @@ function Section({ title, icon, step, children, active }) {
           boxShadow: '0 4px 12px rgba(212,175,55,0.3)',
         }}>{icon}</div>
         <div>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: '#D4AF37', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: '#D4AF37', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: '2px' }}>
             Step {step} of 4
           </div>
-          <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-primary)' }}>{title}</div>
+          <div style={{ fontSize: '17px', fontWeight: '700', color: 'var(--text-primary)' }}>{title}</div>
         </div>
         <div style={{
           marginLeft: 'auto', width: '28px', height: '28px', borderRadius: '50%',
           background: active > step ? '#D4AF37' : active === step ? 'rgba(212,175,55,0.15)' : 'var(--bg-input)',
           border: `2px solid ${active > step ? '#D4AF37' : active === step ? 'rgba(212,175,55,0.4)' : 'var(--border)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '12px', color: active > step ? '#1A1200' : 'var(--text-muted)', fontWeight: '800',
+          fontSize: '12px', color: active > step ? '#1A1200' : 'var(--text-muted)', fontWeight: '700',
           flexShrink: 0,
         }}>
           {active > step ? '✓' : step}
         </div>
       </div>
-      <div style={{ padding: '28px' }}>{children}</div>
+      <div style={{ padding: '20px 22px' }}>{children}</div>
     </div>
   );
 }
@@ -231,7 +232,7 @@ function PackageCard({ pkg, selected, onSelect, disabled }) {
       onClick={() => !disabled && onSelect(pkg.key)}
       style={{
         border: `2px solid ${selected ? pkg.color : disabled ? 'var(--border)' : 'rgba(100,100,100,0.3)'}`,
-        borderRadius: '16px', overflow: 'hidden', cursor: disabled ? 'not-allowed' : 'pointer',
+        borderRadius: '14px', overflow: 'hidden', cursor: disabled ? 'not-allowed' : 'pointer',
         boxShadow: selected ? `0 0 0 3px ${pkg.glow}, var(--shadow)` : 'var(--shadow)',
         transition: 'all 0.25s ease',
         opacity: disabled ? 0.5 : 1,
@@ -263,11 +264,11 @@ function PackageCard({ pkg, selected, onSelect, disabled }) {
       }}>
         <div style={{ fontSize: '32px' }}>{pkg.emoji}</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '17px', fontWeight: '900', color: pkg.color, marginBottom: '2px' }}>{pkg.label}</div>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{pkg.tagline}</div>
+          <div style={{ fontSize: '17px', fontWeight: '700', color: pkg.color, marginBottom: '2px' }}>{pkg.label}</div>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{pkg.tagline}</div>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: '28px', fontWeight: '900', color: pkg.color }}>${pkg.price.toLocaleString()}</div>
+          <div style={{ fontSize: '28px', fontWeight: '700', color: pkg.color }}>${pkg.price.toLocaleString()}</div>
           <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>one-time</div>
         </div>
       </div>
@@ -292,8 +293,8 @@ function PackageCard({ pkg, selected, onSelect, disabled }) {
           position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'rgba(0,0,0,0.4)', borderRadius: '14px',
         }}>
-          <div style={{ background: 'rgba(0,0,0,0.7)', padding: '8px 18px', borderRadius: '20px', fontSize: '13px', fontWeight: '800', color: '#fff' }}>
-            🔒 Closed
+          <div style={{ background: 'rgba(0,0,0,0.7)', padding: '8px 18px', borderRadius: '14px', fontSize: '13px', fontWeight: '700', color: '#fff' }}>
+            Closed
           </div>
         </div>
       )}
@@ -340,7 +341,7 @@ function SponsorFormContent() {
       <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '48px', height: '48px', border: '4px solid rgba(212,175,55,0.2)', borderTop: '4px solid #D4AF37', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }}/>
-          <div style={{ color: '#D4AF37', fontSize: '15px', fontWeight: '700', fontFamily: 'Inter, sans-serif' }}>Loading…</div>
+          <div style={{ color: '#D4AF37', fontSize: '15px', fontWeight: '700', fontFamily: 'var(--font-sans)' }}>Loading…</div>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
@@ -349,18 +350,18 @@ function SponsorFormContent() {
 
   if (bothClosed) {
     return (
-      <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', padding: '40px 20px' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)', padding: '40px 20px' }}>
         <div style={{ textAlign: 'center', maxWidth: '480px' }}>
           <div style={{ height: '5px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', borderRadius: '99px', marginBottom: '40px', width: '200px', margin: '0 auto 40px' }}/>
-          <div style={{ fontSize: '56px', marginBottom: '20px' }}>🔒</div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--bg-card)', border: '1px solid var(--border)', padding: '6px 18px', borderRadius: '20px', marginBottom: '24px' }}>
+          <div style={{ fontSize: '56px', marginBottom: '20px' }}><Icon name="lock" /></div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--bg-card)', border: '1px solid var(--border)', padding: '6px 18px', borderRadius: '14px', marginBottom: '24px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D4AF37', display: 'inline-block', flexShrink: 0 }}/>
-            <span style={{ fontSize: '11px', fontWeight: '800', color: '#D4AF37', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: '#D4AF37', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
           </div>
-          <h1 style={{ margin: '0 0 6px', fontSize: '40px', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-1px' }}>India Fest 2026</h1>
+          <h1 style={{ margin: '0 0 6px', fontSize: '40px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-1px' }}>India Fest 2026</h1>
           <h2 style={{ margin: '0 0 10px', fontSize: '18px', fontWeight: '700', color: '#D4AF37' }}>Sponsorship Registration Closed</h2>
           <div style={{ display: 'inline-block', background: 'rgba(212,175,55,0.08)', border: '1.5px solid rgba(212,175,55,0.25)', padding: '8px 16px', borderRadius: '10px', marginBottom: '20px', fontSize: '14px', fontWeight: '700', color: '#D4AF37' }}>
-            📅 Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM
+            Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: '1.8', margin: '0' }}>
             Sponsor registration is not currently open.<br/>
@@ -413,16 +414,16 @@ function SponsorFormContent() {
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.3)', padding: '6px 18px', borderRadius: '99px', marginBottom: '24px', position: 'relative' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D4AF37', display: 'inline-block', flexShrink: 0, boxShadow: '0 0 8px rgba(212,175,55,0.6)' }}/>
-          <span style={{ fontSize: '11px', fontWeight: '800', color: 'rgba(212,175,55,0.9)', letterSpacing: '2px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
+          <span style={{ fontSize: '11px', fontWeight: '700', color: 'rgba(212,175,55,0.9)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
         </div>
 
         <h1 style={{ margin: '0 0 10px', lineHeight: '1', position: 'relative' }}>
-          <div style={{ fontSize: 'clamp(44px, 9vw, 80px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-2px' }}>IndiaFest</div>
-          <div style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: '900', color: '#D4AF37', letterSpacing: '8px', marginTop: '4px' }}>2026</div>
+          <div style={{ fontSize: 'clamp(44px, 9vw, 80px)', fontWeight: '700', color: '#FFFFFF', letterSpacing: '-2px' }}>IndiaFest</div>
+          <div style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: '700', color: '#D4AF37', letterSpacing: '8px', marginTop: '4px' }}>2026</div>
         </h1>
 
         <div style={{ display: 'inline-block', background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.4)', borderRadius: '10px', padding: '10px 24px', margin: '20px 0 18px', position: 'relative' }}>
-          <span style={{ fontSize: '14px', fontWeight: '700', color: '#D4AF37', letterSpacing: '1px', textTransform: 'uppercase' }}>🤝 Sponsorship Registration</span>
+          <span style={{ fontSize: '14px', fontWeight: '700', color: '#D4AF37', letterSpacing: '1px', textTransform: 'uppercase' }}><Icon name="users" />Sponsorship Registration</span>
         </div>
 
         <p style={{ color: 'rgba(255,255,255,0.72)', fontSize: '15px', maxWidth: '520px', margin: '0 auto', lineHeight: '1.75', fontWeight: '400', position: 'relative' }}>
@@ -431,14 +432,14 @@ function SponsorFormContent() {
 
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '32px', flexWrap: 'wrap', position: 'relative' }}>
           {[
-            { icon: '📅', val: 'Aug 23, 2026', label: '11am to 5pm' },
-            { icon: '👥', val: '2,000+', label: 'Expected Guests' },
-            { icon: '🏆', val: '$5,001+', label: 'Grand Sponsorship' },
-            { icon: '🌟', val: '$1,001+', label: 'Basic Sponsorship' },
+            { icon: <Icon name="calendar" />, val: 'Aug 23, 2026', label: '11am to 5pm' },
+            { icon: <Icon name="users" />, val: '2,000+', label: 'Expected Guests' },
+            { icon: <Icon name="trophy" />, val: '$5,001+', label: 'Grand Sponsorship' },
+            { icon: <Icon name="star" />, val: '$1,001+', label: 'Basic Sponsorship' },
           ].map((s, i) => (
             <div key={i} style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: '12px', padding: '12px 18px', minWidth: '120px' }}>
               <div style={{ fontSize: '18px', marginBottom: '4px' }}>{s.icon}</div>
-              <div style={{ fontSize: '14px', fontWeight: '800', color: '#D4AF37', marginBottom: '1px' }}>{s.val}</div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: '#D4AF37', marginBottom: '1px' }}>{s.val}</div>
               <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', fontWeight: '600' }}>{s.label}</div>
             </div>
           ))}
@@ -451,21 +452,21 @@ function SponsorFormContent() {
         {/* Alerts */}
         {cancelled && (
           <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', color: 'var(--text-error)', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '18px' }}>⚠️</span>
+            <span style={{ fontSize: '18px' }}><Icon name="alert" /></span>
             Your payment was cancelled — registration is not complete. Please try again below.
           </div>
         )}
         {error && (
           <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', color: 'var(--text-error)', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '18px' }}>❌</span>
+            <span style={{ fontSize: '18px' }}><Icon name="x" /></span>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', opacity: mounted ? 1 : 0, transition: 'opacity 0.5s ease 0.15s' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px', opacity: mounted ? 1 : 0, transition: 'opacity 0.5s ease 0.15s' }}>
 
           {/* Step 1: Organization */}
-          <Section title="Organization Information" icon="🏢" step={1} active={activeStep}>
+          <Section title="Organization Information" icon={<Icon name="building" />} step={1} active={activeStep}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <Field label="First Name" required value={form.first_name} onChange={setField('first_name')} placeholder="Jane" />
@@ -476,7 +477,7 @@ function SponsorFormContent() {
           </Section>
 
           {/* Step 2: Contact */}
-          <Section title="Contact Information" icon="📞" step={2} active={activeStep}>
+          <Section title="Contact Information" icon={<Icon name="phone" />} step={2} active={activeStep}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <Field label="Email Address" required type="email" value={form.email} onChange={setField('email')} placeholder="jane@example.com" />
@@ -495,7 +496,7 @@ function SponsorFormContent() {
           </Section>
 
           {/* Step 3: Sponsorship Tier */}
-          <Section title="Choose Your Sponsorship Tier" icon="🎯" step={3} active={activeStep}>
+          <Section title="Choose Your Sponsorship Tier" icon={<Icon name="target" />} step={3} active={activeStep}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '4px', lineHeight: '1.6' }}>
                 Select the sponsorship package that best fits your organization. Both tiers include recognition at India Fest 2026.
@@ -516,7 +517,7 @@ function SponsorFormContent() {
           </Section>
 
           {/* Step 4: Agreement */}
-          <Section title="Sponsor Agreement & Disclaimer" icon="📋" step={4} active={activeStep}>
+          <Section title="Sponsor Agreement & Disclaimer" icon={<Icon name="clipboard" />} step={4} active={activeStep}>
             <div style={{
               background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: '12px',
               padding: '20px 22px', height: '220px', overflowY: 'auto',
@@ -565,16 +566,16 @@ function SponsorFormContent() {
           <div style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.5s ease 0.3s' }}>
             {/* Summary card */}
             <div style={{
-              background: 'var(--bg-card)', border: `1px solid ${selectedPkg.glow}`, borderRadius: '16px',
+              background: 'var(--bg-card)', border: `1px solid ${selectedPkg.glow}`, borderRadius: '14px',
               padding: '22px 24px', marginBottom: '16px',
               boxShadow: `0 0 0 1px ${selectedPkg.glow}, var(--shadow)`,
             }}>
-              <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '14px' }}>Order Summary</div>
+              <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px' }}>Order Summary</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', paddingBottom: '14px', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: selectedPkg.glow, border: `1px solid ${selectedPkg.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>{selectedPkg.emoji}</div>
                   <div>
-                    <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)' }}>{selectedPkg.label}</div>
+                    <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>{selectedPkg.label}</div>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>India Fest 2026 · Knoxville, TN · 1 sponsorship</div>
                   </div>
                 </div>
@@ -584,7 +585,7 @@ function SponsorFormContent() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px' }}>
                 <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-muted)' }}>Total Due</div>
-                <div style={{ fontSize: '32px', fontWeight: '900', color: selectedPkg.color }}>${selectedPkg.price.toLocaleString()}.00</div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: selectedPkg.color }}>${selectedPkg.price.toLocaleString()}.00</div>
               </div>
             </div>
 
@@ -601,7 +602,7 @@ function SponsorFormContent() {
                     ? 'linear-gradient(135deg, #D4AF37 0%, #B8960C 60%, #9A7A00 100%)'
                     : 'linear-gradient(135deg, #2D7A3A 0%, #1E5C2A 60%, #154D21 100%)',
                 color: loading || !canSubmit ? 'var(--text-muted)' : '#FFFFFF',
-                fontWeight: '800', fontSize: '17px', letterSpacing: '0.2px',
+                fontWeight: '700', fontSize: '17px', letterSpacing: '0.2px',
                 cursor: loading || !canSubmit ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
                 boxShadow: loading || !canSubmit ? 'none' : `0 8px 32px ${selectedPkg.glow}`,
@@ -627,12 +628,12 @@ function SponsorFormContent() {
             </button>
 
             {/* Trust badges */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '18px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '18px', flexWrap: 'wrap' }}>
               {[
-                { icon: '🔒', text: 'Secured by Stripe' },
-                { icon: '🇮🇳', text: 'HCC Verified Event' },
-                { icon: '📧', text: 'Instant Confirmation' },
-                { icon: '🔐', text: 'SSL Encrypted' },
+                { icon: <Icon name="lock" />, text: 'Secured by Stripe' },
+                { icon: <Icon name="flag" />, text: 'HCC Verified Event' },
+                { icon: <Icon name="mail" />, text: 'Instant Confirmation' },
+                { icon: <Icon name="key" />, text: 'SSL Encrypted' },
               ].map((b, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600' }}>
                   <span>{b.icon}</span><span>{b.text}</span>
@@ -678,7 +679,7 @@ export default function IndiafestSponsorPage() {
       <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '48px', height: '48px', border: '4px solid var(--border)', borderTop: '4px solid #D4AF37', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }}/>
-          <div style={{ color: '#D4AF37', fontSize: '15px', fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>Loading…</div>
+          <div style={{ color: '#D4AF37', fontSize: '15px', fontFamily: 'var(--font-sans)', fontWeight: '700' }}>Loading…</div>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>

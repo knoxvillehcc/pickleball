@@ -392,7 +392,7 @@ export default function ExpensesManagementPage() {
   }, [expenses, selectedExpenseIds]);
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '32px 28px', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '32px 28px', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
       <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
 
         {/* ── TOP HEADER ────────────────────────────────────────────────────────── */}
@@ -406,7 +406,7 @@ export default function ExpensesManagementPage() {
               }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
               </div>
-              <h1 style={{ fontSize: '24px', fontWeight: '950', color: 'var(--text-primary)', letterSpacing: '-0.5px', margin: 0 }}>
+              <h1 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.5px', margin: 0 }}>
                 Expenses & Accounts
               </h1>
             </div>
@@ -421,7 +421,7 @@ export default function ExpensesManagementPage() {
               style={{
                 padding: '9px 16px', borderRadius: '10px', border: 'none',
                 background: 'linear-gradient(135deg, #FF6B35, #E85D04)', color: '#FFFFFF',
-                fontWeight: '800', fontSize: '13.5px', cursor: 'pointer',
+                fontWeight: '700', fontSize: '13.5px', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: '7px',
                 boxShadow: '0 2px 8px rgba(255,107,53,0.3)',
               }}
@@ -467,7 +467,7 @@ export default function ExpensesManagementPage() {
               >
                 <span>{tab.label}</span>
                 <span style={{
-                  padding: '2px 7px', borderRadius: '99px', fontSize: '11px', fontWeight: '800',
+                  padding: '2px 7px', borderRadius: '99px', fontSize: '11px', fontWeight: '700',
                   background: active ? 'rgba(255,107,53,0.15)' : 'var(--bg-secondary)',
                   color: active ? SAFFRON : 'var(--text-muted)',
                 }}>{tab.count}</span>
@@ -485,7 +485,7 @@ export default function ExpensesManagementPage() {
               border: '1px solid var(--border)', marginBottom: '20px', flexWrap: 'wrap', gap: '14px',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                   Target Event:
                 </span>
                 <select
@@ -493,7 +493,7 @@ export default function ExpensesManagementPage() {
                   onChange={e => setSelectedEvent(e.target.value)}
                   style={{
                     padding: '8px 14px', borderRadius: '8px', border: '1.5px solid var(--border)',
-                    background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '800', fontSize: '14px', cursor: 'pointer',
+                    background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', fontSize: '14px', cursor: 'pointer',
                   }}
                 >
                   {events.map(ev => (
@@ -517,7 +517,7 @@ export default function ExpensesManagementPage() {
                   style={{
                     padding: '10px 18px', borderRadius: '10px', border: 'none',
                     background: 'linear-gradient(135deg, #0284C7, #0369A1)', color: '#FFFFFF',
-                    fontWeight: '800', fontSize: '13px', cursor: 'pointer',
+                    fontWeight: '700', fontSize: '13px', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: '7px',
                     boxShadow: '0 2px 8px rgba(2,132,199,0.3)',
                   }}
@@ -531,24 +531,24 @@ export default function ExpensesManagementPage() {
             {/* Live Financial P&L Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
               <div style={{ padding: '20px', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: `3.5px solid ${EMERALD}`, boxShadow: 'var(--shadow)' }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Total Event Revenue</div>
-                <div style={{ fontSize: '28px', fontWeight: '950', color: EMERALD }}>${(eventRevenue.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Total Event Revenue</div>
+                <div style={{ fontSize: '28px', fontWeight: '700', color: EMERALD }}>${(eventRevenue.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
                   Booths: ${eventRevenue.boothsGross?.toFixed(2)} · Ads: ${eventRevenue.adsGross?.toFixed(2)}
                 </div>
               </div>
 
               <div style={{ padding: '20px', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: '3.5px solid #EF4444', boxShadow: 'var(--shadow)' }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Total Event Expenses</div>
-                <div style={{ fontSize: '28px', fontWeight: '950', color: '#EF4444' }}>${eventExpensesTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Total Event Expenses</div>
+                <div style={{ fontSize: '28px', fontWeight: '700', color: '#EF4444' }}>${eventExpensesTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
                   {expenses.filter(e => e.event_tag === selectedEvent).length} logged receipts/bills
                 </div>
               </div>
 
               <div style={{ padding: '20px', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: `3.5px solid ${eventNetProfit >= 0 ? SKY_BLUE : '#EF4444'}`, boxShadow: 'var(--shadow)' }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Projected Net Profit / (Loss)</div>
-                <div style={{ fontSize: '28px', fontWeight: '950', color: eventNetProfit >= 0 ? SKY_BLUE : '#EF4444' }}>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Projected Net Profit / (Loss)</div>
+                <div style={{ fontSize: '28px', fontWeight: '700', color: eventNetProfit >= 0 ? SKY_BLUE : '#EF4444' }}>
                   ${eventNetProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
@@ -577,7 +577,7 @@ export default function ExpensesManagementPage() {
                 style={{
                   padding: '9px 18px', borderRadius: '10px', border: 'none',
                   background: 'linear-gradient(135deg, #10B981, #059669)', color: '#FFFFFF',
-                  fontWeight: '800', fontSize: '13px', cursor: 'pointer',
+                  fontWeight: '700', fontSize: '13px', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', gap: '8px',
                   boxShadow: '0 2px 8px rgba(16,185,129,0.3)',
                 }}
@@ -627,13 +627,13 @@ export default function ExpensesManagementPage() {
               <tr style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
                 {activeTab === 'utilities' && <th style={{ padding: '12px 14px', width: '30px' }} />}
                 {['Date (MM-DD-YYYY)', 'Vendor / Payee', 'Account Category', 'Target / Event', 'Payment Method & Ref', 'Amount', 'Status', 'Actions'].map(h => (
-                  <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '800', color: 'var(--text-secondary)', fontSize: '11px', letterSpacing: '0.6px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                  <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '700', color: 'var(--text-secondary)', fontSize: '11px', letterSpacing: '0.6px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filteredExpenses.length === 0 ? (
-                <tr><td colSpan={activeTab === 'utilities' ? 9 : 8} style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No expenses recorded under this view.</td></tr>
+                <tr><td colSpan={activeTab === 'utilities' ? 9 : 8} style={{ padding: '28px', textAlign: 'center', color: 'var(--text-secondary)' }}>No expenses recorded under this view.</td></tr>
               ) : filteredExpenses.map(exp => {
                 const isSelected = selectedExpenseIds.has(exp.id);
                 return (
@@ -671,22 +671,22 @@ export default function ExpensesManagementPage() {
                       </div>
                       {exp.payment_ref && <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{exp.payment_ref}</div>}
                     </td>
-                    <td style={{ padding: '12px 14px', fontWeight: '800', color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <td style={{ padding: '12px 14px', fontWeight: '700', color: 'var(--text-primary)', fontSize: '14px' }}>
                       ${Number(exp.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </td>
                     <td style={{ padding: '12px 14px' }}>
                       {exp.status === 'posted_odoo' ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: '800', background: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: '700', background: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' }}>
                           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981' }} />
                           {exp.odoo_move_name || 'Posted to Odoo'}
                         </span>
                       ) : exp.status === 'adjustment_pending' ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: '800', background: 'rgba(245,158,11,0.1)', color: '#D97706', border: '1px solid rgba(245,158,11,0.3)' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: '700', background: 'rgba(245,158,11,0.1)', color: '#D97706', border: '1px solid rgba(245,158,11,0.3)' }}>
                           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D97706' }} />
                           Adjustment Pending
                         </span>
                       ) : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: '800', background: 'rgba(100,116,139,0.1)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: '700', background: 'rgba(100,116,139,0.1)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
                           Draft
                         </span>
                       )}
@@ -725,9 +725,9 @@ export default function ExpensesManagementPage() {
       {/* ── MODAL: ADD / EDIT EXPENSE ─────────────────────────────────────────── */}
       {showAddModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ maxWidth: '520px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ maxWidth: '520px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '20px 22px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
                 {editingExpense ? 'Edit Expense Record' : 'Record New Expense'}
               </h3>
               <button onClick={() => setShowAddModal(false)} style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
@@ -742,7 +742,7 @@ export default function ExpensesManagementPage() {
             <form onSubmit={handleSaveExpense} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Date Paid</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Date Paid</label>
                   <input
                     type="date"
                     value={formDate}
@@ -752,7 +752,7 @@ export default function ExpensesManagementPage() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Amount ($)</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Amount ($)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -761,13 +761,13 @@ export default function ExpensesManagementPage() {
                     value={formAmount}
                     onChange={e => setFormAmount(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '800', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '700', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Vendor / Payee</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Vendor / Payee</label>
                 <input
                   type="text"
                   placeholder="e.g. KUB Electric, DJ Amit, Knox County Sheriff"
@@ -779,7 +779,7 @@ export default function ExpensesManagementPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Expense Category (Odoo Account)</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Expense Category (Odoo Account)</label>
                 <select
                   value={formAccountCode}
                   onChange={e => setFormAccountCode(e.target.value)}
@@ -805,7 +805,7 @@ export default function ExpensesManagementPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Target / Event Tag</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Target / Event Tag</label>
                   <select
                     value={formEventTag}
                     onChange={e => setFormEventTag(e.target.value)}
@@ -819,7 +819,7 @@ export default function ExpensesManagementPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Payment Method</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Payment Method</label>
                   <select
                     value={formMethod}
                     onChange={e => setFormMethod(e.target.value)}
@@ -834,7 +834,7 @@ export default function ExpensesManagementPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>
                   {formMethod === 'check' ? 'Check Number' : formMethod === 'card' ? 'Card Last 4 / Memo' : formMethod === 'reimbursable' ? 'Volunteer Name' : 'Receipt / Cash Ref'}
                 </label>
                 <input
@@ -847,7 +847,7 @@ export default function ExpensesManagementPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Description / Memo</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Description / Memo</label>
                 <input
                   type="text"
                   placeholder="e.g. September electric bill, Garba sound deposit"
@@ -868,7 +868,7 @@ export default function ExpensesManagementPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: SAFFRON, color: '#FFFFFF', fontWeight: '800', cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+                  style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: SAFFRON, color: '#FFFFFF', fontWeight: '700', cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
                 >
                   {isSubmitting ? 'Saving...' : editingExpense ? 'Save Changes' : 'Save Expense'}
                 </button>
@@ -881,9 +881,9 @@ export default function ExpensesManagementPage() {
       {/* ── MODAL: ADD CUSTOM EVENT ───────────────────────────────────────────── */}
       {showNewEventModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ maxWidth: '440px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ maxWidth: '440px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '20px 22px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
                 Add Custom Event
               </h3>
               <button onClick={() => setShowNewEventModal(false)} style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
@@ -891,7 +891,7 @@ export default function ExpensesManagementPage() {
 
             <form onSubmit={handleCreateCustomEvent} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Event Name</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Event Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Diwali Mela 2026, Holi 2026"
@@ -903,7 +903,7 @@ export default function ExpensesManagementPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Odoo Analytic Account Name</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Odoo Analytic Account Name</label>
                 <input
                   type="text"
                   placeholder="Defaults to event name if empty"
@@ -914,7 +914,7 @@ export default function ExpensesManagementPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Event Type</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>Event Type</label>
                 <select
                   value={newEventType}
                   onChange={e => setNewEventType(e.target.value)}
@@ -937,7 +937,7 @@ export default function ExpensesManagementPage() {
                 </button>
                 <button
                   type="submit"
-                  style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: SAFFRON, color: '#FFFFFF', fontWeight: '800', cursor: 'pointer' }}
+                  style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: SAFFRON, color: '#FFFFFF', fontWeight: '700', cursor: 'pointer' }}
                 >
                   Create Event
                 </button>
@@ -950,14 +950,14 @@ export default function ExpensesManagementPage() {
       {/* ── MODAL: POST FINAL EVENT SETTLEMENT ───────────────────────────────── */}
       {showSettlementModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ maxWidth: '540px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div style={{ maxWidth: '540px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '20px 22px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'rgba(2,132,199,0.1)', color: SKY_BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
                     Odoo Event Settlement & P&L
                   </h3>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500' }}>
@@ -971,23 +971,23 @@ export default function ExpensesManagementPage() {
             <div style={{ background: 'var(--bg-input)', borderRadius: '14px', padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                 <span style={{ color: 'var(--text-secondary)' }}>Event / Analytic Account:</span>
-                <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>{selectedEvent}</span>
+                <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{selectedEvent}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                 <span style={{ color: 'var(--text-secondary)' }}>Odoo Journal:</span>
-                <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>MISC (General Operations)</span>
+                <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>MISC (General Operations)</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
                 <span style={{ color: 'var(--text-secondary)' }}>Total Event Expenses:</span>
-                <span style={{ fontWeight: '800', color: '#EF4444' }}>${eventExpensesTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span style={{ fontWeight: '700', color: '#EF4444' }}>${eventExpensesTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                 <span style={{ color: 'var(--text-secondary)' }}>Total Event Revenue:</span>
-                <span style={{ fontWeight: '800', color: EMERALD }}>${(eventRevenue.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span style={{ fontWeight: '700', color: EMERALD }}>${(eventRevenue.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
-                <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>Net Event Profit / (Loss):</span>
-                <span style={{ fontWeight: '950', color: eventNetProfit >= 0 ? SKY_BLUE : '#EF4444' }}>
+                <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Net Event Profit / (Loss):</span>
+                <span style={{ fontWeight: '700', color: eventNetProfit >= 0 ? SKY_BLUE : '#EF4444' }}>
                   ${eventNetProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -1021,7 +1021,7 @@ export default function ExpensesManagementPage() {
                 style={{
                   flex: 1, padding: '11px', borderRadius: '10px', border: 'none',
                   background: isPostingOdoo ? 'rgba(2,132,199,0.5)' : 'linear-gradient(135deg, #0284C7, #0369A1)',
-                  color: '#FFFFFF', fontWeight: '800', cursor: isPostingOdoo ? 'not-allowed' : 'pointer',
+                  color: '#FFFFFF', fontWeight: '700', cursor: isPostingOdoo ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                 }}
               >

@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ClientLayout';
 import { colors, spacing, type, radii, btn, input as dsInput, card, chip, table as tableStyle, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
@@ -80,7 +81,7 @@ export default function MembersPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl, flexWrap: 'wrap', gap: spacing.md }}>
         <div>
-          <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>👥 Members</h1>
+          <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}><Icon name="users" />Members</h1>
           <p style={{ ...type.secondary, color: c.muted, marginTop: spacing.xs }}>
             {members.length} total · {generalCount} general · {pioneerCount} pioneer · {committeeCount} committee
           </p>
@@ -89,7 +90,7 @@ export default function MembersPage() {
           <a href="/navratri" style={{ ...btn('secondary', theme), textDecoration: 'none', ...type.caption }}>← Dashboard</a>
           <button onClick={handleSync} disabled={syncing}
             style={{ ...btn('primary', theme), width: 'auto', ...type.caption, opacity: syncing ? 0.5 : 1 }}>
-            {syncing ? '🔄 Syncing…' : '🔄 Sync from Odoo'}
+            {syncing ? 'Syncing…' : 'Sync from Odoo'}
           </button>
         </div>
       </div>
@@ -97,7 +98,7 @@ export default function MembersPage() {
       {/* Sync result */}
       {syncResult && (
         <div style={{ ...alertStyle(syncResult.error ? 'error' : 'success', theme), marginBottom: spacing.base }}>
-          {syncResult.error ? `❌ ${syncResult.error}` : `✅ Synced ${syncResult.synced} members (${syncResult.generals} general, ${syncResult.pioneers} pioneer)`}
+          {syncResult.error ? `${syncResult.error}` : `Synced ${syncResult.synced} members (${syncResult.generals} general, ${syncResult.pioneers} pioneer)`}
         </div>
       )}
 
@@ -153,7 +154,7 @@ export default function MembersPage() {
                     <td style={{ ...t.td, ...type.bodyMedium }}>{m.name}</td>
                     <td style={t.td}>
                       <span style={chip(m.membership_type === 'pioneer' ? 'active' : 'valid', theme)}>
-                        {m.membership_type === 'pioneer' ? '🏆 Pioneer' : '👤 General'}
+                        {m.membership_type === 'pioneer' ? 'Pioneer' : 'General'}
                       </span>
                     </td>
                     <td style={{ ...t.tdMuted, fontFamily: 'monospace' }}>{m.phone}</td>
@@ -164,7 +165,7 @@ export default function MembersPage() {
                         ...chip(m.is_committee ? 'active' : 'pending', theme),
                         cursor: 'pointer', border: 'none',
                       }}>
-                        {m.is_committee ? '✅ Yes' : 'No'}
+                        {m.is_committee ? 'Yes' : 'No'}
                       </button>
                     </td>
                     <td style={t.tdMuted}>

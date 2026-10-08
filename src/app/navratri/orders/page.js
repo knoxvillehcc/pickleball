@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -157,7 +158,7 @@ export default function OrdersPage() {
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl, flexWrap: 'wrap', gap: '12px' }}>
-        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>🎫 Orders</h1>
+        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}><Icon name="ticket" />Orders</h1>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <button onClick={downloadPDF} style={{
             ...btn('secondary', theme),
@@ -165,7 +166,7 @@ export default function OrdersPage() {
             display: 'inline-flex', alignItems: 'center', gap: '6px',
             fontSize: '13px', fontWeight: '700',
           }}>
-            📄 Export PDF
+            Export PDF
           </button>
           <a href="/navratri" style={{ ...type.bodyMedium, color: c.primary, textDecoration: 'none' }}>← Dashboard</a>
         </div>
@@ -239,7 +240,7 @@ export default function OrdersPage() {
                             fontSize: '11px', fontWeight: '700',
                           }}
                         >
-                          ✏️ Edit
+                          Edit
                         </button>
 
                         {/* Resend Confirmation */}
@@ -255,7 +256,7 @@ export default function OrdersPage() {
                               color: resendDone[order.id] ? '#10B981' : undefined,
                             }}
                           >
-                            {resendingId === order.id ? 'Sending…' : resendDone[order.id] ? '✅ Sent' : '📧 Resend'}
+                            {resendingId === order.id ? 'Sending…' : resendDone[order.id] ? 'Sent' : 'Resend'}
                           </button>
                         )}
 
@@ -394,12 +395,12 @@ function EditOrderModal({ order, theme, onClose, onSave }) {
     }} onClick={onClose}>
       <div style={{
         background: c.card, border: `1px solid ${c.border}`,
-        borderRadius: '16px', padding: '28px', maxWidth: '480px', width: '100%',
+        borderRadius: '14px', padding: '20px 22px', maxWidth: '480px', width: '100%',
         boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: c.text }}>✏️ Edit Order</h3>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: c.text }}><Icon name="edit" />Edit Order</h3>
             <div style={{ fontSize: '12px', color: c.muted, fontFamily: 'monospace', marginTop: '2px' }}>{order.order_number}</div>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '20px', cursor: 'pointer' }}>✕</button>
@@ -407,7 +408,7 @@ function EditOrderModal({ order, theme, onClose, onSave }) {
 
         {error && (
           <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', padding: '10px', marginBottom: '16px', color: '#EF4444', fontSize: '12px' }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 

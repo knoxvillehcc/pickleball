@@ -16,7 +16,7 @@ const WifiIcon = () => (
 
 const InputField = ({ label, hint, ...props }) => (
   <div>
-    <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>{label}</label>
+    <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>{label}</label>
     <input
       style={{
         width: '100%',
@@ -101,11 +101,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '60px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
       
       {/* Page Header */}
       <div>
-        <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+        <h1 style={{ margin: 0, fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
            System <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Settings</span>
         </h1>
         <p style={{ margin: '12px 0 0', color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.6 }}>
@@ -113,18 +113,18 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
         {/* Connection Config Card */}
-        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
            <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', color: 'var(--accent)', justifyContent: 'center' }}><ServerIcon /></div>
               <div>
-                 <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '800', color: 'var(--text-primary)' }}>Odoo Connection</h2>
+                 <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>Odoo Connection</h2>
                  <p style={{ margin: '2px 0 0', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: '500' }}>Instance URL, database name and credentials</p>
               </div>
            </div>
-           <div style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+           <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <InputField
                 label="Odoo URL"
                 type="text"
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                 placeholder="https://your-company.odoo.com"
                 required
               />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
                 <InputField
                   label="Database Name"
                   type="text"
@@ -164,10 +164,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Security Note Card */}
-        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px', boxShadow: 'var(--shadow)' }}>
+        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '16px 18px', display: 'flex', alignItems: 'flex-start', gap: '16px', boxShadow: 'var(--shadow)' }}>
            <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', flexShrink: 0 }}><ShieldIcon /></div>
            <div>
-              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: 'var(--text-primary)' }}>Security Notice</h3>
+              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>Security Notice</h3>
               <p style={{ margin: '6px 0 0', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6, fontWeight: '500' }}>
                  Credentials are stored locally in your environment file and are never transmitted to third parties. Use a dedicated API key with least-privilege access for enhanced security.
               </p>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
               disabled={testing || !formData.url || !formData.db || !formData.username || !formData.password}
               style={{
                 flex: 1, minWidth: '140px', backgroundColor: 'var(--bg-button-secondary)', border: '1px solid var(--border-button-secondary)',
-                color: 'var(--text-button-secondary)', fontWeight: '800', padding: '14px 28px', borderRadius: '12px',
+                color: 'var(--text-button-secondary)', fontWeight: '700', padding: '14px 28px', borderRadius: '12px',
                 cursor: (testing || !formData.url || !formData.db || !formData.username || !formData.password) ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '15px', transition: 'all 0.3s',
               }}
@@ -215,7 +215,7 @@ export default function SettingsPage() {
               disabled={saving}
               style={{
                 flex: 1, minWidth: '140px', background: 'var(--accent)',
-                color: 'white', fontWeight: '800', padding: '14px 28px', borderRadius: '12px', border: 'none',
+                color: 'white', fontWeight: '700', padding: '14px 28px', borderRadius: '12px', border: 'none',
                 cursor: saving ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '15px', transition: 'all 0.3s',
                 boxShadow: '0 4px 14px var(--accent-glow)',

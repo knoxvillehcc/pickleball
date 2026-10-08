@@ -6,6 +6,13 @@ export const metadata = {
   description: 'Knoxville Hindu Community Center — Admin Portal',
 };
 
+export const viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F5F5F7' },
+    { media: '(prefers-color-scheme: dark)', color: '#0A0A0B' },
+  ],
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -15,8 +22,12 @@ export default function RootLayout({ children }) {
             __html: `
               (function() {
                 try {
-                  var saved = localStorage.getItem('hcc-theme') || 'dark';
-                  document.documentElement.setAttribute('data-theme', saved);
+                  var pref = localStorage.getItem('hcc-theme') || 'system';
+                  var resolved = pref === 'system'
+                    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                    : pref;
+                  document.documentElement.setAttribute('data-theme', resolved);
+                  document.documentElement.setAttribute('data-theme-pref', pref);
                 } catch (e) {}
               })();
             `,

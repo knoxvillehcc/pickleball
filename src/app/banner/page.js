@@ -7,7 +7,7 @@ import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 const card = {
   backgroundColor: 'var(--bg-card)',
   border: '1px solid var(--border)',
-  borderRadius: '16px',
+  borderRadius: '14px',
   transition: 'all 0.3s',
 };
 const inputStyle = {
@@ -20,7 +20,7 @@ const inputStyle = {
 };
 const labelStyle = {
   display: 'block', fontSize: '11px', fontWeight: '700',
-  color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px',
+  color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px',
 };
 const STATUS_STYLES = {
   green:  { bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.3)',  color: 'var(--text-success)' },
@@ -146,19 +146,19 @@ export default function BannerPage() {
   ] : [];
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:'28px', paddingBottom:'60px' }}>
+    <div style={{ display:'flex', flexDirection:'column', gap:'18px', paddingBottom: '32px' }}>
 
       {/* Hero */}
       <div style={{
         ...card,
         background: 'var(--bg-card)',
         borderColor: 'var(--border)',
-        padding: '32px', position: 'relative', overflow: 'hidden',
+        padding: '22px 24px', position: 'relative', overflow: 'hidden',
         boxShadow: 'var(--shadow)',
-        display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
+        display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px',
       }}>
         <div style={{ position:'relative' }}>
-          <h1 style={{ margin:0, fontSize:'28px', fontWeight:'950', color:'var(--text-primary)', lineHeight:1.1, letterSpacing:'-0.5px' }}>
+          <h1 style={{ margin:0, fontSize:'28px', fontWeight:'700', color:'var(--text-primary)', lineHeight:1.1, letterSpacing:'-0.5px' }}>
             Banner{' '}
             <span style={{ background:'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip: 'text' }}>Check-In</span>
           </h1>
@@ -171,7 +171,7 @@ export default function BannerPage() {
           <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', position:'relative', zIndex:1 }}>
             <button onClick={downloadPDF} style={{
               background: 'var(--accent)',
-              color:'white', fontWeight:'800', fontSize:'14px',
+              color:'white', fontWeight:'700', fontSize:'14px',
               padding:'12px 26px', borderRadius:'12px', border:'none', cursor:'pointer',
               display:'flex', alignItems:'center', gap:'8px',
               boxShadow:'0 4px 12px var(--accent-glow)',
@@ -181,7 +181,7 @@ export default function BannerPage() {
             </button>
             <button onClick={downloadCSV} style={{
               background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.25)',
-              color:'var(--text-success)', fontWeight:'800', fontSize:'14px',
+              color:'var(--text-success)', fontWeight:'700', fontSize:'14px',
               padding:'12px 26px', borderRadius:'12px', cursor:'pointer',
               display:'flex', alignItems:'center', gap:'8px',
             }}>
@@ -193,7 +193,7 @@ export default function BannerPage() {
       </div>
 
       {/* Filters */}
-      <div style={{ ...card, padding:'28px' }}>
+      <div style={{ ...card, padding:'20px 22px' }}>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'16px', marginBottom:'20px' }}>
           <div>
             <label style={labelStyle}>Customer Name</label>
@@ -213,7 +213,7 @@ export default function BannerPage() {
         <div style={{ display:'flex', gap:'12px', flexWrap:'wrap' }}>
           <button onClick={fetchData} disabled={loading} style={{
             background: loading ? 'var(--accent-glow)' : 'var(--accent)',
-            color:'white', fontWeight:'800', fontSize:'14px',
+            color:'white', fontWeight:'700', fontSize:'14px',
             padding:'12px 28px', borderRadius:'10px', border:'none',
             cursor: loading ? 'not-allowed' : 'pointer',
             display:'flex', alignItems:'center', gap:'8px',
@@ -245,8 +245,8 @@ export default function BannerPage() {
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))', gap:'16px' }}>
           {statCards.map(({ label, value, color }) => (
             <div key={label} style={{ ...card, padding:'22px', borderTop:'2px solid '+color }}>
-              <div style={{ fontSize:'11px', fontWeight:'700', color:'var(--text-secondary)', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:'8px' }}>{label}</div>
-              <div style={{ fontSize:'30px', fontWeight:'900', color:'var(--text-primary)', lineHeight:1 }}>{value}</div>
+              <div style={{ fontSize:'11px', fontWeight:'700', color:'var(--text-secondary)', textTransform:'uppercase', letterSpacing: '0.6px', marginBottom:'8px' }}>{label}</div>
+              <div style={{ fontSize:'30px', fontWeight:'700', color:'var(--text-primary)', lineHeight:1 }}>{value}</div>
             </div>
           ))}
         </div>
@@ -270,7 +270,7 @@ export default function BannerPage() {
                 <thead>
                   <tr style={{ backgroundColor:'var(--bg-table-header)', borderBottom:'1px solid var(--border-table)' }}>
                     {[['Customer Name','left'],['Date','left'],['Product','left'],['Amount','right'],['Payment Taken By','left'],['Status','center'],['Invoice Ref','left']].map(([h,align]) => (
-                      <th key={h} style={{ padding:'14px 20px', fontSize:'11px', fontWeight:'700', color:'var(--text-table-header)', textTransform:'uppercase', letterSpacing:'1.5px', textAlign:align }}>{h}</th>
+                      <th key={h} style={{ padding:'14px 20px', fontSize:'11px', fontWeight:'700', color:'var(--text-table-header)', textTransform:'uppercase', letterSpacing: '0.6px', textAlign:align }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -287,18 +287,18 @@ export default function BannerPage() {
                         <td style={{ padding:'14px 20px', color:'var(--text-secondary)' }}>{r.date}</td>
                         <td style={{ padding:'14px 20px' }}>
                           <span style={{
-                            display:'inline-block', padding:'3px 10px', borderRadius:'9999px', fontSize:'12px', fontWeight:'800',
+                            display:'inline-block', padding:'3px 10px', borderRadius:'9999px', fontSize:'12px', fontWeight:'700',
                             backgroundColor: r.product.includes('Any') ? 'var(--accent-glow)' : 'rgba(139,30,63,0.08)',
-                            color:           r.product.includes('Any') ? 'var(--accent)' : '#8B1E3F',
+                            color:           r.product.includes('Any') ? 'var(--accent)' : 'var(--maroon)',
                             border:          '1px solid ' + (r.product.includes('Any') ? 'rgba(255,153,51,0.25)' : 'rgba(139,30,63,0.25)'),
                           }}>{r.product}</span>
                         </td>
-                        <td style={{ padding:'14px 20px', textAlign:'right', fontWeight:'800', color:'var(--text-success)', fontSize:'15px' }}>
+                        <td style={{ padding:'14px 20px', textAlign:'right', fontWeight:'700', color:'var(--text-success)', fontSize:'15px' }}>
                           ${(r.amount||0).toLocaleString('en-US',{minimumFractionDigits:2})}
                         </td>
                         <td style={{ padding:'14px 20px', color:'var(--text-secondary)', fontWeight:'600' }}>
                           <span style={{ display:'inline-flex', alignItems:'center', gap:'6px' }}>
-                            <span style={{ width:'26px', height:'26px', borderRadius:'50%', backgroundColor:'var(--accent-glow)', border:'1px solid var(--border)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'10px', fontWeight:'800', color:'var(--accent)', flexShrink:0 }}>
+                            <span style={{ width:'26px', height:'26px', borderRadius:'50%', backgroundColor:'var(--accent-glow)', border:'1px solid var(--border)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'10px', fontWeight:'700', color:'var(--accent)', flexShrink:0 }}>
                               {(r.takenBy||'?').charAt(0).toUpperCase()}
                             </span>
                             {r.takenBy}
@@ -317,8 +317,8 @@ export default function BannerPage() {
                 </tbody>
                 <tfoot>
                   <tr style={{ borderTop:'2px solid var(--border)', backgroundColor:'var(--bg-table-header)' }}>
-                    <td colSpan={3} style={{ padding:'15px 20px', fontWeight:'800', color:'var(--text-primary)', fontSize:'13px', textTransform:'uppercase', letterSpacing:'1px' }}>GRAND TOTAL</td>
-                    <td style={{ padding:'15px 20px', textAlign:'right', fontWeight:'900', color:'var(--text-success)', fontSize:'18px' }}>
+                    <td colSpan={3} style={{ padding:'15px 20px', fontWeight:'700', color:'var(--text-primary)', fontSize:'13px', textTransform:'uppercase', letterSpacing:'1px' }}>GRAND TOTAL</td>
+                    <td style={{ padding:'15px 20px', textAlign:'right', fontWeight:'700', color:'var(--text-success)', fontSize:'18px' }}>
                       ${results.reduce((s,r) => s+(r.amount||0), 0).toLocaleString('en-US',{minimumFractionDigits:2})}
                     </td>
                     <td colSpan={3}></td>

@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useRouter } from 'next/navigation';
 
 export default function AccessDeniedPage() {
@@ -7,15 +8,15 @@ export default function AccessDeniedPage() {
     <div style={{
       minHeight: '100vh', background: 'var(--bg-primary)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: "'Inter', sans-serif", padding: '24px', textAlign: 'center',
+      fontFamily: 'var(--font-sans)', padding: '16px 18px', textAlign: 'center',
     }}>
       <div style={{ maxWidth: '420px' }}>
         <div style={{
           width: '80px', height: '80px', borderRadius: '50%', margin: '0 auto 24px',
           background: 'rgba(239,68,68,0.1)', border: '1.5px solid rgba(239,68,68,0.3)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px',
-        }}>🚫</div>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--text-primary)', margin: '0 0 12px' }}>
+        }}><Icon name="ban" /></div>
+        <h1 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 12px' }}>
           Access Denied
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: '1.6', margin: '0 0 32px' }}>
@@ -26,7 +27,7 @@ export default function AccessDeniedPage() {
           style={{
             padding: '12px 28px', borderRadius: '12px', border: 'none', cursor: 'pointer',
             background: 'linear-gradient(135deg, var(--accent), var(--accent-glow))',
-            color: '#fff', fontWeight: '800', fontSize: '14px', fontFamily: 'inherit',
+            color: '#fff', fontWeight: '700', fontSize: '14px', fontFamily: 'inherit',
           }}
         >← Go Back</button>
       </div>

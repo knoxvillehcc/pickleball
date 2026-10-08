@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -48,9 +49,9 @@ export default function VendorSuccessClient() {
       }}>
 
         {/* Top badge */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,153,51,0.12)', border: '1px solid rgba(255,153,51,0.3)', padding: '6px 18px', borderRadius: '20px', marginBottom: '28px' }}>
-          <span style={{ fontSize: '16px' }}>🇮🇳</span>
-          <span style={{ fontSize: '12px', fontWeight: '800', color: T.saffron, letterSpacing: '2px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,153,51,0.12)', border: '1px solid rgba(255,153,51,0.3)', padding: '6px 18px', borderRadius: '14px', marginBottom: '28px' }}>
+          <span style={{ fontSize: '16px' }}><Icon name="flag" /></span>
+          <span style={{ fontSize: '12px', fontWeight: '700', color: T.saffron, letterSpacing: '0.6px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
         </div>
 
         {/* Check icon */}
@@ -69,10 +70,10 @@ export default function VendorSuccessClient() {
         </div>
 
         {/* Headings */}
-        <h1 style={{ margin: '0 0 8px', fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: '900', letterSpacing: '-1.5px', lineHeight: 0.95, textTransform: 'uppercase', color: T.white }}>
-          You're In! 🎊
+        <h1 style={{ margin: '0 0 8px', fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: '700', letterSpacing: '-1.5px', lineHeight: 0.95, textTransform: 'uppercase', color: T.white }}>
+          You're In! 
         </h1>
-        <h2 style={{ margin: '0 0 6px', fontSize: 'clamp(18px, 3.5vw, 28px)', fontWeight: '900', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+        <h2 style={{ margin: '0 0 6px', fontSize: 'clamp(18px, 3.5vw, 28px)', fontWeight: '700', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
           <span style={{ background: `linear-gradient(135deg, ${T.saffron}, ${T.gold})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             India Fest 2026
           </span>
@@ -88,14 +89,14 @@ export default function VendorSuccessClient() {
         {/* Registration number */}
         {regNumber && (
           <div style={{
-            background: T.card, border: '1px solid rgba(255,153,51,0.25)', borderRadius: '18px',
-            padding: '28px', marginBottom: '20px', backdropFilter: 'blur(12px)',
+            background: T.card, border: '1px solid rgba(255,153,51,0.25)', borderRadius: '14px',
+            padding: '20px 22px', marginBottom: '20px', backdropFilter: 'blur(12px)',
             boxShadow: '0 0 40px rgba(255,153,51,0.10)',
           }}>
-            <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px' }}>
               Your Registration Number
             </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '30px', fontWeight: '900', color: T.saffron, letterSpacing: '4px' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '30px', fontWeight: '700', color: T.saffron, letterSpacing: '4px' }}>
               {regNumber}
             </div>
             <div style={{ fontSize: '13px', color: T.muted, marginTop: '10px' }}>
@@ -106,17 +107,17 @@ export default function VendorSuccessClient() {
 
         {/* Event info */}
         <div style={{
-          background: T.card, border: '1px solid rgba(255,255,255,0.06)', borderRadius: '18px',
-          padding: '24px', marginBottom: '20px', textAlign: 'left', backdropFilter: 'blur(12px)',
+          background: T.card, border: '1px solid rgba(255,255,255,0.06)', borderRadius: '14px',
+          padding: '16px 18px', marginBottom: '20px', textAlign: 'left', backdropFilter: 'blur(12px)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '18px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '18px' }}>
             Event Details
           </div>
           {[
-            { icon: '📅', label: 'Event Date & Time', value: 'Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM' },
-            { icon: '📍', label: 'Location', value: 'HCC — 8580 Hickory Creek Rd, Lenoir City, TN 37771' },
-            { icon: '🏪', label: 'Setup', value: 'Arrive 30 min before doors open for booth setup' },
-            { icon: '📧', label: 'Details', value: 'Full event & setup instructions will be emailed separately' },
+            { icon: <Icon name="calendar" />, label: 'Event Date & Time', value: 'Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM' },
+            { icon: <Icon name="pin" />, label: 'Location', value: 'HCC — 8580 Hickory Creek Rd, Lenoir City, TN 37771' },
+            { icon: <Icon name="store" />, label: 'Setup', value: 'Arrive 30 min before doors open for booth setup' },
+            { icon: <Icon name="mail" />, label: 'Details', value: 'Full event & setup instructions will be emailed separately' },
           ].map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 3 ? '14px' : 0 }}>
               <span style={{ fontSize: '20px', flexShrink: 0, marginTop: '1px' }}>{item.icon}</span>
@@ -130,16 +131,16 @@ export default function VendorSuccessClient() {
 
         {/* What's next */}
         <div style={{
-          background: T.card, border: '1px solid rgba(255,215,0,0.12)', borderRadius: '18px',
-          padding: '24px', marginBottom: '32px', textAlign: 'left', backdropFilter: 'blur(12px)',
+          background: T.card, border: '1px solid rgba(255,215,0,0.12)', borderRadius: '14px',
+          padding: '16px 18px', marginBottom: '32px', textAlign: 'left', backdropFilter: 'blur(12px)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: T.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '18px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: T.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '18px' }}>
             What Happens Next
           </div>
           {[
-            { icon: '✅', title: 'Confirmation Email Sent', desc: 'Check your inbox (and spam) for your vendor confirmation' },
-            { icon: '📋', title: 'Space Assignment', desc: 'You will receive your specific booth location closer to the event' },
-            { icon: '🎊', title: 'See You at India Fest!', desc: 'Celebrate culture, food, and community with all of Knoxville' },
+            { icon: <Icon name="check" />, title: 'Confirmation Email Sent', desc: 'Check your inbox (and spam) for your vendor confirmation' },
+            { icon: <Icon name="clipboard" />, title: 'Space Assignment', desc: 'You will receive your specific booth location closer to the event' },
+            { icon: <Icon name="sparkles" />, title: 'See You at India Fest!', desc: 'Celebrate culture, food, and community with all of Knoxville' },
           ].map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 2 ? '16px' : 0 }}>
               <span style={{ fontSize: '20px', flexShrink: 0 }}>{item.icon}</span>

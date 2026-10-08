@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ClientLayout';
 import { colors, spacing, type, radii, btn, input as dsInput, card, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
@@ -78,25 +79,25 @@ export default function SettingsPage() {
       <style>{keyframes}</style>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl, flexWrap: 'wrap', gap: spacing.md }}>
-        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>⚙️ Event Settings</h1>
+        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}><Icon name="settings" />Event Settings</h1>
         <div style={{ display: 'flex', gap: spacing.md }}>
           <a href="/navratri" style={{ ...btn('secondary', theme), textDecoration: 'none', ...type.caption }}>← Dashboard</a>
           <button onClick={handleSave} disabled={saving}
             style={{ ...btn('primary', theme), width: 'auto', ...type.caption, opacity: saving ? 0.5 : 1 }}>
-            {saving ? 'Saving…' : '💾 Save'}
+            {saving ? 'Saving…' : 'Save'}
           </button>
         </div>
       </div>
 
       {message && (
         <div style={{ ...alertStyle(message.type, theme), marginBottom: spacing.base }}>
-          {message.type === 'error' ? '❌' : '✅'} {message.text}
+          {message.type === 'error' ? <Icon name="x" /> : <Icon name="check" />} {message.text}
         </div>
       )}
 
       {/* Status */}
       <div style={sectionCard}>
-        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>📊 Event Status</h3>
+        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}><Icon name="chart" />Event Status</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: spacing.base, flexWrap: 'wrap' }}>
           <span style={{ ...type.bodyMedium, textTransform: 'capitalize' }}>Current: {event.status}</span>
           {event.status === 'draft' && <button onClick={() => handleStatusChange('published')} style={toggleStyle(true)}>Publish</button>}
@@ -107,18 +108,18 @@ export default function SettingsPage() {
 
       {/* Sales Toggles */}
       <div style={sectionCard}>
-        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>🛒 Sales Controls</h3>
+        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}><Icon name="cart" />Sales Controls</h3>
         <div style={{ display: 'flex', gap: spacing.xl, flexWrap: 'wrap' }}>
           <div>
             <span style={labelStyle}>Daily Ticket Sales</span>
             <button onClick={() => updateField('daily_sales_open', !event.daily_sales_open)} style={toggleStyle(event.daily_sales_open)}>
-              {event.daily_sales_open ? '✅ Open' : '❌ Closed'}
+              {event.daily_sales_open ? 'Open' : 'Closed'}
             </button>
           </div>
           <div>
             <span style={labelStyle}>Combo Pass Sales</span>
             <button onClick={() => updateField('combo_sales_open', !event.combo_sales_open)} style={toggleStyle(event.combo_sales_open)}>
-              {event.combo_sales_open ? '✅ Open' : '❌ Closed'}
+              {event.combo_sales_open ? 'Open' : 'Closed'}
             </button>
           </div>
         </div>
@@ -126,7 +127,7 @@ export default function SettingsPage() {
 
       {/* Pricing */}
       <div style={sectionCard}>
-        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>💰 Pricing</h3>
+        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}><Icon name="money" />Pricing</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.base }}>
           <div><label style={labelStyle}>General Daily ($)</label><input style={inputS} type="number" step="0.01" value={((event.price_general_daily || 0) / 100).toFixed(2)} onChange={e => updateField('price_general_daily', Math.round(parseFloat(e.target.value) * 100))} /></div>
           <div><label style={labelStyle}>Pioneer Guest Daily ($)</label><input style={inputS} type="number" step="0.01" value={((event.price_pioneer_guest_daily || 0) / 100).toFixed(2)} onChange={e => updateField('price_pioneer_guest_daily', Math.round(parseFloat(e.target.value) * 100))} /></div>
@@ -137,7 +138,7 @@ export default function SettingsPage() {
 
       {/* Limits */}
       <div style={sectionCard}>
-        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>📏 Entitlement Limits</h3>
+        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}><Icon name="ruler" />Entitlement Limits</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.base }}>
           <div><label style={labelStyle}>Daily Member Limit</label><input style={inputS} type="number" value={event.daily_member_limit || ''} onChange={e => updateField('daily_member_limit', parseInt(e.target.value))} /></div>
           <div><label style={labelStyle}>Pioneer Guest Limit</label><input style={inputS} type="number" value={event.daily_pioneer_guest_limit || ''} onChange={e => updateField('daily_pioneer_guest_limit', parseInt(e.target.value))} /></div>
@@ -150,7 +151,7 @@ export default function SettingsPage() {
 
       {/* Venue */}
       <div style={sectionCard}>
-        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>📍 Venue</h3>
+        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}><Icon name="pin" />Venue</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.base }}>
           <div><label style={labelStyle}>Venue Name</label><input style={inputS} value={event.venue_name || ''} onChange={e => updateField('venue_name', e.target.value)} /></div>
           <div><label style={labelStyle}>Venue Address</label><input style={inputS} value={event.venue_address || ''} onChange={e => updateField('venue_address', e.target.value)} /></div>
@@ -161,7 +162,7 @@ export default function SettingsPage() {
 
       {/* Checkout */}
       <div style={sectionCard}>
-        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>⏱️ Checkout & Refund</h3>
+        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>Checkout & Refund</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.base }}>
           <div><label style={labelStyle}>Price Lock Minutes</label><input style={inputS} type="number" value={event.price_lock_minutes || ''} onChange={e => updateField('price_lock_minutes', parseInt(e.target.value))} /></div>
           <div><label style={labelStyle}>Stripe Session Minutes</label><input style={inputS} type="number" value={event.stripe_session_minutes || ''} onChange={e => updateField('stripe_session_minutes', parseInt(e.target.value))} /></div>

@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from '@/components/ClientLayout';
@@ -90,10 +91,10 @@ function UploadInner() {
 
   // Error (invalid token, etc.)
   if (error && !registration) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: '24px' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: '16px 18px' }}>
       <div style={{ textAlign: 'center', maxWidth: '480px' }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>❌</div>
-        <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '8px' }}>Upload Link Invalid</h1>
+        <div style={{ fontSize: '48px', marginBottom: '16px' }}><Icon name="x" /></div>
+        <h1 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '8px' }}>Upload Link Invalid</h1>
         <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{error}</p>
       </div>
     </div>
@@ -103,12 +104,12 @@ function UploadInner() {
   const hasMedia = registration?.media_url;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 18px' }}>
       <div style={{ maxWidth: '560px', width: '100%' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '12px' }}>📺</div>
-          <h1 style={{ fontSize: '24px', fontWeight: '900', color: 'var(--text-primary)', marginBottom: '4px' }}>
+          <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon name="tv" /></div>
+          <h1 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>
             Upload Your Ad Media
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
@@ -118,13 +119,13 @@ function UploadInner() {
 
         {/* Registration info card */}
         <div style={{
-          padding: '20px', borderRadius: '16px', marginBottom: '24px',
+          padding: '20px', borderRadius: '14px', marginBottom: '24px',
           background: 'var(--bg-primary)', border: '1px solid var(--border)',
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)' }}>REGISTRATION</span>
-            <span style={{ fontSize: '13px', fontWeight: '800', color: '#FF9933' }}>{registration.registration_number}</span>
+            <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--accent)' }}>{registration.registration_number}</span>
           </div>
           <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>{registration.business_name}</div>
           <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '2px' }}>{registration.contact_name}</div>
@@ -136,7 +137,7 @@ function UploadInner() {
           background: isDark ? 'rgba(255,153,51,0.06)' : '#FFF8F0',
           border: '1px solid rgba(255,153,51,0.2)',
         }}>
-          <div style={{ fontSize: '12px', fontWeight: '700', color: '#FF9933', marginBottom: '4px' }}>📐 MEDIA REQUIREMENT</div>
+          <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent)', marginBottom: '4px' }}><Icon name="ruler" />MEDIA REQUIREMENT</div>
           <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: '600' }}>1920 × 1080 pixels (landscape, high resolution)</div>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>Max file size: 10 MB · Any file type accepted</div>
         </div>
@@ -148,7 +149,7 @@ function UploadInner() {
             background: isDark ? 'rgba(34,197,94,0.06)' : '#F0FDF4',
             border: '1px solid rgba(34,197,94,0.2)',
           }}>
-            <div style={{ fontSize: '12px', fontWeight: '700', color: '#22C55E', marginBottom: '6px' }}>✅ MEDIA ALREADY UPLOADED</div>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: '#22C55E', marginBottom: '6px' }}><Icon name="check" />MEDIA ALREADY UPLOADED</div>
             <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: '600' }}>{registration.media_filename}</div>
             <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>
               Uploaded: {new Date(registration.media_uploaded_at).toLocaleString()}
@@ -163,12 +164,12 @@ function UploadInner() {
         {/* Upload success */}
         {uploadSuccess && (
           <div style={{
-            padding: '24px', borderRadius: '16px', marginBottom: '20px', textAlign: 'center',
+            padding: '16px 18px', borderRadius: '14px', marginBottom: '20px', textAlign: 'center',
             background: isDark ? 'rgba(34,197,94,0.06)' : '#F0FDF4',
             border: '1px solid rgba(34,197,94,0.2)',
           }}>
-            <div style={{ fontSize: '40px', marginBottom: '8px' }}>✅</div>
-            <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>Upload Successful!</div>
+            <div style={{ fontSize: '40px', marginBottom: '8px' }}><Icon name="check" /></div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>Upload Successful!</div>
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Your ad media has been received. Thank you!</div>
           </div>
         )}
@@ -182,8 +183,8 @@ function UploadInner() {
               onDrop={handleDrop}
               onClick={() => document.getElementById('file-input').click()}
               style={{
-                padding: '40px 24px', borderRadius: '16px', textAlign: 'center', cursor: 'pointer',
-                border: `2px dashed ${dragOver ? '#FF9933' : selectedFile ? '#22C55E' : 'var(--border)'}`,
+                padding: '40px 24px', borderRadius: '14px', textAlign: 'center', cursor: 'pointer',
+                border: `2px dashed ${dragOver ? 'var(--accent)' : selectedFile ? '#22C55E' : 'var(--border)'}`,
                 background: dragOver ? (isDark ? 'rgba(255,153,51,0.06)' : '#FFF8F0') : 'var(--bg-secondary)',
                 transition: 'all 0.2s ease',
               }}
@@ -196,7 +197,7 @@ function UploadInner() {
                     <img src={preview} alt="Preview" style={{ maxWidth: '200px', maxHeight: '300px', borderRadius: '10px', marginBottom: '12px', border: '1px solid var(--border)' }} />
                   )}
                   {preview === 'video' && (
-                    <div style={{ fontSize: '48px', marginBottom: '8px' }}>🎬</div>
+                    <div style={{ fontSize: '48px', marginBottom: '8px' }}><Icon name="film" /></div>
                   )}
                   <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>{selectedFile.name}</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
@@ -205,7 +206,7 @@ function UploadInner() {
                 </div>
               ) : (
                 <div>
-                  <div style={{ fontSize: '40px', marginBottom: '8px' }}>📁</div>
+                  <div style={{ fontSize: '40px', marginBottom: '8px' }}><Icon name="folder" /></div>
                   <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>
                     Drop your file here or click to browse
                   </div>
@@ -218,7 +219,7 @@ function UploadInner() {
 
             {error && (
               <div style={{ padding: '12px 16px', borderRadius: '10px', background: '#FEE2E2', border: '1px solid #FCA5A5', color: '#991B1B', fontSize: '13px', marginTop: '12px' }}>
-                ❌ {error}
+                {error}
               </div>
             )}
 
@@ -228,14 +229,14 @@ function UploadInner() {
               style={{
                 width: '100%', padding: '16px', borderRadius: '14px', border: 'none', marginTop: '20px',
                 background: selectedFile ? 'linear-gradient(135deg, #22C55E, #16A34A)' : '#ccc',
-                color: 'white', fontWeight: '800', fontSize: '16px',
+                color: 'white', fontWeight: '700', fontSize: '16px',
                 cursor: selectedFile && !uploading ? 'pointer' : 'not-allowed',
                 opacity: uploading ? 0.6 : 1,
                 boxShadow: selectedFile ? '0 4px 16px rgba(34,197,94,0.3)' : 'none',
                 transition: 'all 0.2s ease',
               }}
             >
-              {uploading ? '⏳ Uploading...' : hasMedia ? '🔄 Replace Media' : '📤 Upload Media'}
+              {uploading ? 'Uploading...' : hasMedia ? 'Replace Media' : 'Upload Media'}
             </button>
           </>
         )}

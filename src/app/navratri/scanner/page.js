@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, useRef } from 'react';
 import { colors, spacing, type, radii, btn, input as inputStyle, card, page as pageStyle, keyframes, alert as alertStyle, chip } from '@/lib/navratri/designSystem';
 
@@ -250,7 +251,7 @@ export default function ScannerPage() {
         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '44px',
         background: c.primaryBg, border: `1px solid ${c.border}`,
         marginBottom: spacing['2xl'],
-      }}>🪔</div>
+      }}><Icon name="flame" /></div>
 
       <h1 style={{ ...type.pageTitle, color: c.text, margin: `0 0 ${spacing.xs}px` }}>Gate Scanner</h1>
       <p style={{ ...type.body, color: c.muted, marginBottom: spacing['2xl'] }}>Enter your staff PIN to begin</p>
@@ -300,12 +301,12 @@ export default function ScannerPage() {
 
         {autoDateLabel && eventDateId && (
           <div style={{ ...alertStyle('success', 'dark'), marginTop: spacing.sm }}>
-            ✅ Today: {autoDateLabel}
+            Today: {autoDateLabel}
           </div>
         )}
         {!autoDateLabel && dates.length > 0 && !eventDateId && (
           <div style={{ ...alertStyle('warning', 'dark'), marginTop: spacing.sm }}>
-            ⚠️ No event today — select a date manually
+            No event today — select a date manually
           </div>
         )}
       </div>
@@ -338,14 +339,14 @@ export default function ScannerPage() {
         background: c.bgAlt,
       }}>
         <div>
-          <div style={{ ...type.bodyMedium, color: c.text }}>👤 {employee?.name}</div>
+          <div style={{ ...type.bodyMedium, color: c.text }}><Icon name="user" />{employee?.name}</div>
           <div style={{ ...type.caption, color: c.muted }}>
-            ✅ {stats.valid} in · ❌ {stats.denied} denied
+            {stats.valid} in · {stats.denied} denied
           </div>
         </div>
         <div style={{ display: 'flex', gap: spacing.sm }}>
           <button onClick={() => setMode('lookup')} style={{ ...btn('secondary', 'dark'), padding: `${spacing.sm}px ${spacing.md}px`, ...type.caption }}>
-            🔍 Lookup
+            Lookup
           </button>
           <button onClick={handleLogout} style={{ ...btn('destructive', 'dark'), padding: `${spacing.sm}px ${spacing.md}px`, ...type.caption }}>
             Exit
@@ -376,7 +377,7 @@ export default function ScannerPage() {
           background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)',
           ...type.bodyMedium, color: c.green,
         }}>
-          {loading ? '⏳ Validating…' : '📸 Point at QR code'}
+          {loading ? 'Validating…' : 'Point at QR code'}
         </div>
       </div>
 
@@ -425,7 +426,7 @@ export default function ScannerPage() {
           background: isConfirmed ? c.greenBg : isValid ? c.accentBg : c.redBg,
           border: `3px solid ${isConfirmed ? c.green : isValid ? c.accent : c.red}`,
         }}>
-          {isConfirmed ? '✅' : isValid ? '🎫' : '❌'}
+          {isConfirmed ? <Icon name="check" /> : isValid ? <Icon name="ticket" /> : <Icon name="x" />}
         </div>
 
         <h1 style={{
@@ -446,7 +447,7 @@ export default function ScannerPage() {
             <div style={{ ...type.pageTitle, fontSize: '26px', color: c.text }}>{scanResult.purchaserName}</div>
             {scanResult.quantity > 1 && (
               <div style={{ ...type.bodyMedium, color: c.accent, marginTop: spacing.sm }}>
-                👥 {scanResult.quantity} person(s)
+                {scanResult.quantity} person(s)
               </div>
             )}
             {scanResult.orderNumber && (
@@ -467,7 +468,7 @@ export default function ScannerPage() {
             ...alertStyle('error', 'dark'), width: '100%', maxWidth: '360px',
             marginTop: spacing.base, justifyContent: 'center', fontWeight: '600',
           }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -479,13 +480,13 @@ export default function ScannerPage() {
               fontSize: '20px', padding: `${spacing.lg}px`,
               opacity: loading ? 0.5 : 1,
             }}>
-              {loading ? 'Processing…' : '✅ Confirm Check-In'}
+              {loading ? 'Processing…' : 'Confirm Check-In'}
             </button>
           )}
           <button onClick={() => { setScanResult(null); setMode('scan'); setError(''); }} style={{
             ...btn('secondary', 'dark'), width: '100%', padding: `${spacing.base}px`,
           }}>
-            {isConfirmed ? '📸 Scan Next' : '← Back to Scanner'}
+            {isConfirmed ? 'Scan Next' : '← Back to Scanner'}
           </button>
         </div>
       </div>

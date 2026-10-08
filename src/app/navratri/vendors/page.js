@@ -54,7 +54,7 @@ function Badge({ status }) {
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: '5px',
       padding: '3px 10px', borderRadius: '99px',
-      fontSize: '11px', fontWeight: '800',
+      fontSize: '11px', fontWeight: '700',
       backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.color,
       whiteSpace: 'nowrap',
     }}>
@@ -92,13 +92,13 @@ function StatCard({ label, value, accent, sub }) {
   return (
     <div style={{
       backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)',
-      borderRadius: '16px', padding: '22px 20px', borderTop: `3.5px solid ${accent}`,
+      borderRadius: '14px', padding: '22px 20px', borderTop: `3.5px solid ${accent}`,
       boxShadow: 'var(--shadow)', width: '100%', boxSizing: 'border-box',
     }}>
-      <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '8px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
         {label}
       </div>
-      <div style={{ fontSize: '32px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{value}</div>
       {sub && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', fontWeight: '600' }}>{sub}</div>}
     </div>
   );
@@ -603,7 +603,7 @@ export default function NavratriVendorsDashboard() {
   };
 
   return (
-    <div style={{ padding: '32px 28px', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ padding: '32px 28px', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
       {/* ── TOP HEADER BAR ───────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
@@ -615,7 +615,7 @@ export default function NavratriVendorsDashboard() {
             }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M2 9h20"/></svg>
             </div>
-            <h1 style={{ fontSize: '24px', fontWeight: '950', margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+            <h1 style={{ fontSize: '24px', fontWeight: '700', margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
               Navratri 2026 — Vendor Booths
             </h1>
           </div>
@@ -715,7 +715,7 @@ export default function NavratriVendorsDashboard() {
         }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           <span>Odoo General Entry Confirmed:</span>
-          <span style={{ fontFamily: 'monospace', fontWeight: '800' }}>{odooSyncStatus.moveName}</span>
+          <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{odooSyncStatus.moveName}</span>
           <span>· Gross: ${Number(odooSyncStatus.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
           <span>· Analytic: Navratri 2026</span>
           {odooSyncStatus.date && <span>· Date: {formatMMDDYYYY(odooSyncStatus.date)}</span>}
@@ -753,7 +753,7 @@ export default function NavratriVendorsDashboard() {
       {/* ── CONTROLS, SEARCH & REPORT GENERATION ──────────────────────────────── */}
       <div style={{
         background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: '16px', padding: '20px', marginBottom: '24px',
+        borderRadius: '14px', padding: '20px', marginBottom: '24px',
         boxShadow: 'var(--shadow)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '18px' }}>
@@ -845,7 +845,7 @@ export default function NavratriVendorsDashboard() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderTop: '1px solid var(--border)', paddingTop: '14px' }}>
           {/* Status Pills */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginRight: '4px' }}>Status:</span>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginRight: '4px' }}>Status:</span>
             {['all', 'paid', 'pending', 'partially_refunded', 'refunded'].map(st => (
               <button
                 key={st}
@@ -855,7 +855,7 @@ export default function NavratriVendorsDashboard() {
                   border: `1px solid ${statusFilter === st ? SAFFRON : 'var(--border)'}`,
                   background: statusFilter === st ? 'rgba(255,107,53,0.12)' : 'transparent',
                   color: statusFilter === st ? SAFFRON : 'var(--text-secondary)',
-                  fontWeight: '800', fontSize: '12px', cursor: 'pointer', textTransform: 'capitalize',
+                  fontWeight: '700', fontSize: '12px', cursor: 'pointer', textTransform: 'capitalize',
                 }}
               >
                 {st.replace('_', ' ')}
@@ -865,7 +865,7 @@ export default function NavratriVendorsDashboard() {
 
           {/* Category Filter */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginRight: '4px' }}>Category:</span>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginRight: '4px' }}>Category:</span>
             {['all', 'clothing', 'jewelry', 'food', 'henna', 'handicrafts', 'services'].map(cat => (
               <button
                 key={cat}
@@ -888,7 +888,7 @@ export default function NavratriVendorsDashboard() {
       {/* ── REGISTRATIONS TABLE ──────────────────────────────────────────────── */}
       <div style={{
         background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: '16px', overflow: 'hidden', boxShadow: 'var(--shadow)',
+        borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow)',
       }}>
         {loading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: SAFFRON, fontSize: '15px', fontWeight: '700' }}>
@@ -903,7 +903,7 @@ export default function NavratriVendorsDashboard() {
             }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
-            <h3 style={{ fontSize: '17px', fontWeight: '800', margin: '0 0 6px' }}>No registrations match your search</h3>
+            <h3 style={{ fontSize: '17px', fontWeight: '700', margin: '0 0 6px' }}>No registrations match your search</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: 0 }}>Try clearing filters or search terms</p>
           </div>
         ) : (
@@ -911,13 +911,13 @@ export default function NavratriVendorsDashboard() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
               <thead>
                 <tr style={{ background: 'var(--bg-input)', borderBottom: `2px solid ${SAFFRON}` }}>
-                  <th style={{ padding: '14px 16px', fontWeight: '800', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Reg #</th>
-                  <th style={{ padding: '14px 16px', fontWeight: '800', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Business & Category</th>
-                  <th style={{ padding: '14px 16px', fontWeight: '800', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Contact Info</th>
-                  <th style={{ padding: '14px 16px', fontWeight: '800', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Booked Dates & Spot #</th>
-                  <th style={{ padding: '14px 16px', fontWeight: '800', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Amount Paid</th>
-                  <th style={{ padding: '14px 16px', fontWeight: '800', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Status</th>
-                  <th style={{ padding: '14px 16px', fontWeight: '800', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '14px 16px', fontWeight: '700', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Reg #</th>
+                  <th style={{ padding: '14px 16px', fontWeight: '700', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Business & Category</th>
+                  <th style={{ padding: '14px 16px', fontWeight: '700', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Contact Info</th>
+                  <th style={{ padding: '14px 16px', fontWeight: '700', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Booked Dates & Spot #</th>
+                  <th style={{ padding: '14px 16px', fontWeight: '700', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Amount Paid</th>
+                  <th style={{ padding: '14px 16px', fontWeight: '700', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)' }}>Status</th>
+                  <th style={{ padding: '14px 16px', fontWeight: '700', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -937,7 +937,7 @@ export default function NavratriVendorsDashboard() {
                     >
                       {/* Reg Number */}
                       <td style={{ padding: '16px', verticalAlign: 'top' }}>
-                        <div style={{ fontFamily: 'monospace', fontWeight: '900', color: SAFFRON, fontSize: '13px' }}>
+                        <div style={{ fontFamily: 'monospace', fontWeight: '700', color: SAFFRON, fontSize: '13px' }}>
                           {reg.registration_number}
                         </div>
                         <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -947,7 +947,7 @@ export default function NavratriVendorsDashboard() {
 
                       {/* Business & Category */}
                       <td style={{ padding: '16px', verticalAlign: 'top' }}>
-                        <div style={{ fontWeight: '900', fontSize: '14px', color: 'var(--text-primary)' }}>
+                        <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--text-primary)' }}>
                           {reg.business_name}
                         </div>
                         <div style={{ marginTop: '6px' }}>
@@ -996,7 +996,7 @@ export default function NavratriVendorsDashboard() {
                               </div>
                               {/* Inline spot editor */}
                               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ fontSize: '11px', color: GOLD, fontWeight: '800' }}>Spot:</span>
+                                <span style={{ fontSize: '11px', color: GOLD, fontWeight: '700' }}>Spot:</span>
                                 <input
                                   type="text"
                                   defaultValue={d.booth_spot_number || ''}
@@ -1005,7 +1005,7 @@ export default function NavratriVendorsDashboard() {
                                   style={{
                                     width: '60px', padding: '2px 6px', borderRadius: '4px',
                                     border: '1px solid var(--border)', background: 'var(--bg-card)',
-                                    color: 'var(--text-primary)', fontSize: '11px', fontWeight: '800', textAlign: 'center',
+                                    color: 'var(--text-primary)', fontSize: '11px', fontWeight: '700', textAlign: 'center',
                                   }}
                                 />
                               </div>
@@ -1022,7 +1022,7 @@ export default function NavratriVendorsDashboard() {
 
                       {/* Amount Paid */}
                       <td style={{ padding: '16px', verticalAlign: 'top' }}>
-                        <div style={{ fontSize: '16px', fontWeight: '950', color: reg.amount_paid > 0 ? '#10B981' : 'var(--text-primary)' }}>
+                        <div style={{ fontSize: '16px', fontWeight: '700', color: reg.amount_paid > 0 ? '#10B981' : 'var(--text-primary)' }}>
                           ${((reg.amount_paid || 0) / 100).toFixed(2)}
                         </div>
                         {reg.amount_due !== reg.amount_paid && (
@@ -1109,9 +1109,9 @@ export default function NavratriVendorsDashboard() {
       {/* ── MODAL: REFUND (FULL OR PARTIAL) ─────────────────────────────────── */}
       {refundingReg && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ maxWidth: '520px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)' }}>
+          <div style={{ maxWidth: '520px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '20px 22px', boxShadow: 'var(--shadow)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
                 Issue Refund — {refundingReg.business_name}
               </h2>
               <button onClick={() => setRefundingReg(null)} style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
@@ -1132,7 +1132,7 @@ export default function NavratriVendorsDashboard() {
                   border: `2px solid ${refundMode === 'full' ? SAFFRON : 'var(--border)'}`,
                   background: refundMode === 'full' ? 'rgba(255,107,53,0.12)' : 'var(--bg-input)',
                   color: refundMode === 'full' ? SAFFRON : 'var(--text-primary)',
-                  fontWeight: '800', fontSize: '13px', cursor: 'pointer',
+                  fontWeight: '700', fontSize: '13px', cursor: 'pointer',
                 }}
               >
                 Full Refund (${((refundingReg.amount_paid || 0) / 100).toFixed(2)})
@@ -1146,7 +1146,7 @@ export default function NavratriVendorsDashboard() {
                   border: `2px solid ${refundMode === 'partial' ? '#F59E0B' : 'var(--border)'}`,
                   background: refundMode === 'partial' ? 'rgba(245,158,11,0.12)' : 'var(--bg-input)',
                   color: refundMode === 'partial' ? '#F59E0B' : 'var(--text-primary)',
-                  fontWeight: '800', fontSize: '13px', cursor: 'pointer',
+                  fontWeight: '700', fontSize: '13px', cursor: 'pointer',
                 }}
               >
                 Partial Date Refund
@@ -1156,7 +1156,7 @@ export default function NavratriVendorsDashboard() {
             {/* Partial Date Selection */}
             {refundMode === 'partial' && (
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>
                   Select Date(s) to Cancel & Refund:
                 </label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto' }}>
@@ -1177,7 +1177,7 @@ export default function NavratriVendorsDashboard() {
                           />
                           <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>{d.day_label || d.event_date}</span>
                         </div>
-                        <span style={{ fontSize: '12px', fontWeight: '800', color: '#F59E0B' }}>
+                        <span style={{ fontSize: '12px', fontWeight: '700', color: '#F59E0B' }}>
                           ${((d.total_cents || 0) / 100).toFixed(2)}
                         </span>
                       </label>
@@ -1201,7 +1201,7 @@ export default function NavratriVendorsDashboard() {
                 disabled={isRefunding || (refundMode === 'partial' && selectedRefundDateIds.length === 0)}
                 style={{
                   padding: '10px 22px', borderRadius: '10px', border: 'none',
-                  background: '#EF4444', color: '#FFFFFF', fontWeight: '800',
+                  background: '#EF4444', color: '#FFFFFF', fontWeight: '700',
                   cursor: isRefunding ? 'not-allowed' : 'pointer',
                 }}
               >
@@ -1215,9 +1215,9 @@ export default function NavratriVendorsDashboard() {
       {/* ── MODAL: EDIT REGISTRATION & SPOTS ─────────────────────────────────── */}
       {editingReg && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ maxWidth: '640px', width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)' }}>
+          <div style={{ maxWidth: '640px', width: '100%', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '20px 22px', boxShadow: 'var(--shadow)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
                 Edit Vendor — {editingReg.registration_number}
               </h2>
               <button onClick={() => setEditingReg(null)} style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
@@ -1225,7 +1225,7 @@ export default function NavratriVendorsDashboard() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Business Name</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Business Name</label>
                 <input
                   type="text"
                   value={editingReg.business_name || ''}
@@ -1235,7 +1235,7 @@ export default function NavratriVendorsDashboard() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Contact Person</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Contact Person</label>
                 <input
                   type="text"
                   value={editingReg.contact_name || ''}
@@ -1245,7 +1245,7 @@ export default function NavratriVendorsDashboard() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Email</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Email</label>
                 <input
                   type="email"
                   value={editingReg.email || ''}
@@ -1255,7 +1255,7 @@ export default function NavratriVendorsDashboard() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Phone</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Phone</label>
                 <input
                   type="text"
                   value={editingReg.phone || ''}
@@ -1267,7 +1267,7 @@ export default function NavratriVendorsDashboard() {
 
             {/* Assigned Spot Numbers */}
             <div style={{ marginBottom: '18px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', color: GOLD, textTransform: 'uppercase', marginBottom: '8px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: GOLD, textTransform: 'uppercase', marginBottom: '8px' }}>
                 Assigned Booth Spot Numbers:
               </label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1285,7 +1285,7 @@ export default function NavratriVendorsDashboard() {
                           nextDates[index] = { ...d, booth_spot_number: e.target.value };
                           setEditingReg({ ...editingReg, dates: nextDates });
                         }}
-                        style={{ width: '110px', padding: '4px 8px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: '12px', fontWeight: '800' }}
+                        style={{ width: '110px', padding: '4px 8px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: '12px', fontWeight: '700' }}
                       />
                     </div>
                   </div>
@@ -1295,7 +1295,7 @@ export default function NavratriVendorsDashboard() {
 
             {/* Notes */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Staff Notes</label>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px' }}>Staff Notes</label>
               <textarea
                 rows={3}
                 value={editingReg.notes || ''}
@@ -1315,7 +1315,7 @@ export default function NavratriVendorsDashboard() {
               <button
                 type="button"
                 onClick={handleSaveEdit}
-                style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: SAFFRON, color: '#FFFFFF', fontWeight: '800', cursor: 'pointer' }}
+                style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: SAFFRON, color: '#FFFFFF', fontWeight: '700', cursor: 'pointer' }}
               >
                 Save Changes
               </button>
@@ -1327,11 +1327,11 @@ export default function NavratriVendorsDashboard() {
       {/* ── MODAL: CAPACITY SETTINGS ─────────────────────────────────────────── */}
       {showSettingsModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ maxWidth: '440px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)' }}>
+          <div style={{ maxWidth: '440px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '20px 22px', boxShadow: 'var(--shadow)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={SAFFRON} strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
                   Booth Capacity Settings
                 </h2>
               </div>
@@ -1339,7 +1339,7 @@ export default function NavratriVendorsDashboard() {
             </div>
 
             <div style={{ marginBottom: '18px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '6px' }}>
                 Default Booth Capacity Per Night
               </label>
               <input
@@ -1348,7 +1348,7 @@ export default function NavratriVendorsDashboard() {
                 max="50"
                 value={capacityInput}
                 onChange={e => setCapacityInput(e.target.value)}
-                style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '800' }}
+                style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '700' }}
               />
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '6px' }}>
                 When total booths booked on a given date reach this limit, the public form automatically flags that night as Sold Out.
@@ -1366,7 +1366,7 @@ export default function NavratriVendorsDashboard() {
               <button
                 type="button"
                 onClick={handleSaveSettings}
-                style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: SAFFRON, color: '#FFFFFF', fontWeight: '800', cursor: 'pointer' }}
+                style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: SAFFRON, color: '#FFFFFF', fontWeight: '700', cursor: 'pointer' }}
               >
                 Save Settings
               </button>
@@ -1378,14 +1378,14 @@ export default function NavratriVendorsDashboard() {
       {/* ── MODAL: ODOO GENERAL ENTRY SYNC ───────────────────────────────────── */}
       {showOdooModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ maxWidth: '540px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div style={{ maxWidth: '540px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '20px 22px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'rgba(14,165,233,0.1)', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
                     Odoo General Entry
                   </h3>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500' }}>
@@ -1400,14 +1400,14 @@ export default function NavratriVendorsDashboard() {
             {odooSyncStatus && !forceOdooSync ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '12px', padding: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#D97706', fontWeight: '800', fontSize: '14px', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#D97706', fontWeight: '700', fontSize: '14px', marginBottom: '8px' }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                     <span>Duplicate Blocked: Already Posted to Odoo</span>
                   </div>
                   <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
                     Event revenue was previously posted to Odoo under journal entry:
                   </p>
-                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'monospace', fontWeight: '800', fontSize: '13.5px', color: '#0284C7' }}>
+                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'monospace', fontWeight: '700', fontSize: '13.5px', color: '#0284C7' }}>
                     <span>{odooSyncStatus.moveName}</span>
                     <span>${Number(odooSyncStatus.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
@@ -1424,7 +1424,7 @@ export default function NavratriVendorsDashboard() {
                   <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
                     Close
                   </button>
-                  <button onClick={() => setForceOdooSync(true)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid #D97706', background: 'rgba(245,158,11,0.1)', color: '#D97706', fontWeight: '800', cursor: 'pointer' }}>
+                  <button onClick={() => setForceOdooSync(true)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid #D97706', background: 'rgba(245,158,11,0.1)', color: '#D97706', fontWeight: '700', cursor: 'pointer' }}>
                     Force Re-sync
                   </button>
                 </div>
@@ -1440,19 +1440,19 @@ export default function NavratriVendorsDashboard() {
                 <div style={{ background: 'var(--bg-input)', borderRadius: '14px', padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Event / Analytic Account:</span>
-                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>Navratri 2026</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Navratri 2026</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Odoo Journal:</span>
-                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>MISC (General Operations)</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>MISC (General Operations)</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Paid Vendors:</span>
-                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>{paidRegs.length} vendors</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{paidRegs.length} vendors</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Credit Revenue (Acct 2007):</span>
-                    <span style={{ fontWeight: '800', color: '#10B981' }}>+${(totalRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span style={{ fontWeight: '700', color: '#10B981' }}>+${(totalRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Debit CC Fees (Acct 950):</span>
@@ -1460,7 +1460,7 @@ export default function NavratriVendorsDashboard() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
                     <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Debit HCC Bank (Acct 101401):</span>
-                    <span style={{ fontWeight: '950', color: '#0284C7' }}>${((totalRevenue / 100) - (totalRevenue / 100 * 0.029 + paidRegs.length * 0.30)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span style={{ fontWeight: '700', color: '#0284C7' }}>${((totalRevenue / 100) - (totalRevenue / 100 * 0.029 + paidRegs.length * 0.30)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
 
@@ -1483,7 +1483,7 @@ export default function NavratriVendorsDashboard() {
                   <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
                     Cancel
                   </button>
-                  <button onClick={() => handlePostToOdoo(forceOdooSync)} disabled={isSyncingOdoo || paidRegs.length === 0} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: 'none', background: isSyncingOdoo ? 'rgba(14,165,233,0.5)' : 'linear-gradient(135deg, #0284C7, #0369A1)', color: '#FFFFFF', fontWeight: '800', cursor: isSyncingOdoo || paidRegs.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <button onClick={() => handlePostToOdoo(forceOdooSync)} disabled={isSyncingOdoo || paidRegs.length === 0} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: 'none', background: isSyncingOdoo ? 'rgba(14,165,233,0.5)' : 'linear-gradient(135deg, #0284C7, #0369A1)', color: '#FFFFFF', fontWeight: '700', cursor: isSyncingOdoo || paidRegs.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     {isSyncingOdoo ? 'Posting to Odoo...' : 'Confirm & Post General Entry'}
                   </button>
                 </div>

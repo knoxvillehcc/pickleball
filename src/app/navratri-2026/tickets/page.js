@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { colors, spacing, type, radii, card, page as pageStyle, keyframes, alert as alertStyle, emptyState as emptyStateStyle } from '@/lib/navratri/designSystem';
 
@@ -131,7 +132,7 @@ export default function TicketViewerPage() {
   if (error) return (
     <div style={{ ...pageStyle(theme), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: c.redBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '28px' }}>⚠️</div>
+        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: c.redBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '28px' }}><Icon name="alert" /></div>
         <h2 style={{ ...type.sectionTitle, color: c.red, marginBottom: spacing.sm }}>Unable to Load Tickets</h2>
         <p style={{ ...type.secondary, color: c.muted }}>{error}</p>
       </div>
@@ -143,7 +144,7 @@ export default function TicketViewerPage() {
   if (tickets.length === 0) return (
     <div style={{ ...pageStyle(theme), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: c.accentBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '28px' }}>🎫</div>
+        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: c.accentBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '28px' }}><Icon name="ticket" /></div>
         <h2 style={{ ...type.sectionTitle, color: c.text }}>No Active Tickets</h2>
         <p style={{ ...type.secondary, color: c.muted, marginTop: spacing.sm }}>No active tickets found for this order.</p>
       </div>
@@ -202,8 +203,8 @@ export default function TicketViewerPage() {
               background: c.accentBg, color: c.accent,
               ...type.caption, fontWeight: '600',
             }}>
-              {activeTicket.type === 'daily_entry' ? `📅 ${activeTicket.dateLabel}` :
-                activeTicket.type === 'combo_pickup' ? '🎪 Full Event Pass' : '🏆 Pioneer Pass'}
+              {activeTicket.type === 'daily_entry' ? `${activeTicket.dateLabel}` :
+                activeTicket.type === 'combo_pickup' ? 'Full Event Pass' : 'Pioneer Pass'}
             </div>
             <div style={{ ...type.secondary, color: c.muted, marginTop: spacing.sm }}>
               Qty: <strong style={{ color: c.text }}>{activeTicket.quantity}</strong> person(s)
@@ -276,7 +277,7 @@ export default function TicketViewerPage() {
             <li>Show this screen to the scanner</li>
             <li>Staff will scan your QR code</li>
             <li>Staff will verify your name</li>
-            <li>Enjoy Navratri! 🪔</li>
+            <li>Enjoy Navratri! </li>
           </ol>
         </div>
       </div>

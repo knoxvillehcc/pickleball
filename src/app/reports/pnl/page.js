@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import Icon from '@/components/Icon';
+import { useState, useEffect, useCallback, useRef, Fragment } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
@@ -109,11 +110,11 @@ function SummaryCard({ label, value, icon, color = 'var(--accent)', sublabel, ne
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span style={{ color, fontSize: '18px', lineHeight: 1 }}>{icon}</span>
-        <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
+        <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
           {label}
         </span>
       </div>
-      <div style={{ fontSize: '26px', fontWeight: '950', color: displayColor, lineHeight: 1, letterSpacing: '-0.5px' }}>
+      <div style={{ fontSize: '26px', fontWeight: '700', color: displayColor, lineHeight: 1, letterSpacing: '-0.5px' }}>
         {value ?? <span style={{ color: 'var(--text-muted)', fontSize: '16px' }}>—</span>}
       </div>
       {sublabel && <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '500' }}>{sublabel}</div>}
@@ -160,13 +161,13 @@ function BarChart({ data, valueKey, labelKey, color = 'var(--accent)', formatVal
             return (
               <g key={item[labelKey] || i}>
                 <text x={labelW - 8} y={y + barH / 2 + 5} textAnchor="end"
-                  style={{ fontSize: 11, fill: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif' }}>
+                  style={{ fontSize: 11, fill: 'var(--text-secondary)', fontFamily: 'var(--font-sans)' }}>
                   {(item[labelKey] || '').slice(0, 18)}{(item[labelKey] || '').length > 18 ? '…' : ''}
                 </text>
                 <rect x={labelW} y={y + 4} width={Math.max(barLen, 2)} height={barH - 8}
                   rx={4} fill={barColor} opacity={0.85} />
                 <text x={labelW + barLen + 6} y={y + barH / 2 + 5}
-                  style={{ fontSize: 10, fill: isNeg ? 'var(--text-error)' : 'var(--text-muted)', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                  style={{ fontSize: 10, fill: isNeg ? 'var(--text-error)' : 'var(--text-muted)', fontFamily: 'var(--font-sans)', fontWeight: 600 }}>
                   {formatValue(val)}
                 </text>
               </g>
@@ -195,7 +196,7 @@ function WarningSection({ warnings }) {
           color: '#D97706', fontFamily: 'inherit', textAlign: 'left',
         }}
       >
-        <span style={{ fontSize: '18px' }}>⚠️</span>
+        <span style={{ fontSize: '18px' }}><Icon name="alert" /></span>
         <span style={{ fontWeight: '700', fontSize: '14px' }}>
           {warnings.length} Data Quality Warning{warnings.length !== 1 ? 's' : ''}
         </span>
@@ -210,7 +211,7 @@ function WarningSection({ warnings }) {
               fontSize: '13px', color: 'var(--text-secondary)',
             }}>
               <span style={{ fontWeight: '700', color: '#D97706', marginRight: '6px' }}>
-                {w.type === 'no_cost' ? '💰' : w.type === 'no_cogs' ? '📊' : '⚠️'}
+                {w.type === 'no_cost' ? <Icon name="money" /> : w.type === 'no_cogs' ? <Icon name="chart" /> : <Icon name="alert" />}
               </span>
               {w.message}
               {w.productName && <span style={{ marginLeft: '8px', color: 'var(--text-muted)', fontSize: '12px' }}>({w.productName})</span>}
@@ -766,7 +767,7 @@ export default function PnLPage() {
   if (!user || !hasPerm(user, PERMISSIONS.VIEW)) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '50vh', gap: 16, textAlign: 'center' }}>
-        <div style={{ fontSize: 48 }}>🔒</div>
+        <div style={{ fontSize: 48 }}><Icon name="lock" /></div>
         <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>Access Denied</h2>
         <p style={{ color: 'var(--text-secondary)', maxWidth: 400 }}>
           You do not have permission to view the HCC P&L report. Contact your administrator.
@@ -826,7 +827,7 @@ export default function PnLPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 60 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingBottom: 60 }}>
       <style>{`
         @keyframes pnl-spin    { to { transform: rotate(360deg); } }
         @keyframes pnl-pulse   { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -841,14 +842,14 @@ export default function PnLPage() {
       {/* ── Page Header ──────────────────────────────────────────────────────── */}
       <div style={{
         background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: '16px', padding: '28px 32px',
+        borderRadius: '14px', padding: '28px 32px',
         display: 'flex', flexWrap: 'wrap', alignItems: 'center',
         justifyContent: 'space-between', gap: 16,
         boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
       }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 950, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
               HCC{' '}
               <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 P&L Report
@@ -899,7 +900,7 @@ export default function PnLPage() {
                 style={{
                   padding: '10px 20px', borderRadius: 10, border: 'none',
                   background: 'var(--accent)', color: 'white',
-                  fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: 'pointer',
+                  fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', gap: 8,
                   boxShadow: '0 4px 12px var(--accent-glow)',
                 }}
@@ -974,7 +975,7 @@ export default function PnLPage() {
             style={{
               padding: '10px 24px', borderRadius: 10, border: 'none',
               background: 'var(--accent)', color: 'white',
-              fontFamily: 'inherit', fontSize: 14, fontWeight: 800, cursor: 'pointer',
+              fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 8,
             }}
           >
@@ -1082,7 +1083,7 @@ export default function PnLPage() {
       {/* ── Error banner ─────────────────────────────────────────────────────── */}
       {error && (
         <div style={{ padding: '14px 20px', background: 'var(--bg-error)', border: '1px solid var(--border-error)', borderRadius: 12, color: 'var(--text-error)', fontSize: 14, fontWeight: 600, display: 'flex', gap: 10 }}>
-          ⚠️ {error}
+          {error}
           <button onClick={() => setError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-error)', cursor: 'pointer', fontWeight: 700 }}>✕</button>
         </div>
       )}
@@ -1093,21 +1094,21 @@ export default function PnLPage() {
           Array.from({ length: canViewCosts ? 10 : 7 }).map((_, i) => <SkeletonCard key={i} />)
         ) : s ? (
           <>
-            <SummaryCard label="Gross Sales"   value={fmtCur(s.grossSales)}  icon="💰" color="var(--accent)" />
-            <SummaryCard label="Discounts"     value={fmtCur(-s.discounts)}  icon="🏷" color="#6366F1" negative />
+            <SummaryCard label="Gross Sales"   value={fmtCur(s.grossSales)}  icon={<Icon name="money" />} color="var(--accent)" />
+            <SummaryCard label="Discounts"     value={fmtCur(-s.discounts)}  icon={<Icon name="tag" />} color="#6366F1" negative />
             <SummaryCard label="Refunds"       value={fmtCur(-s.refunds)}    icon="↩" color="var(--text-error)" negative />
-            <SummaryCard label="Net Sales"     value={fmtCur(s.netSales)}    icon="📈" color="var(--text-success)" />
+            <SummaryCard label="Net Sales"     value={fmtCur(s.netSales)}    icon={<Icon name="trending" />} color="var(--text-success)" />
             {canViewCosts && <>
-              <SummaryCard label="Cost of Goods" value={fmtCur(s.cogs)}        icon="📦" color="#8B5CF6" />
-              <SummaryCard label="Gross Profit"  value={fmtCur(s.grossProfit)} icon="🏆" color={s.grossProfit >= 0 ? 'var(--text-success)' : 'var(--text-error)'} negative />
+              <SummaryCard label="Cost of Goods" value={fmtCur(s.cogs)}        icon={<Icon name="package" />} color="#8B5CF6" />
+              <SummaryCard label="Gross Profit"  value={fmtCur(s.grossProfit)} icon={<Icon name="trophy" />} color={s.grossProfit >= 0 ? 'var(--text-success)' : 'var(--text-error)'} negative />
               <SummaryCard label="Gross Margin"  value={fmtPct(s.grossMargin)} icon="%" color={s.grossMargin >= 0 ? '#10B981' : 'var(--text-error)'} />
             </>}
-            <SummaryCard label="Taxes"         value={fmtCur(s.taxes)}       icon="🧾" color="#F59E0B" />
-            <SummaryCard label="Net Qty Sold"  value={fmtInt(s.netQty)}      icon="📦" color="var(--text-secondary)" sublabel="units" />
-            <SummaryCard label="Invoice Count" value={fmtInt(s.invoiceCount)} icon="📄" color="var(--text-secondary)" sublabel="invoices & credit notes" />
+            <SummaryCard label="Taxes"         value={fmtCur(s.taxes)}       icon={<Icon name="receipt" />} color="#F59E0B" />
+            <SummaryCard label="Net Qty Sold"  value={fmtInt(s.netQty)}      icon={<Icon name="package" />} color="var(--text-secondary)" sublabel="units" />
+            <SummaryCard label="Invoice Count" value={fmtInt(s.invoiceCount)} icon={<Icon name="file" />} color="var(--text-secondary)" sublabel="invoices & credit notes" />
           </>
         ) : (
-          <div style={{ gridColumn: '1/-1', padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+          <div style={{ gridColumn: '1/-1', padding: '28px', textAlign: 'center', color: 'var(--text-secondary)' }}>
             Apply a date filter to load the P&L report.
           </div>
         )}
@@ -1166,7 +1167,7 @@ export default function PnLPage() {
           display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>
+            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
               Category P&L
             </h2>
             {!loading && totalCats > 0 && (
@@ -1255,7 +1256,7 @@ export default function PnLPage() {
                 displayCats.map((cat, i) => {
                   const isExp = expandedCats.has(cat.catId);
                   return (
-                    <>
+                    <Fragment key={cat.catId}>
                       <tr
                         key={cat.catId}
                         className="pnl-row-hover"
@@ -1276,7 +1277,7 @@ export default function PnLPage() {
                       {isExp && canViewProd && cat.products?.map((prod, pi) => {
                         const isProdExp = expandedProds.has(`${cat.catId}-${prod.productId}`);
                         return (
-                          <>
+                          <Fragment key={prod.prodId ?? `${cat.catId}-${pi}`}>
                             <tr
                               key={`prod-${prod.productId}`}
                               className="pnl-row-hover"
@@ -1328,22 +1329,22 @@ export default function PnLPage() {
                                 </td>
                               </tr>
                             ))}
-                          </>
+                          </Fragment>
                         );
                       })}
-                    </>
+                    </Fragment>
                   );
                 })
               )}
 
               {/* Grand total row */}
               {!loading && s && (
-                <tr style={{ background: 'var(--bg-table-header)', fontWeight: 900, fontSize: 13, position: 'sticky', bottom: 0 }}>
+                <tr style={{ background: 'var(--bg-table-header)', fontWeight: 700, fontSize: 13, position: 'sticky', bottom: 0 }}>
                   <td style={{ padding: '13px 8px', borderTop: '2px solid var(--border)' }} />
                   {visibleCols.map(c => {
                     const v = s[c.key];
                     const isFirst = c.key === 'catName';
-                    if (isFirst) return <td key={c.key} style={{ padding: '13px 14px', borderTop: '2px solid var(--border)', fontWeight: 900, color: 'var(--text-primary)' }}>GRAND TOTAL</td>;
+                    if (isFirst) return <td key={c.key} style={{ padding: '13px 14px', borderTop: '2px solid var(--border)', fontWeight: 700, color: 'var(--text-primary)' }}>GRAND TOTAL</td>;
                     if (c.key === 'parentCatName') return <td key={c.key} style={{ padding: '13px 14px', borderTop: '2px solid var(--border)' }} />;
                     if (c.key === 'grossMargin' || c.key === 'pctOfTotalSales' || c.key === 'pctOfTotalProfit') {
                       return <td key={c.key} style={{ padding: '13px 14px', textAlign: 'right', borderTop: '2px solid var(--border)', color: 'var(--text-primary)' }}>{fmtPct(c.key === 'pctOfTotalSales' || c.key === 'pctOfTotalProfit' ? 100 : s.grossMargin)}</td>;
@@ -1398,12 +1399,12 @@ export default function PnLPage() {
         >
           <div style={{
             background: 'var(--bg-modal)', border: '1px solid var(--border-modal)',
-            borderRadius: 20, width: '100%', maxWidth: 480, padding: 32,
+            borderRadius: 14, width: '100%', maxWidth: 480, padding: 32,
             boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>Export PDF</h2>
+                <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Export PDF</h2>
                 <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-muted)' }}>HCC Product Category P&L Report</p>
               </div>
               <button onClick={() => setPdfModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 22 }}>✕</button>
@@ -1444,7 +1445,7 @@ export default function PnLPage() {
               <div>
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8 }}>Orientation</label>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  {[['landscape','🖥 Landscape (recommended)'],['portrait','📄 Portrait']].map(([val, label]) => (
+                  {[['landscape','Landscape (recommended)'],['portrait','Portrait']].map(([val, label]) => (
                     <label key={val} style={{
                       flex: 1, display: 'flex', gap: 8, cursor: 'pointer', padding: '10px 12px', borderRadius: 10, justifyContent: 'center',
                       border: `1px solid ${pdfOptions.orientation === val ? 'var(--accent)' : 'var(--border)'}`,
@@ -1493,7 +1494,7 @@ export default function PnLPage() {
                 style={{
                   padding: '11px 28px', borderRadius: 10, border: 'none',
                   background: 'var(--accent)', color: 'white',
-                  fontFamily: 'inherit', fontSize: 14, fontWeight: 800, cursor: 'pointer',
+                  fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', gap: 10,
                   boxShadow: '0 4px 12px var(--accent-glow)',
                   opacity: pdfGenerating ? 0.7 : 1,

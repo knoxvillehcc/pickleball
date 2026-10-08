@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ClientLayout';
 import { colors, spacing, type, radii, btn, input as dsInput, card, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
@@ -85,13 +86,13 @@ export default function ManualIssuePage() {
       <style>{keyframes}</style>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl }}>
-        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>📝 Manual Ticket Issue</h1>
+        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}><Icon name="note" />Manual Ticket Issue</h1>
         <a href="/navratri" style={{ ...type.bodyMedium, color: c.primary, textDecoration: 'none' }}>← Dashboard</a>
       </div>
 
       {result && (
         <div style={{ ...alertStyle(result.error ? 'error' : 'success', theme), marginBottom: spacing.lg }}>
-          {result.error ? `❌ ${result.error}` : `✅ Order ${result.orderNumber} created — ${result.ticketsCreated} ticket(s), $${result.totalAmount?.toFixed(2)}`}
+          {result.error ? `${result.error}` : `Order ${result.orderNumber} created — ${result.ticketsCreated} ticket(s), $${result.totalAmount?.toFixed(2)}`}
         </div>
       )}
 
@@ -120,9 +121,9 @@ export default function ManualIssuePage() {
           <div>
             <label style={labelStyle}>Payment Method *</label>
             <select style={{ ...inputS, cursor: 'pointer', appearance: 'auto' }} value={form.paymentMethod} onChange={e => updateField('paymentMethod', e.target.value)}>
-              <option value="cash">💵 Cash</option>
-              <option value="check">📝 Check</option>
-              <option value="complimentary">🎁 Complimentary</option>
+              <option value="cash"><Icon name="money" />Cash</option>
+              <option value="check"><Icon name="note" />Check</option>
+              <option value="complimentary"><Icon name="gift" />Complimentary</option>
             </select>
           </div>
           {form.paymentMethod === 'check' && (
@@ -173,7 +174,7 @@ export default function ManualIssuePage() {
           <button onClick={handleSubmit}
             disabled={loading || !form.purchaserName || !form.purchaserPhone || !form.reason || Object.keys(form.selectedDates).length === 0}
             style={{ ...btn('primary', theme), width: 'auto', padding: `${spacing.md}px ${spacing['2xl']}px`, opacity: loading ? 0.5 : 1 }}>
-            {loading ? 'Creating…' : '📝 Issue Tickets'}
+            {loading ? 'Creating…' : 'Issue Tickets'}
           </button>
         </div>
       </div>

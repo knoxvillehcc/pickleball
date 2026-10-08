@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ClientLayout';
 import { colors, spacing, type, radii, btn, input as dsInput, card, chip, table as tableStyle, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
@@ -62,7 +63,7 @@ export default function AccountingPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl, flexWrap: 'wrap', gap: spacing.md }}>
         <div>
-          <h1 style={{ ...type.pageTitle, color: co.text, margin: 0 }}>💰 Accounting & Daily Close</h1>
+          <h1 style={{ ...type.pageTitle, color: co.text, margin: 0 }}><Icon name="money" />Accounting & Daily Close</h1>
           <p style={{ ...type.secondary, color: co.muted, marginTop: spacing.xs }}>Close days, create Odoo journal entries, and reconcile</p>
         </div>
         <a href="/navratri" style={{ ...btn('secondary', theme), textDecoration: 'none', ...type.caption }}>← Dashboard</a>
@@ -70,20 +71,20 @@ export default function AccountingPage() {
 
       {message && (
         <div style={{ ...alertStyle(message.type, theme), marginBottom: spacing.base }}>
-          {message.type === 'error' ? '❌' : '✅'} {message.text}
+          {message.type === 'error' ? <Icon name="x" /> : <Icon name="check" />} {message.text}
         </div>
       )}
 
       {/* Close a new day */}
       <div style={{ ...card(theme), padding: spacing.xl, marginBottom: spacing.xl }}>
-        <h3 style={{ ...type.cardTitle, color: co.text, marginBottom: spacing.base }}>📅 Close a Day</h3>
+        <h3 style={{ ...type.cardTitle, color: co.text, marginBottom: spacing.base }}><Icon name="calendar" />Close a Day</h3>
         <div style={{ display: 'flex', gap: spacing.md, alignItems: 'center', flexWrap: 'wrap' }}>
           <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
             style={{ ...dsInput(theme), width: 'auto' }} />
           <button onClick={() => handleAction('close', { date: selectedDate })}
             disabled={!selectedDate || actionLoading === 'close'}
             style={{ ...btn('primary', theme), width: 'auto', background: co.accent, color: '#000', opacity: !selectedDate || actionLoading ? 0.5 : 1 }}>
-            {actionLoading === 'close' ? 'Closing…' : '🔒 Close Day'}
+            {actionLoading === 'close' ? 'Closing…' : 'Close Day'}
           </button>
         </div>
       </div>
@@ -91,7 +92,7 @@ export default function AccountingPage() {
       {/* Closed days table */}
       <div style={{ ...card(theme), overflow: 'hidden' }}>
         <div style={{ padding: `${spacing.lg}px ${spacing.lg}px 0` }}>
-          <h3 style={{ ...type.cardTitle, color: co.text }}>📋 Daily Close Records</h3>
+          <h3 style={{ ...type.cardTitle, color: co.text }}><Icon name="clipboard" />Daily Close Records</h3>
         </div>
         {loading ? (
           <div style={{ padding: spacing['3xl'], textAlign: 'center' }}>
@@ -128,7 +129,7 @@ export default function AccountingPage() {
                     <td style={{ ...t.td, color: c.refund_total > 0 ? co.red : co.muted }}>{fmt(c.refund_total)}</td>
                     <td style={t.td}>
                       <span style={chip(c.status === 'posted' ? 'posted' : c.status === 'draft_created' ? 'draft' : c.status === 'closed' ? 'closed' : 'active', theme)}>
-                        {c.status === 'posted' ? '✅ Posted' : c.status === 'draft_created' ? '📝 Draft' : c.status === 'closed' ? '🔒 Closed' : '🔓 Reopened'}
+                        {c.status === 'posted' ? 'Posted' : c.status === 'draft_created' ? 'Draft' : c.status === 'closed' ? 'Closed' : 'Reopened'}
                       </span>
                     </td>
                     <td style={t.td}>
@@ -137,18 +138,18 @@ export default function AccountingPage() {
                           <>
                             <button onClick={() => handleAction('draft', { closeId: c.id })} disabled={actionLoading === 'draft'}
                               style={{ ...btn('secondary', theme), padding: `${spacing.xs}px ${spacing.md}px`, ...type.caption, color: co.blue }}>
-                              📝 Draft
+                              Draft
                             </button>
                             <button onClick={() => { const reason = prompt('Reason for reopening?'); if (reason) handleAction('reopen', { date: c.close_date, reason }); }}
                               style={{ ...btn('secondary', theme), padding: `${spacing.xs}px ${spacing.md}px`, ...type.caption, color: co.primary }}>
-                              🔓 Reopen
+                              Reopen
                             </button>
                           </>
                         )}
                         {c.status === 'draft_created' && (
                           <button onClick={() => handleAction('post', { closeId: c.id })} disabled={actionLoading === 'post'}
                             style={{ ...btn('secondary', theme), padding: `${spacing.xs}px ${spacing.md}px`, ...type.caption, color: co.green }}>
-                            ✅ Post
+                            Post
                           </button>
                         )}
                         {c.status === 'posted' && (

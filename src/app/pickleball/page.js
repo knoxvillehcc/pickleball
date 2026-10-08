@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -15,7 +16,7 @@ const C = {
 const card = {
   backgroundColor: 'var(--bg-card)',
   border: '1px solid var(--border)',
-  borderRadius: '16px',
+  borderRadius: '14px',
   overflow: 'hidden',
 };
 
@@ -23,7 +24,7 @@ const card = {
 function Badge({ status }) {
   const map = {
     paid:     { bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)', color: '#10B981', label: '✓ Paid' },
-    pending:  { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', color: '#F59E0B', label: '⏳ Pending' },
+    pending:  { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', color: '#F59E0B', label: 'Pending' },
     failed:   { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.4)',  color: '#EF4444', label: '✗ Failed' },
     refunded: { bg: 'rgba(148,163,184,0.15)',border: 'rgba(148,163,184,0.4)',color: '#94A3B8', label: '↩ Refunded' },
   };
@@ -41,10 +42,10 @@ function Badge({ status }) {
 // ── Category badge ───────────────────────────────────────────────────────────────
 function CategoryBadge({ category }) {
   const map = {
-    middle_high_school: { label: 'Middle School & High School', emoji: '🎓', color: 'var(--accent)' },
-    adult:              { label: 'Adults (18+)', emoji: '👤', color: 'var(--text-success)' },
+    middle_high_school: { label: 'Middle School & High School', emoji: <Icon name="graduation" />, color: 'var(--accent)' },
+    adult:              { label: 'Adults (18+)', emoji: <Icon name="user" />, color: 'var(--text-success)' },
   };
-  const s = map[category] || { label: 'Adults (18+)', emoji: '👤', color: 'var(--text-success)' };
+  const s = map[category] || { label: 'Adults (18+)', emoji: <Icon name="user" />, color: 'var(--text-success)' };
   return (
     <span style={{ color: s.color, fontWeight: '700', fontSize: '13px' }}>
       {s.emoji} {s.label}
@@ -57,14 +58,14 @@ function StatCard({ label, value, accent, sub }) {
   return (
     <div style={{
       ...card,
-      padding: '24px',
+      padding: '16px 18px',
       borderTop: `2px solid ${accent}`,
       width: '100%',
     }}>
-      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '10px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
         {label}
       </div>
-      <div style={{ fontSize: '40px', fontWeight: '900', color: accent, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '40px', fontWeight: '700', color: accent, lineHeight: 1 }}>{value}</div>
       {sub && <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '6px' }}>{sub}</div>}
     </div>
   );
@@ -133,13 +134,13 @@ function PaymentLinkModal({ reg, onClose }) {
     }} onClick={onClose}>
       <div style={{
         background: 'var(--bg-modal)', border: '1px solid var(--border-modal)',
-        borderRadius: '20px', padding: '32px', maxWidth: '540px', width: '100%',
+        borderRadius: '14px', padding: '22px 24px', maxWidth: '540px', width: '100%',
         boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
       }} onClick={e => e.stopPropagation()}>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
-            📧 Send Payment Link
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)' }}>
+            Send Payment Link
           </h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
         </div>
@@ -148,12 +149,12 @@ function PaymentLinkModal({ reg, onClose }) {
           <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}>Player</div>
           <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{reg.full_name}</div>
           <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>{reg.email}</div>
-          <div style={{ fontSize: '12px', color: '#F59E0B', marginTop: '6px', fontFamily: 'monospace' }}>{reg.registration_number} · ⏳ Pending Payment</div>
+          <div style={{ fontSize: '12px', color: '#F59E0B', marginTop: '6px', fontFamily: 'monospace' }}>{reg.registration_number} · Pending Payment</div>
         </div>
 
         {error && (
           <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', marginBottom: '16px', color: '#FCA5A5', fontSize: '13px' }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -161,12 +162,12 @@ function PaymentLinkModal({ reg, onClose }) {
           <button onClick={generate} disabled={loading} style={{
             width: '100%', padding: '14px', borderRadius: '12px', border: 'none',
             background: loading ? 'rgba(51,65,85,0.5)' : 'linear-gradient(135deg, #F4A40B, #D4AF37)',
-            color: loading ? '#475569' : '#000', fontWeight: '800', fontSize: '15px',
+            color: loading ? '#475569' : '#000', fontWeight: '700', fontSize: '15px',
             cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
           }}>
             {loading
               ? <><span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid rgba(0,0,0,0.3)', borderTop: '2px solid black', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Generating link...</>
-              : <>🔗 Generate Payment Link</>}
+              : <><Icon name="link" />Generate Payment Link</>}
           </button>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -179,14 +180,14 @@ function PaymentLinkModal({ reg, onClose }) {
                 background: copied ? 'rgba(16,185,129,0.15)' : 'transparent',
                 color: '#10B981', fontWeight: '700', fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s',
               }}>
-                {copied ? '✅ Copied!' : '📋 Copy Link'}
+                {copied ? 'Copied!' : 'Copy Link'}
               </button>
               <button onClick={emailLink} style={{
                 flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
                 background: 'linear-gradient(135deg, #F4A40B, #D4AF37)',
-                color: '#000', fontWeight: '800', fontSize: '14px', cursor: 'pointer',
+                color: '#000', fontWeight: '700', fontSize: '14px', cursor: 'pointer',
               }}>
-                📧 Open Email
+                Open Email
               </button>
             </div>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
@@ -259,13 +260,13 @@ export default function PickleballDashboard() {
       const data = await res.json();
       if (data.success) {
         setSyncStatus(data.syncInfo);
-        setSyncMsg(`✅ Success! Invoice ${data.syncInfo.invoiceName} posted to Odoo and marked as Paid.`);
+        setSyncMsg(`Success! Invoice ${data.syncInfo.invoiceName} posted to Odoo and marked as Paid.`);
         setForceSync(false);
       } else {
-        setSyncMsg(`❌ ${data.error || data.message || 'Failed to sync to Odoo'}`);
+        setSyncMsg(`${data.error || data.message || 'Failed to sync to Odoo'}`);
       }
     } catch (err) {
-      setSyncMsg(`❌ Error: ${err.message}`);
+      setSyncMsg(`Error: ${err.message}`);
     } finally {
       setSyncingOdoo(false);
     }
@@ -470,7 +471,7 @@ export default function PickleballDashboard() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '60px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
       {payLinkReg && <PaymentLinkModal reg={payLinkReg} onClose={() => setPayLinkReg(null)} />}
       {editingReg && (
         <EditRegistrationModal
@@ -501,8 +502,8 @@ export default function PickleballDashboard() {
             boxShadow: isPublished ? '0 0 8px #10B981' : '0 0 8px #F59E0B',
             animation: 'pulse 2s infinite',
           }}/>
-          <span style={{ fontWeight: '800', fontSize: '15px', color: isPublished ? '#10B981' : '#F59E0B' }}>
-            Registration Page: {isPublished ? '🌐 LIVE' : '🔒 CLOSED'}
+          <span style={{ fontWeight: '700', fontSize: '15px', color: isPublished ? '#10B981' : '#F59E0B' }}>
+            Registration Page: {isPublished ? 'LIVE' : 'CLOSED'}
           </span>
         </div>
 
@@ -517,7 +518,7 @@ export default function PickleballDashboard() {
               background: urlCopied ? 'rgba(16,185,129,0.2)' : 'transparent',
               color: '#10B981', fontSize: '12px', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap',
             }}>
-              {urlCopied ? '✅ Copied!' : '📋 Copy URL'}
+              {urlCopied ? 'Copied!' : 'Copy URL'}
             </button>
             <a href={PUBLIC_URL} target="_blank" rel="noreferrer" style={{
               padding: '4px 12px', borderRadius: '6px', border: '1px solid rgba(16,185,129,0.3)',
@@ -534,12 +535,12 @@ export default function PickleballDashboard() {
             ? 'linear-gradient(135deg, #EF4444, #DC2626)'
             : 'linear-gradient(135deg, #10B981, #059669)',
           color: publishing ? '#475569' : 'white',
-          fontWeight: '800', fontSize: '14px', cursor: publishing ? 'not-allowed' : 'pointer',
+          fontWeight: '700', fontSize: '14px', cursor: publishing ? 'not-allowed' : 'pointer',
           display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap',
           boxShadow: publishing ? 'none' : isPublished ? '0 0 20px rgba(239,68,68,0.3)' : '0 0 20px rgba(16,185,129,0.3)',
           transition: 'all 0.3s',
         }}>
-          {publishing ? '⏳ Saving...' : isPublished ? '🔒 Unpublish Page' : '🌐 Publish Page'}
+          {publishing ? 'Saving...' : isPublished ? 'Unpublish Page' : 'Publish Page'}
         </button>
       </div>}
 
@@ -548,7 +549,7 @@ export default function PickleballDashboard() {
         ...card,
         background: 'var(--bg-card)',
         borderColor: 'var(--border)',
-        padding: '32px',
+        padding: '22px 24px',
         boxShadow: 'var(--shadow)',
         position: 'relative',
       }}>
@@ -560,9 +561,9 @@ export default function PickleballDashboard() {
               border: '1px solid var(--border)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '26px',
-            }}>🏓</div>
+            }}><Icon name="ball" /></div>
             <div>
-              <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '950', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+              <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
                 Pickleball{' '}
                 <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                   Registrations
@@ -600,7 +601,7 @@ export default function PickleballDashboard() {
             }}>
               {exporting === fmt
                 ? <><span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(244,164,11,0.3)', borderTop: `2px solid ${C.saffron}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Exporting...</>
-                : <>{fmt === 'csv' ? '📄' : fmt === 'excel' ? '📊' : '🖨️'} {fmt.toUpperCase()}</>
+                : <>{fmt === 'csv' ? <Icon name="file" /> : fmt === 'excel' ? <Icon name="chart" /> : <Icon name="printer" />} {fmt.toUpperCase()}</>
               }
             </button>
           ))}
@@ -613,7 +614,7 @@ export default function PickleballDashboard() {
             display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s',
             boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
           }}>
-            <span>💼 Sync Revenue to Odoo</span>
+            <span><Icon name="briefcase" />Sync Revenue to Odoo</span>
           </button>
 
           {syncStatus && (
@@ -624,7 +625,7 @@ export default function PickleballDashboard() {
               color: 'var(--text-success)', fontSize: '12.5px', fontWeight: '700'
             }}>
               <span>✓ Synced to Odoo:</span>
-              <span style={{ fontFamily: 'monospace', fontWeight: '800' }}>{syncStatus.invoiceName}</span>
+              <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{syncStatus.invoiceName}</span>
               <span>(${syncStatus.totalAmount?.toFixed(2)})</span>
             </div>
           )}
@@ -635,7 +636,7 @@ export default function PickleballDashboard() {
       {error && (
         <div style={{ ...card, padding: '20px 24px', borderColor: 'rgba(239,68,68,0.4)',
           background: 'rgba(239,68,68,0.05)', color: '#EF4444', fontWeight: '600' }}>
-          ⚠️ {error}
+          {error}
           {error.includes('Missing Supabase') && (
             <div style={{ marginTop: '8px', fontSize: '13px', color: '#94A3B8', fontWeight: '400' }}>
               Add <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> to your <code>.env.local</code> file and restart the server.
@@ -680,13 +681,13 @@ export default function PickleballDashboard() {
           {/* Payment filters */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <FilterBtn active={filter.payment === 'paid'}     onClick={() => setPaymentFilter('paid')}>✓ Paid</FilterBtn>
-            <FilterBtn active={filter.payment === 'pending'}  onClick={() => setPaymentFilter('pending')}>⏳ Unpaid</FilterBtn>
+            <FilterBtn active={filter.payment === 'pending'}  onClick={() => setPaymentFilter('pending')}>Unpaid</FilterBtn>
           </div>
 
           {/* Category filters */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <FilterBtn active={filter.category === 'middle_high_school'} onClick={() => setCategoryFilter('middle_high_school')}>🎓 Middle/High School</FilterBtn>
-            <FilterBtn active={filter.category === 'adult'}              onClick={() => setCategoryFilter('adult')}>👤 Adults (18+)</FilterBtn>
+            <FilterBtn active={filter.category === 'middle_high_school'} onClick={() => setCategoryFilter('middle_high_school')}>Middle/High School</FilterBtn>
+            <FilterBtn active={filter.category === 'adult'}              onClick={() => setCategoryFilter('adult')}>Adults (18+)</FilterBtn>
           </div>
 
           {(filter.payment || filter.category || search) && (
@@ -725,7 +726,7 @@ export default function PickleballDashboard() {
           </div>
         ) : sorted.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏓</div>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}><Icon name="ball" /></div>
             <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '8px' }}>No registrations found</div>
             <div style={{ fontSize: '14px' }}>
               {(filter.payment || filter.skill || search)
@@ -755,7 +756,7 @@ export default function PickleballDashboard() {
                       onClick={() => handleSort(field)}
                       style={{
                         padding: '14px 16px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)',
-                        textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: 'left',
+                        textTransform: 'uppercase', letterSpacing: '0.6px', textAlign: 'left',
                         cursor: 'pointer', userSelect: 'none',
                       }}>
                         {label}<SortIndicator field={field}/>
@@ -774,7 +775,7 @@ export default function PickleballDashboard() {
                     onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
                     onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent'}
                   >
-                    <td style={{ padding: '13px 16px', fontFamily: 'monospace', fontWeight: '800', color: C.saffron, fontSize: '13px' }}>
+                    <td style={{ padding: '13px 16px', fontFamily: 'monospace', fontWeight: '700', color: C.saffron, fontSize: '13px' }}>
                       {r.registration_number}
                     </td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-primary)', fontWeight: '600' }}>{r.full_name}</td>
@@ -804,7 +805,7 @@ export default function PickleballDashboard() {
                           onMouseEnter={e => e.currentTarget.style.background = 'rgba(129,140,248,0.18)'}
                           onMouseLeave={e => e.currentTarget.style.background = 'rgba(129,140,248,0.08)'}
                         >
-                          ✏️ Edit
+                          Edit
                         </button>
                         {r.payment_status !== 'paid' && (
                           <button
@@ -819,7 +820,7 @@ export default function PickleballDashboard() {
                             onMouseEnter={e => e.currentTarget.style.background = 'rgba(244,164,11,0.18)'}
                             onMouseLeave={e => e.currentTarget.style.background = 'rgba(244,164,11,0.08)'}
                           >
-                            📧 Send Link
+                            Send Link
                           </button>
                         )}
                         {r.payment_status === 'paid' && (
@@ -837,7 +838,7 @@ export default function PickleballDashboard() {
                           >
                             {resendingId === r.registration_number
                               ? <><span style={{ display:'inline-block',width:'10px',height:'10px',border:'2px solid rgba(14,158,138,0.3)',borderTop:'2px solid #0E9E8A',borderRadius:'50%',animation:'spin 0.7s linear infinite',marginRight:'5px' }}/> Sending...</>
-                              : resendDone[r.registration_number] ? '✅ Sent!' : '📧 Resend Email'
+                              : resendDone[r.registration_number] ? 'Sent!' : 'Resend Email'
                             }
                           </button>
                         )}
@@ -860,14 +861,14 @@ export default function PickleballDashboard() {
         }}>
           <div style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
-            borderRadius: '20px', padding: '28px', maxWidth: '520px', width: '100%',
-            boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '20px'
+            borderRadius: '14px', padding: '20px 22px', maxWidth: '520px', width: '100%',
+            boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '14px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '24px' }}>💼</span>
+                <span style={{ fontSize: '24px' }}><Icon name="briefcase" /></span>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '19px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  <h3 style={{ margin: 0, fontSize: '19px', fontWeight: '700', color: 'var(--text-primary)' }}>
                     Odoo Revenue Sync
                   </h3>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500' }}>
@@ -885,8 +886,8 @@ export default function PickleballDashboard() {
                   background: 'rgba(244, 164, 11, 0.12)', border: '1px solid rgba(244, 164, 11, 0.4)',
                   borderRadius: '14px', padding: '16px', color: 'var(--text-primary)'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#F4A40B', fontWeight: '800', fontSize: '15px', marginBottom: '8px' }}>
-                    <span>⚠️ Warning: Already Synced to Odoo</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#F4A40B', fontWeight: '700', fontSize: '15px', marginBottom: '8px' }}>
+                    <span><Icon name="alert" />Warning: Already Synced to Odoo</span>
                   </div>
                   <p style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
                     Tournament revenue was already posted to Odoo on <strong>{new Date(syncStatus.syncedAt).toLocaleDateString()}</strong> under invoice reference:
@@ -895,7 +896,7 @@ export default function PickleballDashboard() {
                     marginTop: '12px', padding: '10px 14px', background: 'var(--bg-input)',
                     borderRadius: '8px', border: '1px solid var(--border)',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    fontFamily: 'monospace', fontWeight: '800', fontSize: '14px', color: 'var(--accent)'
+                    fontFamily: 'monospace', fontWeight: '700', fontSize: '14px', color: 'var(--accent)'
                   }}>
                     <span>{syncStatus.invoiceName}</span>
                     <span>${syncStatus.totalAmount?.toFixed(2)}</span>
@@ -915,7 +916,7 @@ export default function PickleballDashboard() {
                   </button>
                   <button onClick={() => setForceSync(true)} style={{
                     flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
-                    background: 'rgba(244, 164, 11, 0.2)', border: '1px solid #F4A40B', color: '#F4A40B', fontWeight: '800', cursor: 'pointer'
+                    background: 'rgba(244, 164, 11, 0.2)', border: '1px solid #F4A40B', color: '#F4A40B', fontWeight: '700', cursor: 'pointer'
                   }}>
                     Force Re-sync
                   </button>
@@ -926,7 +927,7 @@ export default function PickleballDashboard() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {forceSync && (
                   <div style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(244, 164, 11, 0.1)', border: '1px solid #F4A40B', color: '#F4A40B', fontSize: '12px', fontWeight: '700' }}>
-                    ⚡ Force Re-sync mode active. A new invoice will be generated.
+                    Force Re-sync mode active. A new invoice will be generated.
                   </div>
                 )}
 
@@ -937,11 +938,11 @@ export default function PickleballDashboard() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13.5px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Paid Teams/Registrations:</span>
-                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>{stats?.paid || 0}</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{stats?.paid || 0}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
                     <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Total Collection (Stripe):</span>
-                    <span style={{ fontWeight: '950', color: 'var(--accent)' }}>${stats?.totalRevenue?.toFixed(2) || '0.00'}</span>
+                    <span style={{ fontWeight: '700', color: 'var(--accent)' }}>${stats?.totalRevenue?.toFixed(2) || '0.00'}</span>
                   </div>
                 </div>
 
@@ -952,9 +953,9 @@ export default function PickleballDashboard() {
                 {syncMsg && (
                   <div style={{
                     padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: '700',
-                    background: syncMsg.startsWith('✅') ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-                    color: syncMsg.startsWith('✅') ? '#10B981' : '#EF4444',
-                    border: `1px solid ${syncMsg.startsWith('✅') ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`
+                    background: syncMsg.startsWith(<Icon name="check" />) ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                    color: syncMsg.startsWith(<Icon name="check" />) ? '#10B981' : '#EF4444',
+                    border: `1px solid ${syncMsg.startsWith(<Icon name="check" />) ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`
                   }}>
                     {syncMsg}
                   </div>
@@ -970,7 +971,7 @@ export default function PickleballDashboard() {
                   <button onClick={() => handleSyncToOdoo(forceSync)} disabled={syncingOdoo} style={{
                     flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
                     background: syncingOdoo ? 'rgba(16,185,129,0.5)' : 'linear-gradient(135deg, #10B981, #059669)',
-                    color: '#FFFFFF', fontWeight: '800', fontSize: '14px', cursor: syncingOdoo ? 'not-allowed' : 'pointer',
+                    color: '#FFFFFF', fontWeight: '700', fontSize: '14px', cursor: syncingOdoo ? 'not-allowed' : 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                   }}>
                     {syncingOdoo ? 'Posting to Odoo...' : 'Confirm & Post to Odoo'}
@@ -992,8 +993,8 @@ export default function PickleballDashboard() {
 }
 
 // ── Edit Registration Modal Component ──────────────────────────────────────────
-const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' };
-const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' };
+const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' };
+const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-sans)' };
 
 function EditRegistrationModal({ reg, onClose, onSave }) {
   const [form, setForm] = useState({
@@ -1058,21 +1059,21 @@ function EditRegistrationModal({ reg, onClose, onSave }) {
     }} onClick={onClose}>
       <div style={{
         background: 'var(--bg-modal)', border: '1px solid var(--border-modal)',
-        borderRadius: '20px', padding: '32px', maxWidth: '640px', width: '100%',
+        borderRadius: '14px', padding: '22px 24px', maxWidth: '640px', width: '100%',
         maxHeight: '90vh', overflowY: 'auto',
         boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
       }} onClick={e => e.stopPropagation()}>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
-            ✏️ Edit Registration
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)' }}>
+            Edit Registration
           </h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
         </div>
 
         {error && (
           <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', marginBottom: '20px', color: '#FCA5A5', fontSize: '13px' }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -1150,7 +1151,7 @@ function EditRegistrationModal({ reg, onClose, onSave }) {
             <div style={{ flex: 1 }}>
               <label style={labelStyle}>Payment Status</label>
               <select value={form.payment_status} onChange={e => handleChange('payment_status', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                <option value="pending">⏳ Pending</option>
+                <option value="pending">Pending</option>
                 <option value="paid">✓ Paid</option>
                 <option value="failed">✗ Failed</option>
                 <option value="refunded">↩ Refunded</option>
@@ -1172,7 +1173,7 @@ function EditRegistrationModal({ reg, onClose, onSave }) {
             </button>
             <button type="submit" disabled={saving} style={{
               flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
-              background: 'linear-gradient(135deg, #F4A40B, #D4AF37)', color: '#000', fontWeight: '800', fontSize: '14px',
+              background: 'linear-gradient(135deg, #F4A40B, #D4AF37)', color: '#000', fontWeight: '700', fontSize: '14px',
               cursor: saving ? 'not-allowed' : 'pointer',
             }}>
               {saving ? 'Saving...' : 'Save Changes'}

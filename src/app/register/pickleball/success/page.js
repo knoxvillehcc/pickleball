@@ -11,7 +11,7 @@ export default function PickleballSuccessPage() {
       <div style={{
         minHeight: '100vh', background: 'var(--bg-primary)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'Inter, sans-serif',
+        fontFamily: 'var(--font-sans)',
       }}>
         <div style={{ color: 'var(--accent)', fontSize: '18px' }}>Loading...</div>
       </div>

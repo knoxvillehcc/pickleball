@@ -8,7 +8,7 @@ import SyncBar from '@/components/SyncBar';
 const card = {
   backgroundColor: 'var(--bg-card)',
   border: '1px solid var(--border)',
-  borderRadius: '16px',
+  borderRadius: '14px',
   transition: 'all 0.3s',
 };
 
@@ -160,19 +160,19 @@ export default function ReportsPage() {
   const totalRevenue  = Object.values(data.summary).reduce((s, x) => s + x.revenue, 0);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '60px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
 
       {/* Hero */}
       <div style={{
         ...card,
         background: 'var(--bg-card)',
         borderColor: 'var(--border)',
-        padding: '32px', position: 'relative', overflow: 'hidden',
+        padding: '22px 24px', position: 'relative', overflow: 'hidden',
         boxShadow: 'var(--shadow)',
-        display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px',
+        display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px',
       }}>
         <div style={{ position: 'relative' }}>
-          <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
+          <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
             Membership{' '}
             <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Reports</span>
           </h1>
@@ -185,7 +185,7 @@ export default function ReportsPage() {
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button onClick={downloadPDF} style={{
               background: 'var(--accent)',
-              color: 'white', fontWeight: '800', fontSize: '14px',
+              color: 'white', fontWeight: '700', fontSize: '14px',
               padding: '12px 28px', borderRadius: '12px', border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px',
               boxShadow: '0 4px 12px var(--accent-glow)',
@@ -196,7 +196,7 @@ export default function ReportsPage() {
             </button>
             <button onClick={downloadPDFNoPrice} style={{
               background: 'transparent',
-              color: 'var(--accent)', fontWeight: '800', fontSize: '14px',
+              color: 'var(--accent)', fontWeight: '700', fontSize: '14px',
               padding: '12px 28px', borderRadius: '12px', border: '2px solid var(--accent)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px',
               position: 'relative', zIndex: 1,
@@ -218,23 +218,23 @@ export default function ReportsPage() {
         <>
           {/* Global Totals */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
-            <div style={{ ...card, padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+            <div style={{ ...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
               <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Active Members</div>
-                <div style={{ fontSize: '36px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Total Active Members</div>
+                <div style={{ fontSize: '36px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
               </div>
             </div>
 
-            <div style={{ ...card, padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', borderTop: '3.5px solid var(--text-success)', boxShadow: 'var(--shadow)' }}>
+            <div style={{ ...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--text-success)', boxShadow: 'var(--shadow)' }}>
               <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(16,185,129,0.08)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-success)" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>All Membership Payments Received</div>
-                <div style={{ fontSize: '32px', fontWeight: '950', color: 'var(--text-success)', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>All Membership Payments Received</div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-success)', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
               </div>
             </div>
           </div>
@@ -250,16 +250,16 @@ export default function ReportsPage() {
           {/* Summary Cards per Type */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
             {Object.entries(data.summary).map(([type, stats]) => (
-              <div key={type} style={{ ...card, padding: '24px', position: 'relative', overflow: 'hidden', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div key={type} style={{ ...card, padding: '16px 18px', position: 'relative', overflow: 'hidden', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
                 <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '24px', lineHeight: 1.4 }}>{type}</div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Active Members</div>
-                    <div style={{ fontSize: '36px', fontWeight: '950', color: 'var(--text-primary)', lineHeight: 1 }}>{stats.count}</div>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Active Members</div>
+                    <div style={{ fontSize: '36px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{stats.count}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Revenue</div>
-                    <div style={{ fontSize: '20px', fontWeight: '900', color: 'var(--accent)' }}>${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Revenue</div>
+                    <div style={{ fontSize: '20px', fontWeight: '700', color: 'var(--accent)' }}>${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                   </div>
                 </div>
               </div>
@@ -282,7 +282,7 @@ export default function ReportsPage() {
                 <thead>
                   <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>
                     {[['Customer Name','left'],['Subscription Type','left'],['Order Ref','left'],['Start Date','left'],['Updated in Odoo','left'],['Amount','right']].map(([h, align]) => (
-                      <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: align }}>{h}</th>
+                      <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '0.6px', textAlign: align }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -306,7 +306,7 @@ export default function ReportsPage() {
                       <td style={{ padding: '14px 24px', fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-muted)' }}>{row.order}</td>
                       <td style={{ padding: '14px 24px', color: 'var(--text-secondary)' }}>{formatMMDDYYYY(row.date)}</td>
                       <td style={{ padding: '14px 24px', color: 'var(--text-secondary)' }}>{row.odooUpdatedAt ? formatMMDDYYYY(row.odooUpdatedAt) : '—'}</td>
-                      <td style={{ padding: '14px 24px', textAlign: 'right', fontWeight: '800', color: 'var(--text-success)' }}>${(row.amount||0).toFixed(2)}</td>
+                      <td style={{ padding: '14px 24px', textAlign: 'right', fontWeight: '700', color: 'var(--text-success)' }}>${(row.amount||0).toFixed(2)}</td>
                     </tr>
                   ))}
                   {data.results.length === 0 && (

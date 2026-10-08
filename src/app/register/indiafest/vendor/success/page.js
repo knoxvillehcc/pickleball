@@ -11,7 +11,7 @@ export default function IndiafestVendorSuccessPage() {
       <div style={{
         minHeight: '100vh', background: 'var(--if-bg-grad)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'Inter, sans-serif',
+        fontFamily: 'var(--font-sans)',
       }}>
         <div style={{ color: 'var(--if-primary)', fontSize: '18px' }}>Loading…</div>
       </div>

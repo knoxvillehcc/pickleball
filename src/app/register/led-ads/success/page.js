@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -9,11 +10,11 @@ function SuccessInner() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'var(--bg-primary)', padding: '24px',
+      background: 'var(--bg-primary)', padding: '16px 18px',
     }}>
       <div style={{
         maxWidth: '520px', width: '100%', textAlign: 'center',
-        background: 'var(--bg-primary)', borderRadius: '24px',
+        background: 'var(--bg-primary)', borderRadius: '14px',
         border: '1px solid var(--border)', padding: '48px 36px',
         boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
       }}>
@@ -22,9 +23,9 @@ function SuccessInner() {
           background: 'linear-gradient(135deg, #22C55E, #16A34A)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '40px', boxShadow: '0 8px 24px rgba(34,197,94,0.3)',
-        }}>✅</div>
+        }}><Icon name="check" /></div>
 
-        <h1 style={{ fontSize: '24px', fontWeight: '900', color: 'var(--text-primary)', marginBottom: '8px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '8px' }}>
           Payment Successful!
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: '1.6', marginBottom: '24px' }}>
@@ -37,7 +38,7 @@ function SuccessInner() {
           marginBottom: '24px',
         }}>
           <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', letterSpacing: '1px', marginBottom: '4px' }}>REGISTRATION NUMBER</div>
-          <div style={{ fontSize: '22px', fontWeight: '900', color: '#FF9933', letterSpacing: '1px' }}>{regNumber}</div>
+          <div style={{ fontSize: '22px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '1px' }}>{regNumber}</div>
         </div>
 
         <div style={{
@@ -45,7 +46,7 @@ function SuccessInner() {
           background: 'rgba(255,153,51,0.06)', border: '1px solid rgba(255,153,51,0.15)',
           fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.6',
         }}>
-          📐 <strong>Media Requirement:</strong> 1920×1080 pixels (landscape, high resolution).
+          <strong>Media Requirement:</strong> 1920×1080 pixels (landscape, high resolution).
           <br />Please submit your ad media at least 7 days before the event.
         </div>
 

@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -178,16 +179,16 @@ export default function NavratriDashboard() {
       {/* Quick Nav */}
       <div style={{ display: 'flex', gap: spacing.sm, marginBottom: spacing.lg, flexWrap: 'wrap' }}>
         {[
-          { href: '/navratri/orders', icon: '🎫', label: 'Orders' },
-          { href: '/navratri/vendors', icon: '🎪', label: 'Vendor Booths' },
-          { href: '/navratri/members', icon: '👥', label: 'Members' },
-          { href: '/navratri/manual', icon: '📝', label: 'Manual Issue' },
-          { href: '/navratri/accounting', icon: '💰', label: 'Accounting' },
-          { href: '/navratri/communications', icon: '📢', label: 'Comms' },
-          { href: '/navratri/scanner', icon: '📸', label: 'Scanner' },
-          { href: '/navratri/pickup', icon: '🎫', label: 'Pickup' },
-          { href: '/navratri/settings', icon: '⚙️', label: 'Settings' },
-          { href: '/navratri-2026', icon: '🌐', label: 'Public Page', external: true },
+          { href: '/navratri/orders', icon: <Icon name="ticket" />, label: 'Orders' },
+          { href: '/navratri/vendors', icon: <Icon name="tent" />, label: 'Vendor Booths' },
+          { href: '/navratri/members', icon: <Icon name="users" />, label: 'Members' },
+          { href: '/navratri/manual', icon: <Icon name="note" />, label: 'Manual Issue' },
+          { href: '/navratri/accounting', icon: <Icon name="money" />, label: 'Accounting' },
+          { href: '/navratri/communications', icon: <Icon name="megaphone" />, label: 'Comms' },
+          { href: '/navratri/scanner', icon: <Icon name="camera" />, label: 'Scanner' },
+          { href: '/navratri/pickup', icon: <Icon name="ticket" />, label: 'Pickup' },
+          { href: '/navratri/settings', icon: <Icon name="settings" />, label: 'Settings' },
+          { href: '/navratri-2026', icon: <Icon name="globe" />, label: 'Public Page', external: true },
         ].map(link => (
           <a key={link.href} href={link.href} target={link.external ? '_blank' : undefined}
             style={{
@@ -231,14 +232,14 @@ export default function NavratriDashboard() {
           {/* KPI Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: spacing.base, marginBottom: spacing.xl }}>
             {[
-              { label: 'Total Revenue', value: fmt(overview.totalRevenue), color: c.green, icon: '💰' },
-              { label: 'Net Revenue', value: fmt(overview.netRevenue), color: c.accent, icon: '📈' },
-              { label: 'Stripe Fees', value: fmt(overview.totalFees), color: c.red, icon: '💳' },
+              { label: 'Total Revenue', value: fmt(overview.totalRevenue), color: c.green, icon: <Icon name="money" /> },
+              { label: 'Net Revenue', value: fmt(overview.netRevenue), color: c.accent, icon: <Icon name="trending" /> },
+              { label: 'Stripe Fees', value: fmt(overview.totalFees), color: c.red, icon: <Icon name="card" /> },
               { label: 'Refunds', value: fmt(overview.totalRefunds), color: c.red, icon: '↩️' },
-              { label: 'Total Orders', value: overview.totalOrders, color: c.blue, icon: '🎫' },
-              { label: 'Pending', value: overview.pendingOrders, color: c.amber, icon: '⏳' },
-              { label: 'Check-ins', value: overview.totalCheckins, color: c.green, icon: '✅' },
-              { label: 'Members Synced', value: overview.membersSynced, color: c.blue, icon: '👥' },
+              { label: 'Total Orders', value: overview.totalOrders, color: c.blue, icon: <Icon name="ticket" /> },
+              { label: 'Pending', value: overview.pendingOrders, color: c.amber, icon: '' },
+              { label: 'Check-ins', value: overview.totalCheckins, color: c.green, icon: <Icon name="check" /> },
+              { label: 'Members Synced', value: overview.membersSynced, color: c.blue, icon: <Icon name="users" /> },
             ].map((kpi, i) => (
               <div key={i} style={{ ...card(theme), padding: spacing.lg }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm }}>
@@ -253,9 +254,9 @@ export default function NavratriDashboard() {
           {/* Revenue Breakdown */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: spacing.base, marginBottom: spacing.xl }}>
             {[
-              { title: 'By Payment Method', data: overview.revenueByMethod || {}, labels: { stripe: '💳 Stripe', cash: '💵 Cash', check: '📝 Check', complimentary: '🎁 Complimentary' } },
+              { title: 'By Payment Method', data: overview.revenueByMethod || {}, labels: { stripe: 'Stripe', cash: 'Cash', check: 'Check', complimentary: 'Complimentary' } },
               { title: 'By Ticket Type', data: overview.revenueByType || {}, labels: {} },
-              { title: 'By Customer Type', data: overview.revenueByCustomer || {}, labels: { general: '👤 General', pioneer: '🏆 Pioneer', non_member: '🌐 Non-Member' } },
+              { title: 'By Customer Type', data: overview.revenueByCustomer || {}, labels: { general: 'General', pioneer: 'Pioneer', non_member: 'Non-Member' } },
             ].map((section, si) => (
               <div key={si} style={{ ...card(theme), padding: spacing.lg }}>
                 <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>{section.title}</h3>
@@ -271,7 +272,7 @@ export default function NavratriDashboard() {
 
           {/* Membership */}
           <div style={{ ...card(theme), padding: spacing.lg }}>
-            <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>👥 Membership Breakdown</h3>
+            <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}><Icon name="users" />Membership Breakdown</h3>
             <div style={{ display: 'flex', gap: spacing['2xl'] }}>
               <div>
                 <span style={{ ...type.bigNum, color: c.blue }}>{overview.generalMembers}</span>
@@ -329,7 +330,7 @@ export default function NavratriDashboard() {
       {['orders', 'members', 'accounting'].includes(tab) && (
         <div style={{ ...card(theme), padding: spacing['3xl'], textAlign: 'center' }}>
           <div style={{ fontSize: '40px', marginBottom: spacing.base, opacity: 0.5 }}>
-            {tab === 'orders' ? '🎫' : tab === 'members' ? '👥' : '💰'}
+            {tab === 'orders' ? <Icon name="ticket" /> : tab === 'members' ? <Icon name="users" /> : <Icon name="money" />}
           </div>
           <h3 style={{ ...type.sectionTitle, color: c.text }}>
             {tab === 'orders' ? 'Orders Management' : tab === 'members' ? 'Member Management' : 'Accounting & Daily Close'}
@@ -343,13 +344,13 @@ export default function NavratriDashboard() {
       {/* System Health */}
       {health && (
         <div style={{ ...card(theme), padding: spacing.lg, marginTop: spacing.xl }}>
-          <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}>🔧 System Health</h3>
+          <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.base }}><Icon name="wrench" />System Health</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: spacing.md }}>
             {Object.entries(health.checks || {}).map(([name, check]) => (
               <div key={name} style={{ padding: spacing.md, borderRadius: `${radii.sm}px`, background: c.bgAlt }}>
                 <div style={{ ...type.bodyMedium, marginBottom: spacing.xs, textTransform: 'capitalize' }}>{name}</div>
                 <span style={chip(check.status === 'healthy' ? 'active' : check.status === 'not_configured' ? 'pending' : 'invalid', theme)}>
-                  {check.status === 'healthy' ? '✅ Healthy' : check.status === 'not_configured' ? '⚙️ Not Configured' : '❌ Error'}
+                  {check.status === 'healthy' ? 'Healthy' : check.status === 'not_configured' ? 'Not Configured' : 'Error'}
                 </span>
               </div>
             ))}

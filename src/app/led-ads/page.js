@@ -252,7 +252,7 @@ export default function LedAdsAdminPage() {
 
   const chipStyle = (status) => ({
     display: 'inline-flex', alignItems: 'center', gap: '5px',
-    padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase',
+    padding: '3px 10px', borderRadius: '14px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase',
     ...(status === 'paid' ? { background: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' } :
       status === 'pending' ? { background: 'rgba(245,158,11,0.1)', color: '#D97706', border: '1px solid rgba(245,158,11,0.3)' } :
       { background: 'rgba(239,68,68,0.1)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.3)' }),
@@ -265,7 +265,7 @@ export default function LedAdsAdminPage() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '32px 28px', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '32px 28px', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
       <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
 
         {/* ── HEADER ──────────────────────────────────────────────────────────── */}
@@ -279,7 +279,7 @@ export default function LedAdsAdminPage() {
               }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
               </div>
-              <h1 style={{ fontSize: '24px', fontWeight: '950', color: 'var(--text-primary)', letterSpacing: '-0.5px', margin: 0 }}>
+              <h1 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.5px', margin: 0 }}>
                 LED Screen Ads — Navratri 2026
               </h1>
             </div>
@@ -354,7 +354,7 @@ export default function LedAdsAdminPage() {
           }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Odoo General Entry Confirmed:</span>
-            <span style={{ fontFamily: 'monospace', fontWeight: '800' }}>{odooSyncStatus.moveName}</span>
+            <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{odooSyncStatus.moveName}</span>
             <span>· Gross: ${Number(odooSyncStatus.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
             <span>· Analytic: Navratri 2026</span>
             {odooSyncStatus.date && <span>· Date: {formatMMDDYYYY(odooSyncStatus.date)}</span>}
@@ -382,8 +382,8 @@ export default function LedAdsAdminPage() {
               padding: '20px', borderRadius: '14px', background: 'var(--bg-card)',
               border: '1px solid var(--border)', boxShadow: 'var(--shadow)',
             }}>
-              <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '8px' }}>{kpi.label}</div>
-              <div style={{ fontSize: '28px', fontWeight: '950', color: kpi.color }}>{kpi.value}</div>
+              <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '8px' }}>{kpi.label}</div>
+              <div style={{ fontSize: '28px', fontWeight: '700', color: kpi.color }}>{kpi.value}</div>
             </div>
           ))}
         </div>
@@ -432,25 +432,25 @@ export default function LedAdsAdminPage() {
             <thead>
               <tr style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
                 {['Reg #', 'Business Name', 'Contact', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Status', 'Amount', 'Graphic', 'Actions'].map(h => (
-                  <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '800', color: 'var(--text-secondary)', fontSize: '11px', letterSpacing: '0.6px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                  <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '700', color: 'var(--text-secondary)', fontSize: '11px', letterSpacing: '0.6px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={10} style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No registrations found.</td></tr>
+                <tr><td colSpan={10} style={{ padding: '28px', textAlign: 'center', color: 'var(--text-secondary)' }}>No registrations found.</td></tr>
               ) : filtered.map(r => {
                 const hasGraphic = r.graphic_received || r.media_url;
                 return (
                   <tr key={r.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px 14px', fontWeight: '800', color: '#0284C7', fontFamily: 'monospace' }}>{r.registration_number}</td>
+                    <td style={{ padding: '12px 14px', fontWeight: '700', color: '#0284C7', fontFamily: 'monospace' }}>{r.registration_number}</td>
                     <td style={{ padding: '12px 14px', fontWeight: '700', color: 'var(--text-primary)' }}>{r.business_name}</td>
                     <td style={{ padding: '12px 14px', color: 'var(--text-primary)' }}>{r.contact_name}</td>
                     <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', fontSize: '12px' }}>{r.email}</td>
                     <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{r.phone || '—'}</td>
                     <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontSize: '12px' }}>{formatMMDDYYYY(r.registration_date)}</td>
                     <td style={{ padding: '12px 14px' }}><span style={chipStyle(r.payment_status)}>{r.payment_status}</span></td>
-                    <td style={{ padding: '12px 14px', fontWeight: '800', color: 'var(--text-primary)' }}>${((r.amount_paid || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '12px 14px', fontWeight: '700', color: 'var(--text-primary)' }}>${((r.amount_paid || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td style={{ padding: '12px 14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <button
@@ -490,7 +490,7 @@ export default function LedAdsAdminPage() {
                             fontWeight: '700', fontSize: '12px', cursor: 'pointer',
                           }}
                         >
-                          ✏️ Edit
+                          Edit
                         </button>
 
                         {/* Resend Button */}
@@ -502,15 +502,15 @@ export default function LedAdsAdminPage() {
                             padding: '6px 12px', borderRadius: '8px', cursor: resendingId === r.registration_number ? 'not-allowed' : 'pointer',
                             border: `1px solid ${resendDone[r.registration_number] ? 'rgba(16,185,129,0.5)' : 'rgba(255,153,51,0.4)'}`,
                             background: resendDone[r.registration_number] ? 'rgba(16,185,129,0.15)' : 'rgba(255,153,51,0.08)',
-                            color: resendDone[r.registration_number] ? '#10B981' : '#FF9933',
+                            color: resendDone[r.registration_number] ? '#10B981' : 'var(--accent)',
                             fontWeight: '700', fontSize: '12px',
                           }}
                         >
                           {resendingId === r.registration_number
-                            ? '⏳ Sending...'
+                            ? 'Sending...'
                             : resendDone[r.registration_number]
-                            ? '✅ Sent!'
-                            : r.payment_status === 'paid' ? '📧 Resend Receipt' : '💳 Send Link'}
+                            ? 'Sent!'
+                            : r.payment_status === 'paid' ? 'Resend Receipt' : 'Send Link'}
                         </button>
 
                         {/* Delete Button */}
@@ -535,14 +535,14 @@ export default function LedAdsAdminPage() {
       {/* ── MODAL: ODOO GENERAL ENTRY SYNC ───────────────────────────────────── */}
       {showOdooModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ maxWidth: '540px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '28px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div style={{ maxWidth: '540px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '20px 22px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', gap: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'rgba(14,165,233,0.1)', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: 'var(--text-primary)' }}>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>
                     Odoo General Entry
                   </h3>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500' }}>
@@ -557,14 +557,14 @@ export default function LedAdsAdminPage() {
             {odooSyncStatus && !forceOdooSync ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '12px', padding: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#D97706', fontWeight: '800', fontSize: '14px', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#D97706', fontWeight: '700', fontSize: '14px', marginBottom: '8px' }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                     <span>Duplicate Blocked: Already Posted to Odoo</span>
                   </div>
                   <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
                     LED Ads revenue was previously posted to Odoo under journal entry:
                   </p>
-                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'monospace', fontWeight: '800', fontSize: '13.5px', color: '#0284C7' }}>
+                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'monospace', fontWeight: '700', fontSize: '13.5px', color: '#0284C7' }}>
                     <span>{odooSyncStatus.moveName}</span>
                     <span>${Number(odooSyncStatus.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
@@ -581,7 +581,7 @@ export default function LedAdsAdminPage() {
                   <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
                     Close
                   </button>
-                  <button onClick={() => setForceOdooSync(true)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid #D97706', background: 'rgba(245,158,11,0.1)', color: '#D97706', fontWeight: '800', cursor: 'pointer' }}>
+                  <button onClick={() => setForceOdooSync(true)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid #D97706', background: 'rgba(245,158,11,0.1)', color: '#D97706', fontWeight: '700', cursor: 'pointer' }}>
                     Force Re-sync
                   </button>
                 </div>
@@ -597,19 +597,19 @@ export default function LedAdsAdminPage() {
                 <div style={{ background: 'var(--bg-input)', borderRadius: '14px', padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Event / Analytic Account:</span>
-                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>Navratri 2026</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Navratri 2026</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Odoo Journal:</span>
-                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>MISC (General Operations)</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>MISC (General Operations)</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Paid Advertisers:</span>
-                    <span style={{ fontWeight: '800', color: 'var(--text-primary)' }}>{paidCount} advertisers</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{paidCount} advertisers</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Credit Revenue (Acct 2005):</span>
-                    <span style={{ fontWeight: '800', color: '#10B981' }}>+${(totalRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span style={{ fontWeight: '700', color: '#10B981' }}>+${(totalRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Debit CC Fees (Acct 950):</span>
@@ -617,7 +617,7 @@ export default function LedAdsAdminPage() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
                     <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Debit HCC Bank (Acct 101401):</span>
-                    <span style={{ fontWeight: '950', color: '#0284C7' }}>${((totalRevenue / 100) - (totalRevenue / 100 * 0.029 + paidCount * 0.30)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span style={{ fontWeight: '700', color: '#0284C7' }}>${((totalRevenue / 100) - (totalRevenue / 100 * 0.029 + paidCount * 0.30)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
 
@@ -640,7 +640,7 @@ export default function LedAdsAdminPage() {
                   <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
                     Cancel
                   </button>
-                  <button onClick={() => handlePostToOdoo(forceOdooSync)} disabled={isSyncingOdoo || paidCount === 0} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: 'none', background: isSyncingOdoo ? 'rgba(14,165,233,0.5)' : 'linear-gradient(135deg, #0284C7, #0369A1)', color: '#FFFFFF', fontWeight: '800', cursor: isSyncingOdoo || paidCount === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <button onClick={() => handlePostToOdoo(forceOdooSync)} disabled={isSyncingOdoo || paidCount === 0} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: 'none', background: isSyncingOdoo ? 'rgba(14,165,233,0.5)' : 'linear-gradient(135deg, #0284C7, #0369A1)', color: '#FFFFFF', fontWeight: '700', cursor: isSyncingOdoo || paidCount === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     {isSyncingOdoo ? 'Posting to Odoo...' : 'Confirm & Post General Entry'}
                   </button>
                 </div>
@@ -713,7 +713,7 @@ function EditLedAdModal({ reg, onClose, onSave }) {
     color: 'var(--text-primary)', fontSize: '13px', outline: 'none',
   };
   const labelStyle = {
-    display: 'block', fontSize: '11px', fontWeight: '800',
+    display: 'block', fontSize: '11px', fontWeight: '700',
     color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px'
   };
 
@@ -725,15 +725,15 @@ function EditLedAdModal({ reg, onClose, onSave }) {
     }} onClick={onClose}>
       <div style={{
         background: 'var(--bg-modal, #1E293B)', border: '1px solid var(--border-modal, rgba(255,255,255,0.1))',
-        borderRadius: '20px', padding: '32px', maxWidth: '600px', width: '100%',
+        borderRadius: '14px', padding: '22px 24px', maxWidth: '600px', width: '100%',
         maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
-              ✏️ Edit LED Ad Registration
+            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)' }}>
+              Edit LED Ad Registration
             </h2>
-            <div style={{ fontSize: '12px', color: '#FF9933', fontFamily: 'monospace', marginTop: '4px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--accent)', fontFamily: 'monospace', marginTop: '4px' }}>
               {reg.registration_number}
             </div>
           </div>
@@ -742,7 +742,7 @@ function EditLedAdModal({ reg, onClose, onSave }) {
 
         {error && (
           <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', marginBottom: '20px', color: '#FCA5A5', fontSize: '13px' }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -788,7 +788,7 @@ function EditLedAdModal({ reg, onClose, onSave }) {
             <div style={{ flex: 1 }}>
               <label style={labelStyle}>Payment Status</label>
               <select value={form.payment_status} onChange={e => setForm(f => ({ ...f, payment_status: e.target.value }))} style={inputStyle}>
-                <option value="pending">⏳ Pending</option>
+                <option value="pending">Pending</option>
                 <option value="paid">✓ Paid</option>
                 <option value="failed">✗ Failed</option>
                 <option value="refunded">↩ Refunded</option>
@@ -814,7 +814,7 @@ function EditLedAdModal({ reg, onClose, onSave }) {
             }}>Cancel</button>
             <button type="submit" disabled={saving} style={{
               flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
-              background: '#FF9933', color: '#000000', fontWeight: '800', cursor: saving ? 'not-allowed' : 'pointer',
+              background: 'var(--accent)', color: '#000000', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer',
             }}>
               {saving ? 'Saving...' : 'Save Changes'}
             </button>

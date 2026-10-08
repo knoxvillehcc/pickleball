@@ -1,220 +1,257 @@
-:root, [data-theme="dark"] {
-  --bg-primary:    #0f0d13;
-  --bg-secondary:  #16121c;
-  --bg-sidebar:    #110e16;
-  --bg-card:       #16121c;
-  --bg-input:      #0f0d13;
-  --text-primary:  #F8FAFC;
-  --text-secondary:#E2E8F0;
-  --text-muted:    #94A3B8;
-  --border:        rgba(139, 30, 63, 0.35);
-  --border-hover:  #FF9933;
-  --accent:        #FF9933;
-  --accent-glow:   rgba(255, 153, 51, 0.08);
-  --shadow:        rgba(0,0,0,0.5);
+/* ═══════════════════════════════════════════════════════════════════════════
+   HCC Design System — Apple-inspired, saffron-accented
+   Light: soft gray canvas, white cards, hairline borders
+   Dark : near-black canvas, elevated #1C1C1E surfaces
+   Variable names are unchanged so every page inherits the new look.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-  /* Table styling */
-  --bg-table-header: #1b1624;
-  --bg-table-stripe: #120e18;
-  --border-table: rgba(139, 30, 63, 0.2);
-  --text-table-header: #E2E8F0;
-  
-  /* Banners */
-  --bg-banner-grad: linear-gradient(135deg, rgba(255,153,51,0.1) 0%, rgba(139,30,63,0.1) 100%);
-  --bg-banner-scanner: linear-gradient(135deg, #16121c 0%, rgba(139,30,63,0.2) 100%);
-  
-  /* Buttons & badges */
-  --bg-button-secondary: #16121c;
-  --border-button-secondary: rgba(139,30,63,0.35);
-  --text-button-secondary: #E2E8F0;
-  --bg-badge-pill: rgba(139,30,63,0.2);
-  --text-badge-pill: #FF9933;
-  --border-badge-pill: rgba(139,30,63,0.4);
-  
-  /* Modals */
-  --bg-modal: #110e16;
-  --border-modal: rgba(139,30,63,0.45);
-
-  /* IndiaFest Specific Theme Variables */
-  --if-bg-grad: linear-gradient(160deg, #08070F 0%, #110E1C 60%, #180D15 100%);
-  --if-text: #F1F5F9;
-  --if-text-secondary: #A78BFA;
-  --if-text-muted: #6B7280;
-  --if-border: rgba(255, 153, 51, 0.25);
-  --if-input-bg: rgba(15, 13, 25, 0.6);
-  --if-card-bg: rgba(21, 19, 36, 0.85);
-  --if-header-bg: rgba(11, 13, 25, 0.95);
-  --if-primary: #FF9933;
-  --if-secondary: #C084FC;
-
-  /* Errors & alerts */
-  --text-error: #FCA5A5;
-  --text-success: #34D399;
-  --bg-error: rgba(239, 68, 68, 0.1);
-  --border-error: rgba(239, 68, 68, 0.3);
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  color-scheme: light dark;
 }
 
-[data-theme="light"] {
-  --bg-primary:    #FFFDF9;
+/* ── Light (default) ───────────────────────────────────────────────────── */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg-primary:    #F5F5F7;
   --bg-secondary:  #FFFFFF;
-  --bg-sidebar:    #FFFFFF;
+  --bg-sidebar:    rgba(246, 246, 248, 0.82);
   --bg-card:       #FFFFFF;
-  --bg-input:      #FFFBF6;
-  --text-primary:  #2D1A08;
-  --text-secondary:#5D4037;
-  --text-muted:    #8D6E63;
-  --border:        #EAE3D2;
-  --border-hover:  #8B1E3F;
-  --accent:        #8B1E3F;
-  --accent-glow:   rgba(139, 30, 63, 0.05);
-  --shadow:        0 10px 15px -3px rgba(139, 30, 63, 0.05), 0 4px 6px -4px rgba(139, 30, 63, 0.05);
+  --bg-input:      #F2F2F5;
+  --bg-hover:      rgba(0, 0, 0, 0.045);
+  --text-primary:  #1D1D1F;
+  --text-secondary:#515154;
+  --text-muted:    #86868B;
+  --border:        rgba(0, 0, 0, 0.09);
+  --border-hover:  rgba(0, 0, 0, 0.18);
+  --accent:        #E8780C;
+  --accent-glow:   rgba(232, 120, 12, 0.10);
+  --accent-strong: #C96205;
+  --maroon:        #8B1E3F;
+  --shadow:        0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-color:  rgba(0, 0, 0, 0.14);
 
   /* Table styling */
-  --bg-table-header: #FFF8F0;
-  --bg-table-stripe: #FFFDF9;
-  --border-table: #F3EFE0;
-  --text-table-header: #5D4037;
-  
+  --bg-table-header: #FAFAFC;
+  --bg-table-stripe: transparent;
+  --border-table: rgba(0, 0, 0, 0.06);
+  --text-table-header: #6E6E73;
+
   /* Banners */
-  --bg-banner-grad: linear-gradient(135deg, rgba(255,153,51,0.06) 0%, rgba(139,30,63,0.06) 100%);
-  --bg-banner-scanner: linear-gradient(135deg, #FFF8F0 0%, #F3EFE0 100%);
+  --bg-banner-grad: linear-gradient(135deg, rgba(232,120,12,0.07) 0%, rgba(139,30,63,0.05) 100%);
+  --bg-banner-scanner: linear-gradient(135deg, #FFFFFF 0%, #F5F5F7 100%);
 
   /* Buttons & badges */
   --bg-button-secondary: #FFFFFF;
-  --border-button-secondary: #CBD5E1;
-  --text-button-secondary: #5D4037;
-  --bg-badge-pill: #FFF8F0;
-  --text-badge-pill: #8B1E3F;
-  --border-badge-pill: #EAE3D2;
+  --border-button-secondary: rgba(0, 0, 0, 0.14);
+  --text-button-secondary: #1D1D1F;
+  --bg-badge-pill: rgba(232, 120, 12, 0.10);
+  --text-badge-pill: #B85A05;
+  --border-badge-pill: rgba(232, 120, 12, 0.22);
 
   /* Modals */
   --bg-modal: #FFFFFF;
-  --border-modal: #CBD5E1;
+  --border-modal: rgba(0, 0, 0, 0.10);
 
-  /* IndiaFest Specific Theme Variables */
-  --if-bg-grad: linear-gradient(160deg, #FFF8F2 0%, #FFF4EC 60%, #FFFAF6 100%);
-  --if-text: #2D1A08;
-  --if-text-secondary: #8B1E3F;
-  --if-text-muted: #8B6040;
-  --if-border: #F0E6D3;
-  --if-input-bg: #FAFAF8;
+  /* Event dashboards (IndiaFest / Navratri / registration forms) */
+  --if-bg-grad: #F5F5F7;
+  --if-text: #1D1D1F;
+  --if-text-secondary: #515154;
+  --if-text-muted: #86868B;
+  --if-border: rgba(0, 0, 0, 0.09);
+  --if-input-bg: #F2F2F5;
   --if-card-bg: #FFFFFF;
-  --if-header-bg: rgba(255, 255, 255, 0.95);
-  --if-primary: #FF9933;
+  --if-header-bg: rgba(255, 255, 255, 0.82);
+  --if-primary: #E8780C;
   --if-secondary: #8B1E3F;
 
-  /* Errors & alerts */
-  --text-error: #B91C1C;
-  --text-success: #15803D;
-  --bg-error: rgba(239, 68, 68, 0.05);
-  --border-error: rgba(239, 68, 68, 0.2);
+  /* Status */
+  --text-error: #D70015;
+  --text-success: #1F8A3E;
+  --bg-error: rgba(215, 0, 21, 0.06);
+  --border-error: rgba(215, 0, 21, 0.20);
+}
+
+/* ── Dark ──────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-primary:    #0A0A0B;
+  --bg-secondary:  #1C1C1E;
+  --bg-sidebar:    rgba(24, 24, 26, 0.78);
+  --bg-card:       #1C1C1E;
+  --bg-input:      #2C2C2E;
+  --bg-hover:      rgba(255, 255, 255, 0.07);
+  --text-primary:  #F5F5F7;
+  --text-secondary:#C7C7CC;
+  --text-muted:    #8E8E93;
+  --border:        rgba(255, 255, 255, 0.10);
+  --border-hover:  rgba(255, 255, 255, 0.22);
+  --accent:        #FF9F0A;
+  --accent-glow:   rgba(255, 159, 10, 0.14);
+  --accent-strong: #FFB340;
+  --maroon:        #D45A7C;
+  --shadow:        0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.35);
+  --shadow-color:  rgba(0, 0, 0, 0.6);
+
+  --bg-table-header: #232326;
+  --border-table: rgba(255, 255, 255, 0.07);
+  --text-table-header: #98989D;
+  --bg-table-stripe: transparent;
+
+  --bg-banner-grad: linear-gradient(135deg, rgba(255,159,10,0.10) 0%, rgba(212,90,124,0.08) 100%);
+  --bg-banner-scanner: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 100%);
+
+  --bg-button-secondary: #2C2C2E;
+  --border-button-secondary: rgba(255, 255, 255, 0.14);
+  --text-button-secondary: #F5F5F7;
+  --bg-badge-pill: rgba(255, 159, 10, 0.14);
+  --text-badge-pill: #FFB340;
+  --border-badge-pill: rgba(255, 159, 10, 0.28);
+
+  --bg-modal: #1C1C1E;
+  --border-modal: rgba(255, 255, 255, 0.14);
+
+  --if-bg-grad: #0A0A0B;
+  --if-text: #F5F5F7;
+  --if-text-secondary: #C7C7CC;
+  --if-text-muted: #8E8E93;
+  --if-border: rgba(255, 255, 255, 0.10);
+  --if-input-bg: #2C2C2E;
+  --if-card-bg: #1C1C1E;
+  --if-header-bg: rgba(28, 28, 30, 0.82);
+  --if-primary: #FF9F0A;
+  --if-secondary: #D45A7C;
+
+  --text-error: #FF6961;
+  --text-success: #32D74B;
+  --bg-error: rgba(255, 105, 97, 0.12);
+  --border-error: rgba(255, 105, 97, 0.30);
 }
 
 @layer base {
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.45;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.3s, color 0.3s;
-    /* Safe Area Inset Support */
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv11', 'ss01';
+    transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
-  ::selection {
-    background-color: rgba(99,102,241,0.3);
-  }
+  ::selection { background-color: var(--accent-glow); }
+  button, input, select, textarea { font-family: inherit; }
 }
 
 @layer utilities {
   .glass-panel {
-    background-color: rgba(15, 23, 42, 0.5);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(51, 65, 85, 0.5);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    background-color: var(--bg-sidebar);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
   }
-
   .glass-card {
-    background-color: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(51, 65, 85, 0.6);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
   }
-  .glass-card:hover {
-    border-color: rgba(99, 102, 241, 0.25);
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08);
-  }
-
-  .text-gradient-primary {
-    background: linear-gradient(135deg, #818CF8, #38BDF8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .text-gradient {
-    background: linear-gradient(135deg, #ffffff, #94A3B8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  .glass-card:hover { border-color: var(--border-hover); }
+  .text-gradient-primary, .text-gradient { color: var(--accent); }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.8);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(71, 85, 105, 1);
-}
+/* ── Scrollbars (thin, native-feeling) ─────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 9999px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); background-clip: content-box; border: 2px solid transparent; }
 
-/* Slide in animations */
+/* ── Motion ────────────────────────────────────────────────────────────── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0);    }
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
 }
-.animate-in {
-  animation: fadeIn 0.6s ease forwards;
+.animate-in { animation: fadeIn 0.35s var(--ease) both; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Global refinements — apply the system to every page without touching its
+   markup: typography scale, compact tables, calmer headings, focus rings.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+h1 { font-size: clamp(22px, 2.1vw, 28px) !important; font-weight: 700 !important; letter-spacing: -0.022em !important; line-height: 1.15 !important; }
+h2 { font-size: 17px !important; font-weight: 650 !important; letter-spacing: -0.012em !important; }
+h3 { font-weight: 650 !important; letter-spacing: -0.008em !important; }
+
+/* Gradient text becomes a solid accent (Apple never gradients headings) */
+[style*="-webkit-background-clip"] {
+  background: none !important;
+  -webkit-text-fill-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+/* Compact, hairline tables */
+table { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+table th {
+  padding: 8px 14px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  color: var(--text-table-header) !important;
+  background-color: var(--bg-table-header) !important;
+  border-bottom: 1px solid var(--border-table) !important;
+}
+table td { padding: 9px 14px !important; }
+table tbody tr { border-bottom: 1px solid var(--border-table) !important; }
+table tbody tr:hover { background-color: var(--bg-hover) !important; }
+
+/* Keyboard focus ring, iOS-style */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-glow) !important;
+}
+
+/* Press feedback on buttons */
+button { transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease), opacity 0.15s var(--ease), transform 0.12s var(--ease), box-shadow 0.15s var(--ease); }
+button:active:not(:disabled) { transform: scale(0.98); }
+button:disabled { cursor: not-allowed; }
+
+a { text-underline-offset: 3px; }
 
 /* ── Mobile Responsive Helpers ── */
 .table-responsive {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 @media (max-width: 640px) {
-  /* Prevent auto-zooming on iPhone inputs by keeping font size at 16px */
-  input, select, textarea {
-    font-size: 16px !important;
-  }
-
-  /* Make margins & paddings tighter on small viewports */
-  .mobile-p-4 {
-    padding: 16px !important;
-  }
-  
-  /* Standard 44px tap targets on mobile menu and links */
-  .sidebar-link, header button, footer button {
-    min-height: 44px;
-  }
+  input, select, textarea { font-size: 16px !important; }
+  .mobile-p-4 { padding: 14px !important; }
+  .sidebar-link, header button, footer button { min-height: 44px; }
+  table th, table td { padding-left: 10px !important; padding-right: 10px !important; }
 }
+/* Inline icons (replace emoji) */
+.hcc-icon { display: inline-block; vertical-align: -0.18em; flex-shrink: 0; margin-right: 0.4em; }
+.hcc-icon:only-child { margin-right: 0; }
+button > .hcc-icon:last-child, a > .hcc-icon:last-child { margin-right: 0; }
+[style*="display: flex"] > .hcc-icon, [style*="display:flex"] > .hcc-icon { margin-right: 0; }
+

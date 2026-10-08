@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTheme } from '@/components/ClientLayout';
@@ -147,7 +148,7 @@ function LoginContent() {
       background: 'var(--bg-primary)',
       fontFamily: "'Inter', -apple-system, sans-serif",
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '24px', position: 'relative',
+      padding: '16px 18px', position: 'relative',
       transition: 'background-color 0.3s, color 0.3s',
     }}>
       {/* Top flag stripe */}
@@ -166,7 +167,7 @@ function LoginContent() {
             boxShadow: 'var(--shadow)', transition: 'all 0.25s', fontSize: '18px',
           }}
         >
-          {isDark ? '☀️' : '🌙'}
+          {isDark ? <Icon name="sun" /> : <Icon name="moon" />}
         </button>
       </div>
 
@@ -175,7 +176,7 @@ function LoginContent() {
         {/* Mandir Branding Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <img src="/hcc_logo.png" alt="HCC Logo" style={{ height: '48px', width: 'auto', marginBottom: '16px', objectFit: 'contain' }} />
-          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: C.text, letterSpacing: '-0.4px' }}>
+          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: C.text, letterSpacing: '-0.4px' }}>
             Hindu Community Center
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: '12px', color: C.muted, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>
@@ -189,8 +190,8 @@ function LoginContent() {
           {/* ── Email Step ── */}
           {step === 'email' && (
             <form onSubmit={handleEmailSubmit}>
-              <div style={{ marginBottom: '8px', fontSize: '11px', fontWeight: '800',
-                color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+              <div style={{ marginBottom: '8px', fontSize: '11px', fontWeight: '700',
+                color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                 Registered Staff Email
               </div>
               <input
@@ -219,8 +220,8 @@ function LoginContent() {
           {step === 'pin' && (
             <div>
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--accent)',
-                  textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent)',
+                  textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>
                   Enter 6-Digit Login PIN
                 </div>
                 <div style={{ fontSize: '13px', color: C.muted, wordBreak: 'break-all', fontWeight: '500' }}>{email}</div>
@@ -265,7 +266,7 @@ function LoginContent() {
               {/* Lockouts and errors */}
               {loading && (
                 <div style={{ textAlign: 'center', color: 'var(--accent)', fontSize: '13px', marginBottom: '16px', fontWeight: '700' }}>
-                  ⏳ Verifying code credentials…
+                  Verifying code credentials…
                 </div>
               )}
 
@@ -273,7 +274,7 @@ function LoginContent() {
                 <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)',
                   borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: 'var(--text-error)',
                   marginBottom: '16px', display: 'flex', gap: '8px', alignItems: 'center', fontWeight: '600' }}>
-                  🔒 {locked}
+                  {locked}
                 </div>
               )}
 
@@ -325,7 +326,7 @@ function LoginContent() {
                 onClick={() => { setStep('email'); setPin(['','','','','','']); setError(''); setLocked(''); }}
                 disabled={loading}
                 style={{ width: '100%', background: 'none', border: 'none', color: 'var(--accent)',
-                  fontSize: '13px', cursor: 'pointer', padding: '10px', marginTop: '16px', fontWeight: '800' }}>
+                  fontSize: '13px', cursor: 'pointer', padding: '10px', marginTop: '16px', fontWeight: '700' }}>
                 ← Change Email Address
               </button>
             </div>
@@ -451,7 +452,7 @@ function ErrorBox({ msg }) {
     <div style={{ background: 'var(--bg-error)', border: '1px solid var(--border-error)',
       borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: 'var(--text-error)',
       marginBottom: '16px', display: 'flex', gap: '8px', alignItems: 'center', fontWeight: '600' }}>
-      ⚠️ {msg}
+      {msg}
     </div>
   );
 }
@@ -460,7 +461,7 @@ function btnStyle() {
   return {
     width: '100%', padding: '14px', borderRadius: '12px', border: 'none', cursor: 'pointer',
     background: 'var(--accent)',
-    color: '#FFF', fontWeight: '900', fontSize: '15px',
+    color: '#FFF', fontWeight: '700', fontSize: '15px',
     boxShadow: '0 4px 14px var(--accent-glow)',
     transition: 'all 0.2s',
   };
@@ -470,7 +471,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex',
-        alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontFamily: 'Inter, sans-serif' }}>
+        alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontFamily: 'var(--font-sans)' }}>
         Loading...
       </div>
     }>

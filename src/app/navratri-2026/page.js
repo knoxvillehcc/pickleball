@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, useCallback } from 'react';
 import { colors, spacing, type, radii, btn, input, card, page as pageStyle, container, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
 
@@ -261,7 +262,7 @@ export default function NavratriPublicPage() {
         {/* ── Error Banner ────────────────────────────────────────────────── */}
         {error && (
           <div style={{ ...alertStyle('error', theme), marginTop: spacing.base }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -288,7 +289,7 @@ export default function NavratriPublicPage() {
               <>
                 {devCode && (
                   <div style={{ ...alertStyle('success', theme), marginTop: spacing.md }}>
-                    🧪 Dev mode code: <strong>{devCode}</strong>
+                    Dev mode code: <strong>{devCode}</strong>
                   </div>
                 )}
                 <label style={{ ...labelStyle, marginTop: spacing.base }}>Enter 6-digit code</label>
@@ -318,7 +319,7 @@ export default function NavratriPublicPage() {
               background: existingOrder.pickedUp ? c.greenBg : c.accentBg,
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px',
             }}>
-              {existingOrder.pickedUp ? '✅' : '🎟️'}
+              {existingOrder.pickedUp ? <Icon name="check" /> : <Icon name="ticket" />}
             </div>
             <h2 style={{ ...type.sectionTitle, color: c.text }}>
               {existingOrder.pickedUp ? 'Wristbands Already Picked Up' : 'Pass Already Claimed'}

@@ -300,8 +300,8 @@ function NavratriVendorFormContent() {
 
   if (!loadingConfig && (settings.is_published === false || isPastCutoff)) {
     return (
-      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center', color: textPrimary }}>
-        <div style={{ maxWidth: '520px', width: '100%', background: cardBg, padding: '44px 28px', borderRadius: '20px', border: `1px solid ${cardBorder}`, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 18px', textAlign: 'center', color: textPrimary }}>
+        <div style={{ maxWidth: '520px', width: '100%', background: cardBg, padding: '44px 28px', borderRadius: '14px', border: `1px solid ${cardBorder}`, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
           <div style={{
             width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,107,53,0.15)',
             border: `1.5px solid ${saffron}`, margin: '0 auto 20px',
@@ -309,7 +309,7 @@ function NavratriVendorFormContent() {
           }}>
             <CalendarIcon />
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: '900', color: saffron, marginBottom: '10px' }}>Vendor Registration Closed</h1>
+          <h1 style={{ fontSize: '24px', fontWeight: '700', color: saffron, marginBottom: '10px' }}>Vendor Registration Closed</h1>
           <p style={{ color: textMuted, fontSize: '15px', lineHeight: 1.6 }}>
             {isPastCutoff
               ? 'Navratri 2026 vendor registrations have concluded for this season. Thank you for your support!'
@@ -339,12 +339,12 @@ function NavratriVendorFormContent() {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             background: 'rgba(255,184,0,0.14)', border: '1px solid rgba(255,184,0,0.3)',
-            padding: '6px 16px', borderRadius: '99px', fontSize: '12px', fontWeight: '800',
-            color: gold, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '14px',
+            padding: '6px 16px', borderRadius: '99px', fontSize: '12px', fontWeight: '700',
+            color: gold, letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: '14px',
           }}>
             Knoxville Hindu Community Center
           </div>
-          <h1 style={{ fontSize: 'clamp(26px, 5.5vw, 42px)', fontWeight: '950', letterSpacing: '-0.5px', margin: '0 0 12px', lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: 'clamp(26px, 5.5vw, 42px)', fontWeight: '700', letterSpacing: '-0.5px', margin: '0 0 12px', lineHeight: 1.2 }}>
             Navratri 2026 Vendor Booths
           </h1>
           <p style={{ fontSize: 'clamp(14px, 2.5vw, 16px)', color: '#E2E8F0', maxWidth: '680px', margin: '0 auto 20px', lineHeight: 1.6 }}>
@@ -1517,7 +1517,7 @@ export default function NavratriVendorRegistrationPage() {
   return (
     <Suspense fallback={
       <div style={{ minHeight: '100vh', background: '#0B0714', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#FF6B35', fontSize: '18px', fontWeight: '800' }}>Loading…</div>
+        <div style={{ color: '#FF6B35', fontSize: '18px', fontWeight: '700' }}>Loading…</div>
       </div>
     }>
       <NavratriVendorFormContent />

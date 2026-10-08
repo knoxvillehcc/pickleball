@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ClientLayout';
 import { colors, spacing, type, radii, btn, input as dsInput, card, keyframes, alert as alertStyle } from '@/lib/navratri/designSystem';
@@ -58,22 +59,22 @@ export default function CommunicationsPage() {
       <style>{keyframes}</style>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl }}>
-        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}>📢 Communications</h1>
+        <h1 style={{ ...type.pageTitle, color: c.text, margin: 0 }}><Icon name="megaphone" />Communications</h1>
         <a href="/navratri" style={{ ...type.bodyMedium, color: c.primary, textDecoration: 'none' }}>← Dashboard</a>
       </div>
 
       {result && (
         <div style={{ ...alertStyle(result.type, theme), marginBottom: spacing.base }}>
-          {result.type === 'error' ? '❌' : '✅'} {result.text}
+          {result.type === 'error' ? <Icon name="x" /> : <Icon name="check" />} {result.text}
         </div>
       )}
 
       {/* Tab bar */}
       <div style={{ display: 'flex', gap: '3px', marginBottom: spacing.xl, background: c.inputBg, borderRadius: `${radii.md}px`, padding: '3px' }}>
         {[
-          { key: 'reminder', label: '⏰ Reminder' },
-          { key: 'announcement', label: '📢 Announcement' },
-          { key: 'test', label: '🧪 Test' },
+          { key: 'reminder', label: 'Reminder' },
+          { key: 'announcement', label: 'Announcement' },
+          { key: 'test', label: 'Test' },
         ].map(tb => (
           <button key={tb.key} onClick={() => { setTab(tb.key); setResult(null); }} style={{
             padding: `${spacing.sm}px ${spacing.base}px`, borderRadius: `${radii.sm}px`, border: 'none',
@@ -86,7 +87,7 @@ export default function CommunicationsPage() {
 
       {/* Channel selector */}
       <div style={{ ...card(theme), padding: spacing.lg, marginBottom: spacing.lg }}>
-        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.md }}>📡 Channels</h3>
+        <h3 style={{ ...type.cardTitle, color: c.text, marginBottom: spacing.md }}><Icon name="broadcast" />Channels</h3>
         <div style={{ display: 'flex', gap: spacing.base }}>
           {['email', 'sms'].map(ch => (
             <label key={ch} style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, cursor: 'pointer' }}>
@@ -97,7 +98,7 @@ export default function CommunicationsPage() {
                 }}
                 style={{ width: '20px', height: '20px', accentColor: c.primary }} />
               <span style={{ ...type.bodyMedium, textTransform: 'capitalize' }}>
-                {ch === 'email' ? '📧 Email' : '📱 SMS'}
+                {ch === 'email' ? 'Email' : 'SMS'}
               </span>
             </label>
           ))}
@@ -107,7 +108,7 @@ export default function CommunicationsPage() {
       {/* REMINDER */}
       {tab === 'reminder' && (
         <div style={{ ...card(theme), padding: spacing.xl }}>
-          <h3 style={{ ...type.sectionTitle, color: c.text, marginBottom: spacing.xs }}>⏰ Send Reminder</h3>
+          <h3 style={{ ...type.sectionTitle, color: c.text, marginBottom: spacing.xs }}>Send Reminder</h3>
           <p style={{ ...type.secondary, color: c.muted, marginBottom: spacing.lg }}>
             Send a reminder to all ticket holders for a specific date.
           </p>
@@ -120,7 +121,7 @@ export default function CommunicationsPage() {
           <button onClick={() => handleSend('reminder', { eventDateId: parseInt(reminderDateId) })}
             disabled={loading || !reminderDateId}
             style={{ ...btn('primaryLg', theme), marginTop: spacing.lg, background: c.accent, color: '#000', opacity: loading || !reminderDateId ? 0.5 : 1 }}>
-            {loading ? 'Sending…' : '⏰ Send Reminder'}
+            {loading ? 'Sending…' : 'Send Reminder'}
           </button>
         </div>
       )}
@@ -128,7 +129,7 @@ export default function CommunicationsPage() {
       {/* ANNOUNCEMENT */}
       {tab === 'announcement' && (
         <div style={{ ...card(theme), padding: spacing.xl }}>
-          <h3 style={{ ...type.sectionTitle, color: c.text, marginBottom: spacing.xs }}>📢 Send Announcement</h3>
+          <h3 style={{ ...type.sectionTitle, color: c.text, marginBottom: spacing.xs }}><Icon name="megaphone" />Send Announcement</h3>
           <p style={{ ...type.secondary, color: c.muted, marginBottom: spacing.lg }}>
             Send a message to ALL ticket holders (deduplicated by phone).
           </p>
@@ -140,7 +141,7 @@ export default function CommunicationsPage() {
           <button onClick={() => handleSend('announcement', { subject, message })}
             disabled={loading || !subject || !message}
             style={{ ...btn('primaryLg', theme), marginTop: spacing.lg, opacity: loading || !subject || !message ? 0.5 : 1 }}>
-            {loading ? 'Sending…' : '📢 Send to All Ticket Holders'}
+            {loading ? 'Sending…' : 'Send to All Ticket Holders'}
           </button>
         </div>
       )}
@@ -148,7 +149,7 @@ export default function CommunicationsPage() {
       {/* TEST */}
       {tab === 'test' && (
         <div style={{ ...card(theme), padding: spacing.xl }}>
-          <h3 style={{ ...type.sectionTitle, color: c.text, marginBottom: spacing.xs }}>🧪 Test Send</h3>
+          <h3 style={{ ...type.sectionTitle, color: c.text, marginBottom: spacing.xs }}><Icon name="flask" />Test Send</h3>
           <p style={{ ...type.secondary, color: c.muted, marginBottom: spacing.lg }}>
             Send a test message to your admin email. Optionally include a phone for SMS test.
           </p>
@@ -162,7 +163,7 @@ export default function CommunicationsPage() {
           <button onClick={() => handleSend('test', { subject, message, testPhone })}
             disabled={loading}
             style={{ ...btn('primaryLg', theme), marginTop: spacing.lg, background: c.blue, color: '#fff', opacity: loading ? 0.5 : 1 }}>
-            {loading ? 'Sending…' : '🧪 Send Test'}
+            {loading ? 'Sending…' : 'Send Test'}
           </button>
         </div>
       )}

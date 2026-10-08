@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState, useEffect, useCallback } from 'react';
 
 // ── HCC Pages that can be assigned ───────────────────────────────────────────
@@ -29,8 +30,8 @@ const PNL_PERMISSIONS = [
 ];
 
 const ROLE_COLORS = {
-  super_admin: { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.25)', text: '#FF9933' },
-  staff:       { bg: 'rgba(139,30,63,0.12)', border: 'rgba(139,30,63,0.25)',  text: '#8B1E3F' },
+  super_admin: { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.25)', text: 'var(--accent)' },
+  staff:       { bg: 'rgba(139,30,63,0.12)', border: 'rgba(139,30,63,0.25)',  text: 'var(--maroon)' },
 };
 
 const C = {
@@ -56,9 +57,9 @@ function Toast({ toast }) {
       background: isErr ? 'rgba(127,29,29,0.95)' : 'var(--bg-modal)',
       border: `1px solid ${isErr ? 'rgba(239,68,68,0.4)' : 'var(--border-modal)'}`,
       color: isErr ? 'var(--text-error)' : 'var(--text-success)', fontSize: '14px', fontWeight: '600',
-      boxShadow: '0 8px 32px var(--shadow)',
+      boxShadow: '0 8px 32px var(--shadow-color)',
     }}>
-      {isErr ? '⚠️' : '✅'} {toast.msg}
+      {isErr ? <Icon name="alert" /> : <Icon name="check" />} {toast.msg}
     </div>
   );
 }
@@ -104,13 +105,13 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
     }}>
       <div style={{
         background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`,
-        borderRadius: '20px', width: '100%', maxWidth: '540px',
-        boxShadow: '0 24px 80px var(--shadow)',
+        borderRadius: '14px', width: '100%', maxWidth: '540px',
+        boxShadow: '0 24px 80px var(--shadow-color)',
       }}>
         {/* Header */}
         <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: C.text }}>Manage Access</h2>
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: C.text }}>Manage Access</h2>
             <p style={{ margin: '4px 0 0', fontSize: '13px', color: C.muted }}>{targetUser.email}</p>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: '20px', padding: '0 4px' }}>✕</button>
@@ -132,7 +133,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
             />
             <div>
               <div style={{ fontWeight: '700', fontSize: '14px', color: allAccess ? C.gold : C.text }}>
-                👑 Full Access (Super Admin equivalent)
+                Full Access (Super Admin equivalent)
               </div>
               <div style={{ fontSize: '12px', color: C.muted, marginTop: '2px' }}>
                 Grant access to all current and future pages
@@ -143,7 +144,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
 
         {/* Individual Pages */}
         <div style={{ padding: '16px 28px', display: 'flex', flexDirection: 'column', gap: '8px', opacity: allAccess ? 0.5 : 1 }}>
-          <div style={{ fontSize: '11px', fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '4px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>
             Individual Pages
           </div>
           {HCC_PAGES.map(page => {
@@ -166,7 +167,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
                   <div style={{ fontSize: '14px', fontWeight: '600', color: on ? C.text : C.muted }}>{page.label}</div>
                   <div style={{ fontSize: '12px', color: C.muted }}>{page.desc}</div>
                 </div>
-                {on && <span style={{ fontSize: '11px', fontWeight: '700', color: C.indigo, background: 'rgba(129,140,248,0.15)', padding: '2px 8px', borderRadius: '20px' }}>✓ On</span>}
+                {on && <span style={{ fontSize: '11px', fontWeight: '700', color: C.indigo, background: 'rgba(129,140,248,0.15)', padding: '2px 8px', borderRadius: '14px' }}>✓ On</span>}
               </label>
             );
           })}
@@ -176,7 +177,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
         <div style={{ padding: '0 28px 16px', opacity: allAccess ? 0.5 : 1 }}>
           <div style={{
             fontSize: '11px', fontWeight: '700', color: 'var(--accent)',
-            textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px',
+            textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px',
             display: 'flex', alignItems: 'center', gap: '8px',
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/><rect x="2" y="2" width="20" height="20" rx="2"/></svg>
@@ -207,7 +208,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
                     </div>
                     <div style={{ fontSize: '11px', color: C.muted }}>{perm.desc}</div>
                   </div>
-                  {on && <span style={{ fontSize: '11px', fontWeight: '700', color: isSensitive ? '#D97706' : C.indigo, background: isSensitive ? 'rgba(245,158,11,0.12)' : 'rgba(129,140,248,0.15)', padding: '2px 8px', borderRadius: '20px' }}>✓ On</span>}
+                  {on && <span style={{ fontSize: '11px', fontWeight: '700', color: isSensitive ? '#D97706' : C.indigo, background: isSensitive ? 'rgba(245,158,11,0.12)' : 'rgba(129,140,248,0.15)', padding: '2px 8px', borderRadius: '14px' }}>✓ On</span>}
                 </label>
               );
             })}
@@ -218,7 +219,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
         <div style={{ padding: '16px 28px 24px', borderTop: `1px solid var(--border)`, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <button onClick={onClose} style={btnStyle('var(--bg-button-secondary)', 'var(--border-button-secondary)', 'var(--text-button-secondary)')}>Cancel</button>
           <button onClick={handleSave} disabled={saving} style={btnStyle('var(--accent)', 'transparent', 'white', true)}>
-            {saving ? '⏳ Saving…' : '💾 Save Access'}
+            {saving ? 'Saving…' : 'Save Access'}
           </button>
         </div>
       </div>
@@ -250,8 +251,8 @@ function ResetPinModal({ targetUser, onClose, onToast }) {
       position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', padding: '16px',
     }}>
-      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '360px' }}>
-        <h3 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: '800', color: C.text }}>Reset PIN</h3>
+      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '14px', padding: '20px 22px', width: '100%', maxWidth: '360px' }}>
+        <h3 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: '700', color: C.text }}>Reset PIN</h3>
         <p style={{ margin: '0 0 20px', fontSize: '13px', color: C.muted }}>{targetUser.email}</p>
         <input
           type="text" inputMode="numeric" maxLength={6} value={pin}
@@ -313,9 +314,9 @@ function EditUserModal({ targetUser, onClose, onSave, onToast }) {
       position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', padding: '16px',
     }}>
-      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '20px', width: '100%', maxWidth: '400px' }}>
+      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '14px', width: '100%', maxWidth: '400px' }}>
         <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: C.text }}>Edit User Details</h2>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: C.text }}>Edit User Details</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: '20px' }}>✕</button>
         </div>
 
@@ -379,9 +380,9 @@ function AddUserModal({ onClose, onCreated, onToast }) {
       position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', padding: '16px',
     }}>
-      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '20px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '14px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
         <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: C.text }}>Add User</h2>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: C.text }}>Add User</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: '20px' }}>✕</button>
         </div>
 
@@ -417,7 +418,7 @@ function AddUserModal({ onClose, onCreated, onToast }) {
               borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
               <input type="checkbox" checked={allAccess} onChange={e => { setAllAccess(e.target.checked); if(e.target.checked) setForm(f=>({...f,allowedPages:HCC_PAGES.map(p=>p.key)})); }}
                 style={{ width:'16px',height:'16px',accentColor:C.gold,cursor:'pointer' }} />
-              <span style={{ fontSize: '13px', fontWeight: '700', color: allAccess ? C.gold : C.muted }}>👑 All pages (Full Access)</span>
+              <span style={{ fontSize: '13px', fontWeight: '700', color: allAccess ? C.gold : C.muted }}><Icon name="crown" />All pages (Full Access)</span>
             </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', opacity: allAccess ? 0.5 : 1 }}>
               {HCC_PAGES.map(page => {
@@ -449,10 +450,10 @@ function AddUserModal({ onClose, onCreated, onToast }) {
 }
 
 // ── Shared style helpers ──────────────────────────────────────────────────────
-const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' };
-const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-input)', border: `1px solid var(--border)`, color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' };
+const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' };
+const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-input)', border: `1px solid var(--border)`, color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-sans)' };
 function btnStyle(bg, borderColor, color, bold = false) {
-  return { padding: '11px 20px', borderRadius: '10px', border: `1px solid ${borderColor}`, background: bg, color, fontSize: '13px', fontWeight: bold ? '800' : '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s' };
+  return { padding: '11px 20px', borderRadius: '10px', border: `1px solid ${borderColor}`, background: bg, color, fontSize: '13px', fontWeight: bold ? '800' : '600', cursor: 'pointer', fontFamily: 'var(--font-sans)', transition: 'all 0.15s' };
 }
 
 // ── Main Users Page ───────────────────────────────────────────────────────────
@@ -531,7 +532,7 @@ export default function UsersPage() {
   const isSA = me?.role === 'super_admin';
 
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ fontFamily: 'var(--font-sans)' }}>
       <Toast toast={toast} />
 
       {showAdd      && <AddUserModal onClose={() => setShowAdd(false)} onCreated={u => setUsers(us => [...us, u])} onToast={showToast} />}
@@ -542,16 +543,16 @@ export default function UsersPage() {
       {/* Page Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👥</div>
+          <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}><Icon name="users" /></div>
           <div>
-            <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>User Management</h1>
+            <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>User Management</h1>
             <p style={{ margin: '2px 0 0', fontSize: '13px', color: C.muted, fontWeight: '500' }}>{users.length} user{users.length !== 1 ? 's' : ''} registered</p>
           </div>
         </div>
         {isSA && (
           <button onClick={() => setShowAdd(true)} style={{
             display: 'flex', alignItems: 'center', gap: '8px', padding: '11px 20px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-            background: 'var(--accent)', color: 'white', fontSize: '14px', fontWeight: '800', fontFamily: 'inherit',
+            background: 'var(--accent)', color: 'white', fontSize: '14px', fontWeight: '700', fontFamily: 'inherit',
             boxShadow: '0 4px 12px var(--accent-glow)',
           }}>
             + Add User
@@ -569,13 +570,13 @@ export default function UsersPage() {
             border: 'none',
             borderBottom: activeTab === 'users' ? '2.5px solid var(--accent)' : '2.5px solid transparent',
             color: activeTab === 'users' ? 'var(--text-primary)' : 'var(--text-secondary)',
-            fontWeight: '800',
+            fontWeight: '700',
             fontSize: '14px',
             cursor: 'pointer',
             transition: 'all 0.15s',
           }}
         >
-          👤 Active Users
+          Active Users
         </button>
         <button
           onClick={() => setActiveTab('activity')}
@@ -585,13 +586,13 @@ export default function UsersPage() {
             border: 'none',
             borderBottom: activeTab === 'activity' ? '2.5px solid var(--accent)' : '2.5px solid transparent',
             color: activeTab === 'activity' ? 'var(--text-primary)' : 'var(--text-secondary)',
-            fontWeight: '800',
+            fontWeight: '700',
             fontSize: '14px',
             cursor: 'pointer',
             transition: 'all 0.15s',
           }}
         >
-          📜 Login Activity Logs
+          Login Activity Logs
         </button>
       </div>
 
@@ -602,7 +603,7 @@ export default function UsersPage() {
             <div style={{ width: '28px', height: '28px', border: '2px solid var(--accent)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
           </div>
         ) : (
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
             <div className="table-responsive">
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
               <thead>
@@ -624,7 +625,7 @@ export default function UsersPage() {
                       {/* User */}
                       <td style={{ padding: '16px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent-glow)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '800', color: 'var(--accent)', flexShrink: 0 }}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent-glow)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '700', color: 'var(--accent)', flexShrink: 0 }}>
                             {(u.name || u.email)[0].toUpperCase()}
                           </div>
                           <div>
@@ -635,8 +636,8 @@ export default function UsersPage() {
                       </td>
                       {/* Role */}
                       <td style={{ padding: '16px 20px' }}>
-                        <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', background: roleColor.bg, border: `1px solid ${roleColor.border}`, color: roleColor.text }}>
-                          {u.role === 'super_admin' ? '👑 Super Admin' : '👤 Staff'}
+                        <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '14px', fontSize: '12px', fontWeight: '700', background: roleColor.bg, border: `1px solid ${roleColor.border}`, color: roleColor.text }}>
+                          {u.role === 'super_admin' ? 'Super Admin' : 'Staff'}
                         </span>
                       </td>
                       {/* Pages */}
@@ -650,7 +651,7 @@ export default function UsersPage() {
                             ) : pages.map(pk => {
                                const page = HCC_PAGES.find(p => p.key === pk);
                                return (
-                                 <span key={pk} style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '20px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo }}>
+                                 <span key={pk} style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '14px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo }}>
                                    {page?.label || pk}
                                  </span>
                                );
@@ -673,14 +674,14 @@ export default function UsersPage() {
                       {isSA && (
                         <td style={{ padding: '16px 20px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                            <ActionBtn onClick={() => setEditingUser(u)} color="var(--text-primary)" bg="var(--bg-button-secondary)" label="✏️ Edit" />
-                            <ActionBtn onClick={() => setManagingUser(u)} color="var(--accent)" bg="rgba(129,140,248,0.08)" label="🔑 Access" />
-                            <ActionBtn onClick={() => setResetPinUser(u)} color="var(--text-secondary)" bg="var(--bg-button-secondary)" label="🔢 PIN" />
+                            <ActionBtn onClick={() => setEditingUser(u)} color="var(--text-primary)" bg="var(--bg-button-secondary)" label="Edit" />
+                            <ActionBtn onClick={() => setManagingUser(u)} color="var(--accent)" bg="rgba(129,140,248,0.08)" label="Access" />
+                            <ActionBtn onClick={() => setResetPinUser(u)} color="var(--text-secondary)" bg="var(--bg-button-secondary)" label="PIN" />
                             {u.role !== 'super_admin' && (
-                              <ActionBtn onClick={() => handleToggleActive(u)} color={u.active ? '#D97706' : C.green} bg={u.active ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)'} label={u.active ? '⏸ Disable' : '▶ Enable'} />
+                              <ActionBtn onClick={() => handleToggleActive(u)} color={u.active ? '#D97706' : C.green} bg={u.active ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)'} label={u.active ? 'Disable' : '▶ Enable'} />
                             )}
                             {String(u.id) !== String(me?.id) && u.role !== 'super_admin' && (
-                              <ActionBtn onClick={() => handleDelete(u)} color="#FC8181" bg="rgba(239,68,68,0.1)" label="🗑 Delete" />
+                              <ActionBtn onClick={() => handleDelete(u)} color="#FC8181" bg="rgba(239,68,68,0.1)" label="Delete" />
                             )}
                           </div>
                         </td>
@@ -699,8 +700,8 @@ export default function UsersPage() {
       ) : (
         /* Activity Logs UI */
         tableMissing ? (
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', padding: '40px 28px', textAlign: 'center' }}>
-            <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '18px' }}>⚠️ Setup Required</h3>
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '14px', padding: '40px 28px', textAlign: 'center' }}>
+            <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '18px' }}><Icon name="alert" />Setup Required</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '10px 0 20px', lineHeight: '1.6' }}>
               The activity logging table `hcc_login_activity` does not exist in your database yet. Run this script in your Supabase SQL Editor:
             </p>
@@ -733,7 +734,7 @@ ALTER TABLE public.hcc_login_activity ENABLE ROW LEVEL SECURITY;`}
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
               <input
                 type="text"
-                placeholder="🔍 Search email, name, IP, status..."
+                placeholder="Search email, name, IP, status..."
                 value={actSearch}
                 onChange={e => setActSearch(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && fetchActivity()}
@@ -754,12 +755,12 @@ ALTER TABLE public.hcc_login_activity ENABLE ROW LEVEL SECURITY;`}
                 disabled={actLoading}
                 style={{ ...btnStyle('var(--accent)', 'transparent', 'white', true) }}
               >
-                {actLoading ? '⏳ Loading...' : '🔄 Refresh'}
+                {actLoading ? 'Loading...' : 'Refresh'}
               </button>
             </div>
 
             {/* Table */}
-            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden' }}>
+            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '14px', overflow: 'hidden' }}>
               <div className="table-responsive">
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead>
@@ -780,7 +781,7 @@ ALTER TABLE public.hcc_login_activity ENABLE ROW LEVEL SECURITY;`}
                           </td>
                           <td style={{ padding: '14px 20px' }}>
                             <span style={{
-                              display: 'inline-block', padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '800',
+                              display: 'inline-block', padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '700',
                               backgroundColor: isSuccess ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
                               color: isSuccess ? 'var(--text-success)' : 'var(--text-error)',
                               border: `1px solid ${isSuccess ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`
@@ -819,7 +820,7 @@ function ActionBtn({ onClick, color, bg, label }) {
   return (
     <button onClick={onClick} style={{
       padding: '6px 12px', borderRadius: '8px', border: `1px solid var(--border)`,
-      background: bg, color, fontSize: '12px', fontWeight: '700', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+      background: bg, color, fontSize: '12px', fontWeight: '700', cursor: 'pointer', fontFamily: 'var(--font-sans)',
       whiteSpace: 'nowrap', transition: 'all 0.15s',
     }}>{label}</button>
   );

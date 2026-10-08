@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -8,26 +9,26 @@ const GREEN = '#2D7A3A';
 const TIER_CONFIG = {
   grand_sponsor: {
     label:   'Grand Sponsor',
-    emoji:   '🏆',
+    emoji:   <Icon name="trophy" />,
     color:   GOLD,
     glow:    'rgba(212,175,55,0.25)',
     tagline: 'Grand Sponsorship Confirmed',
     benefits: [
-      { icon: '📢', label: 'Logo Advertising',      value: 'Logo on Marketing Materials (Flyers, Web, Social)' },
-      { icon: '🏠', label: 'Dedicated Booth',        value: 'Booth Space (10×10) to showcase your brand' },
-      { icon: '🎤', label: 'On-Stage Announcement',  value: 'Live Recognition & Shout-out at India Fest 2026' },
-      { icon: '🏳️', label: 'Banner Display',        value: 'Your banner prominently displayed at the event' },
+      { icon: <Icon name="megaphone" />, label: 'Logo Advertising',      value: 'Logo on Marketing Materials (Flyers, Web, Social)' },
+      { icon: <Icon name="home" />, label: 'Dedicated Booth',        value: 'Booth Space (10×10) to showcase your brand' },
+      { icon: <Icon name="mic" />, label: 'On-Stage Announcement',  value: 'Live Recognition & Shout-out at India Fest 2026' },
+      { icon: <Icon name="flag" />, label: 'Banner Display',        value: 'Your banner prominently displayed at the event' },
     ],
   },
   basic_sponsor: {
     label:   'Basic Sponsor',
-    emoji:   '🌟',
+    emoji:   <Icon name="star" />,
     color:   GREEN,
     glow:    'rgba(45,122,58,0.25)',
     tagline: 'Basic Sponsorship Confirmed',
     benefits: [
-      { icon: '🏳️', label: 'Banner Display',        value: 'Placement Under the Main Stage' },
-      { icon: '🌐', label: 'Website Recognition',    value: 'Recognition on Event Website' },
+      { icon: <Icon name="flag" />, label: 'Banner Display',        value: 'Placement Under the Main Stage' },
+      { icon: <Icon name="globe" />, label: 'Website Recognition',    value: 'Recognition on Event Website' },
     ],
   },
 };
@@ -68,9 +69,9 @@ export default function SponsorSuccessClient() {
       }}>
 
         {/* Top badge */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: `${tier.glow}`, border: `1px solid ${tier.color}50`, padding: '6px 18px', borderRadius: '20px', marginBottom: '28px' }}>
-          <span style={{ fontSize: '16px' }}>🇮🇳</span>
-          <span style={{ fontSize: '12px', fontWeight: '800', color: tier.color, letterSpacing: '2px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: `${tier.glow}`, border: `1px solid ${tier.color}50`, padding: '6px 18px', borderRadius: '14px', marginBottom: '28px' }}>
+          <span style={{ fontSize: '16px' }}><Icon name="flag" /></span>
+          <span style={{ fontSize: '12px', fontWeight: '700', color: tier.color, letterSpacing: '0.6px', textTransform: 'uppercase' }}>Knoxville Hindu Community Center</span>
         </div>
 
         {/* Icon */}
@@ -86,10 +87,10 @@ export default function SponsorSuccessClient() {
         </div>
 
         {/* Headings */}
-        <h1 style={{ margin: '0 0 8px', fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: '900', letterSpacing: '-1.5px', lineHeight: 0.95, textTransform: 'uppercase', color: 'var(--text-primary)' }}>
-          Thank You! 🎊
+        <h1 style={{ margin: '0 0 8px', fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: '700', letterSpacing: '-1.5px', lineHeight: 0.95, textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+          Thank You! 
         </h1>
-        <h2 style={{ margin: '0 0 6px', fontSize: 'clamp(18px, 3.5vw, 28px)', fontWeight: '900', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+        <h2 style={{ margin: '0 0 6px', fontSize: 'clamp(18px, 3.5vw, 28px)', fontWeight: '700', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
           <span style={{ background: `linear-gradient(135deg, ${tier.color}, ${tier.color}BB)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             India Fest 2026
           </span>
@@ -105,14 +106,14 @@ export default function SponsorSuccessClient() {
         {/* Registration number */}
         {regNumber && (
           <div style={{
-            background: 'var(--bg-card)', border: `1px solid ${tier.color}40`, borderRadius: '18px',
-            padding: '28px', marginBottom: '20px',
+            background: 'var(--bg-card)', border: `1px solid ${tier.color}40`, borderRadius: '14px',
+            padding: '20px 22px', marginBottom: '20px',
             boxShadow: `0 0 40px ${tier.glow}`,
           }}>
-            <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px' }}>
               Your Sponsor Reference Number
             </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '28px', fontWeight: '900', color: tier.color, letterSpacing: '4px' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '28px', fontWeight: '700', color: tier.color, letterSpacing: '4px' }}>
               {regNumber}
             </div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '10px' }}>
@@ -123,16 +124,16 @@ export default function SponsorSuccessClient() {
 
         {/* What's included */}
         <div style={{
-          background: 'var(--bg-card)', border: `1px solid ${tier.color}25`, borderRadius: '18px',
-          padding: '24px', marginBottom: '20px', textAlign: 'left',
+          background: 'var(--bg-card)', border: `1px solid ${tier.color}25`, borderRadius: '14px',
+          padding: '16px 18px', marginBottom: '20px', textAlign: 'left',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '18px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '18px' }}>
             Your {tier.label} Benefits
           </div>
           {[
             ...tier.benefits,
-            { icon: '📅', label: 'Event Date', value: 'Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM' },
-            { icon: '📍', label: 'Location',   value: 'HCC — 8580 Hickory Creek Rd, Lenoir City, TN 37771' },
+            { icon: <Icon name="calendar" />, label: 'Event Date', value: 'Sunday, Aug 23, 2026 · 11:00 AM – 5:00 PM' },
+            { icon: <Icon name="pin" />, label: 'Location',   value: 'HCC — 8580 Hickory Creek Rd, Lenoir City, TN 37771' },
           ].map((item, i, arr) => (
             <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < arr.length - 1 ? '14px' : 0 }}>
               <span style={{ fontSize: '20px', flexShrink: 0, marginTop: '1px' }}>{item.icon}</span>
@@ -146,16 +147,16 @@ export default function SponsorSuccessClient() {
 
         {/* What's next */}
         <div style={{
-          background: 'var(--bg-card)', border: `1px solid ${tier.color}15`, borderRadius: '18px',
-          padding: '24px', marginBottom: '32px', textAlign: 'left',
+          background: 'var(--bg-card)', border: `1px solid ${tier.color}15`, borderRadius: '14px',
+          padding: '16px 18px', marginBottom: '32px', textAlign: 'left',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '18px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '18px' }}>
             What Happens Next
           </div>
           {[
-            { icon: '✅', title: 'Confirmation Email Sent',   desc: 'Check your inbox (and spam) for your sponsorship confirmation' },
-            { icon: '🎨', title: 'Branding Assets Request',   desc: 'Our team will reach out for your logo and branding materials' },
-            { icon: '🎊', title: 'See You at India Fest!',    desc: 'We look forward to celebrating with you on Aug 23, 2026' },
+            { icon: <Icon name="check" />, title: 'Confirmation Email Sent',   desc: 'Check your inbox (and spam) for your sponsorship confirmation' },
+            { icon: <Icon name="palette" />, title: 'Branding Assets Request',   desc: 'Our team will reach out for your logo and branding materials' },
+            { icon: <Icon name="sparkles" />, title: 'See You at India Fest!',    desc: 'We look forward to celebrating with you on Aug 23, 2026' },
           ].map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 2 ? '16px' : 0 }}>
               <span style={{ fontSize: '20px', flexShrink: 0 }}>{item.icon}</span>

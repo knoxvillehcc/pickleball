@@ -1,4 +1,5 @@
 'use client';
+import Icon from '@/components/Icon';
 import { useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -7,7 +8,7 @@ import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 const card = {
   backgroundColor: 'var(--bg-card)',
   border: '1px solid var(--border)',
-  borderRadius: '16px',
+  borderRadius: '14px',
   transition: 'all 0.3s',
 };
 
@@ -521,7 +522,7 @@ export default function StripeStatementPage() {
           { content: `Payout ${fmtDate(po.date)} — Deposited ${fmt(po.net)}`, colSpan: 5, styles: { fillColor: [30, 41, 59] } },
         ]],
         body: po.categories.map(c => [
-          c.category + (c.source === 'unmatched' ? ' ⚠️' : ''),
+          c.category + (c.source === 'unmatched' ? ' ' : ''),
           c.charges.toString(),
           fmt(c.gross),
           fmt(c.fees),
@@ -782,11 +783,11 @@ export default function StripeStatementPage() {
   };
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto' }}>
+    <div style={{ padding: '22px 24px', maxWidth: '1400px', margin: '0 auto' }}>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
-          💳 Payment Reports
+          Payment Reports
         </h1>
         <p style={{ color: 'var(--text-muted)', marginTop: '8px', fontSize: '14px' }}>
           View charges, deposits, fees, and category breakdown
@@ -799,36 +800,36 @@ export default function StripeStatementPage() {
           style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
             backgroundColor: topTab === 'statement' ? 'var(--accent)' : 'transparent',
             color: topTab === 'statement' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
-          🏦 Bank Statement
+          Bank Statement
         </button>
         <button onClick={() => setTopTab('deposits')}
           style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
             backgroundColor: topTab === 'deposits' ? 'var(--accent)' : 'transparent',
             color: topTab === 'deposits' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
-          🏦 Deposit Breakdown
+          Deposit Breakdown
         </button>
         <button onClick={() => setTopTab('cashcheck')}
           style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
             backgroundColor: topTab === 'cashcheck' ? 'var(--accent)' : 'transparent',
             color: topTab === 'cashcheck' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
-          💵 Cash/Check
+          Cash/Check
         </button>
         <button onClick={() => setTopTab('invoices')}
           style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
             backgroundColor: topTab === 'invoices' ? 'var(--accent)' : 'transparent',
             color: topTab === 'invoices' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
-          📋 Invoices
+          Invoices
         </button>
         <button onClick={() => setTopTab('fullreport')}
           style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
             backgroundColor: topTab === 'fullreport' ? 'var(--accent)' : 'transparent',
             color: topTab === 'fullreport' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
-          📈 Full Report
+          Full Report
         </button>
       </div>
 
       {/* Date Range Picker */}
-      <div style={{ ...card, padding: '24px', marginBottom: '24px' }}>
+      <div style={{ ...card, padding: '16px 18px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <div style={{ flex: '1', minWidth: '160px' }}>
             <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', letterSpacing: '0.5px', marginBottom: '6px', display: 'block', textTransform: 'uppercase' }}>
@@ -845,17 +846,17 @@ export default function StripeStatementPage() {
           {topTab === 'statement' ? (
             <>
               <button onClick={() => fetchStatement(false)} disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1, minWidth: '140px' }}>
-                {loading ? '⏳ Loading...' : '🔍 Generate'}
+                {loading ? 'Loading...' : 'Generate'}
               </button>
               {data && (
                 <>
-                  <button onClick={downloadPDF} style={btnSecondary}>📄 PDF</button>
-                  <button onClick={downloadCSV} style={btnSecondary}>📊 CSV</button>
+                  <button onClick={downloadPDF} style={btnSecondary}><Icon name="file" />PDF</button>
+                  <button onClick={downloadCSV} style={btnSecondary}><Icon name="chart" />CSV</button>
                   <button onClick={() => fetchStatement(true)} disabled={loading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
-                    🔄 Refresh
+                    Refresh
                   </button>
                   <span style={{ fontSize: '11px', color: data.source === 'cache' ? '#10B981' : '#818CF8', alignSelf: 'center', fontWeight: '600' }}>
-                    {data.source === 'cache' ? '⚡ Cached' : '☁️ Live'}
+                    {data.source === 'cache' ? 'Cached' : 'Live'}
                   </span>
                 </>
               )}
@@ -863,19 +864,19 @@ export default function StripeStatementPage() {
           ) : topTab === 'deposits' ? (
             <>
               <button onClick={() => fetchDeposits(false)} disabled={depositLoading} style={{ ...btnPrimary, opacity: depositLoading ? 0.6 : 1, minWidth: '160px' }}>
-                {depositLoading ? '⏳ Resolving...' : '🏦 Load Deposits'}
+                {depositLoading ? 'Resolving...' : 'Load Deposits'}
               </button>
               {depositData && (
                 <>
-                  <button onClick={downloadDepositPDF} style={btnSecondary}>📄 PDF</button>
-                  <button onClick={downloadDepositCSV} style={btnSecondary}>📊 CSV</button>
+                  <button onClick={downloadDepositPDF} style={btnSecondary}><Icon name="file" />PDF</button>
+                  <button onClick={downloadDepositCSV} style={btnSecondary}><Icon name="chart" />CSV</button>
                   {depositData.unmatchedCharges?.length > 0 && (
                     <button onClick={downloadUnmatchedCSV} style={{ ...btnSecondary, borderColor: 'rgba(251,191,36,0.4)', color: '#FBBF24' }}>
-                      ⚠️ Unmatched ({depositData.unmatchedCharges.length})
+                      Unmatched ({depositData.unmatchedCharges.length})
                     </button>
                   )}
                   <button onClick={() => fetchDeposits(true)} disabled={depositLoading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
-                    🔄 Refresh
+                    Refresh
                   </button>
                 </>
               )}
@@ -883,38 +884,38 @@ export default function StripeStatementPage() {
           ) : topTab === 'invoices' ? (
             <>
               <button onClick={fetchInvoices} disabled={invoiceLoading} style={{ ...btnPrimary, opacity: invoiceLoading ? 0.6 : 1, minWidth: '160px' }}>
-                {invoiceLoading ? '⏳ Loading...' : '📋 Load Invoices'}
+                {invoiceLoading ? 'Loading...' : 'Load Invoices'}
               </button>
               {invoiceData && (
                 <>
-                  <button onClick={downloadInvoicePDF} style={btnSecondary}>📄 PDF</button>
-                  <button onClick={downloadInvoiceCSV} style={btnSecondary}>📊 CSV</button>
+                  <button onClick={downloadInvoicePDF} style={btnSecondary}><Icon name="file" />PDF</button>
+                  <button onClick={downloadInvoiceCSV} style={btnSecondary}><Icon name="chart" />CSV</button>
                 </>
               )}
             </>
           ) : topTab === 'fullreport' ? (
             <>
               <button onClick={fetchFullReport} disabled={fullReportLoading} style={{ ...btnPrimary, opacity: fullReportLoading ? 0.6 : 1, minWidth: '200px' }}>
-                {fullReportLoading ? '⏳ Loading all sources...' : '📈 Generate Full Report'}
+                {fullReportLoading ? 'Loading all sources...' : 'Generate Full Report'}
               </button>
               {fullReport && (
-                <button onClick={downloadFullReportPDF} style={btnSecondary}>📄 Full PDF</button>
+                <button onClick={downloadFullReportPDF} style={btnSecondary}><Icon name="file" />Full PDF</button>
               )}
             </>
           ) : (
             <>
               <button onClick={() => fetchCashCheck(false)} disabled={cashCheckLoading} style={{ ...btnPrimary, opacity: cashCheckLoading ? 0.6 : 1, minWidth: '160px' }}>
-                {cashCheckLoading ? '⏳ Loading...' : '💵 Generate Report'}
+                {cashCheckLoading ? 'Loading...' : 'Generate Report'}
               </button>
               {cashCheckData && (
                 <>
-                  <button onClick={downloadCashCheckPDF} style={btnSecondary}>📄 PDF</button>
-                  <button onClick={downloadCashCheckCSV} style={btnSecondary}>📊 CSV</button>
+                  <button onClick={downloadCashCheckPDF} style={btnSecondary}><Icon name="file" />PDF</button>
+                  <button onClick={downloadCashCheckCSV} style={btnSecondary}><Icon name="chart" />CSV</button>
                   <button onClick={() => fetchCashCheck(true)} disabled={cashCheckLoading} style={{ ...btnSecondary, borderColor: 'rgba(99,102,241,0.4)', color: '#818CF8' }}>
-                    🔄 Refresh
+                    Refresh
                   </button>
                   <span style={{ fontSize: '11px', color: cashCheckData.source === 'cache' ? '#10B981' : '#818CF8', alignSelf: 'center', fontWeight: '600' }}>
-                    {cashCheckData.source === 'cache' ? '⚡ Cached' : '☁️ Live'}
+                    {cashCheckData.source === 'cache' ? 'Cached' : 'Live'}
                   </span>
                 </>
               )}
@@ -945,7 +946,7 @@ export default function StripeStatementPage() {
           {/* Loading */}
           {loading && (
             <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>💳</div>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}><Icon name="card" /></div>
               <p style={{ color: 'var(--text-muted)' }}>Fetching charges from Stripe...</p>
             </div>
           )}
@@ -983,13 +984,13 @@ export default function StripeStatementPage() {
                   style={{ ...btnSecondary, padding: '8px 20px', fontSize: '13px', borderRadius: '10px',
                     backgroundColor: view === 'daily' ? 'var(--accent)' : 'transparent',
                     color: view === 'daily' ? '#fff' : 'var(--text-muted)', border: 'none' }}>
-                  📅 Daily Summary
+                  Daily Summary
                 </button>
                 <button onClick={() => setView('transactions')}
                   style={{ ...btnSecondary, padding: '8px 20px', fontSize: '13px', borderRadius: '10px',
                     backgroundColor: view === 'transactions' ? 'var(--accent)' : 'transparent',
                     color: view === 'transactions' ? '#fff' : 'var(--text-muted)', border: 'none' }}>
-                  💳 All Transactions
+                  All Transactions
                 </button>
               </div>
 
@@ -1079,7 +1080,7 @@ export default function StripeStatementPage() {
           {/* Empty State */}
           {!data && !loading && (
             <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>💳</div>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}><Icon name="card" /></div>
               <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Select a date range</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Choose start and end dates, then click Generate to view your bank statement</p>
             </div>
@@ -1093,7 +1094,7 @@ export default function StripeStatementPage() {
           {/* Loading */}
           {depositLoading && (
             <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>🏦</div>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}><Icon name="bank" /></div>
               <p style={{ color: 'var(--text-muted)' }}>Resolving deposits and product categories...</p>
               <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '8px' }}>First load may take 30-60s while querying Stripe + Odoo POS</p>
             </div>
@@ -1133,7 +1134,7 @@ export default function StripeStatementPage() {
               {/* Overall Category Summary */}
               <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Category Summary</h3>
+                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}><Icon name="chart" />Category Summary</h3>
                   <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{depositData.summary.length} categories</span>
                 </div>
                 <div style={{ overflowX: 'auto' }}>
@@ -1153,7 +1154,7 @@ export default function StripeStatementPage() {
                           onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
                           onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
                           <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>
-                            {s.category === 'Unmatched' ? '⚠️ ' : ''}{s.category}
+                            {s.category === 'Unmatched' ? '' : ''}{s.category}
                           </td>
                           <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-table)' }}>
                             <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', fontWeight: '600',
@@ -1186,7 +1187,7 @@ export default function StripeStatementPage() {
                   <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                     <div>
                       <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                        🏦 {new Date(po.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(po.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                       <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '12px' }}>
                         {po.chargeCount} charges
@@ -1213,7 +1214,7 @@ export default function StripeStatementPage() {
                         {po.categories.map((c, i) => (
                           <tr key={c.category} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent' }}>
                             <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', borderBottom: '1px solid var(--border-table)' }}>
-                              {c.source === 'unmatched' ? '⚠️ ' : c.source === 'pos' ? '🏪 ' : '🌐 '}{c.category}
+                              {c.source === 'unmatched' ? '' : c.source === 'pos' ? '' : ''}{c.category}
                             </td>
                             <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.charges}</td>
                             <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.gross)}</td>
@@ -1232,7 +1233,7 @@ export default function StripeStatementPage() {
           {/* Empty State */}
           {!depositData && !depositLoading && (
             <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏦</div>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}><Icon name="bank" /></div>
               <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Deposit Breakdown</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Select a date range and click "Load Deposits" to see how each bank deposit breaks down by product category</p>
             </div>
@@ -1246,7 +1247,7 @@ export default function StripeStatementPage() {
           {/* Loading */}
           {cashCheckLoading && (
             <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>💵</div>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}><Icon name="money" /></div>
               <p style={{ color: 'var(--text-muted)' }}>Loading cash & check payments from Odoo POS...</p>
               <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '8px' }}>Resolving product categories from order lines</p>
             </div>
@@ -1258,12 +1259,12 @@ export default function StripeStatementPage() {
               {/* KPI Cards */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💵 Cash</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="money" />Cash</span>
                   <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(cashCheckData.totals.cash)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{cashCheckData.totals.cashCount} payments</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📝 Check</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="note" />Check</span>
                   <span style={{ color: '#818CF8', fontSize: '28px', fontWeight: '700' }}>{fmt(cashCheckData.totals.check)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{cashCheckData.totals.checkCount} payments</span>
                 </div>
@@ -1276,7 +1277,7 @@ export default function StripeStatementPage() {
 
               {/* Sub-tab toggle: Monthly / Daily / Transactions */}
               <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', ...card, padding: '4px', width: 'fit-content' }}>
-                {[['monthly', '📅 Monthly'], ['daily', '📆 Daily Summary'], ['transactions', '💳 All Transactions']].map(([key, label]) => (
+                {[['monthly', 'Monthly'], ['daily', 'Daily Summary'], ['transactions', 'All Transactions']].map(([key, label]) => (
                   <button key={key} onClick={() => setCashCheckView(key)}
                     style={{ ...btnSecondary, padding: '8px 18px', fontSize: '13px', borderRadius: '10px',
                       backgroundColor: cashCheckView === key ? 'var(--accent)' : 'transparent',
@@ -1292,7 +1293,7 @@ export default function StripeStatementPage() {
                   {/* Category Summary Table */}
                   <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
                     <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Category Summary</h3>
+                      <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}><Icon name="chart" />Category Summary</h3>
                       <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cashCheckData.summary.length} categories</span>
                     </div>
                     <div style={{ overflowX: 'auto' }}>
@@ -1342,22 +1343,22 @@ export default function StripeStatementPage() {
                       <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                         <div>
                           <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                            📅 {mo.label}
+                            {mo.label}
                           </span>
                           <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '12px' }}>
                             {mo.totalCount} payments
                           </span>
                         </div>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '13px', color: '#4ade80', fontFamily: 'monospace', fontWeight: '500' }}>💵 {fmt(mo.cashTotal)}</span>
-                          <span style={{ fontSize: '13px', color: '#818CF8', fontFamily: 'monospace' }}>📝 {fmt(mo.checkTotal)}</span>
+                          <span style={{ fontSize: '13px', color: '#4ade80', fontFamily: 'monospace', fontWeight: '500' }}><Icon name="money" />{fmt(mo.cashTotal)}</span>
+                          <span style={{ fontSize: '13px', color: '#818CF8', fontFamily: 'monospace' }}><Icon name="note" />{fmt(mo.checkTotal)}</span>
                           <span style={{ fontSize: '15px', color: 'var(--accent)', fontFamily: 'monospace', fontWeight: '700' }}>Total: {fmt(mo.total)}</span>
                         </div>
                       </div>
 
                       {mo.cashCategories.length > 0 && (
                         <div style={{ padding: '12px 20px 0' }}>
-                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ade80', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💵 Cash — {mo.cashCount} payments</span>
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#4ade80', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="money" />Cash — {mo.cashCount} payments</span>
                         </div>
                       )}
                       {mo.cashCategories.length > 0 && (
@@ -1387,7 +1388,7 @@ export default function StripeStatementPage() {
 
                       {mo.checkCategories.length > 0 && (
                         <div style={{ padding: '12px 20px 0' }}>
-                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#818CF8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📝 Check — {mo.checkCount} payments</span>
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#818CF8', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="note" />Check — {mo.checkCount} payments</span>
                         </div>
                       )}
                       {mo.checkCategories.length > 0 && (
@@ -1423,7 +1424,7 @@ export default function StripeStatementPage() {
               {cashCheckView === 'daily' && cashCheckData.dailySummary && (
                 <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
                   <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📆 Daily Summary</h3>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}><Icon name="calendar" />Daily Summary</h3>
                     <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cashCheckData.dailySummary.length} days</span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
@@ -1470,7 +1471,7 @@ export default function StripeStatementPage() {
               {cashCheckView === 'transactions' && cashCheckData.transactions && (
                 <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
                   <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>💳 All Transactions</h3>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}><Icon name="card" />All Transactions</h3>
                     <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cashCheckData.transactions.length} payments</span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
@@ -1496,7 +1497,7 @@ export default function StripeStatementPage() {
                               <span style={{ fontSize: '11px', fontWeight: '600', padding: '3px 10px', borderRadius: '6px',
                                 backgroundColor: tx.method === 'Cash' ? 'rgba(74, 222, 128, 0.12)' : 'rgba(129, 140, 248, 0.12)',
                                 color: tx.method === 'Cash' ? '#4ade80' : '#818CF8' }}>
-                                {tx.method === 'Cash' ? '💵' : '📝'} {tx.method}
+                                {tx.method === 'Cash' ? <Icon name="money" /> : <Icon name="note" />} {tx.method}
                               </span>
                             </td>
                             <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>{fmt(tx.amount)}</td>
@@ -1515,7 +1516,7 @@ export default function StripeStatementPage() {
           {/* Empty State */}
           {!cashCheckData && !cashCheckLoading && (
             <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>💵</div>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}><Icon name="money" /></div>
               <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Cash & Check Report</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Select a date range and click &quot;Generate Report&quot; to see cash and check payments grouped by month and product category</p>
             </div>
@@ -1528,7 +1529,7 @@ export default function StripeStatementPage() {
         <>
           {invoiceLoading && (
             <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>📋</div>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}><Icon name="clipboard" /></div>
               <p style={{ color: 'var(--text-muted)' }}>Loading non-POS invoices from Odoo...</p>
             </div>
           )}
@@ -1538,12 +1539,12 @@ export default function StripeStatementPage() {
               {/* KPI Cards */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>✅ Paid</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="check" />Paid</span>
                   <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(invoiceData.totals.paid)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{invoiceData.totals.countPaid} invoices</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏳ Unpaid</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Unpaid</span>
                   <span style={{ color: '#f87171', fontSize: '28px', fontWeight: '700' }}>{fmt(invoiceData.totals.unpaid)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{invoiceData.totals.countUnpaid} invoices</span>
                 </div>
@@ -1558,7 +1559,7 @@ export default function StripeStatementPage() {
               {invoiceData.categorySummary && invoiceData.categorySummary.length > 0 && (
                 <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
                   <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Category Summary</h3>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}><Icon name="chart" />Category Summary</h3>
                     <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{invoiceData.categorySummary.length} categories</span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
@@ -1591,7 +1592,7 @@ export default function StripeStatementPage() {
               {/* Invoice List */}
               <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📋 All Invoices</h3>
+                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}><Icon name="clipboard" />All Invoices</h3>
                   <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{invoiceData.invoices.length} invoices</span>
                 </div>
                 <div style={{ overflowX: 'auto' }}>
@@ -1633,7 +1634,7 @@ export default function StripeStatementPage() {
 
           {!invoiceData && !invoiceLoading && (
             <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}><Icon name="clipboard" /></div>
               <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Non-POS Invoices</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Shows invoices not captured by POS or Stripe — sale orders, facility rentals, manual invoices</p>
             </div>
@@ -1646,7 +1647,7 @@ export default function StripeStatementPage() {
         <>
           {fullReportLoading && (
             <div style={{ ...card, padding: '60px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>📈</div>
+              <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}><Icon name="trending" /></div>
               <p style={{ color: 'var(--text-muted)' }}>Loading Stripe + Cash/Check + Invoices...</p>
             </div>
           )}
@@ -1659,7 +1660,7 @@ export default function StripeStatementPage() {
                 {/* Grand Summary KPI */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💳 Stripe Gross</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="card" />Stripe Gross</span>
                     <span style={{ color: '#818CF8', fontSize: '24px', fontWeight: '700' }}>{fmt(t.stripeGross)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.stripeCount} charges</span>
                   </div>
@@ -1669,17 +1670,17 @@ export default function StripeStatementPage() {
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.stripeGross > 0 ? ((t.stripeFees / t.stripeGross) * 100).toFixed(2) : 0}% rate</span>
                   </div>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💵 Cash</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="money" />Cash</span>
                     <span style={{ color: '#4ade80', fontSize: '24px', fontWeight: '700' }}>{fmt(t.totalCash)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.cashCount} payments</span>
                   </div>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📝 Check</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="note" />Check</span>
                     <span style={{ color: '#FBBF24', fontSize: '24px', fontWeight: '700' }}>{fmt(t.totalCheck)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.checkCount} payments</span>
                   </div>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📋 Invoices</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="clipboard" />Invoices</span>
                     <span style={{ color: '#38BDF8', fontSize: '24px', fontWeight: '700' }}>{fmt(t.invPaid + t.invUnpaid)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.invCount} invoices ({t.invUnpaid > 0 ? fmt(t.invUnpaid) + ' unpaid' : 'all paid'})</span>
                   </div>
@@ -1693,7 +1694,7 @@ export default function StripeStatementPage() {
                 {/* Revenue Source Breakdown Table */}
                 <div style={{ ...card, overflow: 'hidden', marginBottom: '24px' }}>
                   <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
-                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>📊 Revenue by Source</h3>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}><Icon name="chart" />Revenue by Source</h3>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -1706,11 +1707,11 @@ export default function StripeStatementPage() {
                       </thead>
                       <tbody>
                         {[
-                          { src: '💳 Stripe (Card)', count: t.stripeCount, gross: t.stripeGross, fees: t.stripeFees, net: t.stripeNet, color: '#818CF8' },
-                          { src: '💵 Cash (POS)', count: t.cashCount, gross: t.totalCash, fees: 0, net: t.totalCash, color: '#4ade80' },
-                          { src: '📝 Check (POS)', count: t.checkCount, gross: t.totalCheck, fees: 0, net: t.totalCheck, color: '#FBBF24' },
-                          { src: '📋 Invoices (Paid)', count: '', gross: t.invPaid, fees: 0, net: t.invPaid, color: '#38BDF8' },
-                          { src: '📋 Invoices (Unpaid)', count: '', gross: t.invUnpaid, fees: 0, net: t.invUnpaid, color: '#f87171' },
+                          { src: 'Stripe (Card)', count: t.stripeCount, gross: t.stripeGross, fees: t.stripeFees, net: t.stripeNet, color: '#818CF8' },
+                          { src: 'Cash (POS)', count: t.cashCount, gross: t.totalCash, fees: 0, net: t.totalCash, color: '#4ade80' },
+                          { src: 'Check (POS)', count: t.checkCount, gross: t.totalCheck, fees: 0, net: t.totalCheck, color: '#FBBF24' },
+                          { src: 'Invoices (Paid)', count: '', gross: t.invPaid, fees: 0, net: t.invPaid, color: '#38BDF8' },
+                          { src: 'Invoices (Unpaid)', count: '', gross: t.invUnpaid, fees: 0, net: t.invUnpaid, color: '#f87171' },
                         ].map((r, i) => (
                           <tr key={r.src} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent' }}>
                             <td style={{ padding: '12px 16px', color: r.color, fontSize: '14px', fontWeight: '600', borderBottom: '1px solid var(--border-table)' }}>{r.src}</td>
@@ -1741,7 +1742,7 @@ export default function StripeStatementPage() {
                   return (
                     <div key={mk} style={{ ...card, overflow: 'hidden', marginBottom: '16px' }}>
                       <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.04))' }}>
-                        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>📅 {label}</h3>
+                        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}><Icon name="calendar" />{label}</h3>
                         <span style={{ fontSize: '16px', fontWeight: '700', color: 'var(--accent)', fontFamily: 'monospace' }}>{fmt(moTotal)}</span>
                       </div>
                       <div style={{ overflowX: 'auto' }}>
@@ -1870,7 +1871,7 @@ export default function StripeStatementPage() {
 
           {!fullReport && !fullReportLoading && (
             <div style={{ ...card, padding: '80px', textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📈</div>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}><Icon name="trending" /></div>
               <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Full Monthly Revenue Report</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Combines Stripe + Cash/Check + Invoices into one unified report with month-by-month breakdown</p>
             </div>
