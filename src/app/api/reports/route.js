@@ -1,10 +1,63 @@
 import { NextResponse } from 'next/server';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
 import { getSessionAndPermissions } from '@/lib/auth';
+import { getSnapshot } from '@/lib/membershipSync';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
+  const auth = await getSessionAndPermissions('reports');
+  if (!auth.success) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
+
+  try {
+    const snap = await getSnapshot();
+    if (!snap.missing && snap.rows.length > 0) {
+      const summary = {};
+      // Revenue: every payment received for that level (including earlier memberships that were upgraded)
+      for (const r of snap.rows) {
+        if (!r.counts_toward_revenue) continue;
+        if (!summary[r.level]) summary[r.level] = { count: 0, revenue: 0 };
+        summary[r.level].revenue += Number(r.amount || 0);
+      }
+      const results = [];
+      for (const r of snap.rows) {
+        if (!r.is_current) continue;
+        if (!summary[r.level]) summary[r.level] = { count: 0, revenue: 0 };
+        summary[r.level].count += 1;
+        results.push({
+          id: String(r.history_id),
+          order: r.order_name || r.pos_order_name || '',
+          customerId: r.partner_id,
+          customer: r.partner_name || 'Unknown',
+          type: r.level,
+          status: r.status,
+          date: r.start_date || 'Unknown',
+          endDate: r.end_date || null,
+          amount: Number(r.amount || 0),
+          invoice: r.invoice_name || null,
+          invoicePaymentState: r.invoice_payment_state || null,
+          refunded: !!r.refunded,
+          odooUpdatedAt: r.odoo_updated_at || null,
+          history: Array.isArray(r.history) ? r.history : [],
+        });
+      }
+      results.sort((a, b) => a.type.localeCompare(b.type) || a.customer.localeCompare(b.customer));
+      return NextResponse.json({
+        success: true, source: 'snapshot', summary, results,
+        lastSyncedAt: snap.log?.last_synced_at || null,
+        syncedBy: snap.log?.synced_by || null,
+        meta: snap.log?.meta || null,
+      });
+    }
+  } catch (e) {
+    console.warn('[reports] snapshot unavailable, using live Odoo:', e.message);
+  }
+  return legacyGet(request);
+}
+
+async function legacyGet(request) {
   const auth = await getSessionAndPermissions('reports');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });

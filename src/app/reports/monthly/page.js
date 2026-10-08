@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import SyncBar from '@/components/SyncBar';
 
 const card = {
   backgroundColor: 'var(--bg-card)',
@@ -38,6 +39,12 @@ export default function MonthlyReportPage() {
   const [loading, setLoading]   = useState(true);
   const [expanded, setExpanded] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
+  const [lastSyncedAt, setLastSyncedAt] = useState(null);
+
+  const reload = async () => {
+    const d = await fetch('/api/reports/monthly').then(r => r.json());
+    if (d.success) { setData({ months: d.months, summary: d.summary, results: d.results }); setLastSyncedAt(d.lastSyncedAt || null); }
+  };
 
   useEffect(() => {
     fetch('/api/reports/monthly')
@@ -45,6 +52,7 @@ export default function MonthlyReportPage() {
       .then(d => {
         if (d.success) {
           setData({ months: d.months, summary: d.summary, results: d.results });
+          setLastSyncedAt(d.lastSyncedAt || null);
           // Expand the first (newest) month by default
           const first = Object.keys(d.months)[0];
           if (first) setExpanded({ [first]: true });
@@ -175,6 +183,7 @@ export default function MonthlyReportPage() {
             Download PDF Report
           </button>
         )}
+        <SyncBar scope="monthly" onSynced={reload} externalStamp={lastSyncedAt} />
       </div>
 
       {/* Loading */}
@@ -334,14 +343,17 @@ export default function MonthlyReportPage() {
                               onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent'}
                             >
                               <td style={{ padding: '12px 20px', textAlign: 'center', fontWeight: '700', color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
-                              <td style={{ padding: '12px 20px', fontWeight: '700', color: 'var(--text-primary)' }}>{row.customer}</td>
+                              <td style={{ padding: '12px 20px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                                {row.customer}
+                                {row.note && <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', marginTop: '3px' }}>{row.note}</div>}
+                              </td>
                               <td style={{ padding: '12px 20px', fontWeight: '600' }}>
                                 <span style={{ backgroundColor: `rgba(${hexToRgb(c1)},0.12)`, color: c2, fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px', border: `1px solid rgba(${hexToRgb(c1)},0.25)` }}>
                                   {row.type}
                                 </span>
                               </td>
                               <td style={{ padding: '12px 20px', fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-muted)' }}>{row.order}</td>
-                              <td style={{ padding: '12px 20px', color: 'var(--text-secondary)' }}>{row.date}</td>
+                              <td style={{ padding: '12px 20px', color: 'var(--text-secondary)' }}>{formatMMDDYYYY(row.date)}</td>
                               <td style={{ padding: '12px 20px', textAlign: 'right', fontWeight: '800', color: 'var(--text-success)' }}>${(row.amount || 0).toFixed(2)}</td>
                             </tr>
                           ))}

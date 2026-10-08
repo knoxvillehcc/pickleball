@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import SyncBar from '@/components/SyncBar';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const PERMISSIONS = {
@@ -859,28 +860,11 @@ export default function PnLPage() {
           </div>
           <p style={{ margin: '6px 0 0', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500 }}>
             Product Category Profit & Loss &nbsp;·&nbsp; {startDate} → {endDate}
-            {lastSync && (
-              <span style={{ marginLeft: 12, color: 'var(--text-muted)', fontSize: 11 }}>
-                Last sync: {new Date(lastSync).toLocaleTimeString()}
-              </span>
-            )}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
           {canRefresh && (
-            <button
-              className="pnl-btn"
-              onClick={() => { fetchData(); logAudit('refresh_data'); }}
-              disabled={loading}
-              style={{
-                padding: '10px 18px', borderRadius: 10, border: '1px solid var(--border)',
-                background: 'var(--bg-input)', color: 'var(--text-secondary)',
-                fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: 8,
-              }}
-            >
-              {loading ? <Spinner size={14} /> : '↻'} Refresh
-            </button>
+            <SyncBar scope="pnl" onSynced={() => { fetchData(); logAudit('refresh_data'); }} />
           )}
           {canExport && (
             <>

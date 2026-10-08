@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import SyncBar from '@/components/SyncBar';
 
 const card = {
   backgroundColor: 'var(--bg-card)',
@@ -33,7 +34,7 @@ export default function ReportsPage() {
   useEffect(() => {
     fetch('/api/reports')
       .then(r => r.json())
-      .then(d => { if (d.success) setData({ summary: d.summary, results: d.results }); })
+      .then(d => { if (d.success) setData({ summary: d.summary, results: d.results, meta: d.meta, lastSyncedAt: d.lastSyncedAt }); })
       .catch(console.error)
       .finally(() => setLoading(false));
     fetch('/api/auth/me')
@@ -41,6 +42,11 @@ export default function ReportsPage() {
       .then(d => setCurrentUser(d.user || null))
       .catch(() => {});
   }, []);
+
+  const reload = async () => {
+    const d = await fetch('/api/reports').then(r => r.json());
+    if (d.success) setData({ summary: d.summary, results: d.results, meta: d.meta, lastSyncedAt: d.lastSyncedAt });
+  };
 
   const downloadPDF = async () => {
     try {
@@ -174,6 +180,7 @@ export default function ReportsPage() {
             Complete overview of all active memberships, revenue, and subscription details.
           </p>
         </div>
+        <SyncBar scope="membership" onSynced={reload} externalStamp={data.lastSyncedAt} />
         {!loading && data.results.length > 0 && (
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button onClick={downloadPDF} style={{
@@ -226,11 +233,19 @@ export default function ReportsPage() {
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-success)" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>Total Revenue Collected</div>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>All Membership Payments Received</div>
                 <div style={{ fontSize: '32px', fontWeight: '950', color: 'var(--text-success)', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
               </div>
             </div>
           </div>
+
+          {data.meta && (data.meta.unpaid_invoice_count > 0 || data.meta.refunded_active_count > 0) && (
+            <div style={{ ...card, padding: '14px 20px', borderLeft: '4px solid #d97706', fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.6 }}>
+              Revenue counts all membership payments received, including earlier levels that were upgraded.
+              {data.meta.unpaid_invoice_count > 0 && <> {data.meta.unpaid_invoice_count} unpaid invoice(s) totaling ${Number(data.meta.unpaid_invoice_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} are not included.</>}
+              {data.meta.refunded_active_count > 0 && <> {data.meta.refunded_active_count} membership(s) with a refunded invoice are still marked active in Odoo and are not counted as revenue.</>}
+            </div>
+          )}
 
           {/* Summary Cards per Type */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
@@ -266,7 +281,7 @@ export default function ReportsPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>
-                    {[['Customer Name','left'],['Subscription Type','left'],['Order Ref','left'],['Start Date','left'],['Amount','right']].map(([h, align]) => (
+                    {[['Customer Name','left'],['Subscription Type','left'],['Order Ref','left'],['Start Date','left'],['Updated in Odoo','left'],['Amount','right']].map(([h, align]) => (
                       <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '1.5px', textAlign: align }}>{h}</th>
                     ))}
                   </tr>
@@ -278,15 +293,24 @@ export default function ReportsPage() {
                       onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
                       onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent'}
                     >
-                      <td style={{ padding: '14px 24px', fontWeight: '700', color: 'var(--text-primary)' }}>{row.customer}</td>
+                      <td style={{ padding: '14px 24px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                        {row.customer}
+                        {(row.history || []).map((h, hi) => (
+                          <div key={hi} style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', marginTop: '3px' }}>
+                            Earlier: {h.level} ({h.status}) {formatMMDDYYYY(h.start_date)} to {formatMMDDYYYY(h.end_date)}
+                            {h.invoice_payment_state === 'not_paid' ? ' - invoice unpaid' : ''}
+                          </div>
+                        ))}
+                      </td>
                       <td style={{ padding: '14px 24px', color: 'var(--accent)', fontWeight: '600' }}>{row.type}</td>
                       <td style={{ padding: '14px 24px', fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-muted)' }}>{row.order}</td>
-                      <td style={{ padding: '14px 24px', color: 'var(--text-secondary)' }}>{row.date}</td>
+                      <td style={{ padding: '14px 24px', color: 'var(--text-secondary)' }}>{formatMMDDYYYY(row.date)}</td>
+                      <td style={{ padding: '14px 24px', color: 'var(--text-secondary)' }}>{row.odooUpdatedAt ? formatMMDDYYYY(row.odooUpdatedAt) : '—'}</td>
                       <td style={{ padding: '14px 24px', textAlign: 'right', fontWeight: '800', color: 'var(--text-success)' }}>${(row.amount||0).toFixed(2)}</td>
                     </tr>
                   ))}
                   {data.results.length === 0 && (
-                    <tr><td colSpan={5} style={{ padding: '80px 24px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '600' }}>No active subscriptions found.</td></tr>
+                    <tr><td colSpan={6} style={{ padding: '80px 24px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '600' }}>No active subscriptions found.</td></tr>
                   )}
                 </tbody>
               </table>
