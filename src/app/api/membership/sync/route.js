@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, isMembershipViewOnly } from '@/lib/auth';
 import { buildMembershipSnapshot, saveSnapshot, writeSyncLog, getSyncLog } from '@/lib/membershipSync';
 
 export const dynamic = 'force-dynamic';
@@ -33,6 +33,9 @@ export async function POST(request) {
   if (!SCOPES[scope]) return NextResponse.json({ success: false, error: 'Unknown scope' }, { status: 400 });
   const auth = await getSessionAndPermissions(SCOPES[scope]);
   if (!auth.success) return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  if (isMembershipViewOnly(auth.user)) {
+    return NextResponse.json({ success: false, error: 'View-only access: sync is not permitted' }, { status: 403 });
+  }
 
   const by = auth.user?.name || auth.user?.email || 'Admin';
   const started = Date.now();

@@ -30,6 +30,21 @@ export default function ReportsPage() {
   const [data,    setData]    = useState({ summary: {}, results: [] });
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+  const [query, setQuery] = useState('');
+
+  // Users flagged 'reports-view-only' can view and search but not export or sync.
+  const viewOnly = !!currentUser && currentUser.role !== 'super_admin'
+    && Array.isArray(currentUser.allowedPages)
+    && !currentUser.allowedPages.includes('*')
+    && currentUser.allowedPages.includes('reports-view-only');
+
+  const digitsOf = (s) => String(s || '').replace(/\D/g, '');
+  const q = query.trim().toLowerCase();
+  const qDigits = digitsOf(query);
+  const filteredResults = !q ? data.results : data.results.filter((r) =>
+    String(r.customer || '').toLowerCase().includes(q) ||
+    (qDigits.length > 0 && digitsOf(r.phone).includes(qDigits))
+  );
 
   useEffect(() => {
     fetch('/api/reports')
@@ -88,14 +103,14 @@ export default function ReportsPage() {
 
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 10,
-        head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Start Date (MM-DD-YYYY)', 'Amount']],
-        body: data.results.map(r => [r.customer, r.type, r.order, formatMMDDYYYY(r.date), '$' + (r.amount||0).toFixed(2)]),
+        head: [['Customer Name', 'Phone', 'Subscription Type', 'Order Ref', 'Start Date (MM-DD-YYYY)', 'Amount']],
+        body: data.results.map(r => [r.customer, r.phone || '', r.type, r.order, formatMMDDYYYY(r.date), '$' + (r.amount||0).toFixed(2)]),
         theme: 'striped',
         headStyles: { fillColor: [15, 23, 42] },
         styles: { fontSize: 8, cellPadding: 1.2 },
         alternateRowStyles: { fillColor: [230, 235, 240] },
         margin: { top: 10, bottom: 8, left: 10, right: 10 },
-        columnStyles: { 0:{cellWidth:60}, 1:{cellWidth:100}, 2:{cellWidth:40}, 3:{cellWidth:35}, 4:{cellWidth:30,halign:'right'} },
+        columnStyles: { 0:{cellWidth:55}, 1:{cellWidth:32}, 2:{cellWidth:70}, 3:{cellWidth:30}, 4:{cellWidth:30}, 5:{cellWidth:25,halign:'right'} },
       });
 
       await exportPdfWithNativeShare(doc, 'Membership_Report_' + dateStr + '.pdf');
@@ -142,14 +157,14 @@ export default function ReportsPage() {
       // Detail without amount column
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 10,
-        head: [['Customer Name', 'Subscription Type', 'Order Ref', 'Start Date (MM-DD-YYYY)']],
-        body: data.results.map(r => [r.customer, r.type, r.order, formatMMDDYYYY(r.date)]),
+        head: [['Customer Name', 'Phone', 'Subscription Type', 'Order Ref', 'Start Date (MM-DD-YYYY)']],
+        body: data.results.map(r => [r.customer, r.phone || '', r.type, r.order, formatMMDDYYYY(r.date)]),
         theme: 'striped',
         headStyles: { fillColor: [15, 23, 42] },
         styles: { fontSize: 8, cellPadding: 1.2 },
         alternateRowStyles: { fillColor: [230, 235, 240] },
         margin: { top: 10, bottom: 8, left: 10, right: 10 },
-        columnStyles: { 0:{cellWidth:70}, 1:{cellWidth:100}, 2:{cellWidth:45}, 3:{cellWidth:40} },
+        columnStyles: { 0:{cellWidth:62}, 1:{cellWidth:35}, 2:{cellWidth:80}, 3:{cellWidth:40}, 4:{cellWidth:35} },
       });
 
       await exportPdfWithNativeShare(doc, 'Member_Directory_' + dateStr + '.pdf');
@@ -167,12 +182,12 @@ export default function ReportsPage() {
         ...card,
         background: 'var(--bg-card)',
         borderColor: 'var(--border)',
-        padding: '22px 24px', position: 'relative', overflow: 'hidden',
+        padding: '16px 20px', position: 'relative', overflow: 'hidden',
         boxShadow: 'var(--shadow)',
-        display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px',
+        display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
       }}>
         <div style={{ position: 'relative' }}>
-          <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
+          <h1 style={{ margin: 0, fontSize: '26px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
             Membership{' '}
             <span style={{ background: 'linear-gradient(135deg, var(--accent) 30%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Reports</span>
           </h1>
@@ -180,28 +195,28 @@ export default function ReportsPage() {
             Complete overview of all active memberships, revenue, and subscription details.
           </p>
         </div>
-        <SyncBar scope="membership" onSynced={reload} externalStamp={data.lastSyncedAt} />
-        {!loading && data.results.length > 0 && (
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <SyncBar scope="membership" onSynced={reload} externalStamp={data.lastSyncedAt} readOnly={viewOnly} />
+        {!loading && !viewOnly && data.results.length > 0 && (
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <button onClick={downloadPDF} style={{
               background: 'var(--accent)',
-              color: 'white', fontWeight: '700', fontSize: '14px',
-              padding: '12px 28px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: '10px',
+              color: 'white', fontWeight: '700', fontSize: '13px',
+              padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '7px',
               boxShadow: '0 4px 12px var(--accent-glow)',
               position: 'relative', zIndex: 1,
             }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
               Download PDF Report
             </button>
             <button onClick={downloadPDFNoPrice} style={{
               background: 'transparent',
-              color: 'var(--accent)', fontWeight: '700', fontSize: '14px',
-              padding: '12px 28px', borderRadius: '12px', border: '2px solid var(--accent)', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: '10px',
+              color: 'var(--accent)', fontWeight: '700', fontSize: '13px',
+              padding: '8px 16px', borderRadius: '10px', border: '1.5px solid var(--accent)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '7px',
               position: 'relative', zIndex: 1,
             }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
               Export Without Prices
             </button>
           </div>
@@ -239,14 +254,6 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {data.meta && (data.meta.unpaid_invoice_count > 0 || data.meta.refunded_active_count > 0) && (
-            <div style={{ ...card, padding: '14px 20px', borderLeft: '4px solid #d97706', fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.6 }}>
-              Revenue counts all membership payments received, including earlier levels that were upgraded.
-              {data.meta.unpaid_invoice_count > 0 && <> {data.meta.unpaid_invoice_count} unpaid invoice(s) totaling ${Number(data.meta.unpaid_invoice_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} are not included.</>}
-              {data.meta.refunded_active_count > 0 && <> {data.meta.refunded_active_count} membership(s) with a refunded invoice are still marked active in Odoo and are not counted as revenue.</>}
-            </div>
-          )}
-
           {/* Summary Cards per Type */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
             {Object.entries(data.summary).map(([type, stats]) => (
@@ -272,8 +279,20 @@ export default function ReportsPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>Member Detail</h2>
                 <span style={{ backgroundColor: 'var(--bg-badge-pill)', color: 'var(--text-badge-pill)', fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '9999px', border: '1px solid var(--border-badge-pill)' }}>
-                  {data.results.length} records
+                  {q ? `${filteredResults.length} of ${data.results.length}` : data.results.length} records
                 </span>
+              </div>
+              <div style={{ position: 'relative', flex: '0 1 340px', minWidth: '220px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                <input
+                  id="membership-search"
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search by name or phone number"
+                  autoComplete="off"
+                  style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px 10px 38px', borderRadius: '10px', border: '1px solid var(--border)', backgroundColor: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: '13.5px', fontWeight: 500, outline: 'none' }}
+                />
               </div>
             </div>
 
@@ -281,13 +300,13 @@ export default function ReportsPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ backgroundColor: 'var(--bg-table-header)', borderBottom: '1px solid var(--border-table)' }}>
-                    {[['Customer Name','left'],['Subscription Type','left'],['Order Ref','left'],['Start Date','left'],['Updated in Odoo','left'],['Amount','right']].map(([h, align]) => (
+                    {[['Customer Name','left'],['Phone','left'],['Subscription Type','left'],['Order Ref','left'],['Start Date','left'],['Updated in Odoo','left'],['Amount','right']].map(([h, align]) => (
                       <th key={h} style={{ padding: '14px 24px', fontSize: '11px', fontWeight: '700', color: 'var(--text-table-header)', textTransform: 'uppercase', letterSpacing: '0.6px', textAlign: align }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {data.results.map((row, i) => (
+                  {filteredResults.map((row, i) => (
                     <tr key={row.id || i}
                       style={{ borderBottom: '1px solid var(--border-table)', backgroundColor: i % 2 !== 0 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
                       onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
@@ -295,13 +314,20 @@ export default function ReportsPage() {
                     >
                       <td style={{ padding: '14px 24px', fontWeight: '700', color: 'var(--text-primary)' }}>
                         {row.customer}
-                        {(row.history || []).map((h, hi) => (
-                          <div key={hi} style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', marginTop: '3px' }}>
-                            Earlier: {h.level} ({h.status}) {formatMMDDYYYY(h.start_date)} to {formatMMDDYYYY(h.end_date)}
-                            {h.invoice_payment_state === 'not_paid' ? ' - invoice unpaid' : ''}
-                          </div>
-                        ))}
+                        {(row.history || []).map((h, hi) => {
+                          const upgraded = h.level && h.level !== row.type;
+                          const invs = [h.invoice_name, row.invoice].filter(Boolean).join(' / ');
+                          return (
+                            <div key={hi} style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', marginTop: '3px' }}>
+                              {upgraded
+                                ? <>Upgraded from {h.level} to {row.type}{invs ? ` (Invoices: ${invs})` : ''}</>
+                                : <>Earlier: {h.level} ({h.status}) {formatMMDDYYYY(h.start_date)} to {formatMMDDYYYY(h.end_date)}{h.invoice_name ? ` (Invoice: ${h.invoice_name})` : ''}</>}
+                              {h.invoice_payment_state === 'not_paid' ? ' - invoice unpaid' : ''}
+                            </div>
+                          );
+                        })}
                       </td>
+                      <td style={{ padding: '14px 24px', color: 'var(--text-secondary)', fontWeight: '600' }}>{row.phone || '—'}</td>
                       <td style={{ padding: '14px 24px', color: 'var(--accent)', fontWeight: '600' }}>{row.type}</td>
                       <td style={{ padding: '14px 24px', fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-muted)' }}>{row.order}</td>
                       <td style={{ padding: '14px 24px', color: 'var(--text-secondary)' }}>{formatMMDDYYYY(row.date)}</td>
@@ -309,8 +335,8 @@ export default function ReportsPage() {
                       <td style={{ padding: '14px 24px', textAlign: 'right', fontWeight: '700', color: 'var(--text-success)' }}>${(row.amount||0).toFixed(2)}</td>
                     </tr>
                   ))}
-                  {data.results.length === 0 && (
-                    <tr><td colSpan={6} style={{ padding: '80px 24px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '600' }}>No active subscriptions found.</td></tr>
+                  {filteredResults.length === 0 && (
+                    <tr><td colSpan={7} style={{ padding: '80px 24px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '600' }}>{q ? 'No members match your search.' : 'No active subscriptions found.'}</td></tr>
                   )}
                 </tbody>
               </table>

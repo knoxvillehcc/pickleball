@@ -29,6 +29,15 @@ const PNL_PERMISSIONS = [
   { key: 'pnl-settings',       label: 'Manage P&L Settings',         desc: 'Change defaults, exclusions, cache, and comparison settings' },
 ];
 
+// ── Membership page restriction ───────────────────────────────────────────────
+// Unlike the permissions above, this one REMOVES abilities: the user can view and search
+// the Membership page but cannot export PDFs or run the Odoo sync.
+const MEMBERSHIP_RESTRICTION = {
+  key: 'reports-view-only',
+  label: 'Membership: View & Search Only',
+  desc: 'Can view and search members, but cannot export PDFs or sync from Odoo. Ignored for Full Access users.',
+};
+
 const ROLE_COLORS = {
   super_admin: { bg: 'rgba(255,153,51,0.12)', border: 'rgba(255,153,51,0.25)', text: 'var(--accent)' },
   staff:       { bg: 'rgba(139,30,63,0.12)', border: 'rgba(139,30,63,0.25)',  text: 'var(--maroon)' },
@@ -106,7 +115,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
       <div style={{
         background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`,
         borderRadius: '14px', width: '100%', maxWidth: '540px',
-        boxShadow: '0 24px 80px var(--shadow-color)',
+        boxShadow: '0 24px 80px var(--shadow-color)', maxHeight: 'calc(100dvh - 32px)', display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         {/* Header */}
         <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -117,6 +126,7 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: '20px', padding: '0 4px' }}>✕</button>
         </div>
 
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain' }}>
         {/* All Access Toggle */}
         <div style={{ padding: '20px 28px 0' }}>
           <label style={{
@@ -215,6 +225,39 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
           </div>
         </div>
 
+        {/* Membership page restriction */}
+        <div style={{ padding: '0 28px 16px', opacity: allAccess ? 0.5 : 1 }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
+            Membership Page Restriction
+          </div>
+          {(() => {
+            const perm = MEMBERSHIP_RESTRICTION;
+            const on = selected.includes(perm.key);
+            return (
+              <label style={{
+                display: 'flex', alignItems: 'center', gap: '12px', cursor: allAccess ? 'default' : 'pointer',
+                background: on ? 'rgba(245,158,11,0.08)' : 'var(--bg-input)',
+                border: `1px solid ${on ? 'rgba(245,158,11,0.3)' : 'var(--border)'}`,
+                borderRadius: '10px', padding: '10px 14px', transition: 'all 0.15s',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={on}
+                  disabled={allAccess}
+                  onChange={() => toggle(perm.key)}
+                  style={{ width: '16px', height: '16px', accentColor: '#F59E0B', cursor: allAccess ? 'default' : 'pointer' }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: on ? C.text : C.muted }}>{perm.label}</div>
+                  <div style={{ fontSize: '11px', color: C.muted }}>{perm.desc}</div>
+                </div>
+                {on && <span style={{ fontSize: '11px', fontWeight: '700', color: '#D97706', background: 'rgba(245,158,11,0.12)', padding: '2px 8px', borderRadius: '14px' }}>✓ On</span>}
+              </label>
+            );
+          })()}
+        </div>
+
+        </div>
         {/* Footer */}
         <div style={{ padding: '16px 28px 24px', borderTop: `1px solid var(--border)`, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <button onClick={onClose} style={btnStyle('var(--bg-button-secondary)', 'var(--border-button-secondary)', 'var(--text-button-secondary)')}>Cancel</button>
@@ -649,7 +692,7 @@ export default function UsersPage() {
                             {pages.length === 0 ? (
                               <span style={{ fontSize: '12px', color: C.muted }}>No access</span>
                             ) : pages.map(pk => {
-                               const page = HCC_PAGES.find(p => p.key === pk);
+                               const page = HCC_PAGES.find(p => p.key === pk) || (pk === MEMBERSHIP_RESTRICTION.key ? MEMBERSHIP_RESTRICTION : null);
                                return (
                                  <span key={pk} style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '14px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo }}>
                                    {page?.label || pk}

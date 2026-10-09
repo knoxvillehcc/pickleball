@@ -45,3 +45,6 @@ alter table public.hcc_membership_snapshot enable row level security;
 alter table public.hcc_sync_log enable row level security;
 revoke all on public.hcc_membership_snapshot from anon, authenticated;
 revoke all on public.hcc_sync_log from anon, authenticated;
+
+-- Member phone number (added later; safe to re-run)
+alter table public.hcc_membership_snapshot add column if not exists phone text;

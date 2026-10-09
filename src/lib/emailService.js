@@ -1036,8 +1036,13 @@ export async function sendLedAdConfirmationEmail(reg) {
       </tr>`).join('')}
     </table>
 
+    ${reg.upload_token && !reg.media_url ? `
+    <div style="text-align:center;margin:0 0 20px;">
+      <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://dashboard.knoxvillemandir.org'}/register/led-ads/upload?token=${reg.upload_token}" style="display:inline-block;padding:14px 28px;background:#FF9933;color:#FFFFFF;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;">Upload Your Ad Graphic</a>
+      <div style="font-size:12px;color:#94A3B8;margin-top:8px;">1920x1080 pixels, max 10 MB. Please upload at least 7 days before the event.</div>
+    </div>` : ''}
     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;color:#CBD5E1;font-size:13px;line-height:1.6;">
-      <strong style="color:#FFFFFF;">Next Steps:</strong> If you haven't uploaded your final digital ad graphics yet, please email your 1920x1080 banner or video clip to <a href="mailto:knoxvillehcc@gmail.com" style="color:#FF9933;">knoxvillehcc@gmail.com</a>.
+      <strong style="color:#FFFFFF;">Next Steps:</strong> ${reg.upload_token ? 'Use the button above to upload your ad graphic. If you have trouble, you can also email your 1920x1080 banner or video clip to' : "If you haven't uploaded your final digital ad graphics yet, please email your 1920x1080 banner or video clip to"} <a href="mailto:knoxvillehcc@gmail.com" style="color:#FF9933;">knoxvillehcc@gmail.com</a>.
     </div>
   `;
 

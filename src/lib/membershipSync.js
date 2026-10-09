@@ -61,6 +61,18 @@ export async function buildMembershipSnapshot(odoo) {
     if (!orderByHist[hid] || (orderByHist[hid].state !== 'sale' && o.state === 'sale')) orderByHist[hid] = o;
   }
 
+  // Partner phone numbers (mobile preferred, then phone). Odoo 19 may not expose `mobile`, so fall back.
+  const partnerIds = [...new Set(history.map((h) => m2oId(h.partner_id)).filter(Boolean))];
+  let partners = [];
+  if (partnerIds.length) {
+    try {
+      partners = await odoo('res.partner', 'read', [partnerIds], { fields: ['phone', 'mobile'], context: { active_test: false } });
+    } catch {
+      try { partners = await odoo('res.partner', 'read', [partnerIds], { fields: ['phone'], context: { active_test: false } }); } catch { partners = []; }
+    }
+  }
+  const phoneByPartner = Object.fromEntries(partners.map((p) => [p.id, String(p.mobile || p.phone || '').trim() || null]));
+
   const invIds = [...new Set(history.map((h) => m2oId(h.invoice_id)).filter(Boolean))];
   const invoices = invIds.length
     ? await odoo('account.move', 'read', [invIds], { fields: ['id', 'name', 'payment_state', 'state', 'amount_total'] })
@@ -93,6 +105,7 @@ export async function buildMembershipSnapshot(odoo) {
       history_id: h.id,
       partner_id: m2oId(h.partner_id),
       partner_name: m2oName(h.partner_id),
+      phone: phoneByPartner[m2oId(h.partner_id)] || null,
       level: h.grade_name || m2oName(h.grade_id) || 'Unknown',
       level_id: m2oId(h.grade_id),
       status: h.status,
@@ -147,22 +160,36 @@ export async function buildMembershipSnapshot(odoo) {
   return { rows, meta };
 }
 
+function postBatch(batch) {
+  return fetch(`${SUPABASE_URL}/rest/v1/hcc_membership_snapshot?on_conflict=history_id`, {
+    method: 'POST',
+    headers: headers({ Prefer: 'resolution=merge-duplicates,return=minimal' }),
+    body: JSON.stringify(batch),
+    cache: 'no-store',
+  });
+}
+
 export async function saveSnapshot(rows, meta, syncedBy) {
   const runId = `run-${Date.now()}`;
   const syncedAt = new Date().toISOString();
-  const payload = rows.map((r) => ({ ...r, sync_run_id: runId, synced_at: syncedAt }));
+  let payload = rows.map((r) => ({ ...r, sync_run_id: runId, synced_at: syncedAt }));
+  let phoneColumnMissing = false;
 
   for (let i = 0; i < payload.length; i += 200) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/hcc_membership_snapshot?on_conflict=history_id`, {
-      method: 'POST',
-      headers: headers({ Prefer: 'resolution=merge-duplicates,return=minimal' }),
-      body: JSON.stringify(payload.slice(i, i + 200)),
-      cache: 'no-store',
-    });
+    let res = await postBatch(payload.slice(i, i + 200));
     if (!res.ok) {
-      const body = await res.text();
-      if (tableMissing(res.status, body)) { const e = new Error('Snapshot tables are not created yet'); e.code = 'TABLE_MISSING'; throw e; }
-      throw new Error(`Snapshot save failed: ${body}`);
+      let body = await res.text();
+      // The `phone` column is added by sql/membership_snapshot_migration.sql. Until that runs, retry without it.
+      if (!phoneColumnMissing && /phone/i.test(body) && /PGRST204|column/i.test(body)) {
+        phoneColumnMissing = true;
+        payload = payload.map(({ phone, ...rest }) => rest);
+        res = await postBatch(payload.slice(i, i + 200));
+        body = res.ok ? '' : await res.text();
+      }
+      if (!res.ok) {
+        if (tableMissing(res.status, body)) { const e = new Error('Snapshot tables are not created yet'); e.code = 'TABLE_MISSING'; throw e; }
+        throw new Error(`Snapshot save failed: ${body}`);
+      }
     }
   }
   // Remove rows no longer in Odoo

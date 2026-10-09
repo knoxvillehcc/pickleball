@@ -20,7 +20,7 @@ function formatStamp(iso) {
  * onSynced: called after a successful sync so the page can reload its data.
  * externalStamp: optional ISO timestamp supplied by the page's own data load.
  */
-export default function SyncBar({ scope = 'membership', onSynced, externalStamp }) {
+export default function SyncBar({ scope = 'membership', onSynced, externalStamp, readOnly = false }) {
   const [stamp, setStamp] = useState(externalStamp || null);
   const [by, setBy] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -66,31 +66,31 @@ export default function SyncBar({ scope = 'membership', onSynced, externalStamp 
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-      <div style={{ textAlign: 'right', lineHeight: 1.35 }}>
-        <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Last synced</div>
+      <div className="sync-stamp" style={{ textAlign: 'right', lineHeight: 1.35 }}>
+        <div style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Last synced</div>
         <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>
           {stamp ? formatStamp(stamp) : 'Never'}{by ? <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}> · {by}</span> : null}
         </div>
         {msg && <div style={{ fontSize: '11.5px', fontWeight: 700, color: colors[msg.type] }}>{msg.text}</div>}
       </div>
-      <button
+      {!readOnly && (<button
         id={`sync-btn-${scope}`}
         onClick={sync}
         disabled={busy}
         style={{
-          background: 'transparent', color: 'var(--accent)', fontWeight: 800, fontSize: '14px',
-          padding: '11px 22px', borderRadius: '12px', border: '2px solid var(--accent)',
-          cursor: busy ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
+          background: 'transparent', color: 'var(--accent)', fontWeight: 700, fontSize: '13px',
+          padding: '8px 16px', borderRadius: '10px', border: '1.5px solid var(--accent)',
+          cursor: busy ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: '7px',
           opacity: busy ? 0.7 : 1, position: 'relative', zIndex: 1,
         }}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           style={busy ? { animation: 'hccSyncSpin 0.8s linear infinite' } : undefined}>
           <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
           <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 16h5v5" />
         </svg>
         {busy ? 'Syncing...' : 'Sync from Odoo'}
-      </button>
+      </button>)}
       <style>{`@keyframes hccSyncSpin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

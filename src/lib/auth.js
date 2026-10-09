@@ -78,6 +78,15 @@ export async function getSessionAndPermissions(requiredSlug) {
   return { success: true, user: payload };
 }
 
+// Users flagged 'reports-view-only' may view and search the Membership page only
+// (no PDF/CSV exports, no Odoo sync). Super admins and full-access ('*') users are never restricted.
+export function isMembershipViewOnly(user) {
+  if (!user || user.role === 'super_admin') return false;
+  const pages = Array.isArray(user.allowedPages) ? user.allowedPages : [];
+  if (pages.includes('*')) return false;
+  return pages.includes('reports-view-only');
+}
+
 export async function logLoginActivity(email, name, status, reason = '', request) {
   try {
     const SUPABASE_URL = process.env.SUPABASE_URL;

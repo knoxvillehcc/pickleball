@@ -31,6 +31,7 @@ export async function GET(request) {
           order: r.order_name || r.pos_order_name || '',
           customerId: r.partner_id,
           customer: r.partner_name || 'Unknown',
+          phone: r.phone || null,
           type: r.level,
           status: r.status,
           date: r.start_date || 'Unknown',
