@@ -18,6 +18,17 @@ function formatMMDDYYYY(d) {
   return `${mm}-${dd}-${yyyy}`;
 }
 
+function getPaymentMethodLabel(reg) {
+  if (reg.payment_status !== 'paid') return '—';
+  const method = (reg.payment_method || '').toLowerCase();
+  const chk = reg.check_number ? ` #${reg.check_number}` : '';
+  if (method === 'cash') return 'Cash';
+  if (method === 'check') return `Check${chk}`;
+  if (method === 'zelle') return `Zelle${chk}`;
+  if (method === 'card') return `Card${chk}`;
+  return 'Stripe';
+}
+
 export default function LedAdsAdminPage() {
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,13 +39,16 @@ export default function LedAdsAdminPage() {
   const [publishing, setPublishing] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
 
+  // Modals
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingReg, setEditingReg] = useState(null);
+
   // Odoo General Entry Sync
   const [odooSyncStatus, setOdooSyncStatus] = useState(null);
   const [showOdooModal, setShowOdooModal] = useState(false);
   const [isSyncingOdoo, setIsSyncingOdoo] = useState(false);
   const [odooSyncMsg, setOdooSyncMsg] = useState('');
   const [forceOdooSync, setForceOdooSync] = useState(false);
-  const [editingReg, setEditingReg] = useState(null);
   const [resendingId, setResendingId] = useState(null);
   const [resendDone, setResendDone] = useState({});
 
@@ -164,9 +178,19 @@ export default function LedAdsAdminPage() {
     }
   };
 
+  const cashCount = registrations.filter(r => r.payment_status === 'paid' && (r.payment_method || '').toLowerCase() === 'cash').length;
+  const checkCount = registrations.filter(r => r.payment_status === 'paid' && (r.payment_method || '').toLowerCase() === 'check').length;
+  const paidCount = registrations.filter(r => r.payment_status === 'paid').length;
+  const pendingCount = registrations.filter(r => r.payment_status === 'pending').length;
+  const graphicMissing = registrations.filter(r => r.payment_status === 'paid' && !r.graphic_received && !r.media_url).length;
+  const graphicReceived = registrations.filter(r => r.graphic_received || r.media_url).length;
+  const totalRevenue = registrations.filter(r => r.payment_status === 'paid').reduce((s, r) => s + (r.amount_paid || 0), 0);
+
   const filtered = registrations.filter(r => {
     if (filter === 'paid' && r.payment_status !== 'paid') return false;
     if (filter === 'pending' && r.payment_status !== 'pending') return false;
+    if (filter === 'cash' && (r.payment_status !== 'paid' || (r.payment_method || '').toLowerCase() !== 'cash')) return false;
+    if (filter === 'check' && (r.payment_status !== 'paid' || (r.payment_method || '').toLowerCase() !== 'check')) return false;
     if (filter === 'missing_graphic' && (r.graphic_received || r.media_url)) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -174,17 +198,13 @@ export default function LedAdsAdminPage() {
         r.business_name?.toLowerCase().includes(q) ||
         r.contact_name?.toLowerCase().includes(q) ||
         r.email?.toLowerCase().includes(q) ||
+        r.phone?.toLowerCase().includes(q) ||
+        r.check_number?.toLowerCase().includes(q) ||
         r.registration_number?.toLowerCase().includes(q)
       );
     }
     return true;
   });
-
-  const totalRevenue = registrations.filter(r => r.payment_status === 'paid').reduce((s, r) => s + (r.amount_paid || 0), 0);
-  const paidCount = registrations.filter(r => r.payment_status === 'paid').length;
-  const pendingCount = registrations.filter(r => r.payment_status === 'pending').length;
-  const graphicMissing = registrations.filter(r => r.payment_status === 'paid' && !r.graphic_received && !r.media_url).length;
-  const graphicReceived = registrations.filter(r => r.graphic_received || r.media_url).length;
 
   const exportPDF = async (withPrices = true) => {
     try {
@@ -193,12 +213,11 @@ export default function LedAdsAdminPage() {
       const dateStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
       const timeStr = now.toLocaleTimeString();
 
-      // Strictly filter out pending or unpaid registrations
       const paidRecords = filtered.filter(r => r.payment_status === 'paid');
       const paidRevenue = paidRecords.reduce((s, r) => s + (r.amount_paid || 0), 0);
 
       doc.setFontSize(18);
-      doc.setTextColor(255, 153, 51); // #FF9933
+      doc.setTextColor(255, 153, 51);
       doc.text('HCC Navratri 2026 — LED Screen Advertisements', 14, 15);
 
       doc.setFontSize(9);
@@ -206,8 +225,8 @@ export default function LedAdsAdminPage() {
       doc.text(`Generated: ${dateStr} ${timeStr}  |  Paid Registrations: ${paidRecords.length}  |  Revenue: $${(paidRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 14, 22);
 
       const headRow = withPrices
-        ? ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Description', 'Status', 'Amount']
-        : ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Description', 'Status'];
+        ? ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Payment Method', 'Description', 'Status', 'Amount']
+        : ['#', 'Reg #', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Payment Method', 'Description', 'Status'];
 
       const tableBody = paidRecords.map((r, i) => {
         const row = [
@@ -218,6 +237,7 @@ export default function LedAdsAdminPage() {
           r.email || '',
           r.phone || '',
           formatMMDDYYYY(r.registration_date),
+          getPaymentMethodLabel(r),
           r.ad_description || '—',
           'PAID',
         ];
@@ -230,7 +250,7 @@ export default function LedAdsAdminPage() {
       autoTable(doc, {
         startY: 28,
         head: [headRow],
-        body: tableBody.length ? tableBody : [['', 'No paid registrations found', '', '', '', '', '', '', ...(withPrices ? ['', ''] : [''])]],
+        body: tableBody.length ? tableBody : [['', 'No paid registrations found', '', '', '', '', '', '', '', ...(withPrices ? ['', ''] : [''])]],
         theme: 'striped',
         headStyles: { fillColor: [255, 153, 51] },
         styles: { fontSize: 8, cellPadding: 2.5 },
@@ -250,14 +270,6 @@ export default function LedAdsAdminPage() {
     setTimeout(() => setUrlCopied(false), 2200);
   };
 
-  const chipStyle = (status) => ({
-    display: 'inline-flex', alignItems: 'center', gap: '5px',
-    padding: '3px 10px', borderRadius: '14px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase',
-    ...(status === 'paid' ? { background: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' } :
-      status === 'pending' ? { background: 'rgba(245,158,11,0.1)', color: '#D97706', border: '1px solid rgba(245,158,11,0.3)' } :
-      { background: 'rgba(239,68,68,0.1)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.3)' }),
-  });
-
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
       <p style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600' }}>Loading registrations...</p>
@@ -266,7 +278,7 @@ export default function LedAdsAdminPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '32px 28px', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
-      <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
 
         {/* ── HEADER ──────────────────────────────────────────────────────────── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
@@ -298,6 +310,20 @@ export default function LedAdsAdminPage() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
               <span>Dashboard</span>
             </a>
+
+            {/* + Add Manual Registration Button */}
+            <button
+              onClick={() => setShowAddModal(true)}
+              style={{
+                padding: '9px 16px', borderRadius: '10px',
+                border: '1.5px solid #FF9933', background: 'rgba(255,153,51,0.12)',
+                color: '#FF9933', fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: '7px',
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Add Registration</span>
+            </button>
 
             {/* Public Link Copy Button */}
             <button
@@ -394,7 +420,7 @@ export default function LedAdsAdminPage() {
             <svg style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
               value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Search by business, contact, email, reg #..."
+              placeholder="Search by business, contact, email, reg #, check #..."
               style={{
                 width: '100%', padding: '10px 14px 10px 36px', borderRadius: '10px',
                 border: '1px solid var(--border)', background: 'var(--bg-card)',
@@ -403,13 +429,20 @@ export default function LedAdsAdminPage() {
             />
           </div>
 
-          {[['all', registrations.length], ['paid', paidCount], ['pending', pendingCount], ['missing_graphic', graphicMissing]].map(([f, count]) => (
+          {[
+            ['all', 'All', registrations.length],
+            ['paid', 'Paid', paidCount],
+            ['pending', 'Pending', pendingCount],
+            ['cash', 'Cash', cashCount],
+            ['check', 'Check', checkCount],
+            ['missing_graphic', 'Missing Graphics', graphicMissing]
+          ].map(([f, label, count]) => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: '9px 14px', borderRadius: '10px', border: '1px solid var(--border)',
               background: filter === f ? '#0284C7' : 'var(--bg-card)',
               color: filter === f ? '#FFFFFF' : 'var(--text-primary)',
               fontWeight: '700', fontSize: '12.5px', cursor: 'pointer',
-            }}>{f === 'missing_graphic' ? 'Missing Graphics' : f.charAt(0).toUpperCase() + f.slice(1)} ({count})</button>
+            }}>{label} ({count})</button>
           ))}
 
           <button onClick={() => exportPDF(true)} style={{
@@ -431,7 +464,7 @@ export default function LedAdsAdminPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
             <thead>
               <tr style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
-                {['Reg #', 'Business Name', 'Contact', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Status', 'Amount', 'Graphic', 'Actions'].map(h => (
+                {['Reg #', 'Business Name', 'Contact', 'Email', 'Phone', 'Date (MM-DD-YYYY)', 'Payment Status', 'Amount', 'Graphic', 'Actions'].map(h => (
                   <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '700', color: 'var(--text-secondary)', fontSize: '11px', letterSpacing: '0.6px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
@@ -441,6 +474,9 @@ export default function LedAdsAdminPage() {
                 <tr><td colSpan={10} style={{ padding: '28px', textAlign: 'center', color: 'var(--text-secondary)' }}>No registrations found.</td></tr>
               ) : filtered.map(r => {
                 const hasGraphic = r.graphic_received || r.media_url;
+                const isPaid = r.payment_status === 'paid';
+                const methodLabel = getPaymentMethodLabel(r);
+
                 return (
                   <tr key={r.id} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '12px 14px', fontWeight: '700', color: '#0284C7', fontFamily: 'monospace' }}>{r.registration_number}</td>
@@ -449,7 +485,29 @@ export default function LedAdsAdminPage() {
                     <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', fontSize: '12px' }}>{r.email}</td>
                     <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{r.phone || '—'}</td>
                     <td style={{ padding: '12px 14px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontSize: '12px' }}>{formatMMDDYYYY(r.registration_date)}</td>
-                    <td style={{ padding: '12px 14px' }}><span style={chipStyle(r.payment_status)}>{r.payment_status}</span></td>
+                    <td style={{ padding: '12px 14px' }}>
+                      {isPaid ? (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '5px',
+                          padding: '3px 10px', borderRadius: '14px', fontSize: '11px', fontWeight: '700',
+                          background: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)',
+                          whiteSpace: 'nowrap',
+                        }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981' }} />
+                          <span>PAID · {methodLabel}</span>
+                        </span>
+                      ) : (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '5px',
+                          padding: '3px 10px', borderRadius: '14px', fontSize: '11px', fontWeight: '700',
+                          background: 'rgba(245,158,11,0.1)', color: '#D97706', border: '1px solid rgba(245,158,11,0.3)',
+                          whiteSpace: 'nowrap',
+                        }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D97706' }} />
+                          <span>PENDING</span>
+                        </span>
+                      )}
+                    </td>
                     <td style={{ padding: '12px 14px', fontWeight: '700', color: 'var(--text-primary)' }}>${((r.amount_paid || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td style={{ padding: '12px 14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -483,7 +541,7 @@ export default function LedAdsAdminPage() {
                         {/* Edit Button */}
                         <button
                           onClick={() => setEditingReg(r)}
-                          title="Edit registration details"
+                          title="Edit registration and payment details"
                           style={{
                             padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(129,140,248,0.4)',
                             background: 'rgba(129,140,248,0.08)', color: '#818CF8',
@@ -502,7 +560,7 @@ export default function LedAdsAdminPage() {
                             padding: '6px 12px', borderRadius: '8px', cursor: resendingId === r.registration_number ? 'not-allowed' : 'pointer',
                             border: `1px solid ${resendDone[r.registration_number] ? 'rgba(16,185,129,0.5)' : 'rgba(255,153,51,0.4)'}`,
                             background: resendDone[r.registration_number] ? 'rgba(16,185,129,0.15)' : 'rgba(255,153,51,0.08)',
-                            color: resendDone[r.registration_number] ? '#10B981' : 'var(--accent)',
+                            color: resendDone[r.registration_number] ? '#10B981' : 'var(--accent, #FF9933)',
                             fontWeight: '700', fontSize: '12px',
                           }}
                         >
@@ -531,6 +589,29 @@ export default function LedAdsAdminPage() {
           </table>
         </div>
       </div>
+
+      {/* ── MODAL: ADD MANUAL REGISTRATION ────────────────────────────────────── */}
+      {showAddModal && (
+        <AddLedAdModal
+          onClose={() => setShowAddModal(false)}
+          onCreated={(newReg) => {
+            fetchRegistrations();
+            setShowAddModal(false);
+          }}
+        />
+      )}
+
+      {/* ── MODAL: EDIT REGISTRATION ─────────────────────────────────────────── */}
+      {editingReg && (
+        <EditLedAdModal
+          reg={editingReg}
+          onClose={() => setEditingReg(null)}
+          onSave={() => {
+            fetchRegistrations();
+            setEditingReg(null);
+          }}
+        />
+      )}
 
       {/* ── MODAL: ODOO GENERAL ENTRY SYNC ───────────────────────────────────── */}
       {showOdooModal && (
@@ -564,7 +645,7 @@ export default function LedAdsAdminPage() {
                   <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
                     LED Ads revenue was previously posted to Odoo under journal entry:
                   </p>
-                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'monospace', fontWeight: '700', fontSize: '13.5px', color: '#0284C7' }}>
+                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'var(--bg-input, #0F172A)', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'monospace', fontWeight: '700', fontSize: '13.5px', color: '#0284C7' }}>
                     <span>{odooSyncStatus.moveName}</span>
                     <span>${Number(odooSyncStatus.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
@@ -578,7 +659,7 @@ export default function LedAdsAdminPage() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
+                  <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input, #0F172A)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
                     Close
                   </button>
                   <button onClick={() => setForceOdooSync(true)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid #D97706', background: 'rgba(245,158,11,0.1)', color: '#D97706', fontWeight: '700', cursor: 'pointer' }}>
@@ -594,7 +675,7 @@ export default function LedAdsAdminPage() {
                   </div>
                 )}
 
-                <div style={{ background: 'var(--bg-input)', borderRadius: '14px', padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ background: 'var(--bg-input, #0F172A)', borderRadius: '14px', padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Event / Analytic Account:</span>
                     <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Navratri 2026</span>
@@ -613,11 +694,11 @@ export default function LedAdsAdminPage() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Debit CC Fees (Acct 950):</span>
-                    <span style={{ fontWeight: '700', color: 'var(--text-muted)' }}>+${(totalRevenue / 100 * 0.029 + paidCount * 0.30).toFixed(2)}</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-muted)' }}>Stripe only ($0 for Cash/Check)</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
                     <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>Debit HCC Bank (Acct 101401):</span>
-                    <span style={{ fontWeight: '700', color: '#0284C7' }}>${((totalRevenue / 100) - (totalRevenue / 100 * 0.029 + paidCount * 0.30)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span style={{ fontWeight: '700', color: '#0284C7' }}>Net Receipts Balanced</span>
                   </div>
                 </div>
 
@@ -637,7 +718,7 @@ export default function LedAdsAdminPage() {
                 )}
 
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
+                  <button onClick={() => setShowOdooModal(false)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-input, #0F172A)', color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer' }}>
                     Cancel
                   </button>
                   <button onClick={() => handlePostToOdoo(forceOdooSync)} disabled={isSyncingOdoo || paidCount === 0} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: 'none', background: isSyncingOdoo ? 'rgba(14,165,233,0.5)' : 'linear-gradient(135deg, #0284C7, #0369A1)', color: '#FFFFFF', fontWeight: '700', cursor: isSyncingOdoo || paidCount === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
@@ -649,21 +730,334 @@ export default function LedAdsAdminPage() {
           </div>
         </div>
       )}
-      {/* Edit Registration Modal */}
-      {editingReg && (
-        <EditLedAdModal
-          reg={editingReg}
-          onClose={() => setEditingReg(null)}
-          onSave={(updated) => {
-            setRegistrations(prev => prev.map(item => item.id === updated.id ? { ...item, ...updated } : item));
-            fetchRegistrations();
-          }}
-        />
-      )}
     </div>
   );
 }
 
+// ── MODAL: ADD MANUAL REGISTRATION ──────────────────────────────────────────
+function AddLedAdModal({ onClose, onCreated }) {
+  const [form, setForm] = useState({
+    business_name: '',
+    contact_name:  '',
+    email:         '',
+    phone:         '',
+    address:       '',
+    city:          '',
+    state:         'TN',
+    zip:           '',
+    ad_description:'',
+    amount_due:    '1500.00',
+    payment_status:'pending', // 'pending' | 'paid'
+    payment_method:'cash',    // 'cash' | 'check' | 'zelle' | 'card' | 'stripe'
+    check_number:  '',
+    payment_notes: '',
+    amount_paid:   '1500.00',
+    graphic_received: false,
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      const res = await fetch('/api/led-ads/registrations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to create registration');
+      onCreated(data.record);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputStyle = {
+    width: '100%', padding: '10px 14px', borderRadius: '10px',
+    border: '1px solid var(--border)', background: 'var(--bg-input, #0F172A)',
+    color: 'var(--text-primary)', fontSize: '13px', outline: 'none', boxSizing: 'border-box',
+  };
+  const labelStyle = {
+    display: 'block', fontSize: '11px', fontWeight: '700',
+    color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px'
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 9999, padding: '20px', backdropFilter: 'blur(4px)',
+    }} onClick={onClose}>
+      <div style={{
+        background: 'var(--bg-modal, #1E293B)', border: '1px solid var(--border-modal, rgba(255,255,255,0.1))',
+        borderRadius: '14px', padding: '22px 24px', maxWidth: '640px', width: '100%',
+        maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)' }}>
+              Add Manual LED Ad Registration
+            </h2>
+            <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Register sponsor offline &amp; track cash, check, or online payment
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '22px', cursor: 'pointer' }}>✕</button>
+        </div>
+
+        {error && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '12px', marginBottom: '20px', color: '#FCA5A5', fontSize: '13px' }}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={labelStyle}>Business Name *</label>
+            <input
+              placeholder="e.g. Acme Corporation"
+              value={form.business_name}
+              onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))}
+              required
+              style={inputStyle}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Contact Person *</label>
+              <input
+                placeholder="e.g. John Doe"
+                value={form.contact_name}
+                onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))}
+                required
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Phone Number *</label>
+              <input
+                placeholder="e.g. 865-555-0199"
+                value={form.phone}
+                onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                required
+                style={inputStyle}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Email Address *</label>
+            <input
+              type="email"
+              placeholder="e.g. contact@business.com"
+              value={form.email}
+              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              required
+              style={inputStyle}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 2 }}>
+              <label style={labelStyle}>City</label>
+              <input
+                placeholder="Knoxville"
+                value={form.city}
+                onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>State</label>
+              <input
+                placeholder="TN"
+                value={form.state}
+                onChange={e => setForm(f => ({ ...f, state: e.target.value }))}
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Zip</label>
+              <input
+                placeholder="37922"
+                value={form.zip}
+                onChange={e => setForm(f => ({ ...f, zip: e.target.value }))}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Ad Description / Sponsor Notes</label>
+            <textarea
+              placeholder="e.g. Full screen 1920x1080 banner or flyer display"
+              value={form.ad_description}
+              onChange={e => setForm(f => ({ ...f, ad_description: e.target.value }))}
+              rows={2}
+              style={{ ...inputStyle, resize: 'vertical' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0' }}>
+            <input
+              type="checkbox"
+              id="add_graphic_rcvd"
+              checked={form.graphic_received}
+              onChange={e => setForm(f => ({ ...f, graphic_received: e.target.checked }))}
+            />
+            <label htmlFor="add_graphic_rcvd" style={{ fontSize: '13px', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: '600' }}>
+              Digital Artwork / Graphic Already Received
+            </label>
+          </div>
+
+          {/* ── PAYMENT STATUS SECTION ───────────────────────────────────── */}
+          <div style={{
+            background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
+            borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px'
+          }}>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent, #FF9933)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+              Payment &amp; Billing
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={labelStyle}>Rate / Amount Due ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={form.amount_due}
+                  onChange={e => setForm(f => ({ ...f, amount_due: e.target.value, amount_paid: f.payment_status === 'paid' ? e.target.value : f.amount_paid }))}
+                  required
+                  style={inputStyle}
+                />
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <label style={labelStyle}>Payment Status</label>
+                <select
+                  value={form.payment_status}
+                  onChange={e => {
+                    const status = e.target.value;
+                    setForm(f => ({
+                      ...f,
+                      payment_status: status,
+                      amount_paid: status === 'paid' ? f.amount_due : '0.00',
+                    }));
+                  }}
+                  style={inputStyle}
+                >
+                  <option value="pending">Pending (Awaiting Payment)</option>
+                  <option value="paid">Paid (Payment Received)</option>
+                </select>
+              </div>
+            </div>
+
+            {form.payment_status === 'paid' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={labelStyle}>Payment Method</label>
+                    <select
+                      value={form.payment_method}
+                      onChange={e => setForm(f => ({ ...f, payment_method: e.target.value }))}
+                      style={inputStyle}
+                    >
+                      <option value="cash">Cash</option>
+                      <option value="check">Bank Check</option>
+                      <option value="zelle">Zelle / Bank Transfer</option>
+                      <option value="card">Card (In-Person / Terminal)</option>
+                      <option value="stripe">Stripe (Online / Pre-Paid)</option>
+                    </select>
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <label style={labelStyle}>Amount Paid ($)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={form.amount_paid}
+                      onChange={e => setForm(f => ({ ...f, amount_paid: e.target.value }))}
+                      required
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                {form.payment_method === 'check' && (
+                  <div>
+                    <label style={labelStyle}>Check Number *</label>
+                    <input
+                      placeholder="e.g. 1042"
+                      value={form.check_number}
+                      onChange={e => setForm(f => ({ ...f, check_number: e.target.value }))}
+                      required
+                      style={inputStyle}
+                    />
+                  </div>
+                )}
+
+                {form.payment_method === 'zelle' && (
+                  <div>
+                    <label style={labelStyle}>Zelle Confirmation / Ref #</label>
+                    <input
+                      placeholder="e.g. ZEL-981248"
+                      value={form.check_number}
+                      onChange={e => setForm(f => ({ ...f, check_number: e.target.value }))}
+                      style={inputStyle}
+                    />
+                  </div>
+                )}
+
+                {form.payment_method === 'card' && (
+                  <div>
+                    <label style={labelStyle}>Card Last 4 / Terminal Ref</label>
+                    <input
+                      placeholder="e.g. 4242"
+                      value={form.check_number}
+                      onChange={e => setForm(f => ({ ...f, check_number: e.target.value }))}
+                      style={inputStyle}
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label style={labelStyle}>Payment Notes</label>
+                  <input
+                    placeholder="e.g. Paid in full to Hitesh at temple desk"
+                    value={form.payment_notes}
+                    onChange={e => setForm(f => ({ ...f, payment_notes: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid var(--border)',
+              background: 'transparent', color: 'var(--text-secondary)', fontWeight: '700', cursor: 'pointer',
+            }}>Cancel</button>
+            <button type="submit" disabled={saving} style={{
+              flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
+              background: 'var(--accent, #FF9933)', color: '#000000', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer',
+            }}>
+              {saving ? 'Creating Registration...' : 'Create Registration'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── MODAL: EDIT REGISTRATION ────────────────────────────────────────────────
 function EditLedAdModal({ reg, onClose, onSave }) {
   const [form, setForm] = useState({
     business_name: reg.business_name || '',
@@ -676,6 +1070,9 @@ function EditLedAdModal({ reg, onClose, onSave }) {
     zip:           reg.zip || '',
     ad_description:reg.ad_description || '',
     payment_status:reg.payment_status || 'pending',
+    payment_method:reg.payment_method || (reg.payment_status === 'paid' ? 'stripe' : 'cash'),
+    check_number:  reg.check_number || '',
+    payment_notes: reg.payment_notes || '',
     amount_paid:   ((reg.amount_paid || 0) / 100).toFixed(2),
     graphic_received: !!reg.graphic_received,
   });
@@ -710,7 +1107,7 @@ function EditLedAdModal({ reg, onClose, onSave }) {
   const inputStyle = {
     width: '100%', padding: '10px 14px', borderRadius: '10px',
     border: '1px solid var(--border)', background: 'var(--bg-input, #0F172A)',
-    color: 'var(--text-primary)', fontSize: '13px', outline: 'none',
+    color: 'var(--text-primary)', fontSize: '13px', outline: 'none', boxSizing: 'border-box',
   };
   const labelStyle = {
     display: 'block', fontSize: '11px', fontWeight: '700',
@@ -725,7 +1122,7 @@ function EditLedAdModal({ reg, onClose, onSave }) {
     }} onClick={onClose}>
       <div style={{
         background: 'var(--bg-modal, #1E293B)', border: '1px solid var(--border-modal, rgba(255,255,255,0.1))',
-        borderRadius: '14px', padding: '22px 24px', maxWidth: '600px', width: '100%',
+        borderRadius: '14px', padding: '22px 24px', maxWidth: '640px', width: '100%',
         maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -733,7 +1130,7 @@ function EditLedAdModal({ reg, onClose, onSave }) {
             <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)' }}>
               Edit LED Ad Registration
             </h2>
-            <div style={{ fontSize: '12px', color: 'var(--accent)', fontFamily: 'monospace', marginTop: '4px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--accent, #FF9933)', fontFamily: 'monospace', marginTop: '4px' }}>
               {reg.registration_number}
             </div>
           </div>
@@ -784,27 +1181,98 @@ function EditLedAdModal({ reg, onClose, onSave }) {
             <textarea value={form.ad_description} onChange={e => setForm(f => ({ ...f, ad_description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'vertical' }} />
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Payment Status</label>
-              <select value={form.payment_status} onChange={e => setForm(f => ({ ...f, payment_status: e.target.value }))} style={inputStyle}>
-                <option value="pending">Pending</option>
-                <option value="paid">✓ Paid</option>
-                <option value="failed">✗ Failed</option>
-                <option value="refunded">↩ Refunded</option>
-              </select>
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Amount Paid ($)</label>
-              <input type="number" step="0.01" value={form.amount_paid} onChange={e => setForm(f => ({ ...f, amount_paid: e.target.value }))} style={inputStyle} />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0' }}>
             <input type="checkbox" id="graphic_rcvd" checked={form.graphic_received} onChange={e => setForm(f => ({ ...f, graphic_received: e.target.checked }))} />
             <label htmlFor="graphic_rcvd" style={{ fontSize: '13px', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: '600' }}>
               Digital Artwork / Graphic Received
             </label>
+          </div>
+
+          {/* ── PAYMENT STATUS SECTION ───────────────────────────────────── */}
+          <div style={{
+            background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
+            borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px'
+          }}>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent, #FF9933)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+              Payment Status &amp; Method
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={labelStyle}>Payment Status</label>
+                <select
+                  value={form.payment_status}
+                  onChange={e => {
+                    const status = e.target.value;
+                    setForm(f => ({
+                      ...f,
+                      payment_status: status,
+                      amount_paid: status === 'paid' && parseFloat(f.amount_paid) <= 0 ? '1500.00' : f.amount_paid,
+                    }));
+                  }}
+                  style={inputStyle}
+                >
+                  <option value="pending">Pending (Awaiting Payment)</option>
+                  <option value="paid">✓ Paid</option>
+                  <option value="failed">✗ Failed</option>
+                  <option value="refunded">↩ Refunded</option>
+                </select>
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <label style={labelStyle}>Amount Paid ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={form.amount_paid}
+                  onChange={e => setForm(f => ({ ...f, amount_paid: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
+            {form.payment_status === 'paid' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={labelStyle}>Payment Method</label>
+                    <select
+                      value={form.payment_method}
+                      onChange={e => setForm(f => ({ ...f, payment_method: e.target.value }))}
+                      style={inputStyle}
+                    >
+                      <option value="cash">Cash</option>
+                      <option value="check">Bank Check</option>
+                      <option value="zelle">Zelle / Bank Transfer</option>
+                      <option value="card">Card (In-Person / Terminal)</option>
+                      <option value="stripe">Stripe (Online)</option>
+                    </select>
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <label style={labelStyle}>
+                      {form.payment_method === 'check' ? 'Check Number' : form.payment_method === 'zelle' ? 'Zelle Confirmation #' : 'Reference / Card Last 4'}
+                    </label>
+                    <input
+                      placeholder={form.payment_method === 'check' ? 'e.g. 1042' : 'Reference #'}
+                      value={form.check_number}
+                      onChange={e => setForm(f => ({ ...f, check_number: e.target.value }))}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Payment Notes</label>
+                  <input
+                    placeholder="e.g. Received cash at Mandir front desk"
+                    value={form.payment_notes}
+                    onChange={e => setForm(f => ({ ...f, payment_notes: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
@@ -814,7 +1282,7 @@ function EditLedAdModal({ reg, onClose, onSave }) {
             }}>Cancel</button>
             <button type="submit" disabled={saving} style={{
               flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
-              background: 'var(--accent)', color: '#000000', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer',
+              background: 'var(--accent, #FF9933)', color: '#000000', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer',
             }}>
               {saving ? 'Saving...' : 'Save Changes'}
             </button>

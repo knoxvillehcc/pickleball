@@ -320,31 +320,79 @@ export async function getAllVendorRegistrations(limit = 5000) {
 // ═══════════════════════════════════════════════════════════════════
 
 export async function insertLedAdRegistration(data) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations`, {
+  let payload = { ...data };
+  let res = await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations`, {
     method:  'POST',
     headers: getServiceHeaders(),
-    body:    JSON.stringify(data),
+    body:    JSON.stringify(payload),
     cache:   'no-store',
   });
+
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Supabase LED ad insert failed (${res.status}): ${body}`);
+    // Fallback if payment_method, check_number, or payment_notes columns don't exist yet
+    if (res.status === 400 && (body.includes('payment_method') || body.includes('check_number') || body.includes('payment_notes'))) {
+      if (!payload.stripe_payment_ref && payload.payment_method && payload.payment_method !== 'stripe') {
+        payload.stripe_payment_ref = `OFFLINE_${payload.payment_method.toUpperCase()}${payload.check_number ? ':' + payload.check_number : ''}`;
+      }
+      delete payload.payment_method;
+      delete payload.check_number;
+      delete payload.payment_notes;
+
+      res = await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations`, {
+        method:  'POST',
+        headers: getServiceHeaders(),
+        body:    JSON.stringify(payload),
+        cache:   'no-store',
+      });
+      if (!res.ok) {
+        const retryBody = await res.text();
+        throw new Error(`Supabase LED ad insert failed (${res.status}): ${retryBody}`);
+      }
+    } else {
+      throw new Error(`Supabase LED ad insert failed (${res.status}): ${body}`);
+    }
   }
+
   const result = await res.json();
   return Array.isArray(result) ? result[0] : result;
 }
 
 export async function updateLedAdRegistration(id, data) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations?id=eq.${id}`, {
+  let payload = { ...data };
+  let res = await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations?id=eq.${id}`, {
     method:  'PATCH',
     headers: getServiceHeaders(),
-    body:    JSON.stringify(data),
+    body:    JSON.stringify(payload),
     cache:   'no-store',
   });
+
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Supabase LED ad update failed (${res.status}): ${body}`);
+    // Fallback if payment_method, check_number, or payment_notes columns don't exist yet
+    if (res.status === 400 && (body.includes('payment_method') || body.includes('check_number') || body.includes('payment_notes'))) {
+      if (!payload.stripe_payment_ref && payload.payment_method && payload.payment_method !== 'stripe') {
+        payload.stripe_payment_ref = `OFFLINE_${payload.payment_method.toUpperCase()}${payload.check_number ? ':' + payload.check_number : ''}`;
+      }
+      delete payload.payment_method;
+      delete payload.check_number;
+      delete payload.payment_notes;
+
+      res = await fetch(`${SUPABASE_URL}/rest/v1/led_ad_registrations?id=eq.${id}`, {
+        method:  'PATCH',
+        headers: getServiceHeaders(),
+        body:    JSON.stringify(payload),
+        cache:   'no-store',
+      });
+      if (!res.ok) {
+        const retryBody = await res.text();
+        throw new Error(`Supabase LED ad update failed (${res.status}): ${retryBody}`);
+      }
+    } else {
+      throw new Error(`Supabase LED ad update failed (${res.status}): ${body}`);
+    }
   }
+
   const result = await res.json();
   return Array.isArray(result) ? result[0] : result;
 }

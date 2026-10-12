@@ -119,8 +119,12 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    // Stripe fee estimation (2.9% + $0.30 per transaction)
+    // Stripe fee calculation: only apply fee to actual online Stripe transactions; $0 fee for offline cash/check
     const totalFees = paidRegistrations.reduce((sum, r) => {
+      const method = (r.payment_method || '').toLowerCase();
+      const ref = r.stripe_payment_ref || '';
+      const isOffline = method === 'cash' || method === 'check' || method === 'zelle' || ref.startsWith('OFFLINE_');
+      if (isOffline) return sum;
       const gross = (r.amount_paid || 0) / 100;
       return sum + (gross * 0.029 + 0.30);
     }, 0);

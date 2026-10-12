@@ -26,6 +26,7 @@ const TrophyIcon    = () => <Ico><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d
 const FestivalIcon  = () => <Ico><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></Ico>;
 const VendorIcon    = () => <Ico><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></Ico>;
 const LedIcon       = () => <Ico><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></Ico>;
+const AartiIcon     = () => <Ico><path d="M12 2c.5 2 2 3.5 2 5.5 0 2.5-2 3.5-2 3.5s-2-1-2-3.5C10 5.5 11.5 4 12 2z"/><path d="M4 14c0 4 3.5 7 8 7s8-3 8-7c0-2-3-3-8-3s-8 1-8 3z"/></Ico>;
 const SettingsIcon  = () => <Ico><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/><circle cx="9" cy="6" r="2" fill="var(--bg-primary)"/><circle cx="15" cy="12" r="2" fill="var(--bg-primary)"/><circle cx="8" cy="18" r="2" fill="var(--bg-primary)"/></Ico>;
 const UsersIcon     = () => <Ico><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></Ico>;
 const SunIcon       = () => <Ico size={15}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></Ico>;
@@ -53,6 +54,7 @@ const navGroups = [
     { href: '/indiafest/sponsors',  label: 'Sponsors',          icon: <TrophyIcon />,   slug: 'sponsors' },
     { href: '/navratri',            label: 'Navratri 2026',     icon: <FestivalIcon />, slug: 'navratri' },
     { href: '/navratri/vendors',    label: 'Navratri Vendors',  icon: <VendorIcon />,   slug: 'navratri_vendors' },
+    { href: '/admin/navratri-aarti',label: 'Navratri Aarti',    icon: <AartiIcon />,    slug: 'navratri_aarti' },
     { href: '/pickleball',          label: 'Pickleball',        icon: <PBIcon />,       slug: 'pickleball' },
     { href: '/led-ads',             label: 'LED Screen Ads',    icon: <LedIcon />,      slug: 'led_ads' },
     { href: '/banner',              label: 'Banner In',         icon: <BannerIcon />,   slug: 'banner' },
@@ -64,7 +66,7 @@ const navGroups = [
 ];
 
 // ── Public routes — no sidebar ─────────────────────────────────────────────────────
-const PUBLIC_PREFIXES = ['/register', '/login', '/navratri-2026', '/navratri/scanner', '/navratri/pickup', '/privacy'];
+const PUBLIC_PREFIXES = ['/register', '/login', '/navratri-2026', '/navratri-aarti', '/navratri/scanner', '/navratri/pickup', '/privacy'];
 const isPublicRoute = (path) => PUBLIC_PREFIXES.some(p => path.startsWith(p));
 
 const SIDEBAR_W = 232;
@@ -160,7 +162,7 @@ export default function ClientLayout({ children }) {
     if (link.href === '/') return true;
     if (user.role === 'super_admin') return true;
     const pages = user.allowedPages || [];
-    return pages.includes('*') || pages.includes(link.slug) || (link.slug === 'navratri_vendors' && pages.includes('navratri'));
+    return pages.includes('*') || pages.includes(link.slug) || ((link.slug === 'navratri_vendors' || link.slug === 'navratri_aarti') && pages.includes('navratri'));
   };
   const isActive = (href) => pathname === href || (href !== '/' && pathname.startsWith(href) &&
     // don't highlight a parent when a more specific sibling matches (e.g. /reports vs /reports/monthly)

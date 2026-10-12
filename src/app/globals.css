@@ -255,3 +255,80 @@ a { text-underline-offset: 3px; }
 button > .hcc-icon:last-child, a > .hcc-icon:last-child { margin-right: 0; }
 [style*="display: flex"] > .hcc-icon, [style*="display:flex"] > .hcc-icon { margin-right: 0; }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Responsive system — iPhone first, then iPad, then desktop.
+   Pages use inline styles, so these rules adapt them centrally.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* iPad + phone: drawer layout, dynamic viewport height, scrollable tables */
+@media (max-width: 1024px) {
+  .main-content-layout { height: 100dvh !important; }
+  .sidebar-container { height: 100dvh !important; }
+  .page-container { min-width: 0; padding: 18px 20px 32px !important; }
+  table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+  table td, table th { white-space: nowrap; }
+  img, video, canvas { max-width: 100%; }
+  /* Wide fixed-width panels never exceed the screen */
+  [style*="min-width: 5"], [style*="min-width: 6"], [style*="min-width: 7"] { min-width: 0 !important; }
+}
+
+/* iPad portrait: KPI grids at 2-3 across, cards stay readable */
+@media (min-width: 641px) and (max-width: 1024px) {
+  [style*="minmax(3"] { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important; }
+}
+
+/* iPhone */
+@media (max-width: 640px) {
+  body { font-size: 13.5px; }
+  .page-container { padding: 12px 12px 28px !important; }
+  h1 { font-size: 21px !important; }
+  h2 { font-size: 16px !important; }
+
+  /* Grids: KPI tiles 2 across, content cards 1 across */
+  [style*="repeat(auto-fit"], [style*="repeat(auto-fill"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  [style*="minmax(24"], [style*="minmax(25"], [style*="minmax(26"], [style*="minmax(27"],
+  [style*="minmax(28"], [style*="minmax(29"], [style*="minmax(3"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  [style*="grid-template-columns: 1fr 1fr"], [style*="grid-template-columns:1fr 1fr"] { gap: 10px !important; }
+
+  /* Cards: tighter padding */
+  [style*="padding: 20px"][style*="border-radius"], [style*="padding: 22px"][style*="border-radius"],
+  [style*="padding: 24px"][style*="border-radius"], [style*="padding: 28px"][style*="border-radius"],
+  [style*="padding: 32px"][style*="border-radius"] { padding: 14px !important; }
+
+  /* Page headers and toolbars wrap instead of overflowing */
+  main [style*="justify-content: space-between"] { flex-wrap: wrap; gap: 8px; }
+  main [style*="display: flex"][style*="gap"] { flex-wrap: wrap; }
+
+  /* Buttons: compact, not oversized */
+  main button, .page-container button { font-size: 13px; }
+  main button[style*="padding: 10px 2"], main button[style*="padding: 12px"], main button[style*="padding: 14px"],
+  main button[style*="padding: 11px"], main button[style*="padding: 13px"] { padding: 8px 14px !important; }
+  main button[style*="padding: 16px"], main button[style*="padding: 18px"] { padding: 10px 16px !important; }
+
+  /* Modals: near-full-width sheets that scroll */
+  [style*="position: fixed"][style*="inset: 0"] { padding: 8px !important; align-items: flex-end !important; }
+  [style*="position: fixed"][style*="inset: 0"] > div:not([style*="overflow: hidden"]) {
+    max-height: calc(100dvh - 16px); overflow-y: auto; overscroll-behavior: contain; max-width: 100% !important;
+  }
+  [style*="position: fixed"][style*="inset: 0"] > div { border-radius: 16px !important; }
+  [style*="position: fixed"][style*="inset: 0"] [style*="padding: 24px 28px"],
+  [style*="position: fixed"][style*="inset: 0"] [style*="padding: 20px 28px"],
+  [style*="position: fixed"][style*="inset: 0"] [style*="padding: 16px 28px"],
+  [style*="position: fixed"][style*="inset: 0"] [style*="padding: 0px 28px"],
+  [style*="position: fixed"][style*="inset: 0"] [style*="padding: 0 28px"] { padding-left: 16px !important; padding-right: 16px !important; }
+}
+
+/* Compact KPI icon tiles + sync stamp on phones */
+@media (max-width: 640px) {
+  [style*="width: 52px"][style*="height: 52px"] { width: 40px !important; height: 40px !important; border-radius: 11px !important; }
+  [style*="font-size: 36px"] { font-size: 28px !important; }
+  [style*="font-size: 32px"] { font-size: 26px !important; }
+  [style*="font-size: 28px"] { font-size: 24px !important; }
+  .sync-stamp { text-align: left !important; flex-basis: 100%; }
+}

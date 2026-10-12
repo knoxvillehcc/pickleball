@@ -25,7 +25,21 @@ const PUBLIC_PREFIXES = [
   '/api/auth/login', '/api/auth/logout',
   '/api/pickleball/register', '/api/pickleball/webhook',
   '/api/pickleball/settings', '/api/health',
-  '/api/stripe/webhook',
+  // Navratri public routes
+  '/navratri-2026',                    // Public registration page
+  '/navratri-aarti',                   // Public Aarti bidding page
+  '/navratri/scanner',                 // Staff scanner (has own PIN auth)
+  '/navratri/pickup',                  // Staff pickup (has own PIN auth)
+  '/api/navratri/verify',              // OTP verify (public)
+  '/api/navratri/checkout',            // Stripe checkout (public)
+  '/api/navratri/webhook',             // Stripe webhook
+  '/api/navratri/events',              // Event info (public read)
+  '/api/navratri/tickets',             // Ticket lookup (public)
+  '/api/navratri/scanner',             // Scanner auth + validate
+  '/api/navratri/pickup',              // Pickup lookup + confirm
+  '/api/navratri/aarti/days',          // Public read for days & bids
+  '/api/navratri/aarti/bid',           // Public bidding OTP flows
+  '/privacy',                          // Privacy policy (must be public for A2P compliance)
   '/_next', '/favicon',
 ];
 
@@ -42,11 +56,14 @@ function getPageSlug(pathname) {
   if (pathname.startsWith('/api/dry-run'))       return 'dashboard';
   if (pathname.startsWith('/api/execute'))       return 'dashboard';
   if (pathname.startsWith('/reports/monthly'))  return 'monthly';
+  if (pathname.startsWith('/reports/stripe'))   return 'stripe';
   if (pathname.startsWith('/reports'))          return 'reports';
   if (pathname.startsWith('/banner'))           return 'banner';
   if (pathname.startsWith('/pickleball'))       return 'pickleball';
   if (pathname.startsWith('/indiafest/sponsors'))return 'sponsors';
   if (pathname.startsWith('/indiafest'))        return 'indiafest';
+  if (pathname.startsWith('/navratri/aarti'))   return 'navratri_aarti';
+  if (pathname.startsWith('/admin/navratri-aarti')) return 'navratri_aarti';
   if (pathname.startsWith('/navratri/vendors')) return 'navratri_vendors';
   if (pathname.startsWith('/navratri'))         return 'navratri';
   if (pathname.startsWith('/settings/users'))   return 'users';
@@ -58,7 +75,7 @@ function getPageSlug(pathname) {
 function hasAccess(allowedPages, slug) {
   if (!allowedPages) return false;
   const pages = Array.isArray(allowedPages) ? allowedPages : JSON.parse(allowedPages);
-  return pages.includes('*') || pages.includes(slug) || (slug === 'navratri_vendors' && pages.includes('navratri'));
+  return pages.includes('*') || pages.includes(slug) || ((slug === 'navratri_vendors' || slug === 'navratri_aarti') && pages.includes('navratri'));
 }
 
 // ── Next.js 16: exported function MUST be named 'proxy' ──────────────────────
@@ -121,6 +138,6 @@ export async function proxy(request) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|.*\\.png$).*)',
+    '/((?!api|_next/static|_next/image|privacy|.*\\.png$).*)',
   ],
 };

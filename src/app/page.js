@@ -26,6 +26,7 @@ const SvgIcons = {
   vendor: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M2 9h20"/></svg>,
   screen: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="20" height="15" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="18" y2="21"/></svg>,
   key: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21 2-2 2m-1.5 1.5L14 9l-4.5 4.5a5 5 0 1 1-2.5-2.5L11.5 6.5l3.5-3.5 6 6-1.5 1.5"/><circle cx="7.5" cy="16.5" r="1.5"/></svg>,
+  aarti: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2c.5 2 2 3.5 2 5.5 0 2.5-2 3.5-2 3.5s-2-1-2-3.5C10 5.5 11.5 4 12 2z"/><path d="M4 14c0 4 3.5 7 8 7s8-3 8-7c0-2-3-3-8-3s-8 1-8 3z"/></svg>,
   settings: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
 };
 
@@ -141,6 +142,8 @@ function PublicLanding() {
   const [hovered, setHovered] = useState(null);
   const [ledAdsLive, setLedAdsLive] = useState(false);
   const [vendorLive, setVendorLive] = useState(false);
+  const [aartiLive, setAartiLive] = useState(false);
+  const [aartiData, setAartiData] = useState(null);
 
   // Check if LED ads and Vendor registration are live AND before event last day cutoff (10-25-2026 11:59:59 PM EST)
   useEffect(() => {
@@ -157,13 +160,50 @@ function PublicLanding() {
         .then(r => r.json())
         .then(d => setVendorLive(d.is_published === true && !d.is_past_cutoff))
         .catch(() => setVendorLive(false));
+
+      // Aarti Bidding Cutoff (10-20-2026 11:59:59 PM EST)
+      const aartiCutoff = new Date('2026-10-20T23:59:59-04:00').getTime();
+      if (Date.now() <= aartiCutoff) {
+        fetch('/api/navratri/aarti/days')
+          .then(r => r.json())
+          .then(d => {
+            if (d.success && d.settings?.is_published === true && !d.settings?.is_past_cutoff) {
+              setAartiLive(true);
+              setAartiData(d);
+            } else {
+              setAartiLive(false);
+            }
+          })
+          .catch(() => setAartiLive(false));
+      } else {
+        setAartiLive(false);
+      }
     } else {
       setLedAdsLive(false);
       setVendorLive(false);
+      setAartiLive(false);
     }
   }, []);
 
   const options = [
+    ...(aartiLive ? [{
+      title: 'Navratri 2026 — Daily Aarti Seva',
+      desc: 'Sponsor and perform the sacred evening Aarti each night. Live community bidding with dynamic increments and daily 9:30 PM EST cutoff.',
+      href: '/navratri-aarti',
+      accentColor: '#E8780C',
+      glowColor: 'rgba(232, 120, 12, 0.16)',
+      borderColor: 'rgba(232, 120, 12, 0.35)',
+      icon: SvgIcons.aarti,
+      badge: 'Live Bidding',
+      cta: 'Place Aarti Bid',
+      isOpen: true,
+      kpis: [
+        { label: 'Reserve Opening', value: '$500' },
+        { label: 'Daily Cutoff', value: '9:30 PM EST' },
+        { label: '10 Sacred Nights', value: '10-11-2026 to 10-20-2026' },
+        { label: 'Day 8 Maha Aarti', value: '10-18-2026' },
+      ],
+    }] : []),
     ...(vendorLive ? [{
       title: 'Navratri 2026 — Vendor Booths',
       desc: 'Reserve your booth space for Navratri 2026. Daily slots ($201 Standard / $351 Peak & Weekends) with high community attendance.',
@@ -343,9 +383,35 @@ function PublicLanding() {
                   <h2 style={{ margin: '0 0 10px', fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
                     {opt.title}
                   </h2>
-                  <p style={{ margin: '0 0 28px', fontSize: '13.5px', lineHeight: '1.6', color: 'var(--text-secondary)', flex: 1 }}>
+                  <p style={{ margin: '0 0 20px', fontSize: '13.5px', lineHeight: '1.6', color: 'var(--text-secondary)', flex: 1 }}>
                     {opt.desc}
                   </p>
+
+                  {/* Optional KPI Metrics Strip */}
+                  {opt.kpis && (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      gap: '8px',
+                      marginBottom: '22px',
+                      background: 'var(--bg-input)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '10px',
+                      padding: '10px 12px',
+                      textAlign: 'left',
+                    }}>
+                      {opt.kpis.map((kpi, kIdx) => (
+                        <div key={kIdx}>
+                          <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+                            {kpi.label}
+                          </div>
+                          <div style={{ fontSize: '12.5px', fontWeight: '700', color: 'var(--text-primary)', marginTop: '2px' }}>
+                            {kpi.value}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Action Link Indicator */}
                   <div style={{

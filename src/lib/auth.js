@@ -69,7 +69,12 @@ export async function getSessionAndPermissions(requiredSlug) {
   }
 
   if (requiredSlug) {
-    const allowed = payload.allowedPages?.includes('*') || payload.allowedPages?.includes(requiredSlug);
+    const slugs = Array.isArray(requiredSlug) ? requiredSlug : [requiredSlug];
+    const userPages = payload.allowedPages || [];
+    const allowed = userPages.includes('*') || slugs.some(slug => 
+      userPages.includes(slug) || 
+      ((slug === 'navratri_vendors' || slug === 'navratri_aarti') && userPages.includes('navratri'))
+    );
     if (!allowed) {
       return { success: false, error: 'Forbidden — insufficient permissions', status: 403 };
     }
