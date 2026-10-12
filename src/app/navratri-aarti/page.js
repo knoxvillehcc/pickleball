@@ -109,6 +109,29 @@ export default function NavratriAartiPage() {
     setOtpCode('');
   };
 
+  // Handle URL query parameter `?day=X` for direct re-bidding from email notifications
+  useEffect(() => {
+    if (typeof window === 'undefined' || days.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const dayParam = params.get('day');
+    if (dayParam) {
+      const targetDay = days.find((d) => String(d.day_number) === String(dayParam));
+      if (targetDay && targetDay.status !== 'closed' && !targetDay.is_past_cutoff) {
+        setSelectedDay(targetDay);
+        setStep(1);
+        setBidAmount(targetDay.quick_options?.[0]?.amount || (targetDay.current_highest_bid + 500));
+        setFormError('');
+        setOtpCode('');
+      }
+      const el = document.getElementById(`day-card-${dayParam}`);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
+    }
+  }, [days]);
+
   const closeBidModal = () => {
     setSelectedDay(null);
     setStep(1);
@@ -467,19 +490,23 @@ export default function NavratriAartiPage() {
                         onClick={() => openBidModal(day)}
                         style={{
                           width: '100%',
-                          background: isMaha ? 'var(--accent, #E8780C)' : 'var(--text-primary, #1D1D1F)',
+                          background: 'var(--accent, #E8780C)',
                           color: '#FFFFFF',
                           border: 'none',
-                          borderRadius: '10px',
-                          padding: '11px 14px',
-                          fontSize: '13.5px',
+                          borderRadius: '12px',
+                          padding: '13px 18px',
+                          fontSize: '15px',
                           fontWeight: '700',
                           cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '7px',
                           transition: 'opacity 0.15s ease, transform 0.1s ease',
-                          boxShadow: 'var(--shadow)',
+                          boxShadow: '0 3px 12px rgba(232, 120, 12, 0.28)',
                         }}
                       >
-                        Place Aarti Bid →
+                        {Icons.diya} Place Aarti Seva Bid &rarr;
                       </button>
                     )}
                   </div>
@@ -552,21 +579,22 @@ export default function NavratriAartiPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    background: 'var(--bg-input, #F2F2F5)',
+                    background: '#F8FAFC',
+                    border: '1.5px solid #E2E8F0',
                     borderRadius: '10px',
-                    padding: '10px 14px',
+                    padding: '11px 14px',
                     marginBottom: '16px',
-                    fontSize: '12.5px',
+                    fontSize: '13px',
                   }}>
-                    <span style={{ color: 'var(--text-secondary, #515154)' }}>Current Leader:</span>
-                    <span style={{ fontWeight: '700', color: 'var(--text-primary, #1D1D1F)' }}>
+                    <span style={{ color: '#475569', fontWeight: '500' }}>Current Leader:</span>
+                    <span style={{ fontWeight: '800', color: '#0F172A' }}>
                       {selectedDay.current_winner_name || 'None'} (${selectedDay.current_highest_bid.toLocaleString()})
                     </span>
                   </div>
 
                   {/* 1-Click Increment Pills */}
                   <div style={{ marginBottom: '18px' }}>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #515154)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
                       Select Your Bid Amount
                     </label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
@@ -578,20 +606,21 @@ export default function NavratriAartiPage() {
                             key={opt.amount}
                             onClick={() => setBidAmount(opt.amount)}
                             style={{
-                              background: isSelected ? 'rgba(232, 120, 12, 0.1)' : 'var(--bg-input, #F2F2F5)',
-                              border: isSelected ? '2px solid var(--accent, #E8780C)' : '1px solid var(--border, rgba(0,0,0,0.08))',
-                              borderRadius: '10px',
-                              padding: '10px 6px',
+                              background: isSelected ? '#FFF7ED' : '#FFFFFF',
+                              border: isSelected ? '2px solid #E8780C' : '1.5px solid #CBD5E1',
+                              borderRadius: '12px',
+                              padding: '11px 6px',
                               textAlign: 'center',
                               cursor: 'pointer',
-                              color: isSelected ? 'var(--accent-strong, #C96205)' : 'var(--text-primary, #1D1D1F)',
+                              color: isSelected ? '#C2410C' : '#0F172A',
+                              boxShadow: isSelected ? '0 2px 8px rgba(232, 120, 12, 0.22)' : 'none',
                               transition: 'all 0.15s ease',
                             }}
                           >
-                            <div style={{ fontSize: '15px', fontWeight: '800' }}>
+                            <div style={{ fontSize: '16px', fontWeight: '800' }}>
                               ${opt.amount.toLocaleString()}
                             </div>
-                            <div style={{ fontSize: '10px', fontWeight: '600', color: isSelected ? 'var(--accent, #E8780C)' : 'var(--text-muted, #86868B)', marginTop: '2px' }}>
+                            <div style={{ fontSize: '11px', fontWeight: '700', color: isSelected ? '#EA580C' : '#475569', marginTop: '2px' }}>
                               {opt.label.split('(')[1]?.replace(')', '') || 'Next'}
                             </div>
                           </button>
@@ -601,9 +630,9 @@ export default function NavratriAartiPage() {
                   </div>
 
                   {/* Devotee Inputs */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary, #515154)', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '5px' }}>
                         Full Name (Shown publicly if winning)
                       </label>
                       <input
@@ -615,19 +644,20 @@ export default function NavratriAartiPage() {
                         style={{
                           width: '100%',
                           boxSizing: 'border-box',
-                          background: 'var(--bg-input, #F2F2F5)',
-                          border: '1px solid var(--border, rgba(0,0,0,0.12))',
+                          background: '#FFFFFF',
+                          border: '1.5px solid #CBD5E1',
                           borderRadius: '10px',
-                          padding: '10px 12px',
-                          color: 'var(--text-primary, #1D1D1F)',
-                          fontSize: '13.5px',
+                          padding: '12px 14px',
+                          color: '#0F172A',
+                          fontSize: '16px', // 16px prevents iOS Safari auto-zoom
                           outline: 'none',
+                          fontWeight: '500',
                         }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary, #515154)', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '5px' }}>
                         Phone Number (Private · staff only)
                       </label>
                       <input
@@ -639,19 +669,20 @@ export default function NavratriAartiPage() {
                         style={{
                           width: '100%',
                           boxSizing: 'border-box',
-                          background: 'var(--bg-input, #F2F2F5)',
-                          border: '1px solid var(--border, rgba(0,0,0,0.12))',
+                          background: '#FFFFFF',
+                          border: '1.5px solid #CBD5E1',
                           borderRadius: '10px',
-                          padding: '10px 12px',
-                          color: 'var(--text-primary, #1D1D1F)',
-                          fontSize: '13.5px',
+                          padding: '12px 14px',
+                          color: '#0F172A',
+                          fontSize: '16px', // 16px prevents iOS Safari auto-zoom
                           outline: 'none',
+                          fontWeight: '500',
                         }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary, #515154)', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '5px' }}>
                         Email Address (OTP verification code sent here)
                       </label>
                       <input
@@ -663,13 +694,14 @@ export default function NavratriAartiPage() {
                         style={{
                           width: '100%',
                           boxSizing: 'border-box',
-                          background: 'var(--bg-input, #F2F2F5)',
-                          border: '1px solid var(--border, rgba(0,0,0,0.12))',
+                          background: '#FFFFFF',
+                          border: '1.5px solid #CBD5E1',
                           borderRadius: '10px',
-                          padding: '10px 12px',
-                          color: 'var(--text-primary, #1D1D1F)',
-                          fontSize: '13.5px',
+                          padding: '12px 14px',
+                          color: '#0F172A',
+                          fontSize: '16px', // 16px prevents iOS Safari auto-zoom
                           outline: 'none',
+                          fontWeight: '500',
                         }}
                       />
                     </div>
@@ -677,13 +709,14 @@ export default function NavratriAartiPage() {
 
                   {formError && (
                     <div style={{
-                      background: 'var(--bg-error, rgba(215, 0, 21, 0.06))',
-                      border: '1px solid var(--border-error, rgba(215, 0, 21, 0.20))',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      color: 'var(--text-error, #D70015)',
-                      fontSize: '12px',
-                      marginBottom: '14px',
+                      background: '#FEF2F2',
+                      border: '1.5px solid #FECACA',
+                      borderRadius: '10px',
+                      padding: '10px 14px',
+                      color: '#B91C1C',
+                      fontSize: '12.5px',
+                      fontWeight: '600',
+                      marginBottom: '16px',
                     }}>
                       {formError}
                     </div>
@@ -697,13 +730,14 @@ export default function NavratriAartiPage() {
                       background: 'var(--accent, #E8780C)',
                       color: '#FFFFFF',
                       border: 'none',
-                      borderRadius: '10px',
-                      padding: '12px',
-                      fontSize: '14px',
-                      fontWeight: '700',
+                      borderRadius: '12px',
+                      padding: '15px 18px',
+                      fontSize: '16px',
+                      fontWeight: '800',
                       cursor: submitting ? 'not-allowed' : 'pointer',
                       opacity: submitting ? 0.7 : 1,
-                      boxShadow: 'var(--shadow)',
+                      boxShadow: '0 4px 14px rgba(232, 120, 12, 0.35)',
+                      letterSpacing: '0.2px',
                     }}
                   >
                     {submitting ? 'Sending Verification Code...' : `Verify & Place Bid of $${bidAmount?.toLocaleString()} →`}
@@ -723,7 +757,7 @@ export default function NavratriAartiPage() {
                     </div>
                   </div>
 
-                  <div style={{ marginBottom: '16px' }}>
+                  <div style={{ marginBottom: '18px' }}>
                     <input
                       type="text"
                       maxLength="6"
@@ -735,23 +769,24 @@ export default function NavratriAartiPage() {
                       style={{
                         width: '100%',
                         boxSizing: 'border-box',
-                        background: 'var(--bg-input, #F2F2F5)',
-                        border: '1.5px solid var(--accent, #E8780C)',
-                        borderRadius: '10px',
-                        padding: '12px',
+                        background: '#FFFFFF',
+                        border: '2px solid var(--accent, #E8780C)',
+                        borderRadius: '12px',
+                        padding: '14px',
                         textAlign: 'center',
-                        fontSize: '26px',
+                        fontSize: '28px',
                         fontWeight: '800',
                         letterSpacing: '8px',
-                        color: 'var(--accent-strong, #C96205)',
+                        color: '#0F172A',
                         outline: 'none',
                         fontFamily: 'monospace',
+                        boxShadow: '0 2px 10px rgba(232, 120, 12, 0.15)',
                       }}
                     />
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11.5px', marginBottom: '16px' }}>
-                    <span style={{ color: countdown > 0 ? 'var(--text-secondary, #515154)' : 'var(--text-error, #D70015)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', marginBottom: '16px' }}>
+                    <span style={{ fontWeight: '600', color: countdown > 0 ? '#475569' : '#DC2626' }}>
                       Expires in: {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
                     </span>
                     <button
@@ -761,9 +796,9 @@ export default function NavratriAartiPage() {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: canResend ? 'var(--accent, #E8780C)' : 'var(--text-muted, #86868B)',
-                        fontSize: '11.5px',
-                        fontWeight: '600',
+                        color: canResend ? 'var(--accent, #E8780C)' : '#94A3B8',
+                        fontSize: '12px',
+                        fontWeight: '700',
                         cursor: canResend ? 'pointer' : 'not-allowed',
                         textDecoration: 'underline',
                       }}
@@ -774,13 +809,14 @@ export default function NavratriAartiPage() {
 
                   {formError && (
                     <div style={{
-                      background: 'var(--bg-error, rgba(215, 0, 21, 0.06))',
-                      border: '1px solid var(--border-error, rgba(215, 0, 21, 0.20))',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      color: 'var(--text-error, #D70015)',
-                      fontSize: '12px',
-                      marginBottom: '14px',
+                      background: '#FEF2F2',
+                      border: '1.5px solid #FECACA',
+                      borderRadius: '10px',
+                      padding: '10px 14px',
+                      color: '#B91C1C',
+                      fontSize: '12.5px',
+                      fontWeight: '600',
+                      marginBottom: '16px',
                     }}>
                       {formError}
                     </div>
@@ -791,19 +827,19 @@ export default function NavratriAartiPage() {
                     disabled={submitting || otpCode.length < 6}
                     style={{
                       width: '100%',
-                      background: 'var(--accent, #E8780C)',
+                      background: '#10B981',
                       color: '#FFFFFF',
                       border: 'none',
-                      borderRadius: '10px',
-                      padding: '12px',
-                      fontSize: '14px',
-                      fontWeight: '700',
+                      borderRadius: '12px',
+                      padding: '15px 18px',
+                      fontSize: '16px',
+                      fontWeight: '800',
                       cursor: (submitting || otpCode.length < 6) ? 'not-allowed' : 'pointer',
                       opacity: (submitting || otpCode.length < 6) ? 0.6 : 1,
-                      boxShadow: 'var(--shadow)',
+                      boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)',
                     }}
                   >
-                    {submitting ? 'Verifying...' : 'Confirm & Post Bid'}
+                    {submitting ? 'Confirming...' : 'Confirm & Post Winning Bid ✓'}
                   </button>
                 </form>
               )}

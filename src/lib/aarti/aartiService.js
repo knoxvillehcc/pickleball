@@ -290,61 +290,94 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
 
   const emailHtml = `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
       <meta charset="utf-8">
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0b0f19; color: #f8fafc; margin: 0; padding: 24px; }
-        .card { max-width: 520px; margin: 0 auto; background: #131b2e; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .header { background: linear-gradient(135deg, #b45309 0%, #ea580c 100%); padding: 32px 28px; text-align: center; }
-        .header h1 { margin: 0; font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; }
-        .header p { margin: 6px 0 0; font-size: 13px; color: rgba(255,255,255,0.9); }
-        .body { padding: 32px 28px; }
-        .otp-box { background: #1e293b; border: 1.5px dashed #f59e0b; border-radius: 14px; padding: 20px; text-align: center; margin: 24px 0; }
-        .otp-digits { font-size: 38px; font-weight: 800; letter-spacing: 8px; color: #f59e0b; font-family: monospace; }
-        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 14px; }
-        .detail-label { color: #94a3b8; }
-        .detail-val { color: #ffffff; font-weight: 600; }
-        .footer { padding: 20px 28px; background: #0f172a; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid rgba(255,255,255,0.06); }
-      </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Verification Code - Aarti Seva</title>
     </head>
-    <body>
-      <div class="card">
-        <div class="header">
-          <h1>Hindu Community Center of Knoxville</h1>
-          <p>Navratri 2026 Daily Aarti Seva Bidding</p>
-        </div>
-        <div class="body">
-          <p style="margin: 0 0 16px; font-size: 16px; color: #e2e8f0;">Jai Mataji, <strong>${cleanName}</strong>!</p>
-          <p style="margin: 0 0 20px; font-size: 14px; color: #94a3b8; line-height: 1.5;">
-            Please enter the 6-digit verification code below to confirm and post your Aarti Seva bid. This code expires in <strong>5 minutes</strong>.
-          </p>
+    <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        
+        <!-- Header -->
+        <tr>
+          <td style="background-color: #E8780C; padding: 26px 24px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 800; color: #FFF2E5; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;">
+              Hindu Community Center of Knoxville
+            </div>
+            <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
+              Navratri 2026 · Daily Aarti Seva
+            </h1>
+          </td>
+        </tr>
 
-          <div class="otp-box">
-            <div style="font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Your Verification Code</div>
-            <div class="otp-digits">${otpCode}</div>
-          </div>
+        <!-- Content -->
+        <tr>
+          <td style="padding: 32px 28px;">
+            <h2 style="margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1D1D1F;">
+              Jai Mataji, ${cleanName}!
+            </h2>
+            <p style="margin: 0 0 20px; font-size: 14.5px; color: #515154; line-height: 1.55;">
+              Please enter the 6-digit verification code below to confirm and post your Aarti Seva bid. This code expires in <strong>5 minutes</strong>.
+            </p>
 
-          <div style="margin-top: 24px;">
-            <div class="detail-row">
-              <span class="detail-label">Festival Day</span>
-              <span class="detail-val">${day.day_title}</span>
+            <!-- OTP Box -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #FFFBEB; border: 1.5px dashed #F59E0B; border-radius: 14px; margin-bottom: 24px;">
+              <tr>
+                <td style="padding: 20px; text-align: center;">
+                  <div style="font-size: 11.5px; font-weight: 700; color: #B45309; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                    Your Verification Code
+                  </div>
+                  <div style="font-size: 38px; font-weight: 800; letter-spacing: 8px; color: #D97706; font-family: monospace;">
+                    ${otpCode}
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Details Summary Table -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 10px;">
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #E5E7EB; font-size: 13.5px; color: #64748B;">
+                  Festival Day
+                </td>
+                <td style="padding: 10px 0; border-bottom: 1px solid #E5E7EB; font-size: 14px; font-weight: 700; color: #1D1D1F; text-align: right;">
+                  Day ${day.day_number} — ${day.day_title}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #E5E7EB; font-size: 13.5px; color: #64748B;">
+                  Date (MM-DD-YYYY)
+                </td>
+                <td style="padding: 10px 0; border-bottom: 1px solid #E5E7EB; font-size: 14px; font-weight: 700; color: #1D1D1F; text-align: right;">
+                  ${formattedDate}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; font-size: 14px; color: #64748B;">
+                  Your Bid Amount
+                </td>
+                <td style="padding: 12px 0; font-size: 18px; font-weight: 800; color: #E8780C; text-align: right;">
+                  $${amount.toLocaleString()}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background-color: #FAFAFC; padding: 20px 24px; text-align: center; border-top: 1px solid #E5E7EB;">
+            <div style="font-size: 12px; font-weight: 600; color: #64748B;">
+              Hindu Community Center · 8580 Executive Park Dr, Knoxville, TN 37923
             </div>
-            <div class="detail-row">
-              <span class="detail-label">Date (MM-DD-YYYY)</span>
-              <span class="detail-val">${formattedDate}</span>
+            <div style="font-size: 11px; color: #94A3B8; margin-top: 4px;">
+              If you did not request this bid, please ignore this email.
             </div>
-            <div class="detail-row" style="border-bottom: none;">
-              <span class="detail-label">Your Bid Amount</span>
-              <span class="detail-val" style="color: #34d399; font-size: 16px;">$${amount.toLocaleString()}</span>
-            </div>
-          </div>
-        </div>
-        <div class="footer">
-          Hindu Community Center · 8580 Executive Park Dr, Knoxville, TN 37923<br>
-          If you did not request this bid, please ignore this email.
-        </div>
-      </div>
+          </td>
+        </tr>
+
+      </table>
     </body>
     </html>
   `;
@@ -475,6 +508,7 @@ export async function verifyBid({ bid_id, otp_code }) {
     sendOutbidAlert({
       toEmail: previousWinnerEmail,
       toName: previousWinnerName || 'Devotee',
+      dayNumber: bid.day_number,
       dayTitle: day.day_title,
       eventDate: day.event_date,
       newHighBid: bid.bid_amount,
@@ -535,50 +569,126 @@ export async function resendOtp({ bid_id }) {
 /**
  * Send outbid alert email
  */
-async function sendOutbidAlert({ toEmail, toName, dayTitle, eventDate, newHighBid }) {
+async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate, newHighBid }) {
   const [y, m, d] = (eventDate || '').split('-');
   const formattedDate = (y && m && d) ? `${m}-${d}-${y}` : eventDate;
 
+  // Calculate next minimum bid to take back the lead
+  const settings = await getAartiSettings().catch(() => ({ tier1_max: 3000, tier1_increment: 500, tier2_increment: 250 }));
+  const minStep = calculateNextStep(newHighBid, settings);
+  const minNextBid = newHighBid + minStep;
+
+  // Determine rebid link
+  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL && !process.env.NEXT_PUBLIC_BASE_URL.includes('localhost'))
+    ? process.env.NEXT_PUBLIC_BASE_URL
+    : 'https://dashboard.knoxvillemandir.org';
+  const targetDayNum = dayNumber || 1;
+  const rebidUrl = `${baseUrl}/navratri-aarti?day=${targetDayNum}#day-card-${targetDayNum}`;
+
   const html = `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
       <meta charset="utf-8">
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0b0f19; color: #f8fafc; margin: 0; padding: 24px; }
-        .card { max-width: 520px; margin: 0 auto; background: #131b2e; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .header { background: linear-gradient(135deg, #e11d48 0%, #b45309 100%); padding: 32px 28px; text-align: center; }
-        .header h1 { margin: 0; font-size: 20px; font-weight: 700; color: #ffffff; }
-        .body { padding: 32px 28px; }
-        .alert-pill { display: inline-block; padding: 6px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; border-radius: 50px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
-        .cta-btn { display: block; width: 100%; box-sizing: border-box; text-align: center; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000000; font-weight: 700; font-size: 15px; padding: 14px 20px; border-radius: 12px; text-decoration: none; margin: 24px 0 12px; }
-      </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Outbid Alert - Aarti Seva</title>
     </head>
-    <body>
-      <div class="card">
-        <div class="header">
-          <h1>Hindu Community Center of Knoxville</h1>
-          <p style="margin: 6px 0 0; font-size: 13px; color: rgba(255,255,255,0.9);">Navratri 2026 Daily Aarti Alert</p>
-        </div>
-        <div class="body">
-          <div class="alert-pill">Higher Bid Placed</div>
-          <p style="margin: 0 0 12px; font-size: 16px; color: #e2e8f0;">Jai Mataji, <strong>${toName}</strong>!</p>
-          <p style="margin: 0 0 16px; font-size: 14px; color: #94a3b8; line-height: 1.5;">
-            Another devotee has just placed a higher verified bid on <strong>${dayTitle}</strong> (${formattedDate}).
-          </p>
+    <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        
+        <!-- Header Banner -->
+        <tr>
+          <td style="background-color: #E8780C; padding: 26px 24px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 800; color: #FFF2E5; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;">
+              Hindu Community Center of Knoxville
+            </div>
+            <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
+              Navratri 2026 · Daily Aarti Seva
+            </h1>
+          </td>
+        </tr>
 
-          <div style="background: #1e293b; border-radius: 12px; padding: 16px; margin: 16px 0;">
-            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">New Highest Bid</div>
-            <div style="font-size: 28px; font-weight: 800; color: #f59e0b;">$${newHighBid.toLocaleString()}</div>
-          </div>
+        <!-- Content Area -->
+        <tr>
+          <td style="padding: 32px 28px;">
 
-          <p style="margin: 0 0 20px; font-size: 14px; color: #94a3b8;">
-            Would you like to reclaim your Aarti Seva for this day? Tap the button below to view the live dashboard and submit your new bid.
-          </p>
+            <!-- Higher Bid Pill Badge -->
+            <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 18px;">
+              <tr>
+                <td style="background-color: #FEE2E2; border: 1px solid #FCA5A5; border-radius: 20px; padding: 6px 14px;">
+                  <span style="font-size: 11.5px; font-weight: 800; color: #B91C1C; text-transform: uppercase; letter-spacing: 0.8px;">
+                    Higher Bid Placed
+                  </span>
+                </td>
+              </tr>
+            </table>
 
-          <a href="https://dashboard.knoxvillemandir.org/navratri-aarti" class="cta-btn">View Live Aarti Auction & Rebid →</a>
-        </div>
-      </div>
+            <h2 style="margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1D1D1F;">
+              Jai Mataji, ${toName}!
+            </h2>
+
+            <p style="margin: 0 0 20px; font-size: 14.5px; color: #515154; line-height: 1.55;">
+              Another devotee has just placed a higher verified bid on <strong>Day ${targetDayNum} — ${dayTitle}</strong> (${formattedDate}).
+            </p>
+
+            <!-- Highlighted Bid Summary Card -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #FAFAFC; border: 1.5px solid #E5E7EB; border-radius: 14px; margin-bottom: 22px;">
+              <tr>
+                <td style="padding: 18px 20px;">
+                  <div style="font-size: 11.5px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px;">
+                    New Highest Bid
+                  </div>
+                  <div style="font-size: 32px; font-weight: 800; color: #E8780C; letter-spacing: -0.5px; line-height: 1.1;">
+                    $${newHighBid.toLocaleString()}
+                  </div>
+                  <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #E5E7EB; font-size: 13px; color: #515154;">
+                    Minimum next bid to reclaim lead: <strong style="color: #10B981; font-weight: 700;">$${minNextBid.toLocaleString()}</strong>
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin: 0 0 24px; font-size: 14px; color: #515154; line-height: 1.5;">
+              Would you like to reclaim your Aarti Seva for this day? Tap the button below to view the live dashboard and submit your new bid. Bidding closes daily at <strong>9:30 PM EST</strong>.
+            </p>
+
+            <!-- Bulletproof CTA Button (Solid Orange with White Text) -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 16px;">
+              <tr>
+                <td align="center" style="background-color: #E8780C; border-radius: 12px; box-shadow: 0 3px 12px rgba(232, 120, 12, 0.28);">
+                  <a href="${rebidUrl}" target="_blank" style="display: block; width: 100%; box-sizing: border-box; padding: 16px 24px; font-size: 16px; font-weight: 800; color: #FFFFFF; text-decoration: none; border-radius: 12px; text-align: center; letter-spacing: 0.2px;">
+                    Reclaim Aarti Seva &amp; Rebid Now &rarr;
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Direct URL Link Fallback (Always Clickable) -->
+            <div style="text-align: center; margin-top: 14px; padding: 12px; background-color: #F8F9FA; border-radius: 10px; border: 1px dashed #CBD5E1;">
+              <div style="font-size: 11.5px; color: #64748B; margin-bottom: 4px; font-weight: 600;">
+                Or open this link directly in your browser:
+              </div>
+              <a href="${rebidUrl}" target="_blank" style="font-size: 12.5px; color: #E8780C; font-weight: 700; text-decoration: underline; word-break: break-all;">
+                ${rebidUrl}
+              </a>
+            </div>
+
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background-color: #FAFAFC; padding: 20px 24px; text-align: center; border-top: 1px solid #E5E7EB;">
+            <div style="font-size: 12px; font-weight: 600; color: #64748B;">
+              Hindu Community Center · 8580 Executive Park Dr, Knoxville, TN 37923
+            </div>
+            <div style="font-size: 11px; color: #94A3B8; margin-top: 4px;">
+              Daily Aarti bidding concludes each night at 9:30 PM EST.
+            </div>
+          </td>
+        </tr>
+
+      </table>
     </body>
     </html>
   `;
@@ -587,7 +697,7 @@ async function sendOutbidAlert({ toEmail, toName, dayTitle, eventDate, newHighBi
   await transporter.sendMail({
     from: `"HCC Navratri Aarti" <${process.env.GMAIL_USER}>`,
     to: toEmail,
-    subject: `Outbid Notice: Navratri ${dayTitle} Aarti (New High Bid: $${newHighBid.toLocaleString()})`,
+    subject: `Outbid Notice: Navratri Day ${targetDayNum} Aarti (New High Bid: $${newHighBid.toLocaleString()})`,
     html,
   });
 }
