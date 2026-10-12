@@ -1,19 +1,21 @@
 import { NextResponse } from 'next/server';
-import { getAartiDaysPublic, getAartiSettings } from '@/lib/aarti/aartiService';
+import { getAartiDaysPublic, getAartiSettings, getRecentAartiBidsPublic } from '@/lib/aarti/aartiService';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const [days, settings] = await Promise.all([
+    const [days, settings, recentBids] = await Promise.all([
       getAartiDaysPublic(),
       getAartiSettings(),
+      getRecentAartiBidsPublic(),
     ]);
 
     return NextResponse.json({
       success: true,
       days,
       settings,
+      recent_bids: recentBids,
     });
   } catch (error) {
     console.error('[API /aarti/days Error]:', error);

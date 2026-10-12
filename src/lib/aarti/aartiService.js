@@ -166,6 +166,35 @@ export async function getAartiDaysPublic() {
 }
 
 /**
+ * Public endpoint: returns recent verified bids for the live stage stream
+ */
+export async function getRecentAartiBidsPublic(limit = 12) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?is_verified=eq.true&select=id,day_number,bidder_name,bid_amount,created_at&order=created_at.desc&limit=${limit}`, {
+      headers: getServiceHeaders(),
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      console.error('[getRecentAartiBidsPublic] Supabase error:', await res.text());
+      return [];
+    }
+
+    const rows = await res.json();
+    return rows.map(b => ({
+      id: b.id,
+      day_number: b.day_number,
+      bidder_name: b.bidder_name || 'Devotee',
+      bid_amount: Number(b.bid_amount),
+      created_at: b.created_at,
+    }));
+  } catch (err) {
+    console.error('[getRecentAartiBidsPublic] fetch error:', err);
+    return [];
+  }
+}
+
+/**
  * Admin endpoint data: full unmasked days, payments, and settings
  */
 export async function getAartiDaysAdmin() {
