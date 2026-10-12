@@ -192,10 +192,6 @@ export default function AartiDisplayLivePage() {
     }
   };
 
-  // Grand Total Raised across all 10 days
-  const grandTotalSeva = days.reduce((sum, d) => sum + (Number(d.current_highest_bid) || 0), 0);
-  const totalBidsCount = days.reduce((sum, d) => sum + (Number(d.bids_count) || 0), 0);
-
   // Next Minimum Bid for Active Day
   const activeCurrentBid = Number(activeDay?.current_highest_bid || activeDay?.base_bid || 500);
   const activeBidsCount = Number(activeDay?.bids_count || 0);
@@ -207,16 +203,16 @@ export default function AartiDisplayLivePage() {
   return (
     <div
       style={{
-        minHeight: '100vh',
-        background: 'radial-gradient(ellipse at 50% 10%, #1A0D04 0%, #08080A 60%, #000000 100%)',
+        height: '100vh',
+        maxHeight: '100vh',
+        background: 'radial-gradient(ellipse at 50% 0%, #1c0f05 0%, #0a0a0d 50%, #000000 100%)',
         color: '#FFFFFF',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif",
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '24px 32px',
+        padding: '16px 24px',
         boxSizing: 'border-box',
-        overflowX: 'hidden',
+        overflow: 'hidden',
         userSelect: 'none',
       }}
     >
@@ -226,10 +222,13 @@ export default function AartiDisplayLivePage() {
           50% { transform: scale(1.3); opacity: 0.6; }
         }
         @keyframes subtleGlow {
-          0%, 100% { box-shadow: 0 0 35px rgba(232, 120, 12, 0.25); }
-          50% { box-shadow: 0 0 55px rgba(232, 120, 12, 0.45); }
+          0%, 100% { box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(232, 120, 12, 0.2); }
+          50% { box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6), 0 0 45px rgba(232, 120, 12, 0.35); }
         }
         .display-qr-card {
+          animation: subtleGlow 4s ease-in-out infinite;
+        }
+        .display-hero-card {
           animation: subtleGlow 4s ease-in-out infinite;
         }
       `}</style>
@@ -240,40 +239,43 @@ export default function AartiDisplayLivePage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '20px',
-          paddingBottom: '20px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          gap: '16px',
+          paddingBottom: '12px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          flexShrink: 0,
         }}
       >
         {/* Mandir Branding */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div
             style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '14px',
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
               background: 'linear-gradient(135deg, rgba(232, 120, 12, 0.3) 0%, rgba(232, 120, 12, 0.08) 100%)',
               border: '1px solid rgba(232, 120, 12, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#FF9F0A',
+              boxShadow: '0 4px 16px rgba(232, 120, 12, 0.25)',
+              flexShrink: 0,
             }}
           >
             {Icons.diya}
           </div>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '0.12em', color: '#FF9F0A', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '10.5px', fontWeight: '800', letterSpacing: '0.12em', color: '#FF9F0A', textTransform: 'uppercase' }}>
               Hindu Community Center of Knoxville
             </div>
-            <div style={{ fontSize: '20px', fontWeight: '800', letterSpacing: '-0.02em', color: '#FFFFFF', marginTop: '1px' }}>
+            <div style={{ fontSize: '18px', fontWeight: '800', letterSpacing: '-0.02em', color: '#FFFFFF', marginTop: '1px' }}>
               Navratri 2026 · Daily Aarti Seva Stage
             </div>
           </div>
         </div>
 
         {/* Live Auto-Sync Status & Fullscreen Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {/* Live Sync Beacon */}
           <div
             style={{
@@ -283,8 +285,8 @@ export default function AartiDisplayLivePage() {
               background: 'rgba(255, 255, 255, 0.06)',
               border: '1px solid rgba(255, 255, 255, 0.12)',
               borderRadius: '999px',
-              padding: '7px 16px',
-              fontSize: '12px',
+              padding: '6px 14px',
+              fontSize: '11.5px',
               fontWeight: '600',
               color: '#E5E5E7',
               fontVariantNumeric: 'tabular-nums',
@@ -317,8 +319,8 @@ export default function AartiDisplayLivePage() {
               background: 'rgba(255, 255, 255, 0.08)',
               border: '1px solid rgba(255, 255, 255, 0.16)',
               borderRadius: '999px',
-              padding: '7px 14px',
-              fontSize: '12px',
+              padding: '6px 13px',
+              fontSize: '11.5px',
               fontWeight: '600',
               color: '#FFFFFF',
               cursor: 'pointer',
@@ -332,130 +334,139 @@ export default function AartiDisplayLivePage() {
         </div>
       </header>
 
-      {/* ── MAIN STAGE CONTENT (TWO COLUMN: TODAY'S SPOTLIGHT + SCANNABLE QR) ──── */}
+      {/* ── MAIN STAGE CONTENT (TWO EQUAL HEIGHT EXPANDING CARDS) ─────────────── */}
       <main
         style={{
+          flex: 1,
+          minHeight: 0,
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.65fr) minmax(340px, 1fr)',
-          gap: '32px',
-          alignItems: 'center',
-          margin: '28px 0',
+          gridTemplateColumns: 'minmax(0, 1.48fr) minmax(330px, 1fr)',
+          gap: '20px',
+          alignItems: 'stretch',
+          margin: '14px 0',
         }}
       >
         {/* LEFT COLUMN: TODAY'S AARTI SEVA HERO SPOTLIGHT */}
         {activeDay ? (
           <div
+            className="display-hero-card"
             style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
               background: activeDay.is_maha_aarti
-                ? 'linear-gradient(145deg, rgba(232, 120, 12, 0.18) 0%, rgba(20, 20, 24, 0.85) 100%)'
-                : 'linear-gradient(145deg, rgba(30, 30, 36, 0.8) 0%, rgba(16, 16, 20, 0.9) 100%)',
+                ? 'linear-gradient(150deg, rgba(232, 120, 12, 0.2) 0%, rgba(20, 20, 25, 0.85) 60%, rgba(12, 12, 16, 0.95) 100%)'
+                : 'linear-gradient(150deg, rgba(32, 32, 40, 0.75) 0%, rgba(18, 18, 22, 0.9) 100%)',
               border: activeDay.is_maha_aarti
-                ? '2px solid rgba(232, 120, 12, 0.5)'
-                : '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '28px',
-              padding: '36px 40px',
-              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.6)',
+                ? '2px solid rgba(232, 120, 12, 0.6)'
+                : '1.5px solid rgba(232, 120, 12, 0.25)',
+              borderRadius: '24px',
+              padding: 'clamp(20px, 2.5vw, 32px)',
+              boxSizing: 'border-box',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
             {/* Top Row: Date Pill & Status */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span
-                  style={{
-                    background: '#FF9F0A',
-                    color: '#000000',
-                    fontSize: '12.5px',
-                    fontWeight: '900',
-                    padding: '4px 12px',
-                    borderRadius: '999px',
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Day {activeDay.day_number}
-                </span>
-
-                <span style={{ fontSize: '15px', fontWeight: '700', color: 'rgba(255, 255, 255, 0.85)', fontVariantNumeric: 'tabular-nums' }}>
-                  {activeDay.formatted_date}
-                </span>
-
-                {activeDay.is_maha_aarti && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span
                     style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      background: 'rgba(255, 159, 10, 0.2)',
-                      border: '1px solid rgba(255, 159, 10, 0.45)',
-                      color: '#FFB340',
-                      fontSize: '11px',
-                      fontWeight: '800',
-                      padding: '4px 10px',
-                      borderRadius: '8px',
+                      background: '#FF9F0A',
+                      color: '#000000',
+                      fontSize: '12px',
+                      fontWeight: '900',
+                      padding: '4px 11px',
+                      borderRadius: '999px',
                       letterSpacing: '0.06em',
                       textTransform: 'uppercase',
                     }}
                   >
-                    ★ Maha Aarti (Aatham)
+                    Day {activeDay.day_number}
                   </span>
-                )}
+
+                  <span style={{ fontSize: '14px', fontWeight: '700', color: 'rgba(255, 255, 255, 0.85)', fontVariantNumeric: 'tabular-nums' }}>
+                    {activeDay.formatted_date}
+                  </span>
+
+                  {activeDay.is_maha_aarti && (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        background: 'rgba(255, 159, 10, 0.2)',
+                        border: '1px solid rgba(255, 159, 10, 0.45)',
+                        color: '#FFB340',
+                        fontSize: '11px',
+                        fontWeight: '800',
+                        padding: '3px 9px',
+                        borderRadius: '7px',
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      ★ Maha Aarti (Aatham)
+                    </span>
+                  )}
+                </div>
+
+                {/* Status Pill */}
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: activeDay.status === 'closed' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(16, 185, 129, 0.15)',
+                    border: `1px solid ${activeDay.status === 'closed' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(16, 185, 129, 0.35)'}`,
+                    color: activeDay.status === 'closed' ? 'rgba(255, 255, 255, 0.6)' : '#34D399',
+                    borderRadius: '999px',
+                    padding: '4px 12px',
+                    fontSize: '11.5px',
+                    fontWeight: '700',
+                  }}
+                >
+                  {activeDay.status !== 'closed' && (
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34D399', display: 'inline-block' }} />
+                  )}
+                  <span>{activeDay.status === 'closed' ? 'Bidding Concluded' : 'Bidding Open'}</span>
+                </div>
               </div>
 
-              {/* Status Pill */}
-              <div
+              {/* Festival Day Title */}
+              <h2
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: activeDay.status === 'closed' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(16, 185, 129, 0.15)',
-                  border: `1px solid ${activeDay.status === 'closed' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(16, 185, 129, 0.35)'}`,
-                  color: activeDay.status === 'closed' ? 'rgba(255, 255, 255, 0.6)' : '#34D399',
-                  borderRadius: '999px',
-                  padding: '5px 14px',
-                  fontSize: '12px',
-                  fontWeight: '700',
+                  fontSize: 'clamp(24px, 3.2vw, 36px)',
+                  fontWeight: '800',
+                  letterSpacing: '-0.025em',
+                  margin: '0 0 16px',
+                  color: '#FFFFFF',
+                  lineHeight: 1.15,
                 }}
               >
-                {activeDay.status !== 'closed' && (
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34D399', display: 'inline-block' }} />
-                )}
-                <span>{activeDay.status === 'closed' ? 'Bidding Concluded' : 'Bidding Open'}</span>
-              </div>
+                {activeDay.day_title}
+              </h2>
             </div>
 
-            {/* Festival Day Title */}
-            <h2
-              style={{
-                fontSize: 'clamp(28px, 3.8vw, 42px)',
-                fontWeight: '800',
-                letterSpacing: '-0.025em',
-                margin: '0 0 24px',
-                color: '#FFFFFF',
-                lineHeight: 1.15,
-              }}
-            >
-              {activeDay.day_title}
-            </h2>
-
-            {/* Big Highest Bid Numeral */}
+            {/* Big Highest Bid Numeral Box */}
             <div
               style={{
                 background: 'rgba(0, 0, 0, 0.35)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '20px',
-                padding: '24px 28px',
-                marginBottom: '24px',
+                borderRadius: '18px',
+                padding: 'clamp(16px, 2.2vw, 24px)',
+                margin: 'auto 0',
               }}
             >
-              <div style={{ fontSize: '12px', fontWeight: '800', color: '#98989D', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
+              <div style={{ fontSize: '11px', fontWeight: '800', color: '#98989D', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>
                 {activeDay.status === 'closed' ? 'Winning Aarti Seva Contribution' : 'Current Highest Bid'}
               </div>
 
               <div
                 style={{
-                  fontSize: 'clamp(52px, 7.5vw, 84px)',
+                  fontSize: 'clamp(48px, 6.5vw, 76px)',
                   fontWeight: '900',
                   color: '#FF9F0A',
                   letterSpacing: '-0.03em',
@@ -472,8 +483,8 @@ export default function AartiDisplayLivePage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  marginTop: '16px',
-                  paddingTop: '16px',
+                  marginTop: '12px',
+                  paddingTop: '12px',
                   borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                 }}
               >
@@ -481,12 +492,12 @@ export default function AartiDisplayLivePage() {
                   <>
                     <div
                       style={{
-                        width: '38px',
-                        height: '38px',
+                        width: '36px',
+                        height: '36px',
                         borderRadius: '50%',
                         background: 'linear-gradient(135deg, #E8780C 0%, #B85A05 100%)',
                         color: '#FFFFFF',
-                        fontSize: '14px',
+                        fontSize: '13px',
                         fontWeight: '800',
                         display: 'flex',
                         alignItems: 'center',
@@ -497,20 +508,20 @@ export default function AartiDisplayLivePage() {
                       {getInitials(activeDay.current_winner_name)}
                     </div>
                     <div>
-                      <div style={{ fontSize: '11.5px', color: '#98989D', fontWeight: '600' }}>
+                      <div style={{ fontSize: '11px', color: '#98989D', fontWeight: '600' }}>
                         Leading Devotee Sponsor
                       </div>
-                      <div style={{ fontSize: '20px', fontWeight: '800', color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+                      <div style={{ fontSize: '19px', fontWeight: '800', color: '#FFFFFF', letterSpacing: '-0.01em' }}>
                         {activeDay.current_winner_name}
                       </div>
                     </div>
                   </>
                 ) : (
                   <div>
-                    <div style={{ fontSize: '12px', color: '#98989D' }}>
+                    <div style={{ fontSize: '11.5px', color: '#98989D' }}>
                       Opening Reserve: <strong style={{ color: '#FFFFFF' }}>${Number(activeDay.base_bid || 500).toLocaleString()}</strong>
                     </div>
-                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#FF9F0A', marginTop: '2px' }}>
+                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#FF9F0A', marginTop: '2px' }}>
                       First verified bid takes the lead!
                     </div>
                   </div>
@@ -523,36 +534,37 @@ export default function AartiDisplayLivePage() {
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '14px',
+                gap: '12px',
+                marginTop: '12px',
               }}
             >
               {/* Daily Bids Placed */}
-              <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '14px', padding: '14px 16px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                <div style={{ fontSize: '11px', color: '#8E8E93', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '13px', padding: '12px 14px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                <div style={{ fontSize: '10.5px', color: '#8E8E93', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Bids Placed
                 </div>
-                <div style={{ fontSize: '22px', fontWeight: '800', color: '#FFFFFF', marginTop: '2px' }}>
+                <div style={{ fontSize: '20px', fontWeight: '800', color: '#FFFFFF', marginTop: '2px' }}>
                   {activeDay.bids_count} {activeDay.bids_count === 1 ? 'bid' : 'bids'}
                 </div>
               </div>
 
               {/* Next Minimum Bid */}
-              <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '14px', padding: '14px 16px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                <div style={{ fontSize: '11px', color: '#8E8E93', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '13px', padding: '12px 14px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                <div style={{ fontSize: '10.5px', color: '#8E8E93', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Next Minimum Bid
                 </div>
-                <div style={{ fontSize: '22px', fontWeight: '800', color: '#34D399', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '20px', fontWeight: '800', color: '#34D399', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   ${nextMinBid.toLocaleString()}
                 </div>
               </div>
 
               {/* Daily Cutoff Countdown */}
-              <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '14px', padding: '14px 16px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                <div style={{ fontSize: '11px', color: '#8E8E93', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '13px', padding: '12px 14px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                <div style={{ fontSize: '10.5px', color: '#8E8E93', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ color: '#FF9F0A' }}>{Icons.clock}</span>
-                  <span>Daily 9:30 PM Cutoff</span>
+                  <span>9:30 PM Cutoff</span>
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: '800', color: activeDay.status === 'closed' ? '#8E8E93' : '#FF9F0A', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '18px', fontWeight: '800', color: activeDay.status === 'closed' ? '#8E8E93' : '#FF9F0A', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   {timeLeft || '9:30 PM EST'}
                 </div>
               </div>
@@ -568,71 +580,77 @@ export default function AartiDisplayLivePage() {
         <div
           className="display-qr-card"
           style={{
-            background: 'linear-gradient(160deg, rgba(28, 28, 34, 0.95) 0%, rgba(14, 14, 18, 0.98) 100%)',
-            border: '2px solid rgba(232, 120, 12, 0.35)',
-            borderRadius: '28px',
-            padding: '36px 30px',
-            textAlign: 'center',
+            height: '100%',
             display: 'flex',
             flexDirection: 'column',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            justifyContent: 'center',
+            background: 'linear-gradient(160deg, rgba(28, 28, 34, 0.95) 0%, rgba(14, 14, 18, 0.98) 100%)',
+            border: '2px solid rgba(232, 120, 12, 0.35)',
+            borderRadius: '24px',
+            padding: 'clamp(18px, 2.2vw, 28px) clamp(16px, 2vw, 24px)',
+            textAlign: 'center',
+            boxSizing: 'border-box',
           }}
         >
-          {/* Tag */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'rgba(232, 120, 12, 0.18)',
-              border: '1px solid rgba(232, 120, 12, 0.4)',
-              borderRadius: '999px',
-              padding: '6px 14px',
-              fontSize: '11.5px',
-              fontWeight: '800',
-              color: '#FF9F0A',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              marginBottom: '14px',
-            }}
-          >
-            {Icons.qrPhone} Scan to Bid on Phone
+          {/* Top Tag & Title */}
+          <div>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(232, 120, 12, 0.18)',
+                border: '1px solid rgba(232, 120, 12, 0.4)',
+                borderRadius: '999px',
+                padding: '5px 12px',
+                fontSize: '11px',
+                fontWeight: '800',
+                color: '#FF9F0A',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                marginBottom: '10px',
+              }}
+            >
+              {Icons.qrPhone} Scan to Bid on Phone
+            </div>
+
+            <h3
+              style={{
+                fontSize: 'clamp(20px, 2.2vw, 25px)',
+                fontWeight: '800',
+                color: '#FFFFFF',
+                letterSpacing: '-0.02em',
+                margin: '0 0 4px',
+              }}
+            >
+              Sponsor Tonight&apos;s Aarti
+            </h3>
+
+            <p
+              style={{
+                fontSize: '12.5px',
+                color: '#A1A1A6',
+                margin: '0',
+                maxWidth: '280px',
+                lineHeight: 1.4,
+              }}
+            >
+              Point smartphone camera at QR code to place your verified Aarti Seva bid.
+            </p>
           </div>
 
-          <h3
-            style={{
-              fontSize: '24px',
-              fontWeight: '800',
-              color: '#FFFFFF',
-              letterSpacing: '-0.02em',
-              margin: '0 0 6px',
-            }}
-          >
-            Sponsor Tonight&apos;s Aarti
-          </h3>
-
-          <p
-            style={{
-              fontSize: '13.5px',
-              color: '#A1A1A6',
-              margin: '0 0 22px',
-              maxWidth: '280px',
-              lineHeight: 1.45,
-            }}
-          >
-            Point your smartphone camera at the QR code below to place your verified Aarti Seva bid instantly.
-          </p>
-
-          {/* High-Contrast White Background Squircle for QR Code */}
+          {/* High-Contrast Pure White Squircle for QR Code */}
           <div
             style={{
               background: '#FFFFFF',
-              padding: '16px',
-              borderRadius: '20px',
-              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.5)',
-              display: 'inline-block',
-              marginBottom: '18px',
+              padding: '12px',
+              borderRadius: '18px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.55)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: 'auto 0',
             }}
           >
             {qrDataUrl ? (
@@ -640,36 +658,43 @@ export default function AartiDisplayLivePage() {
               <img
                 src={qrDataUrl}
                 alt="Scan to Bid on Aarti Seva"
-                width={220}
-                height={220}
-                style={{ display: 'block', borderRadius: '8px' }}
+                style={{
+                  display: 'block',
+                  borderRadius: '6px',
+                  width: 'clamp(170px, 21vh, 215px)',
+                  height: 'clamp(170px, 21vh, 215px)',
+                  objectFit: 'contain',
+                }}
               />
             ) : (
-              <div style={{ width: '220px', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+              <div style={{ width: '180px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
                 Generating QR...
               </div>
             )}
           </div>
 
-          {/* Direct URL pill */}
-          <div
-            style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '10px',
-              padding: '8px 14px',
-              fontSize: '12px',
-              color: '#FF9F0A',
-              fontWeight: '700',
-              fontFamily: 'monospace',
-              letterSpacing: '0.2px',
-            }}
-          >
-            dashboard.knoxvillemandir.org/navratri-aarti
-          </div>
+          {/* Bottom URL and footnote */}
+          <div style={{ width: '100%' }}>
+            <div
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '9px',
+                padding: '7px 12px',
+                fontSize: '11.5px',
+                color: '#FF9F0A',
+                fontWeight: '700',
+                fontFamily: 'monospace',
+                letterSpacing: '0.2px',
+                display: 'inline-block',
+              }}
+            >
+              dashboard.knoxvillemandir.org/navratri-aarti
+            </div>
 
-          <div style={{ fontSize: '11px', color: '#6E6E73', marginTop: '10px' }}>
-            Instant email verification · Real-time outbid notices
+            <div style={{ fontSize: '10.5px', color: '#6E6E73', marginTop: '8px' }}>
+              Instant email verification · Real-time outbid notices
+            </div>
           </div>
         </div>
       </main>
@@ -677,25 +702,16 @@ export default function AartiDisplayLivePage() {
       {/* ── 10-DAY FESTIVAL ROSTER TAPE (BOTTOM NAVIGATION) ────────────────── */}
       <footer
         style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          paddingTop: '18px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          paddingTop: '10px',
+          flexShrink: 0,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: '700', color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', fontWeight: '700', color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             <span>Festival 10-Day Roster</span>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>•</span>
             <span style={{ color: '#FF9F0A' }}>Click any day to spotlight</span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '13px' }}>
-            <span style={{ color: '#8E8E93' }}>
-              Total Devotion Pledged: <strong style={{ color: '#10B981', fontVariantNumeric: 'tabular-nums' }}>${grandTotalSeva.toLocaleString()}</strong>
-            </span>
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>|</span>
-            <span style={{ color: '#8E8E93' }}>
-              Total Bids: <strong style={{ color: '#FFFFFF' }}>{totalBidsCount}</strong>
-            </span>
           </div>
         </div>
 
@@ -727,8 +743,13 @@ export default function AartiDisplayLivePage() {
                     : isMaha
                     ? '1.5px solid rgba(232, 120, 12, 0.4)'
                     : '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '12px',
-                  padding: '10px 8px',
+                  borderRadius: '11px',
+                  padding: '7px 8px',
+                  minHeight: '56px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  boxSizing: 'border-box',
                   textAlign: 'left',
                   cursor: 'pointer',
                   color: '#FFFFFF',
@@ -737,8 +758,8 @@ export default function AartiDisplayLivePage() {
                   overflow: 'hidden',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: '800', color: isSelected ? '#FF9F0A' : '#8E8E93' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
+                  <span style={{ fontSize: '10.5px', fontWeight: '800', color: isSelected ? '#FF9F0A' : '#8E8E93' }}>
                     D{day.day_number}
                   </span>
                   {isMaha ? (
@@ -750,15 +771,15 @@ export default function AartiDisplayLivePage() {
                   )}
                 </div>
 
-                <div style={{ fontSize: '13.5px', fontWeight: '800', color: hasWinner ? '#FF9F0A' : '#E5E5E7', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '12.5px', fontWeight: '800', color: hasWinner ? '#FF9F0A' : '#E5E5E7', fontVariantNumeric: 'tabular-nums' }}>
                   ${Number(day.current_highest_bid).toLocaleString()}
                 </div>
 
                 <div
                   style={{
-                    fontSize: '10px',
+                    fontSize: '9.5px',
                     color: '#8E8E93',
-                    marginTop: '2px',
+                    marginTop: '1px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
