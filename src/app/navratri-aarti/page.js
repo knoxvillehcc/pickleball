@@ -18,12 +18,12 @@ const Icons = {
     </svg>
   ),
   check: (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   ),
   mail: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect width="20" height="16" x="2" y="4" rx="2" />
       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
@@ -33,7 +33,38 @@ const Icons = {
       <path d="M12 2c.5 2 2 3.5 2 5.5 0 2.5-2 3.5-2 3.5s-2-1-2-3.5C10 5.5 11.5 4 12 2z" />
       <path d="M4 14c0 4 3.5 7 8 7s8-3 8-7c0-2-3-3-8-3s-8 1-8 3z" />
     </svg>
-  )
+  ),
+  lock: (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  ),
+  clock: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  ),
+  shieldCheck: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  ),
+  user: (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+};
+
+const getInitials = (name) => {
+  if (!name) return 'D';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 };
 
 export default function NavratriAartiPage() {
@@ -250,141 +281,198 @@ export default function NavratriAartiPage() {
       paddingBottom: '60px',
       transition: 'background-color 0.25s, color 0.25s',
     }}>
-      {/* Top Header Navigation */}
-      <header style={{
-        maxWidth: '1160px',
-        margin: '0 auto',
-        padding: '20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-        <Link href="/" style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          color: 'var(--text-secondary, #515154)',
-          textDecoration: 'none',
-          fontSize: '13px',
-          fontWeight: '600',
-          background: 'var(--bg-card, #FFFFFF)',
-          border: '1px solid var(--border, rgba(0,0,0,0.09))',
-          padding: '8px 14px',
-          borderRadius: '10px',
-          boxShadow: 'var(--shadow)',
-        }}>
-          {Icons.chevronLeft} Back to Portal
-        </Link>
+      {/* Sticky Top Frosted Glass Navigation Bar */}
+      <header
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 40,
+          background: 'var(--bg-card, rgba(255, 255, 255, 0.85))',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderBottom: '1px solid var(--border, rgba(0, 0, 0, 0.08))',
+          transition: 'background-color 0.25s, border-color 0.25s',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '12px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--text-secondary, #515154)',
+              textDecoration: 'none',
+              fontSize: '13px',
+              fontWeight: '600',
+              background: 'var(--bg-input, #F2F2F5)',
+              border: '1px solid var(--border, rgba(0,0,0,0.08))',
+              padding: '7px 14px',
+              borderRadius: '999px',
+              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            {Icons.chevronLeft} Portal
+          </Link>
 
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '7px',
-          fontSize: '12px',
-          fontWeight: '700',
-          color: 'var(--accent, #E8780C)',
-          background: 'var(--bg-card, #FFFFFF)',
-          border: '1px solid var(--border, rgba(0,0,0,0.09))',
-          borderRadius: '10px',
-          padding: '8px 14px',
-          boxShadow: 'var(--shadow)',
-        }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent, #E8780C)', display: 'inline-block' }} />
-          Daily Cutoff: 9:30 PM EST
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '7px',
+              fontSize: '12px',
+              fontWeight: '700',
+              color: 'var(--accent, #E8780C)',
+              background: 'rgba(232, 120, 12, 0.1)',
+              border: '1px solid rgba(232, 120, 12, 0.25)',
+              borderRadius: '999px',
+              padding: '6px 14px',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            <span style={{ display: 'flex', color: 'var(--accent, #E8780C)' }}>
+              {Icons.clock}
+            </span>
+            <span>Daily Cutoff: <strong>9:30 PM EST</strong></span>
+          </div>
         </div>
       </header>
 
       {/* Live Scrolling Ticker Bar */}
       <AartiLiveTicker days={days} mode="public" />
 
-      {/* Hero Section */}
-      <section style={{ maxWidth: '780px', margin: '24px auto 36px', textAlign: 'center', padding: '0 20px' }}>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          fontSize: '11.5px',
-          fontWeight: '700',
-          color: 'var(--accent, #E8780C)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.8px',
-          marginBottom: '8px',
-        }}>
+      {/* Apple-Style Hero Section */}
+      <section
+        style={{
+          maxWidth: '820px',
+          margin: '36px auto 32px',
+          textAlign: 'center',
+          padding: '0 20px',
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '11px',
+            fontWeight: '700',
+            color: 'var(--accent, #E8780C)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            background: 'rgba(232, 120, 12, 0.1)',
+            border: '1px solid rgba(232, 120, 12, 0.22)',
+            padding: '5px 12px',
+            borderRadius: '999px',
+            marginBottom: '14px',
+          }}
+        >
           {Icons.diya} Hindu Community Center · Navratri 2026
         </div>
 
-        <h1 style={{
-          fontSize: 'clamp(28px, 4vw, 36px)',
-          fontWeight: '700',
-          letterSpacing: '-0.5px',
-          color: 'var(--text-primary, #1D1D1F)',
-          margin: '0 0 10px',
-        }}>
+        <h1
+          style={{
+            fontSize: 'clamp(32px, 5.5vw, 46px)',
+            fontWeight: '800',
+            letterSpacing: '-0.03em',
+            color: 'var(--text-primary, #1D1D1F)',
+            margin: '0 0 12px',
+            lineHeight: 1.1,
+          }}
+        >
           Daily Aarti Seva
         </h1>
 
-        <p style={{
-          fontSize: '15px',
-          color: 'var(--text-secondary, #515154)',
-          lineHeight: '1.5',
-          maxWidth: '580px',
-          margin: '0 auto 20px',
-        }}>
+        <p
+          style={{
+            fontSize: '16px',
+            color: 'var(--text-secondary, #515154)',
+            lineHeight: '1.55',
+            maxWidth: '620px',
+            margin: '0 auto 24px',
+          }}
+        >
           Devotees can sponsor and perform the sacred evening Aarti for each night of Navratri.
-          Advance bidding is open for all days. Daily bidding closes at <strong>9:30 PM EST</strong>.
+          Advance bidding is open for all 10 festival days. Daily bidding closes at <strong>9:30 PM EST</strong>.
         </p>
 
-        {/* Quiet Rule Strip */}
-        <div style={{
-          display: 'inline-flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '14px',
-          background: 'var(--bg-card, #FFFFFF)',
-          border: '1px solid var(--border, rgba(0,0,0,0.09))',
-          borderRadius: '12px',
-          padding: '10px 18px',
-          fontSize: '12.5px',
-          color: 'var(--text-secondary, #515154)',
-          boxShadow: 'var(--shadow)',
-        }}>
-          <span>Opening Reserve: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>$500</strong></span>
-          <span style={{ color: 'var(--border, #E5E5E5)' }}>|</span>
-          <span>Increments: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>$500</strong> (over $3k: $250)</span>
-          <span style={{ color: 'var(--border, #E5E5E5)' }}>|</span>
-          <span>Verified via Email OTP</span>
+        {/* Apple Segmented Feature Strip */}
+        <div
+          style={{
+            display: 'inline-flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px 18px',
+            background: 'var(--bg-card, #FFFFFF)',
+            border: '1px solid var(--border, rgba(0,0,0,0.09))',
+            borderRadius: '999px',
+            padding: '10px 22px',
+            fontSize: '12.5px',
+            color: 'var(--text-secondary, #515154)',
+            boxShadow: 'var(--shadow)',
+          }}
+        >
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+            <span>Opening Reserve:</span>
+            <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>$500</strong>
+          </span>
+          <span style={{ color: 'var(--border, rgba(0,0,0,0.15))' }}>•</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+            <span>Increments:</span>
+            <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>$500</strong>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)' }}>(+$250 over $3k)</span>
+          </span>
+          <span style={{ color: 'var(--border, rgba(0,0,0,0.15))' }}>•</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+            <span style={{ color: 'var(--accent, #E8780C)', display: 'flex' }}>{Icons.shieldCheck}</span>
+            <span>Verified via Email OTP</span>
+          </span>
         </div>
       </section>
 
-      {/* Main Festival Days Grid */}
-      <main style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 20px' }}>
+      {/* 10 Festival Days Grid */}
+      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted, #86868B)', fontSize: '14px' }}>
             Loading festival schedule...
           </div>
         ) : error ? (
-          <div style={{
-            background: 'var(--bg-error, rgba(215, 0, 21, 0.06))',
-            border: '1px solid var(--border-error, rgba(215, 0, 21, 0.20))',
-            borderRadius: '12px',
-            padding: '20px',
-            textAlign: 'center',
-            color: 'var(--text-error, #D70015)',
-            maxWidth: '460px',
-            margin: '30px auto',
-            fontSize: '13px',
-          }}>
+          <div
+            style={{
+              background: 'var(--bg-error, rgba(215, 0, 21, 0.06))',
+              border: '1px solid var(--border-error, rgba(215, 0, 21, 0.20))',
+              borderRadius: '14px',
+              padding: '20px',
+              textAlign: 'center',
+              color: 'var(--text-error, #D70015)',
+              maxWidth: '460px',
+              margin: '30px auto',
+              fontSize: '13px',
+            }}
+          >
             {error}
           </div>
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '16px',
-          }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
+              gap: '20px',
+            }}
+          >
             {days.map((day) => {
-              const isClosed = day.status === 'closed';
+              const isClosed = day.status === 'closed' || day.is_past_cutoff;
               const isMaha = day.is_maha_aarti;
               const hasWinner = day.bids_count > 0 && day.current_winner_name;
 
@@ -394,77 +482,230 @@ export default function NavratriAartiPage() {
                   id={`day-card-${day.day_number}`}
                   style={{
                     background: isMaha
-                      ? 'linear-gradient(180deg, rgba(232, 120, 12, 0.05) 0%, var(--bg-card, #FFFFFF) 100%)'
+                      ? 'linear-gradient(180deg, rgba(232, 120, 12, 0.06) 0%, var(--bg-card, #FFFFFF) 100%)'
                       : 'var(--bg-card, #FFFFFF)',
                     border: isMaha
                       ? '1.5px solid var(--accent, #E8780C)'
                       : '1px solid var(--border, rgba(0,0,0,0.09))',
-                    borderRadius: '14px',
-                    padding: '20px',
+                    borderRadius: '18px',
+                    padding: '22px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     boxShadow: isMaha
-                      ? '0 4px 14px rgba(232, 120, 12, 0.12), var(--shadow)'
+                      ? '0 6px 20px rgba(232, 120, 12, 0.16), var(--shadow)'
                       : 'var(--shadow)',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
                 >
                   <div>
-                    {/* Top Row: Date & Status */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                      <div style={{ fontSize: '12px', fontWeight: '700', color: isMaha ? 'var(--accent, #E8780C)' : 'var(--text-muted, #86868B)' }}>
-                        Day {day.day_number} · {day.formatted_date}
+                    {/* Top Row: Date Pill & Live Status Badge */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '12px',
+                        gap: '8px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          color: isMaha ? 'var(--accent, #E8780C)' : 'var(--text-secondary, #6E6E73)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        <span style={{ color: 'var(--accent, #E8780C)' }}>{Icons.diya}</span>
+                        <span>Day {day.day_number} · {day.formatted_date}</span>
                       </div>
 
                       {isClosed ? (
-                        <span style={{ fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px', background: 'rgba(0,0,0,0.05)', color: 'var(--text-muted, #86868B)' }}>
-                          Concluded
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            padding: '3px 9px',
+                            borderRadius: '999px',
+                            background: 'var(--bg-input, #F2F2F5)',
+                            color: 'var(--text-muted, #86868B)',
+                            border: '1px solid var(--border, rgba(0,0,0,0.06))',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          {Icons.lock} Concluded
                         </span>
                       ) : (
-                        <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.1)', color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-                          Open
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            padding: '3px 10px',
+                            borderRadius: '999px',
+                            background: 'rgba(16, 185, 129, 0.1)',
+                            color: '#10B981',
+                            border: '1px solid rgba(16, 185, 129, 0.25)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              background: '#10B981',
+                              boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.25)',
+                              display: 'inline-block',
+                            }}
+                          />
+                          Live · Open
                         </span>
                       )}
                     </div>
 
                     {/* Day Title */}
-                    <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)', marginBottom: isMaha ? '4px' : '12px' }}>
+                    <div
+                      style={{
+                        fontSize: '17px',
+                        fontWeight: '700',
+                        color: 'var(--text-primary, #1D1D1F)',
+                        marginBottom: isMaha ? '6px' : '14px',
+                        letterSpacing: '-0.01em',
+                        lineHeight: 1.3,
+                      }}
+                    >
                       {day.day_title}
                     </div>
 
+                    {/* Maha Aarti Badge */}
                     {isMaha && (
-                      <div style={{ fontSize: '11px', color: 'var(--accent, #E8780C)', fontWeight: '700', marginBottom: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          background: 'rgba(232, 120, 12, 0.15)',
+                          color: 'var(--accent, #E8780C)',
+                          fontSize: '10.5px',
+                          fontWeight: '800',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          letterSpacing: '0.4px',
+                          textTransform: 'uppercase',
+                          marginBottom: '14px',
+                        }}
+                      >
                         ★ Maha Aarti (Aatham)
                       </div>
                     )}
 
-                    {/* Bid & Leader Box */}
-                    <div style={{
-                      background: 'var(--bg-input, #F2F2F5)',
-                      borderRadius: '10px',
-                      padding: '12px 14px',
-                      marginBottom: '16px',
-                    }}>
-                      <div style={{ fontSize: '10.5px', fontWeight: '700', color: 'var(--text-muted, #86868B)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                    {/* Apple Wallet / Card Financial Highlight Block */}
+                    <div
+                      style={{
+                        background: 'var(--bg-input, #F2F2F5)',
+                        border: '1px solid var(--border, rgba(0,0,0,0.06))',
+                        borderRadius: '14px',
+                        padding: '14px 16px',
+                        marginBottom: '18px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: '10.5px',
+                          fontWeight: '700',
+                          color: 'var(--text-muted, #86868B)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.06em',
+                        }}
+                      >
                         {isClosed ? 'Winning Contribution' : 'Current Highest Bid'}
                       </div>
-                      <div style={{ fontSize: '24px', fontWeight: '800', color: hasWinner ? 'var(--accent, #E8780C)' : 'var(--text-primary, #1D1D1F)', marginTop: '2px' }}>
+
+                      <div
+                        style={{
+                          fontSize: '28px',
+                          fontWeight: '800',
+                          color: hasWinner ? 'var(--accent, #E8780C)' : 'var(--text-primary, #1D1D1F)',
+                          marginTop: '3px',
+                          fontVariantNumeric: 'tabular-nums',
+                          letterSpacing: '-0.02em',
+                        }}
+                      >
                         ${day.current_highest_bid.toLocaleString()}
                       </div>
 
-                      <div style={{ fontSize: '12px', color: 'var(--text-secondary, #515154)', marginTop: '6px' }}>
+                      {/* Devotee Leader Row */}
+                      <div
+                        style={{
+                          fontSize: '12.5px',
+                          color: 'var(--text-secondary, #515154)',
+                          marginTop: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '8px',
+                        }}
+                      >
                         {hasWinner ? (
-                          <span style={{ fontWeight: '600', color: 'var(--text-primary, #1D1D1F)' }}>
-                            Leader: {day.current_winner_name}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0 }}>
+                            <span
+                              style={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                background: 'rgba(232, 120, 12, 0.15)',
+                                color: 'var(--accent, #E8780C)',
+                                fontSize: '10px',
+                                fontWeight: '800',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {getInitials(day.current_winner_name)}
+                            </span>
+                            <span
+                              style={{
+                                fontWeight: '600',
+                                color: 'var(--text-primary, #1D1D1F)',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                              title={day.current_winner_name}
+                            >
+                              Leader: {day.current_winner_name}
+                            </span>
+                          </div>
                         ) : (
-                          'No bids yet · Reserve: $500'
+                          <span style={{ color: 'var(--text-secondary, #6E6E73)', fontSize: '12px' }}>
+                            No bids yet · Reserve: $500
+                          </span>
                         )}
+
                         {day.bids_count > 0 && (
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)', marginLeft: '6px' }}>
-                            ({day.bids_count} {day.bids_count === 1 ? 'bid' : 'bids'})
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              color: 'var(--text-muted, #86868B)',
+                              background: 'var(--bg-card, #FFFFFF)',
+                              border: '1px solid var(--border, rgba(0,0,0,0.08))',
+                              padding: '2px 7px',
+                              borderRadius: '999px',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {day.bids_count} {day.bids_count === 1 ? 'bid' : 'bids'}
                           </span>
                         )}
                       </div>
@@ -474,20 +715,24 @@ export default function NavratriAartiPage() {
                   {/* Card Bottom CTA */}
                   <div>
                     {isClosed ? (
-                      <div style={{
-                        textAlign: 'center',
-                        padding: '10px 12px',
-                        background: 'var(--bg-input, #F2F2F5)',
-                        borderRadius: '10px',
-                        fontSize: '12px',
-                        color: 'var(--text-secondary, #515154)',
-                        fontWeight: '500',
-                      }}>
-                        Aarti Sponsor: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>{day.current_winner_name || 'Anonymous'}</strong>
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          padding: '12px 14px',
+                          background: 'var(--bg-input, #F2F2F5)',
+                          border: '1px solid var(--border, rgba(0,0,0,0.06))',
+                          borderRadius: '12px',
+                          fontSize: '13px',
+                          color: 'var(--text-secondary, #515154)',
+                          fontWeight: '500',
+                        }}
+                      >
+                        Aarti Sponsor: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>{day.current_winner_name || 'Devotee'}</strong>
                       </div>
                     ) : (
                       <button
                         onClick={() => openBidModal(day)}
+                        type="button"
                         style={{
                           width: '100%',
                           background: 'var(--accent, #E8780C)',
@@ -501,9 +746,9 @@ export default function NavratriAartiPage() {
                           display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: '7px',
-                          transition: 'opacity 0.15s ease, transform 0.1s ease',
-                          boxShadow: '0 3px 12px rgba(232, 120, 12, 0.28)',
+                          gap: '8px',
+                          boxShadow: '0 4px 14px rgba(232, 120, 12, 0.3)',
+                          transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
                         }}
                       >
                         {Icons.diya} Place Aarti Seva Bid &rarr;
@@ -519,50 +764,81 @@ export default function NavratriAartiPage() {
 
       {/* Apple-Style Bidding Modal */}
       {selectedDay && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0, 0, 0, 0.45)',
-          backdropFilter: 'blur(10px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '16px',
-          zIndex: 9999,
-        }}>
-          <div style={{
-            background: 'var(--bg-card, #FFFFFF)',
-            border: '1px solid var(--border, rgba(0,0,0,0.1))',
-            borderRadius: '18px',
-            maxWidth: '420px',
-            width: '100%',
-            overflow: 'hidden',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.18)',
-          }}>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.55)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: 'var(--bg-card, #FFFFFF)',
+              border: '1px solid var(--border, rgba(0,0,0,0.12))',
+              borderRadius: '20px',
+              maxWidth: '430px',
+              width: '100%',
+              overflow: 'hidden',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.25)',
+              color: 'var(--text-primary, #1D1D1F)',
+            }}
+          >
             {/* Modal Header */}
-            <div style={{
-              padding: '18px 20px',
-              borderBottom: '1px solid var(--border, rgba(0,0,0,0.08))',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
+            <div
+              style={{
+                padding: '18px 22px',
+                borderBottom: '1px solid var(--border, rgba(0,0,0,0.08))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
               <div>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent, #E8780C)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                <div
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    color: 'var(--accent, #E8780C)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                  }}
+                >
                   Day {selectedDay.day_number} · {selectedDay.formatted_date}
                 </div>
-                <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)', marginTop: '2px' }}>
+                <div
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    color: 'var(--text-primary, #1D1D1F)',
+                    marginTop: '2px',
+                  }}
+                >
                   {selectedDay.day_title}
                 </div>
               </div>
               <button
                 onClick={closeBidModal}
+                type="button"
                 style={{
-                  background: 'none',
-                  border: 'none',
+                  background: 'var(--bg-input, #F2F2F5)',
+                  border: '1px solid var(--border, rgba(0,0,0,0.08))',
+                  borderRadius: '50%',
+                  width: '30px',
+                  height: '30px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   color: 'var(--text-muted, #86868B)',
                   cursor: 'pointer',
-                  padding: '4px',
+                  padding: 0,
+                  transition: 'opacity 0.15s ease',
                 }}
               >
                 {Icons.close}
@@ -570,31 +846,43 @@ export default function NavratriAartiPage() {
             </div>
 
             {/* Modal Body */}
-            <div style={{ padding: '20px' }}>
+            <div style={{ padding: '22px' }}>
               {/* STEP 1: Select 1-Click Bid & Enter Info */}
               {step === 1 && (
                 <form onSubmit={handleInitiateBid}>
-                  {/* Current Status */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    background: '#F8FAFC',
-                    border: '1.5px solid #E2E8F0',
-                    borderRadius: '10px',
-                    padding: '11px 14px',
-                    marginBottom: '16px',
-                    fontSize: '13px',
-                  }}>
-                    <span style={{ color: '#475569', fontWeight: '500' }}>Current Leader:</span>
-                    <span style={{ fontWeight: '800', color: '#0F172A' }}>
+                  {/* Current Status Strip */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: 'var(--bg-input, #F2F2F5)',
+                      border: '1px solid var(--border, rgba(0,0,0,0.08))',
+                      borderRadius: '12px',
+                      padding: '12px 14px',
+                      marginBottom: '18px',
+                      fontSize: '13px',
+                    }}
+                  >
+                    <span style={{ color: 'var(--text-secondary, #6E6E73)', fontWeight: '500' }}>Current Leader:</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-primary, #1D1D1F)', fontVariantNumeric: 'tabular-nums' }}>
                       {selectedDay.current_winner_name || 'None'} (${selectedDay.current_highest_bid.toLocaleString()})
                     </span>
                   </div>
 
                   {/* 1-Click Increment Pills */}
                   <div style={{ marginBottom: '18px' }}>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '800', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '11.5px',
+                        fontWeight: '700',
+                        color: 'var(--text-secondary, #6E6E73)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        marginBottom: '8px',
+                      }}
+                    >
                       Select Your Bid Amount
                     </label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
@@ -606,21 +894,29 @@ export default function NavratriAartiPage() {
                             key={opt.amount}
                             onClick={() => setBidAmount(opt.amount)}
                             style={{
-                              background: isSelected ? '#FFF7ED' : '#FFFFFF',
-                              border: isSelected ? '2px solid #E8780C' : '1.5px solid #CBD5E1',
+                              background: isSelected ? 'rgba(232, 120, 12, 0.12)' : 'var(--bg-input, #F2F2F5)',
+                              border: isSelected ? '2px solid var(--accent, #E8780C)' : '1px solid var(--border, rgba(0,0,0,0.12))',
                               borderRadius: '12px',
                               padding: '11px 6px',
                               textAlign: 'center',
                               cursor: 'pointer',
-                              color: isSelected ? '#C2410C' : '#0F172A',
-                              boxShadow: isSelected ? '0 2px 8px rgba(232, 120, 12, 0.22)' : 'none',
+                              color: isSelected ? 'var(--accent, #E8780C)' : 'var(--text-primary, #1D1D1F)',
+                              boxShadow: isSelected ? '0 2px 10px rgba(232, 120, 12, 0.22)' : 'none',
                               transition: 'all 0.15s ease',
+                              fontVariantNumeric: 'tabular-nums',
                             }}
                           >
                             <div style={{ fontSize: '16px', fontWeight: '800' }}>
                               ${opt.amount.toLocaleString()}
                             </div>
-                            <div style={{ fontSize: '11px', fontWeight: '700', color: isSelected ? '#EA580C' : '#475569', marginTop: '2px' }}>
+                            <div
+                              style={{
+                                fontSize: '11px',
+                                fontWeight: '700',
+                                color: isSelected ? 'var(--accent, #E8780C)' : 'var(--text-secondary, #6E6E73)',
+                                marginTop: '2px',
+                              }}
+                            >
                               {opt.label.split('(')[1]?.replace(')', '') || 'Next'}
                             </div>
                           </button>
@@ -630,9 +926,9 @@ export default function NavratriAartiPage() {
                   </div>
 
                   {/* Devotee Inputs */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '5px' }}>
+                      <label style={{ display: 'block', fontSize: '12.5px', fontWeight: '600', color: 'var(--text-secondary, #515154)', marginBottom: '5px' }}>
                         Full Name (Shown publicly if winning)
                       </label>
                       <input
@@ -644,20 +940,21 @@ export default function NavratriAartiPage() {
                         style={{
                           width: '100%',
                           boxSizing: 'border-box',
-                          background: '#FFFFFF',
-                          border: '1.5px solid #CBD5E1',
-                          borderRadius: '10px',
-                          padding: '12px 14px',
-                          color: '#0F172A',
-                          fontSize: '16px', // 16px prevents iOS Safari auto-zoom
+                          background: 'var(--bg-input, #F2F2F5)',
+                          border: '1.5px solid var(--border, rgba(0,0,0,0.12))',
+                          borderRadius: '12px',
+                          padding: '13px 14px',
+                          color: 'var(--text-primary, #1D1D1F)',
+                          fontSize: '16px', // 16px strictly prevents iOS Safari auto-zoom
                           outline: 'none',
                           fontWeight: '500',
+                          transition: 'border-color 0.2s, box-shadow 0.2s',
                         }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '5px' }}>
+                      <label style={{ display: 'block', fontSize: '12.5px', fontWeight: '600', color: 'var(--text-secondary, #515154)', marginBottom: '5px' }}>
                         Phone Number (Private · staff only)
                       </label>
                       <input
@@ -669,20 +966,21 @@ export default function NavratriAartiPage() {
                         style={{
                           width: '100%',
                           boxSizing: 'border-box',
-                          background: '#FFFFFF',
-                          border: '1.5px solid #CBD5E1',
-                          borderRadius: '10px',
-                          padding: '12px 14px',
-                          color: '#0F172A',
-                          fontSize: '16px', // 16px prevents iOS Safari auto-zoom
+                          background: 'var(--bg-input, #F2F2F5)',
+                          border: '1.5px solid var(--border, rgba(0,0,0,0.12))',
+                          borderRadius: '12px',
+                          padding: '13px 14px',
+                          color: 'var(--text-primary, #1D1D1F)',
+                          fontSize: '16px', // 16px strictly prevents iOS Safari auto-zoom
                           outline: 'none',
                           fontWeight: '500',
+                          transition: 'border-color 0.2s, box-shadow 0.2s',
                         }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '5px' }}>
+                      <label style={{ display: 'block', fontSize: '12.5px', fontWeight: '600', color: 'var(--text-secondary, #515154)', marginBottom: '5px' }}>
                         Email Address (OTP verification code sent here)
                       </label>
                       <input
@@ -694,30 +992,33 @@ export default function NavratriAartiPage() {
                         style={{
                           width: '100%',
                           boxSizing: 'border-box',
-                          background: '#FFFFFF',
-                          border: '1.5px solid #CBD5E1',
-                          borderRadius: '10px',
-                          padding: '12px 14px',
-                          color: '#0F172A',
-                          fontSize: '16px', // 16px prevents iOS Safari auto-zoom
+                          background: 'var(--bg-input, #F2F2F5)',
+                          border: '1.5px solid var(--border, rgba(0,0,0,0.12))',
+                          borderRadius: '12px',
+                          padding: '13px 14px',
+                          color: 'var(--text-primary, #1D1D1F)',
+                          fontSize: '16px', // 16px strictly prevents iOS Safari auto-zoom
                           outline: 'none',
                           fontWeight: '500',
+                          transition: 'border-color 0.2s, box-shadow 0.2s',
                         }}
                       />
                     </div>
                   </div>
 
                   {formError && (
-                    <div style={{
-                      background: '#FEF2F2',
-                      border: '1.5px solid #FECACA',
-                      borderRadius: '10px',
-                      padding: '10px 14px',
-                      color: '#B91C1C',
-                      fontSize: '12.5px',
-                      fontWeight: '600',
-                      marginBottom: '16px',
-                    }}>
+                    <div
+                      style={{
+                        background: 'var(--bg-error, rgba(215, 0, 21, 0.08))',
+                        border: '1.5px solid var(--border-error, rgba(215, 0, 21, 0.24))',
+                        borderRadius: '10px',
+                        padding: '10px 14px',
+                        color: 'var(--text-error, #D70015)',
+                        fontSize: '12.5px',
+                        fontWeight: '600',
+                        marginBottom: '16px',
+                      }}
+                    >
                       {formError}
                     </div>
                   )}
@@ -738,6 +1039,7 @@ export default function NavratriAartiPage() {
                       opacity: submitting ? 0.7 : 1,
                       boxShadow: '0 4px 14px rgba(232, 120, 12, 0.35)',
                       letterSpacing: '0.2px',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     {submitting ? 'Sending Verification Code...' : `Verify & Place Bid of $${bidAmount?.toLocaleString()} →`}
@@ -749,10 +1051,10 @@ export default function NavratriAartiPage() {
               {step === 2 && (
                 <form onSubmit={handleVerifyOtp}>
                   <div style={{ textAlign: 'center', marginBottom: '18px' }}>
-                    <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)', marginBottom: '4px' }}>
                       Enter 6-Digit Verification Code
                     </div>
-                    <div style={{ fontSize: '12.5px', color: 'var(--text-secondary, #515154)' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--text-secondary, #515154)', lineHeight: 1.4 }}>
                       Sent to <strong>{maskedEmail}</strong> for a bid of <strong>${bidAmount?.toLocaleString()}</strong>
                     </div>
                   </div>
@@ -769,15 +1071,15 @@ export default function NavratriAartiPage() {
                       style={{
                         width: '100%',
                         boxSizing: 'border-box',
-                        background: '#FFFFFF',
+                        background: 'var(--bg-input, #F2F2F5)',
                         border: '2px solid var(--accent, #E8780C)',
-                        borderRadius: '12px',
+                        borderRadius: '14px',
                         padding: '14px',
                         textAlign: 'center',
-                        fontSize: '28px',
+                        fontSize: '30px',
                         fontWeight: '800',
-                        letterSpacing: '8px',
-                        color: '#0F172A',
+                        letterSpacing: '10px',
+                        color: 'var(--text-primary, #1D1D1F)',
                         outline: 'none',
                         fontFamily: 'monospace',
                         boxShadow: '0 2px 10px rgba(232, 120, 12, 0.15)',
@@ -785,8 +1087,8 @@ export default function NavratriAartiPage() {
                     />
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', marginBottom: '16px' }}>
-                    <span style={{ fontWeight: '600', color: countdown > 0 ? '#475569' : '#DC2626' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12.5px', marginBottom: '16px' }}>
+                    <span style={{ fontWeight: '600', color: countdown > 0 ? 'var(--text-secondary, #6E6E73)' : 'var(--text-error, #D70015)', fontVariantNumeric: 'tabular-nums' }}>
                       Expires in: {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
                     </span>
                     <button
@@ -796,8 +1098,8 @@ export default function NavratriAartiPage() {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: canResend ? 'var(--accent, #E8780C)' : '#94A3B8',
-                        fontSize: '12px',
+                        color: canResend ? 'var(--accent, #E8780C)' : 'var(--text-muted, #86868B)',
+                        fontSize: '12.5px',
                         fontWeight: '700',
                         cursor: canResend ? 'pointer' : 'not-allowed',
                         textDecoration: 'underline',
@@ -808,16 +1110,18 @@ export default function NavratriAartiPage() {
                   </div>
 
                   {formError && (
-                    <div style={{
-                      background: '#FEF2F2',
-                      border: '1.5px solid #FECACA',
-                      borderRadius: '10px',
-                      padding: '10px 14px',
-                      color: '#B91C1C',
-                      fontSize: '12.5px',
-                      fontWeight: '600',
-                      marginBottom: '16px',
-                    }}>
+                    <div
+                      style={{
+                        background: 'var(--bg-error, rgba(215, 0, 21, 0.08))',
+                        border: '1.5px solid var(--border-error, rgba(215, 0, 21, 0.24))',
+                        borderRadius: '10px',
+                        padding: '10px 14px',
+                        color: 'var(--text-error, #D70015)',
+                        fontSize: '12.5px',
+                        fontWeight: '600',
+                        marginBottom: '16px',
+                      }}
+                    >
                       {formError}
                     </div>
                   )}
@@ -837,6 +1141,7 @@ export default function NavratriAartiPage() {
                       cursor: (submitting || otpCode.length < 6) ? 'not-allowed' : 'pointer',
                       opacity: (submitting || otpCode.length < 6) ? 0.6 : 1,
                       boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     {submitting ? 'Confirming...' : 'Confirm & Post Winning Bid ✓'}
@@ -847,25 +1152,27 @@ export default function NavratriAartiPage() {
               {/* STEP 3: Success Confirmation */}
               {step === 3 && (
                 <div style={{ textAlign: 'center', padding: '10px 0' }}>
-                  <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '50%',
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    color: '#059669',
-                    marginBottom: '12px',
-                  }}>
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      color: '#10B981',
+                      marginBottom: '14px',
+                    }}
+                  >
                     {Icons.check}
                   </div>
 
-                  <h4 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)' }}>
+                  <h4 style={{ margin: '0 0 6px', fontSize: '19px', fontWeight: '800', color: 'var(--text-primary, #1D1D1F)' }}>
                     Jai Mataji! Bid Confirmed
                   </h4>
 
-                  <p style={{ margin: '0 0 16px', fontSize: '13px', color: 'var(--text-secondary, #515154)', lineHeight: '1.4' }}>
+                  <p style={{ margin: '0 0 20px', fontSize: '13.5px', color: 'var(--text-secondary, #515154)', lineHeight: '1.5' }}>
                     Your bid of <strong>${bidAmount?.toLocaleString()}</strong> has been verified. You are currently the leading sponsor for {selectedDay.day_title}!
                   </p>
 
@@ -876,10 +1183,10 @@ export default function NavratriAartiPage() {
                       width: '100%',
                       background: 'var(--bg-input, #F2F2F5)',
                       border: '1px solid var(--border, rgba(0,0,0,0.08))',
-                      borderRadius: '10px',
-                      padding: '10px',
+                      borderRadius: '12px',
+                      padding: '12px',
                       color: 'var(--text-primary, #1D1D1F)',
-                      fontSize: '13px',
+                      fontSize: '14px',
                       fontWeight: '600',
                       cursor: 'pointer',
                     }}

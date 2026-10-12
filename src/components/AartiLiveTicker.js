@@ -2,9 +2,9 @@
 import { useState } from 'react';
 
 // ── Crisp Inline SVG Icons (Lucide-style) ────────────────────────────────────
-const DiyaIcon = ({ size = 14, color = 'currentColor' }) => (
+const DiyaIcon = ({ size = 15, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M12 2c.5 2 2 3.5 2 5.5 0 2.5-2 3.5-2 3.5s-2-1-2-3.5C10 5.5 11.5 4 12 2z" fill={color} fillOpacity="0.3" />
+    <path d="M12 2c.5 2 2 3.5 2 5.5 0 2.5-2 3.5-2 3.5s-2-1-2-3.5C10 5.5 11.5 4 12 2z" fill={color} fillOpacity="0.35" />
     <path d="M4 14c0 4 3.5 7 8 7s8-3 8-7c0-2-3-3-8-3s-8 1-8 3z" />
   </svg>
 );
@@ -16,7 +16,7 @@ const LockIcon = ({ size = 11, color = 'currentColor' }) => (
   </svg>
 );
 
-const ChevronRightIcon = ({ size = 12 }) => (
+const ChevronRightIcon = ({ size = 11 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polyline points="9 18 15 12 9 6" />
   </svg>
@@ -47,11 +47,10 @@ export default function AartiLiveTicker({
     const el = document.getElementById(targetId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Add brief highlight flash
-      el.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+      el.style.transition = 'box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
       const origShadow = el.style.boxShadow;
       const origBorder = el.style.borderColor;
-      el.style.boxShadow = '0 0 0 4px rgba(232, 120, 12, 0.35)';
+      el.style.boxShadow = '0 0 0 4px rgba(232, 120, 12, 0.45)';
       el.style.borderColor = 'var(--accent, #E8780C)';
       setTimeout(() => {
         el.style.boxShadow = origShadow;
@@ -65,16 +64,19 @@ export default function AartiLiveTicker({
       style={{
         position: 'relative',
         width: '100%',
-        background: 'var(--bg-card, #FFFFFF)',
+        background: 'var(--bg-card, rgba(255, 255, 255, 0.85))',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         borderTop: '1px solid var(--border, rgba(0,0,0,0.08))',
         borderBottom: '1px solid var(--border, rgba(0,0,0,0.08))',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
-        height: '44px',
+        height: '46px',
         userSelect: 'none',
         zIndex: 20,
+        fontFamily: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif)",
       }}
       aria-label="Navratri Aarti Live Bidding Ticker"
     >
@@ -90,10 +92,10 @@ export default function AartiLiveTicker({
         .aarti-ticker-track {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
           white-space: nowrap;
           width: max-content;
-          animation: aartiMarqueeScroll 52s linear infinite;
+          animation: aartiMarqueeScroll 48s linear infinite;
         }
         .aarti-ticker-track:hover {
           animation-play-state: paused;
@@ -101,46 +103,57 @@ export default function AartiLiveTicker({
         .aarti-ticker-pill {
           display: inline-flex;
           align-items: center;
-          gap: 9px;
-          padding: 5px 12px;
+          gap: 8px;
+          padding: 6px 14px;
           border-radius: 999px;
           font-size: 12px;
           font-weight: 500;
           text-decoration: none;
           color: var(--text-primary, #1D1D1F);
-          background: var(--bg-primary, #F5F5F7);
+          background: var(--bg-input, #F2F2F5);
           border: 1px solid var(--border, rgba(0,0,0,0.08));
           cursor: pointer;
-          transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           flex-shrink: 0;
+          font-variant-numeric: tabular-nums;
         }
         .aarti-ticker-pill:hover {
           background: var(--bg-card, #FFFFFF);
           border-color: var(--accent, #E8780C);
           transform: translateY(-1px);
-          box-shadow: 0 2px 6px rgba(232, 120, 12, 0.15);
+          box-shadow: 0 4px 12px rgba(232, 120, 12, 0.2);
         }
         .aarti-live-dot {
           width: 7px;
           height: 7px;
           border-radius: 50%;
           background: #10B981;
-          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
           animation: aartiPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes aartiPulse {
           0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(1.15); }
+          50% { opacity: 0.55; transform: scale(1.2); }
+        }
+        @media (max-width: 640px) {
+          .aarti-ticker-header-desktop { display: none !important; }
+          .aarti-ticker-header-mobile { display: flex !important; }
+          .aarti-ticker-track { animation-duration: 38s; }
+        }
+        @media (min-width: 641px) {
+          .aarti-ticker-header-desktop { display: flex !important; }
+          .aarti-ticker-header-mobile { display: none !important; }
         }
       `}</style>
 
-      {/* Pinned Left Header Tag */}
+      {/* Pinned Left Header Tag (Desktop) */}
       <div
+        className="aarti-ticker-header-desktop"
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
-          padding: '0 14px',
+          gap: '9px',
+          padding: '0 16px',
           height: '100%',
           background: 'var(--bg-card, #FFFFFF)',
           borderRight: '1px solid var(--border, rgba(0,0,0,0.08))',
@@ -149,16 +162,39 @@ export default function AartiLiveTicker({
         }}
       >
         <span style={{ display: 'flex', color: 'var(--accent, #E8780C)' }}>
-          <DiyaIcon size={15} color="var(--accent, #E8780C)" />
+          <DiyaIcon size={16} color="var(--accent, #E8780C)" />
         </span>
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
-          <span style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '0.4px', color: 'var(--accent, #E8780C)', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '0.6px', color: 'var(--accent, #E8780C)', textTransform: 'uppercase' }}>
             Live Aarti
           </span>
-          <span style={{ fontSize: '9.5px', fontWeight: '500', color: 'var(--text-secondary, #6E6E73)' }}>
+          <span style={{ fontSize: '9.5px', fontWeight: '600', color: 'var(--text-secondary, #6E6E73)' }}>
             10-Day Feed
           </span>
         </div>
+      </div>
+
+      {/* Pinned Left Header Tag (Mobile) */}
+      <div
+        className="aarti-ticker-header-mobile"
+        style={{
+          display: 'none',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '0 10px',
+          height: '100%',
+          background: 'var(--bg-card, #FFFFFF)',
+          borderRight: '1px solid var(--border, rgba(0,0,0,0.08))',
+          zIndex: 3,
+          flexShrink: 0,
+        }}
+      >
+        <span style={{ display: 'flex', color: 'var(--accent, #E8780C)' }}>
+          <DiyaIcon size={14} color="var(--accent, #E8780C)" />
+        </span>
+        <span style={{ fontSize: '10px', fontWeight: '800', letterSpacing: '0.5px', color: 'var(--accent, #E8780C)', textTransform: 'uppercase' }}>
+          Live
+        </span>
       </div>
 
       {/* Gradient Edge Masks Container */}
@@ -170,8 +206,8 @@ export default function AartiLiveTicker({
           height: '100%',
           display: 'flex',
           alignItems: 'center',
-          maskImage: 'linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%)',
+          maskImage: 'linear-gradient(to right, transparent 0%, black 28px, black calc(100% - 28px), transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 28px, black calc(100% - 28px), transparent 100%)',
         }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -192,8 +228,8 @@ export default function AartiLiveTicker({
                 className="aarti-ticker-pill"
                 type="button"
                 style={{
-                  borderColor: isMaha ? 'rgba(232, 120, 12, 0.35)' : undefined,
-                  background: isMaha ? 'linear-gradient(90deg, rgba(232, 120, 12, 0.08), var(--bg-primary, #F5F5F7))' : undefined,
+                  borderColor: isMaha ? 'rgba(232, 120, 12, 0.45)' : undefined,
+                  background: isMaha ? 'linear-gradient(90deg, rgba(232, 120, 12, 0.12), var(--bg-input, #F2F2F5))' : undefined,
                 }}
                 title={`Click to view Day ${day.day_number} (${day.formatted_date}) details`}
               >
@@ -216,21 +252,21 @@ export default function AartiLiveTicker({
                 {isMaha && (
                   <span
                     style={{
-                      background: 'rgba(232, 120, 12, 0.15)',
+                      background: 'rgba(232, 120, 12, 0.16)',
                       color: 'var(--accent, #E8780C)',
-                      fontSize: '10px',
-                      fontWeight: '700',
+                      fontSize: '9.5px',
+                      fontWeight: '800',
                       padding: '2px 6px',
-                      borderRadius: '4px',
-                      letterSpacing: '0.3px',
+                      borderRadius: '5px',
+                      letterSpacing: '0.4px',
                       textTransform: 'uppercase',
                     }}
                   >
-                    Maha Aarti
+                    ★ Maha Aarti
                   </span>
                 )}
 
-                <span style={{ color: 'var(--border, rgba(0,0,0,0.12))', fontSize: '10px' }}>•</span>
+                <span style={{ color: 'var(--border, rgba(0,0,0,0.15))', fontSize: '10px' }}>•</span>
 
                 {/* Highest Bid or Opening Reserve */}
                 {hasBid ? (
@@ -238,28 +274,28 @@ export default function AartiLiveTicker({
                     <span
                       style={{
                         color: 'var(--text-success, #10B981)',
-                        fontWeight: '700',
+                        fontWeight: '800',
                         fontSize: '12.5px',
                       }}
                     >
                       ${Number(day.current_highest_bid).toLocaleString()}
                     </span>
-                    <span style={{ color: 'var(--text-secondary, #515154)', fontSize: '11.5px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ color: 'var(--text-secondary, #6E6E73)', fontSize: '11.5px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {day.current_winner_name}
                     </span>
                   </span>
                 ) : (
                   <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary, #6E6E73)', fontSize: '11.5px' }}>
                     <span>Opening:</span>
-                    <strong style={{ color: 'var(--text-primary, #1D1D1F)', fontWeight: '600' }}>
+                    <strong style={{ color: 'var(--text-primary, #1D1D1F)', fontWeight: '700' }}>
                       ${Number(day.base_bid || 500).toLocaleString()}
                     </strong>
-                    <span style={{ fontSize: '10.5px', color: 'var(--accent, #E8780C)' }}>(No bids yet)</span>
+                    <span style={{ fontSize: '10.5px', color: 'var(--accent, #E8780C)', fontWeight: '600' }}>(Reserve)</span>
                   </span>
                 )}
 
                 {/* Subtle Jump Arrow */}
-                <span style={{ color: 'var(--text-secondary, #86868B)', display: 'flex', opacity: 0.6 }}>
+                <span style={{ color: 'var(--text-secondary, #86868B)', display: 'flex', opacity: 0.65 }}>
                   <ChevronRightIcon size={11} />
                 </span>
               </button>
