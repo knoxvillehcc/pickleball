@@ -28,6 +28,17 @@ const Icons = {
       <path d="M12 18h.01" />
     </svg>
   ),
+  sun: (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m14.14-14.14l-1.41 1.41" />
+    </svg>
+  ),
+  moon: (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+    </svg>
+  ),
 };
 
 const getInitials = (name) => {
@@ -46,6 +57,33 @@ export default function AartiDisplayLivePage() {
   const [timeLeft, setTimeLeft] = useState('');
   const [nextRefreshIn, setNextRefreshIn] = useState(15);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [theme, setTheme] = useState('dark');
+
+  // Load saved theme preference
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('hcc_aarti_display_theme');
+      if (saved === 'light' || saved === 'dark') {
+        setTheme(saved);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('hcc_aarti_display_theme', next);
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
+  const isDark = theme === 'dark';
 
   // Generate High-Contrast QR Code linking to canonical bidding page
   useEffect(() => {
@@ -176,8 +214,10 @@ export default function AartiDisplayLivePage() {
       style={{
         height: '100vh',
         maxHeight: '100vh',
-        background: 'radial-gradient(ellipse at 50% 0%, #1a0d03 0%, #0a0a0d 50%, #000000 100%)',
-        color: '#FFFFFF',
+        background: isDark
+          ? 'radial-gradient(ellipse at 50% 0%, #1a0d03 0%, #0a0a0d 50%, #000000 100%)'
+          : 'radial-gradient(ellipse at 50% 0%, #FFF9F3 0%, #F5F5F7 50%, #EBEBED 100%)',
+        color: isDark ? '#FFFFFF' : '#1D1D1F',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif",
         display: 'flex',
         flexDirection: 'column',
@@ -185,6 +225,7 @@ export default function AartiDisplayLivePage() {
         boxSizing: 'border-box',
         overflow: 'hidden',
         userSelect: 'none',
+        transition: 'background 0.3s ease, color 0.3s ease',
       }}
     >
       <style>{`
@@ -192,9 +233,13 @@ export default function AartiDisplayLivePage() {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.3); opacity: 0.6; }
         }
-        @keyframes subtleGlow {
+        @keyframes subtleGlowDark {
           0%, 100% { box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(232, 120, 12, 0.22); }
           50% { box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6), 0 0 55px rgba(232, 120, 12, 0.45); }
+        }
+        @keyframes subtleGlowLight {
+          0%, 100% { box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08), 0 0 25px rgba(232, 120, 12, 0.16); }
+          50% { box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08), 0 0 45px rgba(232, 120, 12, 0.32); }
         }
         @keyframes orangeBreathe {
           0%, 100% {
@@ -212,14 +257,17 @@ export default function AartiDisplayLivePage() {
           0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px #FF9F0A; }
           50% { transform: scale(1.35); opacity: 0.75; box-shadow: 0 0 16px #FF9F0A; }
         }
-        .jumbotron-text-glow {
+        .jumbotron-text-glow-dark {
           text-shadow: 0 0 50px rgba(255, 159, 10, 0.6), 0 0 100px rgba(232, 120, 12, 0.4);
         }
+        .jumbotron-text-glow-light {
+          text-shadow: 0 4px 22px rgba(217, 119, 6, 0.32);
+        }
         .display-hero-card {
-          animation: subtleGlow 4s ease-in-out infinite;
+          animation: ${isDark ? 'subtleGlowDark' : 'subtleGlowLight'} 4s ease-in-out infinite;
         }
         .display-qr-card {
-          animation: subtleGlow 4s ease-in-out infinite;
+          animation: ${isDark ? 'subtleGlowDark' : 'subtleGlowLight'} 4s ease-in-out infinite;
         }
       `}</style>
 
@@ -231,7 +279,7 @@ export default function AartiDisplayLivePage() {
           justifyContent: 'space-between',
           gap: '16px',
           paddingBottom: '8px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)',
           flexShrink: 0,
         }}
       >
@@ -242,50 +290,53 @@ export default function AartiDisplayLivePage() {
               width: '42px',
               height: '42px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, rgba(232, 120, 12, 0.4) 0%, rgba(232, 120, 12, 0.12) 100%)',
-              border: '1.5px solid rgba(232, 120, 12, 0.55)',
+              background: isDark
+                ? 'linear-gradient(135deg, rgba(232, 120, 12, 0.4) 0%, rgba(232, 120, 12, 0.12) 100%)'
+                : 'linear-gradient(135deg, rgba(232, 120, 12, 0.22) 0%, rgba(232, 120, 12, 0.08) 100%)',
+              border: isDark ? '1.5px solid rgba(232, 120, 12, 0.55)' : '1.5px solid rgba(232, 120, 12, 0.45)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#FF9F0A',
-              boxShadow: '0 4px 18px rgba(232, 120, 12, 0.35)',
+              color: isDark ? '#FF9F0A' : '#D97706',
+              boxShadow: isDark ? '0 4px 18px rgba(232, 120, 12, 0.35)' : '0 3px 12px rgba(232, 120, 12, 0.2)',
               flexShrink: 0,
             }}
           >
             {Icons.diya}
           </div>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '0.14em', color: '#FF9F0A', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '0.14em', color: isDark ? '#FF9F0A' : '#D97706', textTransform: 'uppercase' }}>
               Hindu Community Center of Knoxville
             </div>
-            <div style={{ fontSize: '19px', fontWeight: '800', letterSpacing: '-0.02em', color: '#FFFFFF', marginTop: '1px' }}>
+            <div style={{ fontSize: '19px', fontWeight: '800', letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '1px' }}>
               Navratri 2026 · Daily Aarti Seva Stage
             </div>
           </div>
         </div>
 
-        {/* Live Auto-Sync Status & Fullscreen Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Live Sync Beacon */}
+        {/* Live Running Timer, Dark/Light Mode Switch & Fullscreen Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Running Seconds Countdown Beacon (No 'Live Auto-Sync' text) */}
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1.5px solid rgba(255, 255, 255, 0.16)',
+              background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+              border: isDark ? '1.5px solid rgba(255, 255, 255, 0.16)' : '1.5px solid rgba(0, 0, 0, 0.1)',
               borderRadius: '999px',
               padding: '6px 14px',
-              fontSize: '12px',
-              fontWeight: '700',
-              color: '#E5E5E7',
+              fontSize: '12.5px',
+              fontWeight: '800',
+              color: isDark ? '#E5E5E7' : '#1D1D1F',
               fontVariantNumeric: 'tabular-nums',
             }}
+            title="Auto-refresh countdown"
           >
             <span
               style={{
-                width: '7px',
-                height: '7px',
+                width: '7.5px',
+                height: '7.5px',
                 borderRadius: '50%',
                 background: '#10B981',
                 boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.35)',
@@ -293,10 +344,35 @@ export default function AartiDisplayLivePage() {
                 display: 'inline-block',
               }}
             />
-            <span>Live Auto-Sync</span>
-            <span style={{ color: 'rgba(255, 255, 255, 0.4)' }}>•</span>
-            <span style={{ color: '#FF9F0A' }}>{nextRefreshIn}s</span>
+            <span style={{ color: isDark ? '#FF9F0A' : '#C25E00', fontWeight: '900' }}>
+              {nextRefreshIn}s
+            </span>
           </div>
+
+          {/* Dark / Light Mode Toggle Button */}
+          <button
+            id="theme-toggle-btn"
+            onClick={toggleTheme}
+            type="button"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+              border: isDark ? '1.5px solid rgba(255, 255, 255, 0.18)' : '1.5px solid rgba(0, 0, 0, 0.12)',
+              borderRadius: '999px',
+              padding: '6px 13px',
+              fontSize: '12px',
+              fontWeight: '700',
+              color: isDark ? '#FFFFFF' : '#1D1D1F',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
+          >
+            {isDark ? Icons.sun : Icons.moon}
+            <span>{isDark ? 'Light' : 'Dark'}</span>
+          </button>
 
           {/* Fullscreen Button */}
           <button
@@ -306,13 +382,13 @@ export default function AartiDisplayLivePage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1.5px solid rgba(255, 255, 255, 0.18)',
+              background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+              border: isDark ? '1.5px solid rgba(255, 255, 255, 0.18)' : '1.5px solid rgba(0, 0, 0, 0.12)',
               borderRadius: '999px',
-              padding: '6px 12px',
+              padding: '6px 13px',
               fontSize: '12px',
               fontWeight: '700',
-              color: '#FFFFFF',
+              color: isDark ? '#FFFFFF' : '#1D1D1F',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }}
@@ -345,17 +421,22 @@ export default function AartiDisplayLivePage() {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              background: activeDay.is_maha_aarti
-                ? 'linear-gradient(150deg, rgba(232, 120, 12, 0.25) 0%, rgba(22, 22, 28, 0.94) 55%, rgba(10, 10, 14, 0.98) 100%)'
-                : 'linear-gradient(150deg, rgba(32, 32, 42, 0.9) 0%, rgba(16, 16, 22, 0.98) 100%)',
-              border: activeDay.is_maha_aarti
-                ? '2.5px solid rgba(232, 120, 12, 0.7)'
-                : '2px solid rgba(232, 120, 12, 0.4)',
+              background: isDark
+                ? (activeDay.is_maha_aarti
+                    ? 'linear-gradient(150deg, rgba(232, 120, 12, 0.25) 0%, rgba(22, 22, 28, 0.94) 55%, rgba(10, 10, 14, 0.98) 100%)'
+                    : 'linear-gradient(150deg, rgba(32, 32, 42, 0.9) 0%, rgba(16, 16, 22, 0.98) 100%)')
+                : (activeDay.is_maha_aarti
+                    ? 'linear-gradient(150deg, #FFF6EC 0%, #FFFFFF 55%, #FFF0DE 100%)'
+                    : 'linear-gradient(150deg, #FFFFFF 0%, #FAFAF8 100%)'),
+              border: isDark
+                ? (activeDay.is_maha_aarti ? '2.5px solid rgba(232, 120, 12, 0.7)' : '2px solid rgba(232, 120, 12, 0.4)')
+                : (activeDay.is_maha_aarti ? '2.5px solid #FF9F0A' : '2px solid rgba(232, 120, 12, 0.35)'),
               borderRadius: '24px',
               padding: 'clamp(16px, 2vw, 26px)',
               boxSizing: 'border-box',
               position: 'relative',
               overflow: 'hidden',
+              transition: 'background 0.3s ease, border-color 0.3s ease',
             }}
           >
             {/* Top Tier: D1–D10 Day Switcher + Header Row + Big Day Title */}
@@ -379,13 +460,13 @@ export default function AartiDisplayLivePage() {
                       onClick={() => setSelectedDayNum(d.day_number)}
                       type="button"
                       style={{
-                        background: isSel ? '#FF9F0A' : 'rgba(255, 255, 255, 0.08)',
-                        color: isSel ? '#000000' : '#A1A1A6',
+                        background: isSel ? '#FF9F0A' : (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'),
+                        color: isSel ? '#000000' : (isDark ? '#A1A1A6' : '#6E6E73'),
                         border: isSel
                           ? '1.5px solid #FF9F0A'
                           : isMaha
-                          ? '1.5px solid rgba(232, 120, 12, 0.45)'
-                          : '1px solid rgba(255, 255, 255, 0.12)',
+                          ? (isDark ? '1.5px solid rgba(232, 120, 12, 0.45)' : '1.5px solid rgba(232, 120, 12, 0.55)')
+                          : (isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.1)'),
                         borderRadius: '999px',
                         padding: '4px 10px',
                         fontSize: '11px',
@@ -420,7 +501,7 @@ export default function AartiDisplayLivePage() {
                     Day {activeDay.day_number}
                   </span>
 
-                  <span style={{ fontSize: '18px', fontWeight: '800', color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: '18px', fontWeight: '800', color: isDark ? '#FFFFFF' : '#1D1D1F', fontVariantNumeric: 'tabular-nums' }}>
                     {activeDay.formatted_date}
                   </span>
 
@@ -430,9 +511,9 @@ export default function AartiDisplayLivePage() {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
-                        background: 'rgba(255, 159, 10, 0.25)',
-                        border: '1.5px solid rgba(255, 159, 10, 0.55)',
-                        color: '#FFB340',
+                        background: isDark ? 'rgba(255, 159, 10, 0.25)' : 'rgba(255, 159, 10, 0.16)',
+                        border: isDark ? '1.5px solid rgba(255, 159, 10, 0.55)' : '1.5px solid rgba(217, 119, 6, 0.45)',
+                        color: isDark ? '#FFB340' : '#B45309',
                         fontSize: '12px',
                         fontWeight: '800',
                         padding: '4px 10px',
@@ -452,9 +533,15 @@ export default function AartiDisplayLivePage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    background: activeDay.status === 'closed' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 159, 10, 0.2)',
-                    border: activeDay.status === 'closed' ? '1.5px solid rgba(255, 255, 255, 0.2)' : '1.5px solid #FF9F0A',
-                    color: activeDay.status === 'closed' ? 'rgba(255, 255, 255, 0.7)' : '#FFB340',
+                    background: activeDay.status === 'closed'
+                      ? (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.07)')
+                      : (isDark ? 'rgba(255, 159, 10, 0.2)' : 'rgba(255, 159, 10, 0.16)'),
+                    border: activeDay.status === 'closed'
+                      ? (isDark ? '1.5px solid rgba(255, 255, 255, 0.2)' : '1.5px solid rgba(0, 0, 0, 0.14)')
+                      : (isDark ? '1.5px solid #FF9F0A' : '1.5px solid #D97706'),
+                    color: activeDay.status === 'closed'
+                      ? (isDark ? 'rgba(255, 255, 255, 0.7)' : '#6E6E73')
+                      : (isDark ? '#FFB340' : '#B45309'),
                     borderRadius: '999px',
                     padding: '6px 18px',
                     fontSize: '13.5px',
@@ -486,7 +573,7 @@ export default function AartiDisplayLivePage() {
                   fontWeight: '900',
                   letterSpacing: '-0.03em',
                   margin: '2px 0 0',
-                  color: '#FFFFFF',
+                  color: isDark ? '#FFFFFF' : '#1D1D1F',
                   lineHeight: 1.15,
                 }}
               >
@@ -510,7 +597,7 @@ export default function AartiDisplayLivePage() {
                 style={{
                   fontSize: '15px',
                   fontWeight: '800',
-                  color: '#FF9F0A',
+                  color: isDark ? '#FF9F0A' : '#C25E00',
                   textTransform: 'uppercase',
                   letterSpacing: '0.15em',
                   marginBottom: '2px',
@@ -521,11 +608,11 @@ export default function AartiDisplayLivePage() {
 
               {/* Massive Stadium Size Amount ($1,000 / $500) Centered */}
               <div
-                className="jumbotron-text-glow"
+                className={isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}
                 style={{
                   fontSize: 'clamp(98px, 14vw, 175px)',
                   fontWeight: '900',
-                  color: '#FF9F0A',
+                  color: isDark ? '#FF9F0A' : '#D97706',
                   letterSpacing: '-0.04em',
                   lineHeight: 0.9,
                   margin: '0 auto 8px',
@@ -543,14 +630,14 @@ export default function AartiDisplayLivePage() {
                   alignItems: 'center',
                   gap: '6px',
                   paddingTop: '8px',
-                  borderTop: '1.5px solid rgba(255, 255, 255, 0.12)',
+                  borderTop: isDark ? '1.5px solid rgba(255, 255, 255, 0.12)' : '1.5px solid rgba(0, 0, 0, 0.08)',
                   width: '100%',
                   maxWidth: '750px',
                 }}
               >
                 {activeDay.current_winner_name ? (
                   <>
-                    <div style={{ fontSize: '13px', color: '#98989D', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    <div style={{ fontSize: '13px', color: isDark ? '#98989D' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                       Leading Devotee Sponsor
                     </div>
                     <div
@@ -583,7 +670,7 @@ export default function AartiDisplayLivePage() {
                         style={{
                           fontSize: 'clamp(32px, 4.4vw, 56px)',
                           fontWeight: '900',
-                          color: '#FFFFFF',
+                          color: isDark ? '#FFFFFF' : '#1D1D1F',
                           letterSpacing: '-0.02em',
                           lineHeight: 1.05,
                         }}
@@ -594,10 +681,10 @@ export default function AartiDisplayLivePage() {
                   </>
                 ) : (
                   <div>
-                    <div style={{ fontSize: '15px', color: '#98989D' }}>
-                      Opening Reserve: <strong style={{ color: '#FFFFFF' }}>${Number(activeDay.base_bid || 500).toLocaleString()}</strong>
+                    <div style={{ fontSize: '15px', color: isDark ? '#98989D' : '#6E6E73' }}>
+                      Opening Reserve: <strong style={{ color: isDark ? '#FFFFFF' : '#1D1D1F' }}>${Number(activeDay.base_bid || 500).toLocaleString()}</strong>
                     </div>
-                    <div style={{ fontSize: 'clamp(22px, 2.8vw, 34px)', fontWeight: '800', color: '#FF9F0A', marginTop: '2px' }}>
+                    <div style={{ fontSize: 'clamp(22px, 2.8vw, 34px)', fontWeight: '800', color: isDark ? '#FF9F0A' : '#D97706', marginTop: '2px' }}>
                       First verified bid takes the lead!
                     </div>
                   </div>
@@ -614,39 +701,60 @@ export default function AartiDisplayLivePage() {
               }}
             >
               {/* Daily Bids Placed */}
-              <div style={{ background: 'rgba(255, 255, 255, 0.06)', borderRadius: '14px', padding: '12px 16px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                <div style={{ fontSize: '11px', color: '#8E8E93', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <div
+                style={{
+                  background: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F5F5F7',
+                  borderRadius: '14px',
+                  padding: '12px 16px',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)',
+                }}
+              >
+                <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   Bids Placed Tonight
                 </div>
-                <div style={{ fontSize: '24px', fontWeight: '900', color: '#FFFFFF', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   {activeDay.bids_count} {activeDay.bids_count === 1 ? 'bid' : 'bids'}
                 </div>
               </div>
 
               {/* Next Minimum Bid */}
-              <div style={{ background: 'rgba(255, 255, 255, 0.06)', borderRadius: '14px', padding: '12px 16px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                <div style={{ fontSize: '11px', color: '#8E8E93', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <div
+                style={{
+                  background: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F5F5F7',
+                  borderRadius: '14px',
+                  padding: '12px 16px',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)',
+                }}
+              >
+                <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   Next Minimum Bid
                 </div>
-                <div style={{ fontSize: '24px', fontWeight: '900', color: '#34D399', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#34D399' : '#059669', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   ${nextMinBid.toLocaleString()}
                 </div>
               </div>
 
               {/* Daily Cutoff Countdown */}
-              <div style={{ background: 'rgba(255, 255, 255, 0.06)', borderRadius: '14px', padding: '12px 16px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                <div style={{ fontSize: '11px', color: '#8E8E93', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <span style={{ color: '#FF9F0A' }}>{Icons.clock}</span>
+              <div
+                style={{
+                  background: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F5F5F7',
+                  borderRadius: '14px',
+                  padding: '12px 16px',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)',
+                }}
+              >
+                <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span style={{ color: isDark ? '#FF9F0A' : '#D97706' }}>{Icons.clock}</span>
                   <span>9:30 PM Cutoff</span>
                 </div>
-                <div style={{ fontSize: '22px', fontWeight: '900', color: activeDay.status === 'closed' ? '#8E8E93' : '#FF9F0A', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '22px', fontWeight: '900', color: activeDay.status === 'closed' ? (isDark ? '#8E8E93' : '#6E6E73') : (isDark ? '#FF9F0A' : '#D97706'), marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   {timeLeft || '9:30 PM EST'}
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#8E8E93' }}>
+          <div style={{ padding: '60px', textAlign: 'center', color: isDark ? '#8E8E93' : '#6E6E73' }}>
             Loading live festival schedule...
           </div>
         )}
@@ -656,8 +764,10 @@ export default function AartiDisplayLivePage() {
           className="display-qr-card"
           style={{
             height: '100%',
-            background: 'linear-gradient(160deg, rgba(28, 28, 38, 0.95) 0%, rgba(14, 14, 18, 0.98) 100%)',
-            border: '2px solid rgba(232, 120, 12, 0.45)',
+            background: isDark
+              ? 'linear-gradient(160deg, rgba(28, 28, 38, 0.95) 0%, rgba(14, 14, 18, 0.98) 100%)'
+              : 'linear-gradient(160deg, #FFFFFF 0%, #FAFAF8 100%)',
+            border: isDark ? '2px solid rgba(232, 120, 12, 0.45)' : '2px solid rgba(232, 120, 12, 0.35)',
             borderRadius: '24px',
             padding: 'clamp(16px, 2vw, 24px) 14px',
             textAlign: 'center',
@@ -666,6 +776,7 @@ export default function AartiDisplayLivePage() {
             justifyContent: 'space-between',
             alignItems: 'center',
             boxSizing: 'border-box',
+            transition: 'background 0.3s ease, border-color 0.3s ease',
           }}
         >
           {/* Header Tag and Title */}
@@ -675,13 +786,13 @@ export default function AartiDisplayLivePage() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: 'rgba(232, 120, 12, 0.22)',
-                border: '1.5px solid rgba(232, 120, 12, 0.55)',
+                background: isDark ? 'rgba(232, 120, 12, 0.22)' : 'rgba(232, 120, 12, 0.14)',
+                border: isDark ? '1.5px solid rgba(232, 120, 12, 0.55)' : '1.5px solid rgba(217, 119, 6, 0.4)',
                 borderRadius: '999px',
                 padding: '5px 12px',
                 fontSize: '11.5px',
                 fontWeight: '800',
-                color: '#FF9F0A',
+                color: isDark ? '#FF9F0A' : '#B45309',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 marginBottom: '8px',
@@ -694,7 +805,7 @@ export default function AartiDisplayLivePage() {
               style={{
                 fontSize: 'clamp(18px, 2vw, 24px)',
                 fontWeight: '900',
-                color: '#FFFFFF',
+                color: isDark ? '#FFFFFF' : '#1D1D1F',
                 letterSpacing: '-0.02em',
                 margin: '0 0 4px',
                 lineHeight: 1.15,
@@ -706,7 +817,7 @@ export default function AartiDisplayLivePage() {
             <p
               style={{
                 fontSize: '12px',
-                color: '#A1A1A6',
+                color: isDark ? '#A1A1A6' : '#6E6E73',
                 margin: '0',
                 lineHeight: 1.4,
               }}
@@ -721,7 +832,10 @@ export default function AartiDisplayLivePage() {
               background: '#FFFFFF',
               padding: '12px',
               borderRadius: '18px',
-              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.7)',
+              boxShadow: isDark
+                ? '0 12px 36px rgba(0, 0, 0, 0.7)'
+                : '0 10px 30px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.15)',
+              border: isDark ? 'none' : '1px solid rgba(0, 0, 0, 0.06)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -752,12 +866,12 @@ export default function AartiDisplayLivePage() {
           <div style={{ width: '100%' }}>
             <div
               style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.16)',
+                background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(0, 0, 0, 0.1)',
                 borderRadius: '8px',
                 padding: '5px 8px',
                 fontSize: '9.5px',
-                color: '#FF9F0A',
+                color: isDark ? '#FF9F0A' : '#B45309',
                 fontWeight: '800',
                 fontFamily: 'monospace',
                 letterSpacing: '-0.2px',
@@ -770,7 +884,7 @@ export default function AartiDisplayLivePage() {
               dashboard.knoxvillemandir.org/navratri-aarti
             </div>
 
-            <div style={{ fontSize: '10px', color: '#8E8E93', marginTop: '5px', fontWeight: '600' }}>
+            <div style={{ fontSize: '10px', color: isDark ? '#8E8E93' : '#6E6E73', marginTop: '5px', fontWeight: '600' }}>
               Instant OTP verification
             </div>
           </div>
