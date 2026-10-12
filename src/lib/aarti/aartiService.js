@@ -703,6 +703,146 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
 }
 
 /**
+ * Send bid voided / cancellation confirmation email to bidder for proof of withdrawal
+ */
+async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventDate, voidedAmount, reason }) {
+  if (!toEmail) return;
+
+  const [y, m, d] = (eventDate || '').split('-');
+  const formattedDate = (y && m && d) ? `${m}-${d}-${y}` : eventDate;
+
+  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL && !process.env.NEXT_PUBLIC_BASE_URL.includes('localhost'))
+    ? process.env.NEXT_PUBLIC_BASE_URL
+    : 'https://dashboard.knoxvillemandir.org';
+  const aartiUrl = `${baseUrl}/navratri-aarti`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Bid Cancellation Confirmation - Aarti Seva</title>
+    </head>
+    <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        
+        <!-- Header Banner -->
+        <tr>
+          <td style="background-color: #E8780C; padding: 26px 24px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 800; color: #FFF2E5; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;">
+              Hindu Community Center of Knoxville
+            </div>
+            <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
+              Navratri 2026 · Daily Aarti Seva
+            </h1>
+          </td>
+        </tr>
+
+        <!-- Content Area -->
+        <tr>
+          <td style="padding: 32px 28px;">
+
+            <!-- Status Pill Badge -->
+            <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 18px;">
+              <tr>
+                <td style="background-color: #F3F4F6; border: 1px solid #D1D5DB; border-radius: 20px; padding: 6px 14px;">
+                  <span style="font-size: 11.5px; font-weight: 800; color: #4B5563; text-transform: uppercase; letter-spacing: 0.8px;">
+                    Bid Voided &amp; Withdrawn
+                  </span>
+                </td>
+              </tr>
+            </table>
+
+            <h2 style="margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1D1D1F;">
+              Jai Mataji, ${toName}!
+            </h2>
+
+            <p style="margin: 0 0 20px; font-size: 14.5px; color: #515154; line-height: 1.55;">
+              This email serves as official confirmation that your Aarti Seva bid has been voided and withdrawn from the festival register. You hold no further financial commitment for this entry.
+            </p>
+
+            <!-- Highlighted Cancellation Summary Card -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #FAFAFC; border: 1.5px solid #E5E7EB; border-radius: 14px; margin-bottom: 22px;">
+              <tr>
+                <td style="padding: 18px 20px;">
+                  <div style="font-size: 11.5px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px;">
+                    Voided Bid Amount
+                  </div>
+                  <div style="font-size: 32px; font-weight: 800; color: #4B5563; letter-spacing: -0.5px; line-height: 1.1;">
+                    $${Number(voidedAmount || 0).toLocaleString()}
+                  </div>
+                  <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #E5E7EB; font-size: 13px; color: #515154;">
+                    Festival Day: <strong style="color: #1D1D1F; font-weight: 700;">Day ${dayNumber} — ${dayTitle}</strong> (${formattedDate})
+                  </div>
+                  ${reason ? `
+                    <div style="margin-top: 6px; font-size: 12.5px; color: #6B7280;">
+                      Reason: <em>${reason}</em>
+                    </div>
+                  ` : ''}
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin: 0 0 24px; font-size: 14px; color: #515154; line-height: 1.5;">
+              If you wish to participate in Aarti Seva for another evening of Navratri 2026, or if you withdrew by mistake, you can place a new bid at any time on the live bidding dashboard:
+            </p>
+
+            <!-- CTA Button -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 16px;">
+              <tr>
+                <td align="center" style="background-color: #E8780C; border-radius: 12px; box-shadow: 0 3px 12px rgba(232, 120, 12, 0.28);">
+                  <a href="${aartiUrl}" target="_blank" style="display: block; width: 100%; box-sizing: border-box; padding: 16px 24px; font-size: 16px; font-weight: 800; color: #FFFFFF; text-decoration: none; border-radius: 12px; text-align: center; letter-spacing: 0.2px;">
+                    View Live Aarti Bidding Dashboard &rarr;
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Direct URL Link Fallback -->
+            <div style="text-align: center; margin-top: 14px; padding: 12px; background-color: #F8F9FA; border-radius: 10px; border: 1px dashed #CBD5E1;">
+              <div style="font-size: 11.5px; color: #64748B; margin-bottom: 4px; font-weight: 600;">
+                Direct Link:
+              </div>
+              <a href="${aartiUrl}" target="_blank" style="font-size: 12.5px; color: #E8780C; font-weight: 700; text-decoration: underline; word-break: break-all;">
+                ${aartiUrl}
+              </a>
+            </div>
+
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background-color: #FAFAFC; padding: 20px 24px; text-align: center; border-top: 1px solid #E5E7EB;">
+            <div style="font-size: 12px; font-weight: 600; color: #64748B;">
+              Hindu Community Center · 8580 Executive Park Dr, Knoxville, TN 37923
+            </div>
+            <div style="font-size: 11px; color: #94A3B8; margin-top: 4px;">
+              Contact: treasurer@knoxvillemandir.org · info@knoxvillemandir.org
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </body>
+    </html>
+  `;
+
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `"HCC Navratri Aarti" <${process.env.GMAIL_USER}>`,
+      to: toEmail,
+      subject: `Bid Cancellation Notice: Day ${dayNumber} Aarti Seva ($${Number(voidedAmount || 0).toLocaleString()})`,
+      html,
+    });
+  } catch (err) {
+    console.error(`[sendBidVoidedEmail Error]:`, err);
+  }
+}
+
+/**
  * Admin: Update day status, cutoff, or manual winner
  */
 export async function updateAdminDay({ day_number, status, cutoff_time, current_winner_name, current_highest_bid }) {
@@ -867,6 +1007,19 @@ export async function removeAartiBid({ bid_id, day_number, reason = '' }) {
   });
   const day = dayRes.ok ? (await dayRes.json())[0] : null;
   const baseBid = day?.base_bid || 500;
+
+  // Send official cancellation proof email to the devotee whose bid was removed
+  if (targetBid && targetBid.bidder_email) {
+    sendBidVoidedEmail({
+      toEmail: targetBid.bidder_email,
+      toName: targetBid.bidder_name,
+      dayNumber: targetDayNumber,
+      dayTitle: day?.day_title || `Day ${targetDayNumber}`,
+      eventDate: day?.event_date,
+      voidedAmount: targetBid.bid_amount,
+      reason,
+    }).catch(err => console.error('[sendBidVoidedEmail Error]:', err));
+  }
 
   if (remainingBids.length > 0) {
     // 3A. Promote top remaining verified bid

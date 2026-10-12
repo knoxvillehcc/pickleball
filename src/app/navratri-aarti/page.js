@@ -305,25 +305,22 @@ export default function NavratriAartiPage() {
             gap: '12px',
           }}
         >
-          <Link
-            href="/"
+          <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              color: 'var(--text-secondary, #515154)',
-              textDecoration: 'none',
+              gap: '8px',
               fontSize: '13px',
-              fontWeight: '600',
-              background: 'var(--bg-input, #F2F2F5)',
-              border: '1px solid var(--border, rgba(0,0,0,0.08))',
-              padding: '7px 14px',
-              borderRadius: '999px',
-              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+              fontWeight: '700',
+              color: 'var(--text-primary, #1D1D1F)',
+              letterSpacing: '-0.01em',
             }}
           >
-            {Icons.chevronLeft} Portal
-          </Link>
+            <span style={{ color: 'var(--accent, #E8780C)', display: 'flex' }}>
+              {Icons.diya}
+            </span>
+            <span>HCC Navratri 2026</span>
+          </div>
 
           <div
             style={{

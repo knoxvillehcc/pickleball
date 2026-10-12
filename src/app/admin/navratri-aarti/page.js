@@ -450,6 +450,28 @@ export default function NavratriAartiAdminPage() {
               {Icons.external} View Public Page
             </Link>
 
+            <Link
+              href="/navratri-aarti/display"
+              target="_blank"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'linear-gradient(135deg, rgba(232, 120, 12, 0.12) 0%, rgba(232, 120, 12, 0.04) 100%)',
+                border: '1px solid rgba(232, 120, 12, 0.35)',
+                color: 'var(--accent, #E8780C)',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                textDecoration: 'none',
+                boxShadow: 'var(--shadow)',
+              }}
+              title="Launch Live Stage / TV Screen with QR Code"
+            >
+              {Icons.external} Live Stage / TV View
+            </Link>
+
             <button
               onClick={() => setShowSettingsModal(true)}
               style={{
