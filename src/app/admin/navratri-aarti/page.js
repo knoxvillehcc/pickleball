@@ -68,6 +68,20 @@ const Icons = {
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
+  ),
+  trash: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+    </svg>
+  ),
+  alertCircle: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
   )
 };
 
@@ -103,6 +117,11 @@ export default function NavratriAartiAdminPage() {
   // History Drawer State
   const [historyDay, setHistoryDay] = useState(null);
 
+  // Void / Remove Bid Modal State
+  const [voidModalData, setVoidModalData] = useState(null);
+  const [voidReason, setVoidReason] = useState('Devotee backed out / withdrew pledge');
+  const [savingVoid, setSavingVoid] = useState(false);
+
   // Fetch Admin Data
   const fetchData = useCallback(async () => {
     try {
@@ -117,6 +136,10 @@ export default function NavratriAartiAdminPage() {
           setTier2Increment(json.settings.tier2_increment || 250);
           setIsPublished(json.settings.is_published ?? false);
         }
+        setHistoryDay((prev) => {
+          if (!prev) return null;
+          return json.days?.find((d) => d.day_number === prev.day_number) || null;
+        });
       } else {
         setError(json.error || 'Failed to load data.');
       }
@@ -272,6 +295,63 @@ export default function NavratriAartiAdminPage() {
       alert('Network error updating cutoff');
     } finally {
       setSavingCutoff(false);
+    }
+  };
+
+  // Open Void Modal for specific bid in audit drawer
+  const openVoidModalForBid = (bid, day) => {
+    setVoidModalData({
+      bid_id: bid.id,
+      day_number: day.day_number,
+      day_title: day.day_title,
+      bidder_name: bid.bidder_name,
+      bid_amount: bid.bid_amount,
+      is_highest: Boolean(bid.is_highest),
+    });
+    setVoidReason('Devotee backed out / withdrew pledge');
+  };
+
+  // Open Void Modal for winner from main table
+  const openVoidModalForWinner = (day) => {
+    const topBid = (day.bids || []).find((b) => b.is_highest) || (day.bids || [])[0];
+    setVoidModalData({
+      bid_id: topBid?.id || null,
+      day_number: day.day_number,
+      day_title: day.day_title,
+      bidder_name: day.current_winner_name,
+      bid_amount: day.current_highest_bid,
+      is_highest: true,
+    });
+    setVoidReason('Devotee backed out / withdrew pledge');
+  };
+
+  // Confirm Void Bid Action
+  const handleConfirmVoid = async (e) => {
+    e.preventDefault();
+    if (!voidModalData) return;
+    try {
+      setSavingVoid(true);
+      const res = await fetch('/api/navratri/aarti/admin/bid/remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bid_id: voidModalData.bid_id || null,
+          day_number: voidModalData.day_number,
+          reason: voidReason,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        alert(json.message);
+        setVoidModalData(null);
+        await fetchData();
+      } else {
+        alert(json.error || 'Failed to void bid');
+      }
+    } catch {
+      alert('Network error voiding bid');
+    } finally {
+      setSavingVoid(false);
     }
   };
 
@@ -607,21 +687,43 @@ export default function NavratriAartiAdminPage() {
                         <td style={{ padding: '12px 16px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                             {hasWinner && (
-                              <button
-                                onClick={() => openPaymentModal(day)}
-                                style={{
-                                  background: isPaid ? 'var(--bg-input, #F2F2F5)' : 'rgba(16, 185, 129, 0.12)',
-                                  border: isPaid ? '1px solid var(--border)' : '1px solid rgba(16, 185, 129, 0.3)',
-                                  color: isPaid ? 'var(--text-primary)' : '#059669',
-                                  padding: '5px 10px',
-                                  borderRadius: '8px',
-                                  fontSize: '11.5px',
-                                  fontWeight: '600',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                {isPaid ? 'Edit' : 'Mark Paid'}
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => openPaymentModal(day)}
+                                  style={{
+                                    background: isPaid ? 'var(--bg-input, #F2F2F5)' : 'rgba(16, 185, 129, 0.12)',
+                                    border: isPaid ? '1px solid var(--border)' : '1px solid rgba(16, 185, 129, 0.3)',
+                                    color: isPaid ? 'var(--text-primary)' : '#059669',
+                                    padding: '5px 10px',
+                                    borderRadius: '8px',
+                                    fontSize: '11.5px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  {isPaid ? 'Edit' : 'Mark Paid'}
+                                </button>
+
+                                <button
+                                  onClick={() => openVoidModalForWinner(day)}
+                                  title="Void / Remove Winner (Devotee backed out)"
+                                  style={{
+                                    background: 'rgba(239, 68, 68, 0.08)',
+                                    border: '1px solid rgba(239, 68, 68, 0.25)',
+                                    color: '#DC2626',
+                                    padding: '5px 8px',
+                                    borderRadius: '8px',
+                                    fontSize: '11.5px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                  }}
+                                >
+                                  {Icons.trash} Void
+                                </button>
+                              </>
                             )}
 
                             <button
@@ -937,6 +1039,7 @@ export default function NavratriAartiAdminPage() {
                       <th style={{ padding: '8px' }}>Bidder</th>
                       <th style={{ padding: '8px' }}>Contact</th>
                       <th style={{ padding: '8px', textAlign: 'right' }}>Amount</th>
+                      <th style={{ padding: '8px', textAlign: 'right' }}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -960,12 +1063,117 @@ export default function NavratriAartiAdminPage() {
                         <td style={{ padding: '8px', textAlign: 'right', fontWeight: '800', color: 'var(--accent, #E8780C)' }}>
                           ${Number(b.bid_amount).toLocaleString()}
                         </td>
+                        <td style={{ padding: '8px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                          <button
+                            onClick={() => openVoidModalForBid(b, historyDay)}
+                            title="Void this bid"
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.08)',
+                              border: '1px solid rgba(239, 68, 68, 0.25)',
+                              color: '#DC2626',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                            }}
+                          >
+                            {Icons.trash} Void
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── VOID / REMOVE BID MODAL ────────────────────────────────────── */}
+      {voidModalData && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 10000 }}>
+          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.1))', borderRadius: '18px', maxWidth: '440px', width: '100%', padding: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.18)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: '#DC2626' }}>Void / Remove Aarti Bid</h3>
+                <div style={{ fontSize: '11.5px', color: 'var(--text-secondary, #515154)', marginTop: '2px' }}>
+                  Day {voidModalData.day_number} · {voidModalData.day_title}
+                </div>
+              </div>
+              <button onClick={() => setVoidModalData(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>{Icons.close}</button>
+            </div>
+
+            <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '10px', padding: '12px 14px', marginBottom: '16px' }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                {voidModalData.bidder_name} · ${Number(voidModalData.bid_amount).toLocaleString()}
+              </div>
+              {voidModalData.is_highest && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', fontSize: '12px', color: '#B91C1C', marginTop: '6px', lineHeight: 1.4 }}>
+                  <span style={{ flexShrink: 0, marginTop: '2px' }}>{Icons.alertCircle}</span>
+                  <span>
+                    This is currently the <strong>winning bid</strong>. Voiding it will automatically promote the runner-up bidder (or cleanly reset the day to opening reserve if no other bids exist).
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <form onSubmit={handleConfirmVoid}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  Reason for Withdrawal / Removal
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={voidReason}
+                  onChange={(e) => setVoidReason(e.target.value)}
+                  placeholder="e.g. Devotee backed out / withdrew pledge"
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setVoidModalData(null)}
+                  style={{
+                    flex: 1,
+                    background: 'var(--bg-input, #F2F2F5)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '10px',
+                    padding: '10px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: 'var(--text-primary)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingVoid}
+                  style={{
+                    flex: 1.5,
+                    background: '#DC2626',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '10px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    color: '#FFFFFF',
+                    cursor: savingVoid ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {savingVoid ? 'Voiding...' : 'Confirm Void'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

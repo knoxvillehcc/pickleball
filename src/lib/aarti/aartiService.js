@@ -673,3 +673,155 @@ export async function updateAdminSettings({ tier1_max, tier1_increment, tier2_in
 
   return { success: true };
 }
+
+/**
+ * Admin: Void / Remove a bid (e.g. if bidder backs out)
+ * Automatically recalculates highest bid and promotes runner-up if available.
+ */
+export async function removeAartiBid({ bid_id, day_number, reason = '' }) {
+  let targetBid = null;
+
+  if (bid_id) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?id=eq.${bid_id}&select=*`, {
+      headers: getServiceHeaders(),
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const list = await res.json();
+      targetBid = list[0] || null;
+    }
+  } else if (day_number) {
+    // If only day_number was passed, find the active highest bid for that day
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?day_number=eq.${day_number}&is_highest=eq.true&select=*`, {
+      headers: getServiceHeaders(),
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const list = await res.json();
+      targetBid = list[0] || null;
+    }
+  }
+
+  if (!targetBid) {
+    // If no specific bid row found, but day_number exists, reset day directly
+    if (day_number) {
+      const dayRes = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${day_number}&select=*`, {
+        headers: getServiceHeaders(),
+        cache: 'no-store',
+      });
+      const dayData = dayRes.ok ? (await dayRes.json())[0] : null;
+      const baseBid = dayData?.base_bid || 500;
+
+      await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${day_number}`, {
+        method: 'PATCH',
+        headers: getServiceHeaders(),
+        body: JSON.stringify({
+          current_highest_bid: baseBid,
+          current_winner_name: '',
+          current_winner_email: '',
+          current_winner_phone: '',
+          bids_count: 0,
+          payment_status: 'pending',
+          admin_notes: reason ? `Bid withdrawn: ${reason}` : 'Bid withdrawn by admin',
+          updated_at: new Date().toISOString(),
+        }),
+      });
+      return { success: true, message: `Day ${day_number} winner removed and reset to opening reserve $${baseBid}.` };
+    }
+    throw new Error('Target bid not found');
+  }
+
+  const targetDayNumber = targetBid.day_number;
+
+  // 1. Delete the voided bid
+  const delRes = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?id=eq.${targetBid.id}`, {
+    method: 'DELETE',
+    headers: getServiceHeaders(),
+  });
+  if (!delRes.ok) {
+    const errText = await delRes.text();
+    throw new Error(`Failed to delete bid: ${errText}`);
+  }
+
+  // 2. Fetch remaining verified bids for this day
+  const remRes = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?day_number=eq.${targetDayNumber}&is_verified=eq.true&select=*&order=bid_amount.desc,created_at.desc`, {
+    headers: getServiceHeaders(),
+    cache: 'no-store',
+  });
+  const remainingBids = remRes.ok ? await remRes.json() : [];
+
+  // Fetch the day configuration
+  const dayRes = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${targetDayNumber}&select=*`, {
+    headers: getServiceHeaders(),
+    cache: 'no-store',
+  });
+  const day = dayRes.ok ? (await dayRes.json())[0] : null;
+  const baseBid = day?.base_bid || 500;
+
+  if (remainingBids.length > 0) {
+    // 3A. Promote top remaining verified bid
+    const newLeader = remainingBids[0];
+
+    // Mark newLeader as is_highest = true
+    await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?id=eq.${newLeader.id}`, {
+      method: 'PATCH',
+      headers: getServiceHeaders(),
+      body: JSON.stringify({ is_highest: true }),
+    });
+
+    // Mark all other remaining bids as is_highest = false
+    await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?day_number=eq.${targetDayNumber}&id=neq.${newLeader.id}`, {
+      method: 'PATCH',
+      headers: getServiceHeaders(),
+      body: JSON.stringify({ is_highest: false }),
+    });
+
+    // Update day master row
+    await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${targetDayNumber}`, {
+      method: 'PATCH',
+      headers: getServiceHeaders(),
+      body: JSON.stringify({
+        current_highest_bid: newLeader.bid_amount,
+        current_winner_name: newLeader.bidder_name,
+        current_winner_email: newLeader.bidder_email,
+        current_winner_phone: newLeader.bidder_phone,
+        bids_count: remainingBids.length,
+        payment_status: 'pending',
+        admin_notes: reason ? `Previous bid removed (${reason}). Promoted ${newLeader.bidder_name}` : `Previous bid removed. Promoted ${newLeader.bidder_name}`,
+        updated_at: new Date().toISOString(),
+      }),
+    });
+
+    return {
+      success: true,
+      message: `Bid by ${targetBid.bidder_name} ($${Number(targetBid.bid_amount).toLocaleString()}) removed. ${newLeader.bidder_name} ($${Number(newLeader.bid_amount).toLocaleString()}) is now the active highest bid.`,
+      new_leader: {
+        name: newLeader.bidder_name,
+        amount: newLeader.bid_amount,
+      },
+    };
+  } else {
+    // 3B. No remaining bids — reset day back to base opening bid
+    await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${targetDayNumber}`, {
+      method: 'PATCH',
+      headers: getServiceHeaders(),
+      body: JSON.stringify({
+        current_highest_bid: baseBid,
+        current_winner_name: '',
+        current_winner_email: '',
+        current_winner_phone: '',
+        bids_count: 0,
+        payment_status: 'pending',
+        admin_notes: reason ? `Bid withdrawn by ${targetBid.bidder_name}: ${reason}` : `Bid withdrawn by ${targetBid.bidder_name}`,
+        updated_at: new Date().toISOString(),
+      }),
+    });
+
+    return {
+      success: true,
+      message: `Bid by ${targetBid.bidder_name} ($${Number(targetBid.bid_amount).toLocaleString()}) removed. Day ${targetDayNumber} reset to opening reserve of $${baseBid.toLocaleString()}.`,
+      new_leader: null,
+    };
+  }
+}
+
