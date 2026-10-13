@@ -13,7 +13,7 @@ const HCC_PAGES = [
   { key: 'indiafest',       label: 'India Fest 2026',      desc: 'Vendor booth registrations' },
   { key: 'navratri',        label: 'Navratri 2026',        desc: 'Navratri ticketing, orders & check-in' },
   { key: 'navratri_vendors',label: 'Navratri Vendors',     desc: 'Vendor booth reservations, reports & refunds' },
-  { key: 'navratri_aarti',  label: 'Navratri Aarti',       desc: 'Daily Aarti bidding, winner management & iPad payment reconciliation' },
+  { key: 'navratri_aarti',  label: 'Daily Maharaj Aarti',  desc: 'Daily Maharaj Aarti bidding, winner management & iPad payment reconciliation' },
   { key: 'led_ads',         label: 'LED Screen Ads',       desc: 'LED advertisement registrations' },
   { key: 'expenses',        label: 'Expenses & Accounts', desc: 'Enter and manage event expenses & utility bills' },
   { key: 'settings',        label: 'Settings',             desc: 'App settings' },

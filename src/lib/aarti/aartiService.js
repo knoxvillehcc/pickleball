@@ -1,6 +1,6 @@
 /**
  * aartiService.js
- * Master Service layer for Navratri 2026 Daily Aarti Seva & Bidding System.
+ * Master Service layer for Navratri 2026 Daily Maharaj Aarti & Bidding System.
  * Handles bid calculations, dynamic increment tiers, OTP verification,
  * outbid alerts, and administrative payment tracking.
  */
@@ -181,9 +181,32 @@ export async function getAartiDaysPublic() {
   const now = new Date();
 
   return rows.map(day => {
+    let isLocked = Boolean(day.is_locked);
+    let lockedSponsorName = day.locked_sponsor_name || '';
+    let lockedSponsorAmount = day.locked_sponsor_amount;
+    let lockedSponsorPhone = day.locked_sponsor_phone || '';
+    let lockedSponsorEmail = day.locked_sponsor_email || '';
+    let lockedNotes = day.locked_notes || '';
+
+    // Zero-migration fallback via admin_notes
+    if (!isLocked && day.admin_notes && day.admin_notes.includes('__LOCKED__:')) {
+      try {
+        const raw = day.admin_notes.split('__LOCKED__:')[1];
+        const parsed = JSON.parse(raw);
+        if (parsed.is_locked) {
+          isLocked = true;
+          lockedSponsorName = parsed.locked_sponsor_name || '';
+          lockedSponsorAmount = parsed.locked_sponsor_amount;
+          lockedSponsorPhone = parsed.locked_sponsor_phone || '';
+          lockedSponsorEmail = parsed.locked_sponsor_email || '';
+          lockedNotes = parsed.locked_notes || '';
+        }
+      } catch {}
+    }
+
     const cutoffDate = new Date(day.cutoff_time);
     const isPastCutoff = now > cutoffDate;
-    const isClosed = day.status === 'closed' || isPastCutoff;
+    const isClosed = day.status === 'closed' || isPastCutoff || isLocked;
 
     const currentBid = Number(day.current_highest_bid || day.base_bid || 500);
     const bidsCount = Number(day.bids_count || 0);
@@ -204,8 +227,8 @@ export async function getAartiDaysPublic() {
       event_date: day.event_date,
       formatted_date: formattedDate,
       day_title: day.day_title,
-      is_maha_aarti: day.is_maha_aarti,
-      base_bid: day.base_bid,
+      is_maha_aarti: Boolean(day.is_maha_aarti),
+      base_bid: Number(day.base_bid || 500),
       current_highest_bid: currentBid,
       current_winner_name: winnerName,
       show_bidder_names: showBidderNames,
@@ -213,6 +236,12 @@ export async function getAartiDaysPublic() {
       status: isClosed ? 'closed' : 'open',
       is_past_cutoff: isPastCutoff,
       cutoff_time: day.cutoff_time,
+      is_locked: isLocked,
+      locked_sponsor_name: isLocked ? (showBidderNames ? (lockedSponsorName || winnerName) : 'Devotee Sponsor') : '',
+      locked_sponsor_amount: isLocked ? Number(lockedSponsorAmount || currentBid) : null,
+      locked_sponsor_phone: lockedSponsorPhone,
+      locked_sponsor_email: lockedSponsorEmail,
+      locked_notes: lockedNotes,
       quick_options: quickOptions,
     };
   });
@@ -281,10 +310,38 @@ export async function getAartiDaysAdmin() {
 
     const dayBids = allBids.filter(b => b.day_number === day.day_number);
 
+    let isLocked = Boolean(day.is_locked);
+    let lockedSponsorName = day.locked_sponsor_name || '';
+    let lockedSponsorAmount = day.locked_sponsor_amount;
+    let lockedSponsorPhone = day.locked_sponsor_phone || '';
+    let lockedSponsorEmail = day.locked_sponsor_email || '';
+    let lockedNotes = day.locked_notes || '';
+
+    if (!isLocked && day.admin_notes && day.admin_notes.includes('__LOCKED__:')) {
+      try {
+        const raw = day.admin_notes.split('__LOCKED__:')[1];
+        const parsed = JSON.parse(raw);
+        if (parsed.is_locked) {
+          isLocked = true;
+          lockedSponsorName = parsed.locked_sponsor_name || '';
+          lockedSponsorAmount = parsed.locked_sponsor_amount;
+          lockedSponsorPhone = parsed.locked_sponsor_phone || '';
+          lockedSponsorEmail = parsed.locked_sponsor_email || '';
+          lockedNotes = parsed.locked_notes || '';
+        }
+      } catch {}
+    }
+
     return {
       ...day,
       formatted_date: formattedDate,
       is_past_cutoff: isPastCutoff,
+      is_locked: isLocked,
+      locked_sponsor_name: lockedSponsorName,
+      locked_sponsor_amount: lockedSponsorAmount,
+      locked_sponsor_phone: lockedSponsorPhone,
+      locked_sponsor_email: lockedSponsorEmail,
+      locked_notes: lockedNotes,
       bids: dayBids,
     };
   });
@@ -320,9 +377,16 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
   const day = days[0];
   if (!day) throw new Error('Invalid day selected.');
 
+  if (day.is_locked || (day.admin_notes && day.admin_notes.includes('__LOCKED__:'))) {
+    throw new Error('This festival day has been reserved and locked for sponsorship. Public bidding is currently closed.');
+  }
+
   const now = new Date();
   if (day.status === 'closed' || now > new Date(day.cutoff_time)) {
-    throw new Error('Bidding for this day has concluded at 9:30 PM EST.');
+    const cutoffFormatted = day.cutoff_time
+      ? new Date(day.cutoff_time).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }) + ' EST'
+      : '9:45 PM EST';
+    throw new Error(`Bidding for this day has concluded at ${cutoffFormatted}.`);
   }
 
   // 2. Validate bid amount meets minimum
@@ -379,7 +443,7 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Verification Code - Aarti Seva</title>
+      <title>Verification Code - Daily Maharaj Aarti</title>
     </head>
     <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -391,7 +455,7 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
               Hindu Community Center of Knoxville
             </div>
             <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
-              Navratri 2026 · Daily Aarti Seva
+              Navratri 2026 · Daily Maharaj Aarti
             </h1>
           </td>
         </tr>
@@ -403,7 +467,7 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
               Jai Mataji, ${cleanName}!
             </h2>
             <p style="margin: 0 0 20px; font-size: 14.5px; color: #515154; line-height: 1.55;">
-              Please enter the 6-digit verification code below to confirm and post your Aarti Seva bid. This code expires in <strong>5 minutes</strong>.
+              Please enter the 6-digit verification code below to confirm and post your Maharaj Aarti bid. This code expires in <strong>5 minutes</strong>.
             </p>
 
             <!-- OTP Box -->
@@ -536,9 +600,16 @@ export async function verifyBid({ bid_id, otp_code }) {
   const days = await dayRes.json();
   const day = days[0];
 
+  if (day.is_locked || (day.admin_notes && day.admin_notes.includes('__LOCKED__:'))) {
+    throw new Error('This festival day has been reserved and locked for sponsorship. Public bidding is currently closed.');
+  }
+
   const now = new Date();
   if (day.status === 'closed' || now > new Date(day.cutoff_time)) {
-    throw new Error('Bidding for this day has already closed at 9:30 PM EST.');
+    const cutoffFormatted = day.cutoff_time
+      ? new Date(day.cutoff_time).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }) + ' EST'
+      : '9:45 PM EST';
+    throw new Error(`Bidding for this day has already concluded at ${cutoffFormatted}.`);
   }
 
   const previousWinnerEmail = day.current_winner_email;
@@ -676,7 +747,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Outbid Alert - Aarti Seva</title>
+      <title>Outbid Alert - Daily Maharaj Aarti</title>
     </head>
     <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -688,7 +759,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
               Hindu Community Center of Knoxville
             </div>
             <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
-              Navratri 2026 · Daily Aarti Seva
+              Navratri 2026 · Daily Maharaj Aarti
             </h1>
           </td>
         </tr>
@@ -734,7 +805,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
             </table>
 
             <p style="margin: 0 0 24px; font-size: 14px; color: #515154; line-height: 1.5;">
-              Would you like to reclaim your Aarti Seva for this day? Tap the button below to view the live dashboard and submit your new bid. Bidding closes daily at <strong>9:30 PM EST</strong>.
+              Would you like to reclaim your Maharaj Aarti for this day? Tap the button below to view the live dashboard and submit your new bid. Bidding closes daily at <strong>9:45 PM EST</strong>.
             </p>
 
             <!-- Bulletproof CTA Button (Solid Orange with White Text) -->
@@ -742,7 +813,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
               <tr>
                 <td align="center" style="background-color: #E8780C; border-radius: 12px; box-shadow: 0 3px 12px rgba(232, 120, 12, 0.28);">
                   <a href="${rebidUrl}" target="_blank" style="display: block; width: 100%; box-sizing: border-box; padding: 16px 24px; font-size: 16px; font-weight: 800; color: #FFFFFF; text-decoration: none; border-radius: 12px; text-align: center; letter-spacing: 0.2px;">
-                    Reclaim Aarti Seva &amp; Rebid Now &rarr;
+                    Reclaim Maharaj Aarti &amp; Rebid Now &rarr;
                   </a>
                 </td>
               </tr>
@@ -768,7 +839,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
               Hindu Community Center · 8580 Executive Park Dr, Knoxville, TN 37923
             </div>
             <div style="font-size: 11px; color: #94A3B8; margin-top: 4px;">
-              Daily Aarti bidding concludes each night at 9:30 PM EST.
+              Daily Aarti bidding concludes each night at 9:45 PM EST.
             </div>
           </td>
         </tr>
@@ -807,7 +878,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Bid Cancellation Confirmation - Aarti Seva</title>
+      <title>Bid Cancellation Confirmation - Daily Maharaj Aarti</title>
     </head>
     <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -819,7 +890,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
               Hindu Community Center of Knoxville
             </div>
             <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
-              Navratri 2026 · Daily Aarti Seva
+              Navratri 2026 · Daily Maharaj Aarti
             </h1>
           </td>
         </tr>
@@ -844,7 +915,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
             </h2>
 
             <p style="margin: 0 0 20px; font-size: 14.5px; color: #515154; line-height: 1.55;">
-              This email serves as official confirmation that your Aarti Seva bid has been voided and withdrawn from the festival register. You hold no further financial commitment for this entry.
+              This email serves as official confirmation that your Maharaj Aarti bid has been voided and withdrawn from the festival register. You hold no further financial commitment for this entry.
             </p>
 
             <!-- Highlighted Cancellation Summary Card -->
@@ -870,7 +941,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
             </table>
 
             <p style="margin: 0 0 24px; font-size: 14px; color: #515154; line-height: 1.5;">
-              If you wish to participate in Aarti Seva for another evening of Navratri 2026, or if you withdrew by mistake, you can place a new bid at any time on the live bidding dashboard:
+              If you wish to participate in Maharaj Aarti for another evening of Navratri 2026, or if you withdrew by mistake, you can place a new bid at any time on the live bidding dashboard:
             </p>
 
             <!-- CTA Button -->
@@ -878,7 +949,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
               <tr>
                 <td align="center" style="background-color: #E8780C; border-radius: 12px; box-shadow: 0 3px 12px rgba(232, 120, 12, 0.28);">
                   <a href="${aartiUrl}" target="_blank" style="display: block; width: 100%; box-sizing: border-box; padding: 16px 24px; font-size: 16px; font-weight: 800; color: #FFFFFF; text-decoration: none; border-radius: 12px; text-align: center; letter-spacing: 0.2px;">
-                    View Live Aarti Bidding Dashboard &rarr;
+                    View Live Maharaj Aarti Bidding Dashboard &rarr;
                   </a>
                 </td>
               </tr>
@@ -919,7 +990,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
     await transporter.sendMail({
       from: `"HCC Navratri Aarti" <${process.env.GMAIL_USER}>`,
       to: toEmail,
-      subject: `Bid Cancellation Notice: Day ${dayNumber} Aarti Seva ($${Number(voidedAmount || 0).toLocaleString()})`,
+      subject: `Bid Cancellation Notice: Day ${dayNumber} Maharaj Aarti ($${Number(voidedAmount || 0).toLocaleString()})`,
       html,
     });
   } catch (err) {
@@ -928,16 +999,127 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
 }
 
 /**
- * Admin: Update day status, cutoff, or manual winner
+ * Admin: Update day status, cutoff, date, description, starting bid, or manual lock
  */
-export async function updateAdminDay({ day_number, status, cutoff_time, current_winner_name, current_highest_bid }) {
+export async function updateAdminDay({
+  day_number,
+  status,
+  cutoff_time,
+  event_date,
+  day_title,
+  base_bid,
+  is_maha_aarti,
+  is_locked,
+  locked_sponsor_name,
+  locked_sponsor_amount,
+  locked_sponsor_phone,
+  locked_sponsor_email,
+  locked_notes,
+  payment_status,
+  payment_method,
+  current_winner_name,
+  current_highest_bid,
+}) {
   const updates = { updated_at: new Date().toISOString() };
   if (status) updates.status = status;
   if (cutoff_time) updates.cutoff_time = cutoff_time;
-  if (current_winner_name !== undefined) updates.current_winner_name = current_winner_name;
-  if (current_highest_bid !== undefined) updates.current_highest_bid = Number(current_highest_bid);
+  if (event_date) updates.event_date = event_date;
+  if (day_title !== undefined) updates.day_title = day_title.trim();
+  if (base_bid !== undefined) updates.base_bid = Number(base_bid);
+  if (is_maha_aarti !== undefined) updates.is_maha_aarti = Boolean(is_maha_aarti);
 
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${day_number}`, {
+  // If event_date was updated and cutoff_time was not explicitly passed, recompute cutoff_time for 9:45 PM EDT
+  if (event_date && !cutoff_time) {
+    updates.cutoff_time = `${event_date}T21:45:00-04:00`;
+  }
+
+  // Handle Locking / Unlocking
+  if (is_locked === true) {
+    const sponsorName = locked_sponsor_name?.trim() || 'Devotee Sponsor';
+    const sponsorAmount = locked_sponsor_amount ? Number(locked_sponsor_amount) : (base_bid ? Number(base_bid) : 500);
+
+    updates.is_locked = true;
+    updates.locked_sponsor_name = sponsorName;
+    updates.locked_sponsor_amount = sponsorAmount;
+    updates.locked_sponsor_phone = locked_sponsor_phone?.trim() || '';
+    updates.locked_sponsor_email = locked_sponsor_email?.trim() || '';
+    updates.locked_notes = locked_notes?.trim() || '';
+
+    // Zero-migration fallback: embed lock metadata into admin_notes
+    const lockPayload = {
+      is_locked: true,
+      locked_sponsor_name: sponsorName,
+      locked_sponsor_amount: sponsorAmount,
+      locked_sponsor_phone: updates.locked_sponsor_phone,
+      locked_sponsor_email: updates.locked_sponsor_email,
+      locked_notes: updates.locked_notes,
+    };
+    updates.admin_notes = `__LOCKED__:${JSON.stringify(lockPayload)}`;
+
+    // Assign sponsor as winning devotee and update high bid
+    updates.current_winner_name = sponsorName;
+    updates.current_highest_bid = sponsorAmount;
+    updates.current_winner_phone = updates.locked_sponsor_phone;
+    updates.current_winner_email = updates.locked_sponsor_email;
+    if (payment_status) updates.payment_status = payment_status;
+    if (payment_method) updates.payment_method = payment_method;
+
+    // Archive prior online bids for this day
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?day_number=eq.${day_number}`, {
+        method: 'PATCH',
+        headers: getServiceHeaders(),
+        body: JSON.stringify({ is_highest: false }),
+      });
+    } catch (err) {
+      console.warn('[updateAdminDay] Non-fatal error archiving prior bids:', err);
+    }
+  } else if (is_locked === false) {
+    updates.is_locked = false;
+    updates.locked_sponsor_name = '';
+    updates.locked_sponsor_amount = null;
+    updates.locked_sponsor_phone = '';
+    updates.locked_sponsor_email = '';
+    updates.locked_notes = '';
+    updates.admin_notes = '';
+
+    // Re-check if there are existing verified bids to restore
+    try {
+      const topBidRes = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?day_number=eq.${day_number}&is_verified=eq.true&order=bid_amount.desc,created_at.desc&limit=1`, {
+        headers: getServiceHeaders(),
+        cache: 'no-store',
+      });
+      if (topBidRes.ok) {
+        const topBids = await topBidRes.json();
+        if (topBids.length > 0) {
+          const top = topBids[0];
+          updates.current_winner_name = top.bidder_name;
+          updates.current_highest_bid = Number(top.bid_amount);
+          updates.current_winner_email = top.bidder_email || '';
+          updates.current_winner_phone = top.bidder_phone || '';
+          await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?id=eq.${top.id}`, {
+            method: 'PATCH',
+            headers: getServiceHeaders(),
+            body: JSON.stringify({ is_highest: true }),
+          });
+        } else {
+          const base = base_bid !== undefined ? Number(base_bid) : 500;
+          updates.current_winner_name = '';
+          updates.current_highest_bid = base;
+          updates.current_winner_email = '';
+          updates.current_winner_phone = '';
+        }
+      }
+    } catch (err) {
+      console.warn('[updateAdminDay] Non-fatal error restoring prior bid:', err);
+    }
+  } else {
+    // Normal update when lock wasn't toggled
+    if (current_winner_name !== undefined) updates.current_winner_name = current_winner_name;
+    if (current_highest_bid !== undefined) updates.current_highest_bid = Number(current_highest_bid);
+  }
+
+  let res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${day_number}`, {
     method: 'PATCH',
     headers: getServiceHeaders(),
     body: JSON.stringify(updates),
@@ -945,7 +1127,28 @@ export async function updateAdminDay({ day_number, status, cutoff_time, current_
 
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`Failed to update day: ${errText}`);
+    // Resilient fallback if is_locked or locked columns aren't in PostgreSQL schema yet
+    if (errText.includes('is_locked') || errText.includes('locked_')) {
+      const safeUpdates = { ...updates };
+      delete safeUpdates.is_locked;
+      delete safeUpdates.locked_sponsor_name;
+      delete safeUpdates.locked_sponsor_amount;
+      delete safeUpdates.locked_sponsor_phone;
+      delete safeUpdates.locked_sponsor_email;
+      delete safeUpdates.locked_notes;
+
+      res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${day_number}`, {
+        method: 'PATCH',
+        headers: getServiceHeaders(),
+        body: JSON.stringify(safeUpdates),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to update day: ${await res.text()}`);
+      }
+    } else {
+      throw new Error(`Failed to update day: ${errText}`);
+    }
   }
 
   return { success: true };

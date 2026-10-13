@@ -54,7 +54,7 @@ const navGroups = [
     { href: '/indiafest/sponsors',  label: 'Sponsors',          icon: <TrophyIcon />,   slug: 'sponsors' },
     { href: '/navratri',            label: 'Navratri 2026',     icon: <FestivalIcon />, slug: 'navratri' },
     { href: '/navratri/vendors',    label: 'Navratri Vendors',  icon: <VendorIcon />,   slug: 'navratri_vendors' },
-    { href: '/admin/navratri-aarti',label: 'Navratri Aarti',    icon: <AartiIcon />,    slug: 'navratri_aarti' },
+    { href: '/admin/navratri-aarti',label: 'Daily Maharaj Aarti', icon: <AartiIcon />, slug: 'navratri_aarti' },
     { href: '/pickleball',          label: 'Pickleball',        icon: <PBIcon />,       slug: 'pickleball' },
     { href: '/led-ads',             label: 'LED Screen Ads',    icon: <LedIcon />,      slug: 'led_ads' },
     { href: '/banner',              label: 'Banner In',         icon: <BannerIcon />,   slug: 'banner' },

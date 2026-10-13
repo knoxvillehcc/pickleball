@@ -340,7 +340,7 @@ export default function NavratriAartiPage() {
             <span style={{ display: 'flex', color: 'var(--accent, #E8780C)' }}>
               {Icons.clock}
             </span>
-            <span>Daily Cutoff: <strong>9:30 PM EST</strong></span>
+            <span>Daily Cutoff: <strong>9:45 PM EST</strong></span>
           </div>
         </div>
       </header>
@@ -387,7 +387,7 @@ export default function NavratriAartiPage() {
             lineHeight: 1.1,
           }}
         >
-          Daily Aarti Seva
+          Daily Maharaj Aarti
         </h1>
 
         <p
@@ -399,8 +399,8 @@ export default function NavratriAartiPage() {
             margin: '0 auto 24px',
           }}
         >
-          Devotees can sponsor and perform the sacred evening Aarti for each night of Navratri.
-          Advance bidding is open for all 10 festival days. Daily bidding closes at <strong>9:30 PM EST</strong>.
+          Devotees can sponsor and perform the sacred evening Maharaj Aarti for each night of Navratri.
+          Advance bidding is open for all 10 festival days. Daily bidding closes at <strong>9:45 PM EST</strong>.
         </p>
 
         {/* Apple Segmented Feature Strip */}
@@ -521,7 +521,24 @@ export default function NavratriAartiPage() {
                         <span>Day {day.day_number} · {day.formatted_date}</span>
                       </div>
 
-                      {isClosed ? (
+                      {day.is_locked ? (
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: '800',
+                            padding: '3px 10px',
+                            borderRadius: '999px',
+                            background: 'rgba(232, 120, 12, 0.12)',
+                            color: 'var(--accent, #E8780C)',
+                            border: '1px solid rgba(232, 120, 12, 0.3)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          {Icons.lock} Sponsorship Reserved
+                        </span>
+                      ) : isClosed ? (
                         <span
                           style={{
                             fontSize: '11px',
@@ -623,14 +640,14 @@ export default function NavratriAartiPage() {
                           letterSpacing: '0.06em',
                         }}
                       >
-                        {isClosed ? 'Winning Contribution' : 'Current Highest Bid'}
+                        {day.is_locked ? 'Reserved Sponsorship Contribution' : isClosed ? 'Winning Contribution' : 'Current Highest Bid'}
                       </div>
 
                       <div
                         style={{
                           fontSize: '28px',
                           fontWeight: '800',
-                          color: hasWinner ? 'var(--accent, #E8780C)' : 'var(--text-primary, #1D1D1F)',
+                          color: (hasWinner || day.is_locked) ? 'var(--accent, #E8780C)' : 'var(--text-primary, #1D1D1F)',
                           marginTop: '3px',
                           fontVariantNumeric: 'tabular-nums',
                           letterSpacing: '-0.02em',
@@ -651,7 +668,7 @@ export default function NavratriAartiPage() {
                           gap: '8px',
                         }}
                       >
-                        {hasWinner ? (
+                        {(hasWinner || day.is_locked) ? (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0 }}>
                             <span
                               style={{
@@ -680,16 +697,16 @@ export default function NavratriAartiPage() {
                               }}
                               title={day.current_winner_name}
                             >
-                              Leader: {day.current_winner_name}
+                              {day.is_locked ? 'Sponsor: ' : 'Leader: '}{day.current_winner_name}
                             </span>
                           </div>
                         ) : (
                           <span style={{ color: 'var(--text-secondary, #6E6E73)', fontSize: '12px' }}>
-                            No bids yet · Reserve: $500
+                            No bids yet · Reserve: ${Number(day.base_bid || 500).toLocaleString()}
                           </span>
                         )}
 
-                        {day.bids_count > 0 && (
+                        {day.bids_count > 0 && !day.is_locked && (
                           <span
                             style={{
                               fontSize: '11px',
@@ -711,7 +728,26 @@ export default function NavratriAartiPage() {
 
                   {/* Card Bottom CTA */}
                   <div>
-                    {isClosed ? (
+                    {day.is_locked ? (
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          padding: '12px 14px',
+                          background: 'rgba(232, 120, 12, 0.08)',
+                          border: '1px solid rgba(232, 120, 12, 0.25)',
+                          borderRadius: '12px',
+                          fontSize: '13px',
+                          color: 'var(--accent, #E8780C)',
+                          fontWeight: '700',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        {Icons.lock} Sponsorship Reserved · Maharaj Aarti
+                      </div>
+                    ) : isClosed ? (
                       <div
                         style={{
                           textAlign: 'center',
@@ -724,7 +760,7 @@ export default function NavratriAartiPage() {
                           fontWeight: '500',
                         }}
                       >
-                        Aarti Sponsor: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>{day.current_winner_name || 'Devotee'}</strong>
+                        Maharaj Aarti Sponsor: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>{day.current_winner_name || 'Devotee'}</strong>
                       </div>
                     ) : (
                       <button
@@ -748,7 +784,7 @@ export default function NavratriAartiPage() {
                           transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
                         }}
                       >
-                        {Icons.diya} Place Aarti Seva Bid &rarr;
+                        {Icons.diya} Place Maharaj Aarti Bid &rarr;
                       </button>
                     )}
                   </div>

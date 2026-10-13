@@ -1,5 +1,5 @@
 -- ══════════════════════════════════════════════════════════════════════════════
--- NAVRATRI 2026 DAILY AARTI SEVA & BIDDING SYSTEM MIGRATION
+-- NAVRATRI 2026 DAILY MAHARAJ AARTI & BIDDING SYSTEM MIGRATION
 -- Run this in: Supabase Dashboard → SQL Editor → New Query → Run
 -- ══════════════════════════════════════════════════════════════════════════════
 
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.navratri_aarti_settings (
   tier1_max           INTEGER NOT NULL DEFAULT 3000,   -- Threshold ($) where increment changes (e.g. $3,000)
   tier1_increment     INTEGER NOT NULL DEFAULT 500,    -- Increment ($) below tier1_max ($500)
   tier2_increment     INTEGER NOT NULL DEFAULT 250,    -- Increment ($) above tier1_max ($250)
-  daily_cutoff_time   TEXT NOT NULL DEFAULT '21:30',   -- 9:30 PM EST
+  daily_cutoff_time   TEXT NOT NULL DEFAULT '21:45',   -- 9:45 PM EST
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -21,9 +21,9 @@ ALTER TABLE public.navratri_aarti_settings
 
 -- Seed default settings if not exists (Unpublished for safe testing)
 INSERT INTO public.navratri_aarti_settings (id, is_published, show_bidder_names, tier1_max, tier1_increment, tier2_increment, daily_cutoff_time)
-VALUES ('config', false, true, 3000, 500, 250, '21:30')
+VALUES ('config', false, true, 3000, 500, 250, '21:45')
 ON CONFLICT (id) DO UPDATE SET
-  tier1_max = EXCLUDED.tier1_max;
+  daily_cutoff_time = EXCLUDED.daily_cutoff_time;
 
 -- 2. Master 10-Day Festival Aarti Table
 CREATE TABLE IF NOT EXISTS public.navratri_aarti_days (
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.navratri_aarti_days (
   bids_count          INTEGER NOT NULL DEFAULT 0,
   status              TEXT NOT NULL DEFAULT 'open'
                       CHECK (status IN ('open', 'closed')),
-  cutoff_time         TIMESTAMPTZ NOT NULL,            -- 9:30 PM EST of event_date
+  cutoff_time         TIMESTAMPTZ NOT NULL,            -- 9:45 PM EST of event_date
   payment_status      TEXT NOT NULL DEFAULT 'pending'
                       CHECK (payment_status IN ('pending', 'paid', 'waived')),
   payment_collector   TEXT DEFAULT '',                 -- e.g. 'iPad 1', 'iPad 2', 'Front Desk'
@@ -53,6 +53,15 @@ CREATE TABLE IF NOT EXISTS public.navratri_aarti_days (
 
 CREATE INDEX IF NOT EXISTS idx_naarti_days_date ON public.navratri_aarti_days(event_date);
 CREATE INDEX IF NOT EXISTS idx_naarti_days_status ON public.navratri_aarti_days(status);
+
+-- Ensure locked sponsorship columns exist
+ALTER TABLE public.navratri_aarti_days 
+  ADD COLUMN IF NOT EXISTS is_locked BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS locked_sponsor_name TEXT DEFAULT '',
+  ADD COLUMN IF NOT EXISTS locked_sponsor_amount NUMERIC(10, 2) DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS locked_sponsor_phone TEXT DEFAULT '',
+  ADD COLUMN IF NOT EXISTS locked_sponsor_email TEXT DEFAULT '',
+  ADD COLUMN IF NOT EXISTS locked_notes TEXT DEFAULT '';
 
 -- 3. Individual Bids & OTP Verification Audit Log
 CREATE TABLE IF NOT EXISTS public.navratri_aarti_bids (
@@ -77,17 +86,18 @@ CREATE INDEX IF NOT EXISTS idx_naarti_bids_email ON public.navratri_aarti_bids(b
 INSERT INTO public.navratri_aarti_days 
   (day_number, event_date, day_title, is_maha_aarti, base_bid, current_highest_bid, status, cutoff_time)
 VALUES
-  (1,  '2026-10-11', 'Day 1 — Ghatasthapana (Prathama)', false, 500, 500, 'open', '2026-10-11T21:30:00-04:00'),
-  (2,  '2026-10-12', 'Day 2 — Navratri Dwitiya',          false, 500, 500, 'open', '2026-10-12T21:30:00-04:00'),
-  (3,  '2026-10-13', 'Day 3 — Navratri Tritiya',           false, 500, 500, 'open', '2026-10-13T21:30:00-04:00'),
-  (4,  '2026-10-14', 'Day 4 — Navratri Chaturthi',         false, 500, 500, 'open', '2026-10-14T21:30:00-04:00'),
-  (5,  '2026-10-15', 'Day 5 — Navratri Panchami',          false, 500, 500, 'open', '2026-10-15T21:30:00-04:00'),
-  (6,  '2026-10-16', 'Day 6 — Navratri Shashthi',          false, 500, 500, 'open', '2026-10-16T21:30:00-04:00'),
-  (7,  '2026-10-17', 'Day 7 — Navratri Saptami',           false, 500, 500, 'open', '2026-10-17T21:30:00-04:00'),
-  (8,  '2026-10-18', 'Day 8 — Maha Aarti (Aatham)',        true,  500, 500, 'open', '2026-10-18T21:30:00-04:00'),
-  (9,  '2026-10-19', 'Day 9 — Navratri Navami',            false, 500, 500, 'open', '2026-10-19T21:30:00-04:00'),
-  (10, '2026-10-20', 'Day 10 — Vijayadashami (Dussehra)',   false, 500, 500, 'open', '2026-10-20T21:30:00-04:00')
+  (1,  '2026-10-11', 'Day 1 — Ghatasthapana (Prathama)', false, 500, 500, 'open', '2026-10-11T21:45:00-04:00'),
+  (2,  '2026-10-12', 'Day 2 — Navratri Dwitiya',          false, 500, 500, 'open', '2026-10-12T21:45:00-04:00'),
+  (3,  '2026-10-13', 'Day 3 — Navratri Tritiya',           false, 500, 500, 'open', '2026-10-13T21:45:00-04:00'),
+  (4,  '2026-10-14', 'Day 4 — Navratri Chaturthi',         false, 500, 500, 'open', '2026-10-14T21:45:00-04:00'),
+  (5,  '2026-10-15', 'Day 5 — Navratri Panchami',          false, 500, 500, 'open', '2026-10-15T21:45:00-04:00'),
+  (6,  '2026-10-16', 'Day 6 — Navratri Shashthi',          false, 500, 500, 'open', '2026-10-16T21:45:00-04:00'),
+  (7,  '2026-10-17', 'Day 7 — Navratri Saptami',           false, 500, 500, 'open', '2026-10-17T21:45:00-04:00'),
+  (8,  '2026-10-18', 'Day 8 — Maha Aarti (Aatham)',        true,  500, 500, 'open', '2026-10-18T21:45:00-04:00'),
+  (9,  '2026-10-19', 'Day 9 — Navratri Navami',            false, 500, 500, 'open', '2026-10-19T21:45:00-04:00'),
+  (10, '2026-10-20', 'Day 10 — Vijayadashami (Dussehra)',   false, 500, 500, 'open', '2026-10-20T21:45:00-04:00')
 ON CONFLICT (day_number) DO UPDATE SET
+  cutoff_time = EXCLUDED.cutoff_time,
   day_title = EXCLUDED.day_title,
   is_maha_aarti = EXCLUDED.is_maha_aarti;
 

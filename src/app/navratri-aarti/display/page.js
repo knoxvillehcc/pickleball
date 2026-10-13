@@ -209,6 +209,29 @@ export default function AartiDisplayLivePage() {
     : (settings?.tier1_increment || 500);
   const nextMinBid = activeBidsCount > 0 ? (activeCurrentBid + activeNextStep) : (activeDay?.base_bid || 500);
 
+  // Dynamic Knoxville / Eastern cutoff time formatting (e.g. "9:45 PM", "10:00 PM")
+  const formattedCutoffTime = activeDay?.cutoff_time
+    ? new Date(activeDay.cutoff_time).toLocaleTimeString('en-US', {
+        timeZone: 'America/New_York',
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : '9:45 PM';
+
+  // Check if bidding has concluded (time expired OR admin manually closed)
+  const isPastCutoff = activeDay?.cutoff_time
+    ? new Date() >= new Date(activeDay.cutoff_time)
+    : false;
+  const isConcluded = Boolean(
+    activeDay && (activeDay.status === 'closed' || isPastCutoff || timeLeft === 'Bidding Concluded' || activeDay.is_locked)
+  );
+
+  const winnerDisplayName =
+    settings?.show_bidder_names === false
+      ? 'Devotee Sponsor'
+      : (activeDay?.locked_sponsor_name || activeDay?.current_winner_name || (activeDay?.bids_count > 0 ? 'Devotee Sponsor' : ''));
+  const hasWinner = Boolean(activeDay && (activeDay.current_winner_name || activeDay.locked_sponsor_name || activeDay.bids_count > 0 || activeDay.is_locked));
+
   return (
     <div
       style={{
@@ -256,6 +279,16 @@ export default function AartiDisplayLivePage() {
         @keyframes orangeDotBreathe {
           0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px #FF9F0A; }
           50% { transform: scale(1.35); opacity: 0.75; box-shadow: 0 0 16px #FF9F0A; }
+        }
+        @keyframes goldenCelebrationGlow {
+          0%, 100% {
+            box-shadow: 0 0 25px rgba(255, 159, 10, 0.4), inset 0 0 15px rgba(255, 159, 10, 0.15);
+            border-color: rgba(255, 159, 10, 0.6);
+          }
+          50% {
+            box-shadow: 0 0 50px rgba(255, 159, 10, 0.75), inset 0 0 25px rgba(255, 159, 10, 0.3);
+            border-color: #FF9F0A;
+          }
         }
         .jumbotron-text-glow-dark {
           text-shadow: 0 0 50px rgba(255, 159, 10, 0.6), 0 0 100px rgba(232, 120, 12, 0.4);
@@ -309,7 +342,7 @@ export default function AartiDisplayLivePage() {
               Hindu Community Center of Knoxville
             </div>
             <div style={{ fontSize: '19px', fontWeight: '800', letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '1px' }}>
-              Navratri 2026 · Daily Aarti Seva Stage
+              Navratri 2026 · Daily Maharaj Aarti Stage
             </div>
           </div>
         </div>
@@ -527,30 +560,30 @@ export default function AartiDisplayLivePage() {
                   )}
                 </div>
 
-                {/* Status Pill (Orange with Glowing Breathing Effect) */}
+                {/* Status Pill (Orange with Glowing Breathing Effect when Open, Gold when Concluded) */}
                 <div
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    background: activeDay.status === 'closed'
-                      ? (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.07)')
+                    background: isConcluded
+                      ? (isDark ? 'rgba(255, 159, 10, 0.22)' : 'rgba(255, 159, 10, 0.16)')
                       : (isDark ? 'rgba(255, 159, 10, 0.2)' : 'rgba(255, 159, 10, 0.16)'),
-                    border: activeDay.status === 'closed'
-                      ? (isDark ? '1.5px solid rgba(255, 255, 255, 0.2)' : '1.5px solid rgba(0, 0, 0, 0.14)')
+                    border: isConcluded
+                      ? (isDark ? '1.5px solid #FF9F0A' : '1.5px solid #D97706')
                       : (isDark ? '1.5px solid #FF9F0A' : '1.5px solid #D97706'),
-                    color: activeDay.status === 'closed'
-                      ? (isDark ? 'rgba(255, 255, 255, 0.7)' : '#6E6E73')
+                    color: isConcluded
+                      ? (isDark ? '#FFB340' : '#B45309')
                       : (isDark ? '#FFB340' : '#B45309'),
                     borderRadius: '999px',
                     padding: '6px 18px',
                     fontSize: '13.5px',
                     fontWeight: '800',
                     letterSpacing: '0.04em',
-                    animation: activeDay.status !== 'closed' ? 'orangeBreathe 2.5s infinite ease-in-out' : 'none',
+                    animation: !isConcluded ? 'orangeBreathe 2.5s infinite ease-in-out' : 'goldenCelebrationGlow 3s infinite ease-in-out',
                   }}
                 >
-                  {activeDay.status !== 'closed' && (
+                  {!isConcluded ? (
                     <span
                       style={{
                         width: '8px',
@@ -561,8 +594,10 @@ export default function AartiDisplayLivePage() {
                         animation: 'orangeDotBreathe 2s infinite ease-in-out',
                       }}
                     />
+                  ) : (
+                    <span style={{ color: isDark ? '#FF9F0A' : '#D97706' }}>{Icons.diya}</span>
                   )}
-                  <span>{activeDay.status === 'closed' ? 'Bidding Concluded' : 'Bidding Open'}</span>
+                  <span>{activeDay.is_locked ? 'Maharaj Aarti Reserved' : isConcluded ? 'Maharaj Aarti Confirmed' : 'Bidding Open'}</span>
                 </div>
               </div>
 
@@ -581,118 +616,344 @@ export default function AartiDisplayLivePage() {
               </h2>
             </div>
 
-            {/* ── CENTER JUMBOTRON: STADIUM NUMERAL & LEADING DEVOTEE (CENTERED) ─ */}
-            <div
-              style={{
-                margin: 'auto 0',
-                padding: '4px 0',
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
+            {/* ── CENTER JUMBOTRON: CELEBRATORY THANK YOU STAGE OR LIVE BIDDING STAGE ─ */}
+            {isConcluded && hasWinner ? (
+              /* ── GRAND CELEBRATORY THANK YOU STAGE (AFTER 9:45 PM OR EXTENDED CUTOFF) ─ */
               <div
                 style={{
-                  fontSize: '15px',
-                  fontWeight: '800',
-                  color: isDark ? '#FF9F0A' : '#C25E00',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.15em',
-                  marginBottom: '2px',
-                }}
-              >
-                {activeDay.status === 'closed' ? 'Winning Aarti Seva Contribution' : 'Current Highest Bid'}
-              </div>
-
-              {/* Massive Stadium Size Amount ($1,000 / $500) Centered */}
-              <div
-                className={isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}
-                style={{
-                  fontSize: 'clamp(98px, 14vw, 175px)',
-                  fontWeight: '900',
-                  color: isDark ? '#FF9F0A' : '#D97706',
-                  letterSpacing: '-0.04em',
-                  lineHeight: 0.9,
-                  margin: '0 auto 8px',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                ${Number(activeDay.current_highest_bid || 500).toLocaleString()}
-              </div>
-
-              {/* Leading Devotee Sponsor Row (Centered & Massive) */}
-              <div
-                style={{
+                  margin: 'auto 0',
+                  padding: '6px 0',
+                  textAlign: 'center',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '6px',
-                  paddingTop: '8px',
-                  borderTop: isDark ? '1.5px solid rgba(255, 255, 255, 0.12)' : '1.5px solid rgba(0, 0, 0, 0.08)',
+                  justifyContent: 'center',
                   width: '100%',
-                  maxWidth: '750px',
                 }}
               >
-                {activeDay.current_winner_name ? (
-                  <>
-                    <div style={{ fontSize: '13px', color: isDark ? '#98989D' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                      Leading Devotee Sponsor
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '14px',
-                      }}
-                    >
+                {/* Celebratory Dhanyavad Ribbon */}
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: isDark
+                      ? 'linear-gradient(135deg, rgba(255, 159, 10, 0.28) 0%, rgba(217, 119, 6, 0.16) 100%)'
+                      : 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
+                    border: isDark ? '1.5px solid #FF9F0A' : '1.5px solid #F59E0B',
+                    borderRadius: '999px',
+                    padding: '5px 18px',
+                    fontSize: '12.5px',
+                    fontWeight: '900',
+                    color: isDark ? '#FFB340' : '#B45309',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    marginBottom: '4px',
+                    boxShadow: isDark ? '0 4px 20px rgba(255, 159, 10, 0.35)' : '0 2px 10px rgba(245, 158, 11, 0.2)',
+                  }}
+                >
+                  <span>✨ Heartfelt Dhanyavad · Sacred Gratitude ✨</span>
+                </div>
+
+                {/* Subtitle */}
+                <div
+                  style={{
+                    fontSize: 'clamp(15px, 1.8vw, 22px)',
+                    fontWeight: '800',
+                    color: isDark ? '#E5E5E7' : '#374151',
+                    letterSpacing: '-0.01em',
+                    marginBottom: '6px',
+                  }}
+                >
+                  Tonight&apos;s Sacred Maharaj Aarti Sponsor
+                </div>
+
+                {/* Winning Devotee Sponsor Name & Radiant Avatar */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '16px',
+                    margin: '2px 0 8px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 'clamp(52px, 5.5vw, 70px)',
+                      height: 'clamp(52px, 5.5vw, 70px)',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #FF9F0A 0%, #D97706 50%, #92400E 100%)',
+                      color: '#FFFFFF',
+                      fontSize: 'clamp(20px, 2.3vw, 28px)',
+                      fontWeight: '900',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      boxShadow: isDark
+                        ? '0 0 35px rgba(255, 159, 10, 0.6), 0 4px 20px rgba(0, 0, 0, 0.5)'
+                        : '0 0 25px rgba(217, 119, 6, 0.45), 0 4px 15px rgba(0, 0, 0, 0.1)',
+                      border: '2.5px solid #FFF',
+                    }}
+                  >
+                    {getInitials(winnerDisplayName)}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 'clamp(36px, 4.8vw, 64px)',
+                      fontWeight: '900',
+                      color: isDark ? '#FFFFFF' : '#111827',
+                      letterSpacing: '-0.03em',
+                      lineHeight: 1.05,
+                      textShadow: isDark ? '0 2px 20px rgba(0, 0, 0, 0.6)' : 'none',
+                    }}
+                  >
+                    {winnerDisplayName}
+                  </div>
+                </div>
+
+                {/* Winning Contribution Amount */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0px',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: '11.5px',
+                      fontWeight: '800',
+                      color: isDark ? '#FF9F0A' : '#C25E00',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.14em',
+                    }}
+                  >
+                    Confirmed Maharaj Aarti Contribution
+                  </div>
+                  <div
+                    className={isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}
+                    style={{
+                      fontSize: 'clamp(56px, 7.5vw, 105px)',
+                      fontWeight: '900',
+                      color: isDark ? '#FF9F0A' : '#D97706',
+                      letterSpacing: '-0.04em',
+                      lineHeight: 0.95,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    ${Number(activeDay.current_highest_bid || 500).toLocaleString()}
+                  </div>
+                </div>
+
+                {/* Heartfelt Divine Blessing Card */}
+                <div
+                  style={{
+                    background: isDark
+                      ? 'linear-gradient(135deg, rgba(255, 159, 10, 0.14) 0%, rgba(26, 26, 34, 0.85) 100%)'
+                      : 'linear-gradient(135deg, rgba(255, 247, 237, 0.95) 0%, rgba(254, 243, 199, 0.85) 100%)',
+                    border: isDark ? '1.5px solid rgba(255, 159, 10, 0.4)' : '1.5px solid rgba(245, 158, 11, 0.45)',
+                    borderRadius: '16px',
+                    padding: '10px 20px',
+                    maxWidth: '820px',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    boxShadow: isDark ? '0 8px 30px rgba(0, 0, 0, 0.4)' : '0 6px 20px rgba(245, 158, 11, 0.15)',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: 'clamp(13px, 1.4vw, 16px)',
+                      fontWeight: '700',
+                      color: isDark ? '#F5F5F7' : '#1F2937',
+                      lineHeight: 1.4,
+                      margin: '0 0 4px',
+                    }}
+                  >
+                    Dhanyavad, <strong style={{ color: isDark ? '#FFB340' : '#B45309' }}>{winnerDisplayName}</strong>, for sponsoring Day {activeDay.day_number}&apos;s sacred Maharaj Aarti! May Maa Durga bless you and your family with divine grace, vibrant health, peace, and eternal prosperity.
+                  </p>
+                  <div
+                    style={{
+                      fontSize: '11.5px',
+                      fontWeight: '800',
+                      color: isDark ? '#FF9F0A' : '#C25E00',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    🙏 Jai Mata Di · Hindu Community Center of Knoxville 🙏
+                  </div>
+                </div>
+              </div>
+            ) : isConcluded && !hasWinner ? (
+              /* ── CONCLUDED WITH NO BIDS: GENERAL HCC SPONSORSHIP NOTICE ─ */
+              <div
+                style={{
+                  margin: 'auto 0',
+                  padding: '12px 0',
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: '800',
+                    color: isDark ? '#FF9F0A' : '#C25E00',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.14em',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Bidding Concluded at {formattedCutoffTime} EST
+                </div>
+                <div
+                  style={{
+                    fontSize: 'clamp(44px, 6vw, 84px)',
+                    fontWeight: '900',
+                    color: isDark ? '#FF9F0A' : '#D97706',
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1,
+                    marginBottom: '8px',
+                  }}
+                >
+                  ${Number(activeDay.base_bid || 500).toLocaleString()}
+                </div>
+                <div
+                  style={{
+                    fontSize: 'clamp(17px, 2.1vw, 25px)',
+                    fontWeight: '800',
+                    color: isDark ? '#FFFFFF' : '#1D1D1F',
+                    maxWidth: '680px',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Tonight&apos;s Maharaj Aarti is open for General Devotee Sponsorship.
+                </div>
+                <div style={{ fontSize: '13px', color: isDark ? '#A1A1A6' : '#6E6E73', marginTop: '6px' }}>
+                  Please visit the Mandir desk or scan the QR code to sponsor.
+                </div>
+              </div>
+            ) : (
+              /* ── ACTIVE STADIUM BIDDING (BEFORE 9:45 PM OR DURING EXTENSION) ─ */
+              <div
+                style={{
+                  margin: 'auto 0',
+                  padding: '4px 0',
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: '800',
+                    color: isDark ? '#FF9F0A' : '#C25E00',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.15em',
+                    marginBottom: '2px',
+                  }}
+                >
+                  Current Highest Bid
+                </div>
+
+                {/* Massive Stadium Size Amount ($1,000 / $500) Centered */}
+                <div
+                  className={isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}
+                  style={{
+                    fontSize: 'clamp(98px, 14vw, 175px)',
+                    fontWeight: '900',
+                    color: isDark ? '#FF9F0A' : '#D97706',
+                    letterSpacing: '-0.04em',
+                    lineHeight: 0.9,
+                    margin: '0 auto 8px',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  ${Number(activeDay.current_highest_bid || 500).toLocaleString()}
+                </div>
+
+                {/* Leading Devotee Sponsor Row (Centered & Massive) */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    paddingTop: '8px',
+                    borderTop: isDark ? '1.5px solid rgba(255, 255, 255, 0.12)' : '1.5px solid rgba(0, 0, 0, 0.08)',
+                    width: '100%',
+                    maxWidth: '750px',
+                  }}
+                >
+                  {activeDay.current_winner_name ? (
+                    <>
+                      <div style={{ fontSize: '13px', color: isDark ? '#98989D' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        Leading Devotee Sponsor
+                      </div>
                       <div
                         style={{
-                          width: '54px',
-                          height: '54px',
-                          borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #FF9F0A 0%, #B85A05 100%)',
-                          color: '#FFFFFF',
-                          fontSize: '20px',
-                          fontWeight: '900',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          flexShrink: 0,
-                          boxShadow: '0 4px 18px rgba(232, 120, 12, 0.45)',
+                          gap: '14px',
                         }}
                       >
-                        {getInitials(
-                          settings?.show_bidder_names === false ? 'Devotee Sponsor' : activeDay.current_winner_name
-                        )}
+                        <div
+                          style={{
+                            width: '54px',
+                            height: '54px',
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #FF9F0A 0%, #B85A05 100%)',
+                            color: '#FFFFFF',
+                            fontSize: '20px',
+                            fontWeight: '900',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            boxShadow: '0 4px 18px rgba(232, 120, 12, 0.45)',
+                          }}
+                        >
+                          {getInitials(winnerDisplayName)}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 'clamp(32px, 4.4vw, 56px)',
+                            fontWeight: '900',
+                            color: isDark ? '#FFFFFF' : '#1D1D1F',
+                            letterSpacing: '-0.02em',
+                            lineHeight: 1.05,
+                          }}
+                        >
+                          {winnerDisplayName}
+                        </div>
                       </div>
-                      <div
-                        style={{
-                          fontSize: 'clamp(32px, 4.4vw, 56px)',
-                          fontWeight: '900',
-                          color: isDark ? '#FFFFFF' : '#1D1D1F',
-                          letterSpacing: '-0.02em',
-                          lineHeight: 1.05,
-                        }}
-                      >
-                        {settings?.show_bidder_names === false ? 'Devotee Sponsor' : activeDay.current_winner_name}
+                    </>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize: '15px', color: isDark ? '#98989D' : '#6E6E73' }}>
+                        Opening Reserve: <strong style={{ color: isDark ? '#FFFFFF' : '#1D1D1F' }}>${Number(activeDay.base_bid || 500).toLocaleString()}</strong>
+                      </div>
+                      <div style={{ fontSize: 'clamp(22px, 2.8vw, 34px)', fontWeight: '800', color: isDark ? '#FF9F0A' : '#D97706', marginTop: '2px' }}>
+                        First verified bid takes the lead!
                       </div>
                     </div>
-                  </>
-                ) : (
-                  <div>
-                    <div style={{ fontSize: '15px', color: isDark ? '#98989D' : '#6E6E73' }}>
-                      Opening Reserve: <strong style={{ color: isDark ? '#FFFFFF' : '#1D1D1F' }}>${Number(activeDay.base_bid || 500).toLocaleString()}</strong>
-                    </div>
-                    <div style={{ fontSize: 'clamp(22px, 2.8vw, 34px)', fontWeight: '800', color: isDark ? '#FF9F0A' : '#D97706', marginTop: '2px' }}>
-                      First verified bid takes the lead!
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Bottom Tier: 3 Large Stats Cards Spanning Full 75% Width */}
             <div
@@ -712,14 +973,14 @@ export default function AartiDisplayLivePage() {
                 }}
               >
                 <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Bids Placed Tonight
+                  {isConcluded ? 'Total Bids Placed' : 'Bids Placed Tonight'}
                 </div>
                 <div style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   {activeDay.bids_count} {activeDay.bids_count === 1 ? 'bid' : 'bids'}
                 </div>
               </div>
 
-              {/* Next Minimum Bid */}
+              {/* Next Minimum Bid OR Confirmed Seva */}
               <div
                 style={{
                   background: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F5F5F7',
@@ -729,14 +990,14 @@ export default function AartiDisplayLivePage() {
                 }}
               >
                 <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Next Minimum Bid
+                  {isConcluded ? 'Winning Contribution' : 'Next Minimum Bid'}
                 </div>
                 <div style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#34D399' : '#059669', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-                  ${nextMinBid.toLocaleString()}
+                  ${isConcluded ? Number(activeDay.current_highest_bid || activeDay.base_bid || 500).toLocaleString() : nextMinBid.toLocaleString()}
                 </div>
               </div>
 
-              {/* Daily Cutoff Countdown */}
+              {/* Daily Cutoff Countdown OR Concluded Status */}
               <div
                 style={{
                   background: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F5F5F7',
@@ -747,10 +1008,10 @@ export default function AartiDisplayLivePage() {
               >
                 <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <span style={{ color: isDark ? '#FF9F0A' : '#D97706' }}>{Icons.clock}</span>
-                  <span>9:30 PM Cutoff</span>
+                  <span>{isConcluded ? `Concluded (${formattedCutoffTime} EST)` : `${formattedCutoffTime} Cutoff`}</span>
                 </div>
-                <div style={{ fontSize: '22px', fontWeight: '900', color: activeDay.status === 'closed' ? (isDark ? '#8E8E93' : '#6E6E73') : (isDark ? '#FF9F0A' : '#D97706'), marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-                  {timeLeft || '9:30 PM EST'}
+                <div style={{ fontSize: '22px', fontWeight: '900', color: isConcluded ? (isDark ? '#34D399' : '#059669') : (isDark ? '#FF9F0A' : '#D97706'), marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                  {isConcluded ? 'Maharaj Aarti Confirmed' : (timeLeft || `${formattedCutoffTime} EST`)}
                 </div>
               </div>
             </div>
@@ -800,7 +1061,7 @@ export default function AartiDisplayLivePage() {
                 marginBottom: '8px',
               }}
             >
-              {Icons.qrPhone} Scan to Bid
+              {isConcluded ? Icons.diya : Icons.qrPhone} {isConcluded ? 'Upcoming Maharaj Aarti' : 'Scan to Bid'}
             </div>
 
             <h3
@@ -813,7 +1074,7 @@ export default function AartiDisplayLivePage() {
                 lineHeight: 1.15,
               }}
             >
-              Sponsor Tonight&apos;s Aarti
+              {isConcluded ? 'Sponsor Upcoming Days' : 'Sponsor Tonight\'s Maharaj Aarti'}
             </h3>
 
             <p
@@ -824,7 +1085,7 @@ export default function AartiDisplayLivePage() {
                 lineHeight: 1.4,
               }}
             >
-              Point camera to bid on phone
+              {isConcluded ? 'Scan to view upcoming festival days & pledge early' : 'Point camera to bid on phone'}
             </p>
           </div>
 
@@ -848,7 +1109,7 @@ export default function AartiDisplayLivePage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={qrDataUrl}
-                alt="Scan to Bid on Aarti Seva"
+                alt="Scan to Bid on Maharaj Aarti"
                 style={{
                   display: 'block',
                   borderRadius: '6px',
@@ -887,7 +1148,7 @@ export default function AartiDisplayLivePage() {
             </div>
 
             <div style={{ fontSize: '10px', color: isDark ? '#8E8E93' : '#6E6E73', marginTop: '5px', fontWeight: '600' }}>
-              Instant OTP verification
+              {isConcluded ? 'Scan to sponsor upcoming days' : 'Instant OTP verification'}
             </div>
           </div>
         </div>

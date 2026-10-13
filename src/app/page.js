@@ -187,19 +187,19 @@ function PublicLanding() {
 
   const options = [
     ...(aartiLive ? [{
-      title: 'Navratri 2026 — Daily Aarti Seva',
-      desc: 'Sponsor and perform the sacred evening Aarti each night. Live community bidding with dynamic increments and daily 9:30 PM EST cutoff.',
+      title: 'Navratri 2026 — Daily Maharaj Aarti',
+      desc: 'Sponsor and perform the sacred evening Maharaj Aarti each night. Live community bidding with dynamic increments and daily 9:45 PM EST cutoff.',
       href: '/navratri-aarti',
       accentColor: '#E8780C',
       glowColor: 'rgba(232, 120, 12, 0.16)',
       borderColor: 'rgba(232, 120, 12, 0.35)',
       icon: SvgIcons.aarti,
       badge: 'Live Bidding',
-      cta: 'Place Aarti Bid',
+      cta: 'Place Maharaj Aarti Bid',
       isOpen: true,
       kpis: [
         { label: 'Reserve Opening', value: '$500' },
-        { label: 'Daily Cutoff', value: '9:30 PM EST' },
+        { label: 'Daily Cutoff', value: '9:45 PM EST' },
         { label: '10 Sacred Nights', value: '10-11-2026 to 10-20-2026' },
         { label: 'Day 8 Maha Aarti', value: '10-18-2026' },
       ],

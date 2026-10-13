@@ -97,6 +97,32 @@ const Icons = {
       <line x1="2" y1="2" x2="22" y2="22" />
     </svg>
   ),
+  globe: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  ),
+  globeOff: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="2" x2="22" y2="22" />
+      <path d="M4.93 4.93 19.07 19.07" />
+    </svg>
+  ),
+  lock: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  ),
+  edit: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+  ),
 };
 
 export default function NavratriAartiAdminPage() {
@@ -114,6 +140,23 @@ export default function NavratriAartiAdminPage() {
   const [showBidderNames, setShowBidderNames] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
   const [togglingNames, setTogglingNames] = useState(false);
+  const [togglingPublished, setTogglingPublished] = useState(false);
+
+  // Edit Day & Sponsor Lock Modal State
+  const [editDayModal, setEditDayModal] = useState(null);
+  const [editEventDate, setEditEventDate] = useState('');
+  const [editDayTitle, setEditDayTitle] = useState('');
+  const [editBaseBid, setEditBaseBid] = useState(500);
+  const [editIsMaha, setEditIsMaha] = useState(false);
+  const [editIsLocked, setEditIsLocked] = useState(false);
+  const [editLockedName, setEditLockedName] = useState('');
+  const [editLockedAmount, setEditLockedAmount] = useState('');
+  const [editLockedPhone, setEditLockedPhone] = useState('');
+  const [editLockedEmail, setEditLockedEmail] = useState('');
+  const [editLockedPayStatus, setEditLockedPayStatus] = useState('pending');
+  const [editLockedPayMethod, setEditLockedPayMethod] = useState('cash');
+  const [editLockedNotes, setEditLockedNotes] = useState('');
+  const [savingEditDay, setSavingEditDay] = useState(false);
 
   // Payment Modal State
   const [paymentModalDay, setPaymentModalDay] = useState(null);
@@ -199,6 +242,90 @@ export default function NavratriAartiAdminPage() {
     }
   };
 
+  // Quick 1-click toggle for Dashboard Display (Public Landing Tile)
+  const handleTogglePublished = async () => {
+    const nextVal = !isPublished;
+    setIsPublished(nextVal);
+    try {
+      setTogglingPublished(true);
+      const res = await fetch('/api/navratri/aarti/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          is_published: nextVal,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        setIsPublished(!nextVal); // revert
+        alert(json.error || 'Failed to update dashboard visibility');
+      } else {
+        await fetchData();
+      }
+    } catch {
+      setIsPublished(!nextVal);
+      alert('Network error updating dashboard visibility');
+    } finally {
+      setTogglingPublished(false);
+    }
+  };
+
+  // Open Edit Day & Sponsor Lock Modal
+  const openEditDayModal = (day) => {
+    setEditDayModal(day);
+    setEditEventDate(day.event_date || '');
+    setEditDayTitle(day.day_title || '');
+    setEditBaseBid(day.base_bid || 500);
+    setEditIsMaha(Boolean(day.is_maha_aarti));
+    setEditIsLocked(Boolean(day.is_locked));
+    setEditLockedName(day.locked_sponsor_name || day.current_winner_name || '');
+    setEditLockedAmount(day.locked_sponsor_amount || day.current_highest_bid || day.base_bid || 500);
+    setEditLockedPhone(day.locked_sponsor_phone || day.current_winner_phone || '');
+    setEditLockedEmail(day.locked_sponsor_email || day.current_winner_email || '');
+    setEditLockedPayStatus(day.payment_status || 'pending');
+    setEditLockedPayMethod(day.payment_method || 'cash');
+    setEditLockedNotes(day.locked_notes || '');
+  };
+
+  // Save Day Edits & Sponsor Lock
+  const handleSaveEditDay = async (e) => {
+    e.preventDefault();
+    if (!editDayModal) return;
+    try {
+      setSavingEditDay(true);
+      const res = await fetch('/api/navratri/aarti/admin/day', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          day_number: editDayModal.day_number,
+          event_date: editEventDate,
+          day_title: editDayTitle,
+          base_bid: Number(editBaseBid),
+          is_maha_aarti: editIsMaha,
+          is_locked: editIsLocked,
+          locked_sponsor_name: editLockedName,
+          locked_sponsor_amount: editLockedAmount ? Number(editLockedAmount) : Number(editBaseBid),
+          locked_sponsor_phone: editLockedPhone,
+          locked_sponsor_email: editLockedEmail,
+          payment_status: editLockedPayStatus,
+          payment_method: editLockedPayMethod,
+          locked_notes: editLockedNotes,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        alert(json.error || 'Failed to update day configuration');
+      } else {
+        setEditDayModal(null);
+        await fetchData();
+      }
+    } catch {
+      alert('Network error updating day configuration');
+    } finally {
+      setSavingEditDay(false);
+    }
+  };
+
   // Copy Link Handler
   const handleCopyLink = () => {
     navigator.clipboard.writeText('https://dashboard.knoxvillemandir.org/navratri-aarti');
@@ -216,8 +343,9 @@ export default function NavratriAartiAdminPage() {
 
     data.days.forEach((day) => {
       bidsCount += Number(day.bids_count || 0);
-      if (day.bids_count > 0 && day.current_winner_name) {
-        const amt = Number(day.current_highest_bid || 0);
+      const hasWinnerOrLock = (day.bids_count > 0 && day.current_winner_name) || day.is_locked;
+      if (hasWinnerOrLock) {
+        const amt = Number(day.current_highest_bid || day.locked_sponsor_amount || 0);
         pledged += amt;
         if (day.payment_status === 'paid') {
           paid += amt;
@@ -449,7 +577,7 @@ export default function NavratriAartiAdminPage() {
               HCC · Navratri 2026
             </div>
             <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)', letterSpacing: '-0.4px' }}>
-              Aarti Seva Management
+              Daily Maharaj Aarti Management
             </h1>
           </div>
 
@@ -518,6 +646,32 @@ export default function NavratriAartiAdminPage() {
               {Icons.external} Live Stage / TV View
             </Link>
 
+            {/* Quick 1-Click Toggle for Dashboard Display (Public Landing Tile) */}
+            <button
+              onClick={handleTogglePublished}
+              disabled={togglingPublished}
+              type="button"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: isPublished ? 'rgba(16, 185, 129, 0.12)' : 'rgba(100, 116, 139, 0.12)',
+                border: isPublished ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(100, 116, 139, 0.3)',
+                color: isPublished ? '#059669' : '#64748B',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                cursor: togglingPublished ? 'wait' : 'pointer',
+                boxShadow: 'var(--shadow)',
+                transition: 'all 0.2s ease',
+              }}
+              title="Click to toggle whether the Navratri Maharaj Aarti tile appears on the main public dashboard (dashboard.knoxvillemandir.org)"
+            >
+              {isPublished ? Icons.globe : Icons.globeOff}
+              <span>{isPublished ? 'Dashboard: Visible (Live)' : 'Dashboard: Hidden'}</span>
+            </button>
+
             {/* Quick 1-Click Toggle for Public Bidder Names */}
             <button
               onClick={handleToggleBidderNames}
@@ -580,7 +734,7 @@ export default function NavratriAartiAdminPage() {
         }}>
           <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: '14px 18px', boxShadow: 'var(--shadow)' }}>
             <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #515154)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-              Total Pledged Seva
+              Total Pledged Maharaj Aarti
             </div>
             <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--accent, #E8780C)', marginTop: '2px' }}>
               ${stats.pledged.toLocaleString()}
@@ -626,7 +780,7 @@ export default function NavratriAartiAdminPage() {
           <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border, rgba(0,0,0,0.09))', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
             <div>
               <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)' }}>Festival Days & Reconciliation</span>
-              <span style={{ fontSize: '12px', color: 'var(--text-muted, #86868B)', marginLeft: '8px' }}>Daily 9:30 PM cutoff</span>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted, #86868B)', marginLeft: '8px' }}>Daily 9:45 PM cutoff</span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -694,6 +848,7 @@ export default function NavratriAartiAdminPage() {
                     const isClosed = day.status === 'closed' || day.is_past_cutoff;
                     const hasWinner = day.bids_count > 0 && day.current_winner_name;
                     const isPaid = day.payment_status === 'paid';
+                    const hasWinnerOrLock = hasWinner || day.is_locked;
 
                     return (
                       <tr
@@ -701,7 +856,11 @@ export default function NavratriAartiAdminPage() {
                         id={`admin-day-row-${day.day_number}`}
                         style={{
                           borderBottom: '1px solid var(--border-table, rgba(0,0,0,0.06))',
-                          background: day.is_maha_aarti ? 'rgba(232, 120, 12, 0.03)' : 'transparent',
+                          background: day.is_locked
+                            ? 'rgba(232, 120, 12, 0.05)'
+                            : day.is_maha_aarti
+                            ? 'rgba(232, 120, 12, 0.03)'
+                            : 'transparent',
                         }}
                       >
                         {/* Date */}
@@ -713,16 +872,32 @@ export default function NavratriAartiAdminPage() {
                         {/* Title */}
                         <td style={{ padding: '12px 16px' }}>
                           <div style={{ fontWeight: '600', color: 'var(--text-primary, #1D1D1F)' }}>{day.day_title}</div>
-                          {day.is_maha_aarti && (
-                            <span style={{ fontSize: '10.5px', color: 'var(--accent, #E8780C)', fontWeight: '700' }}>
-                              ★ Maha Aarti (Aatham)
-                            </span>
-                          )}
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '3px' }}>
+                            {day.is_maha_aarti && (
+                              <span style={{ fontSize: '10.5px', color: 'var(--accent, #E8780C)', fontWeight: '700' }}>
+                                ★ Maha Aarti (Aatham)
+                              </span>
+                            )}
+                            {day.base_bid && Number(day.base_bid) !== 500 && (
+                              <span style={{ fontSize: '10.5px', color: 'var(--text-muted, #86868B)', fontWeight: '600' }}>
+                                Reserve: ${Number(day.base_bid).toLocaleString()}
+                              </span>
+                            )}
+                          </div>
                         </td>
 
                         {/* Winner */}
                         <td style={{ padding: '12px 16px' }}>
-                          {hasWinner ? (
+                          {day.is_locked ? (
+                            <div>
+                              <div style={{ fontWeight: '700', color: 'var(--accent, #E8780C)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                {Icons.lock} {day.locked_sponsor_name || day.current_winner_name || 'Devotee Sponsor'}
+                              </div>
+                              <div style={{ fontSize: '11px', color: 'var(--text-secondary, #515154)' }}>
+                                {day.locked_sponsor_phone ? `${day.locked_sponsor_phone} · ` : ''}Manual Sponsor Lock
+                              </div>
+                            </div>
+                          ) : hasWinner ? (
                             <div>
                               <div style={{ fontWeight: '700', color: 'var(--text-primary, #1D1D1F)' }}>{day.current_winner_name}</div>
                               <div style={{ fontSize: '11.5px', color: 'var(--text-secondary, #515154)' }}>{day.current_winner_phone || '—'} · {day.current_winner_email || ''}</div>
@@ -734,17 +909,21 @@ export default function NavratriAartiAdminPage() {
 
                         {/* Bid */}
                         <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                          <div style={{ fontWeight: '800', color: hasWinner ? 'var(--accent, #E8780C)' : 'var(--text-secondary, #515154)' }}>
+                          <div style={{ fontWeight: '800', color: hasWinnerOrLock ? 'var(--accent, #E8780C)' : 'var(--text-secondary, #515154)' }}>
                             ${day.current_highest_bid?.toLocaleString()}
                           </div>
                           <div style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)' }}>
-                            {day.bids_count} {day.bids_count === 1 ? 'bid' : 'bids'}
+                            {day.is_locked ? 'Pledged Sponsor' : `${day.bids_count} ${day.bids_count === 1 ? 'bid' : 'bids'}`}
                           </div>
                         </td>
 
                         {/* Cutoff Status */}
                         <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                          {isClosed ? (
+                          {day.is_locked ? (
+                            <span style={{ fontSize: '11px', fontWeight: '800', padding: '3px 8px', borderRadius: '6px', background: 'rgba(232, 120, 12, 0.12)', color: 'var(--accent, #E8780C)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                              {Icons.lock} Reserved
+                            </span>
+                          ) : isClosed ? (
                             <span style={{ fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px', background: 'rgba(0,0,0,0.06)', color: 'var(--text-secondary, #515154)' }}>
                               Closed
                             </span>
@@ -757,7 +936,7 @@ export default function NavratriAartiAdminPage() {
 
                         {/* Payment */}
                         <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                          {hasWinner ? (
+                          {hasWinnerOrLock ? (
                             isPaid ? (
                               <div>
                                 <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.12)', color: '#059669' }}>
@@ -780,7 +959,29 @@ export default function NavratriAartiAdminPage() {
                         {/* Actions */}
                         <td style={{ padding: '12px 16px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                            {hasWinner && (
+                            {/* Edit Day & Sponsor Lock Action Button */}
+                            <button
+                              onClick={() => openEditDayModal(day)}
+                              title="Edit Day Date, Title, Starting Bid & Sponsor Lock"
+                              style={{
+                                background: day.is_locked ? 'rgba(232, 120, 12, 0.12)' : 'var(--bg-input, #F2F2F5)',
+                                border: day.is_locked ? '1px solid rgba(232, 120, 12, 0.35)' : '1px solid var(--border)',
+                                color: day.is_locked ? 'var(--accent, #E8780C)' : 'var(--text-primary)',
+                                padding: '5px 10px',
+                                borderRadius: '8px',
+                                fontSize: '11.5px',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                            >
+                              {day.is_locked ? Icons.lock : Icons.edit}
+                              <span>{day.is_locked ? 'Locked' : 'Edit & Lock'}</span>
+                            </button>
+
+                            {hasWinnerOrLock && (
                               <>
                                 <button
                                   onClick={() => openPaymentModal(day)}
@@ -798,25 +999,27 @@ export default function NavratriAartiAdminPage() {
                                   {isPaid ? 'Edit' : 'Mark Paid'}
                                 </button>
 
-                                <button
-                                  onClick={() => openVoidModalForWinner(day)}
-                                  title="Void / Remove Winner (Devotee backed out)"
-                                  style={{
-                                    background: 'rgba(239, 68, 68, 0.08)',
-                                    border: '1px solid rgba(239, 68, 68, 0.25)',
-                                    color: '#DC2626',
-                                    padding: '5px 8px',
-                                    borderRadius: '8px',
-                                    fontSize: '11.5px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '4px',
-                                  }}
-                                >
-                                  {Icons.trash} Void
-                                </button>
+                                {hasWinner && !day.is_locked && (
+                                  <button
+                                    onClick={() => openVoidModalForWinner(day)}
+                                    title="Void / Remove Winner (Devotee backed out)"
+                                    style={{
+                                      background: 'rgba(239, 68, 68, 0.08)',
+                                      border: '1px solid rgba(239, 68, 68, 0.25)',
+                                      color: '#DC2626',
+                                      padding: '5px 8px',
+                                      borderRadius: '8px',
+                                      fontSize: '11.5px',
+                                      fontWeight: '600',
+                                      cursor: 'pointer',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '4px',
+                                    }}
+                                  >
+                                    {Icons.trash} Void
+                                  </button>
+                                )}
                               </>
                             )}
 
@@ -956,6 +1159,238 @@ export default function NavratriAartiAdminPage() {
               >
                 {savingSettings ? 'Saving...' : 'Save Settings'}
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── EDIT DAY & SPONSOR LOCK MODAL ─────────────────────────────── */}
+      {editDayModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 9999 }}>
+          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.1))', borderRadius: '20px', maxWidth: '480px', width: '100%', maxHeight: '92vh', overflowY: 'auto', padding: '24px', boxShadow: '0 24px 50px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--accent, #E8780C)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                  Festival Schedule & Sponsorship Lock
+                </div>
+                <h3 style={{ margin: '2px 0 0', fontSize: '18px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)' }}>
+                  Configure Day {editDayModal.day_number}
+                </h3>
+              </div>
+              <button onClick={() => setEditDayModal(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>{Icons.close}</button>
+            </div>
+
+            <form onSubmit={handleSaveEditDay}>
+              {/* Event Date (Strict MM-DD-YYYY preview) */}
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: '700', color: 'var(--text-secondary, #515154)', marginBottom: '4px' }}>
+                  Event Date (Displays as MM-DD-YYYY)
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={editEventDate}
+                  onChange={(e) => setEditEventDate(e.target.value)}
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}
+                />
+                {editEventDate && (
+                  <div style={{ fontSize: '11.5px', color: 'var(--text-muted, #86868B)', marginTop: '3px' }}>
+                    Standard Display: <strong>{(() => { const [y, m, d] = editEventDate.split('-'); return `${m}-${d}-${y}`; })()}</strong>
+                  </div>
+                )}
+              </div>
+
+              {/* Day Title / Description */}
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: '700', color: 'var(--text-secondary, #515154)', marginBottom: '4px' }}>
+                  Day Title & Sacred Theme
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editDayTitle}
+                  onChange={(e) => setEditDayTitle(e.target.value)}
+                  placeholder="e.g. Day 1 — Ghatasthapana (Prathama)"
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13.5px' }}
+                />
+              </div>
+
+              {/* Base Opening Bid */}
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: '700', color: 'var(--text-secondary, #515154)', marginBottom: '4px' }}>
+                  Starting Reserve Bid ($)
+                </label>
+                <input
+                  type="number"
+                  min="100"
+                  step="50"
+                  required
+                  value={editBaseBid}
+                  onChange={(e) => setEditBaseBid(e.target.value)}
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '700' }}
+                />
+              </div>
+
+              {/* Maha Aarti Toggle */}
+              <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type="checkbox"
+                  id="isMahaCheck"
+                  checked={editIsMaha}
+                  onChange={(e) => setEditIsMaha(e.target.checked)}
+                  style={{ width: '16px', height: '16px', accentColor: 'var(--accent, #E8780C)' }}
+                />
+                <label htmlFor="isMahaCheck" style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: '600', cursor: 'pointer' }}>
+                  Mark as Maha Aarti (Special High-Priority Gold Styling)
+                </label>
+              </div>
+
+              {/* Lock Bid / Manual Sponsor Card */}
+              <div style={{ background: editIsLocked ? 'rgba(232, 120, 12, 0.08)' : 'var(--bg-input, #F2F2F5)', border: editIsLocked ? '1.5px solid var(--accent, #E8780C)' : '1px solid var(--border)', borderRadius: '14px', padding: '14px', marginBottom: '18px', transition: 'all 0.2s ease' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: editIsLocked ? '12px' : '0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="checkbox"
+                      id="lockCheck"
+                      checked={editIsLocked}
+                      onChange={(e) => setEditIsLocked(e.target.checked)}
+                      style={{ width: '18px', height: '18px', accentColor: 'var(--accent, #E8780C)', cursor: 'pointer' }}
+                    />
+                    <div>
+                      <label htmlFor="lockCheck" style={{ fontSize: '13.5px', fontWeight: '800', color: editIsLocked ? 'var(--accent, #E8780C)' : 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        {Icons.lock} Lock Bidding & Assign Sponsor
+                      </label>
+                      <div style={{ fontSize: '11px', color: 'var(--text-secondary, #6E6E73)', marginTop: '2px' }}>
+                        {editIsLocked ? 'Bidding is locked. Only the designated sponsor below will be registered.' : 'When locked, public bidding is disabled and prior bids are archived.'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {editIsLocked && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '10px', borderTop: '1px solid rgba(232, 120, 12, 0.2)' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                        Sponsor Devotee Name (Required)
+                      </label>
+                      <input
+                        type="text"
+                        required={editIsLocked}
+                        value={editLockedName}
+                        onChange={(e) => setEditLockedName(e.target.value)}
+                        placeholder="e.g. Ramesh & Suman Patel"
+                        style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 10px', fontSize: '13px', color: 'var(--text-primary)', fontWeight: '600' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                          Pledge Amount ($)
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          required={editIsLocked}
+                          value={editLockedAmount}
+                          onChange={(e) => setEditLockedAmount(e.target.value)}
+                          placeholder="500"
+                          style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 10px', fontSize: '13px', color: 'var(--text-primary)', fontWeight: '700' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                          Payment Status
+                        </label>
+                        <select
+                          value={editLockedPayStatus}
+                          onChange={(e) => setEditLockedPayStatus(e.target.value)}
+                          style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 10px', fontSize: '13px', color: 'var(--text-primary)' }}
+                        >
+                          <option value="pending">Pending Collection</option>
+                          <option value="paid">Paid & Confirmed</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                          Phone (Private)
+                        </label>
+                        <input
+                          type="tel"
+                          value={editLockedPhone}
+                          onChange={(e) => setEditLockedPhone(e.target.value)}
+                          placeholder="(865) 555-0199"
+                          style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 10px', fontSize: '12.5px', color: 'var(--text-primary)' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                          Payment Method
+                        </label>
+                        <select
+                          value={editLockedPayMethod}
+                          onChange={(e) => setEditLockedPayMethod(e.target.value)}
+                          style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 10px', fontSize: '12.5px', color: 'var(--text-primary)' }}
+                        >
+                          <option value="cash">Cash</option>
+                          <option value="check">Check</option>
+                          <option value="card_pos">Card POS Swipe</option>
+                          <option value="zelle">Zelle / Online</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                        Email (Private)
+                      </label>
+                      <input
+                        type="email"
+                        value={editLockedEmail}
+                        onChange={(e) => setEditLockedEmail(e.target.value)}
+                        placeholder="sponsor@example.com"
+                        style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 10px', fontSize: '12.5px', color: 'var(--text-primary)' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                        Admin Notes
+                      </label>
+                      <input
+                        type="text"
+                        value={editLockedNotes}
+                        onChange={(e) => setEditLockedNotes(e.target.value)}
+                        placeholder="e.g. VIP sponsor confirmed at temple committee meeting"
+                        style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 10px', fontSize: '12.5px', color: 'var(--text-primary)' }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setEditDayModal(null)}
+                  style={{ flex: 1, background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '10px', padding: '11px', fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEditDay}
+                  style={{ flex: 1.6, background: 'var(--accent, #E8780C)', border: 'none', borderRadius: '10px', padding: '11px', fontSize: '13.5px', fontWeight: '700', color: '#FFFFFF', cursor: savingEditDay ? 'not-allowed' : 'pointer', boxShadow: 'var(--shadow)' }}
+                >
+                  {savingEditDay ? 'Saving Changes...' : 'Save Configuration ✓'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

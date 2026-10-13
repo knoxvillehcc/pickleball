@@ -78,7 +78,7 @@ export default function AartiLiveTicker({
         zIndex: 20,
         fontFamily: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif)",
       }}
-      aria-label="Navratri Aarti Live Bidding Ticker"
+      aria-label="Daily Maharaj Aarti Live Bidding Ticker"
     >
       <style>{`
         @keyframes aartiMarqueeScroll {
@@ -166,7 +166,7 @@ export default function AartiLiveTicker({
         </span>
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
           <span style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '0.6px', color: 'var(--accent, #E8780C)', textTransform: 'uppercase' }}>
-            Live Aarti
+            Maharaj Aarti
           </span>
           <span style={{ fontSize: '9.5px', fontWeight: '600', color: 'var(--text-secondary, #6E6E73)' }}>
             10-Day Feed
