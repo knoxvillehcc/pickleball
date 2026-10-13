@@ -577,7 +577,7 @@ export default function NavratriAartiAdminPage() {
               HCC · Navratri 2026
             </div>
             <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)', letterSpacing: '-0.4px' }}>
-              Daily Maharaj Aarti Management
+              Daily Maha Aarti Management
             </h1>
           </div>
 
@@ -666,7 +666,7 @@ export default function NavratriAartiAdminPage() {
                 boxShadow: 'var(--shadow)',
                 transition: 'all 0.2s ease',
               }}
-              title="Click to toggle whether the Navratri Maharaj Aarti tile appears on the main public dashboard (dashboard.knoxvillemandir.org)"
+              title="Click to toggle whether the Navratri Maha Aarti tile appears on the main public dashboard (dashboard.knoxvillemandir.org)"
             >
               {isPublished ? Icons.globe : Icons.globeOff}
               <span>{isPublished ? 'Dashboard: Visible (Live)' : 'Dashboard: Hidden'}</span>
@@ -734,7 +734,7 @@ export default function NavratriAartiAdminPage() {
         }}>
           <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: '14px 18px', boxShadow: 'var(--shadow)' }}>
             <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #515154)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-              Total Pledged Maharaj Aarti
+              Total Pledged Maha Aarti
             </div>
             <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--accent, #E8780C)', marginTop: '2px' }}>
               ${stats.pledged.toLocaleString()}

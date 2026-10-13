@@ -342,7 +342,7 @@ export default function AartiDisplayLivePage() {
               Hindu Community Center of Knoxville
             </div>
             <div style={{ fontSize: '19px', fontWeight: '800', letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '1px' }}>
-              Navratri 2026 · Daily Maharaj Aarti Stage
+              Navratri 2026 · Daily Maha Aarti Stage
             </div>
           </div>
         </div>
@@ -597,7 +597,7 @@ export default function AartiDisplayLivePage() {
                   ) : (
                     <span style={{ color: isDark ? '#FF9F0A' : '#D97706' }}>{Icons.diya}</span>
                   )}
-                  <span>{activeDay.is_locked ? 'Maharaj Aarti Reserved' : isConcluded ? 'Maharaj Aarti Confirmed' : 'Bidding Open'}</span>
+                  <span>{activeDay.is_locked ? 'Maha Aarti Reserved' : isConcluded ? 'Maha Aarti Confirmed' : 'Bidding Open'}</span>
                 </div>
               </div>
 
@@ -665,7 +665,7 @@ export default function AartiDisplayLivePage() {
                     marginBottom: '6px',
                   }}
                 >
-                  Tonight&apos;s Sacred Maharaj Aarti Sponsor
+                  Tonight&apos;s Sacred Maha Aarti Sponsor
                 </div>
 
                 {/* Winning Devotee Sponsor Name & Radiant Avatar */}
@@ -734,7 +734,7 @@ export default function AartiDisplayLivePage() {
                       letterSpacing: '0.14em',
                     }}
                   >
-                    Confirmed Maharaj Aarti Contribution
+                    Confirmed Maha Aarti Contribution
                   </div>
                   <div
                     className={isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}
@@ -775,7 +775,7 @@ export default function AartiDisplayLivePage() {
                       margin: '0 0 4px',
                     }}
                   >
-                    Dhanyavad, <strong style={{ color: isDark ? '#FFB340' : '#B45309' }}>{winnerDisplayName}</strong>, for sponsoring Day {activeDay.day_number}&apos;s sacred Maharaj Aarti! May Maa Durga bless you and your family with divine grace, vibrant health, peace, and eternal prosperity.
+                    Dhanyavad, <strong style={{ color: isDark ? '#FFB340' : '#B45309' }}>{winnerDisplayName}</strong>, for sponsoring Day {activeDay.day_number}&apos;s sacred Maha Aarti! May Maa Durga bless you and your family with divine grace, vibrant health, peace, and eternal prosperity.
                   </p>
                   <div
                     style={{
@@ -836,7 +836,7 @@ export default function AartiDisplayLivePage() {
                     lineHeight: 1.3,
                   }}
                 >
-                  Tonight&apos;s Maharaj Aarti is open for General Devotee Sponsorship.
+                  Tonight&apos;s Maha Aarti is open for General Devotee Sponsorship.
                 </div>
                 <div style={{ fontSize: '13px', color: isDark ? '#A1A1A6' : '#6E6E73', marginTop: '6px' }}>
                   Please visit the Mandir desk or scan the QR code to sponsor.
@@ -1011,7 +1011,7 @@ export default function AartiDisplayLivePage() {
                   <span>{isConcluded ? `Concluded (${formattedCutoffTime} EST)` : `${formattedCutoffTime} Cutoff`}</span>
                 </div>
                 <div style={{ fontSize: '22px', fontWeight: '900', color: isConcluded ? (isDark ? '#34D399' : '#059669') : (isDark ? '#FF9F0A' : '#D97706'), marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-                  {isConcluded ? 'Maharaj Aarti Confirmed' : (timeLeft || `${formattedCutoffTime} EST`)}
+                  {isConcluded ? 'Maha Aarti Confirmed' : (timeLeft || `${formattedCutoffTime} EST`)}
                 </div>
               </div>
             </div>
@@ -1061,7 +1061,7 @@ export default function AartiDisplayLivePage() {
                 marginBottom: '8px',
               }}
             >
-              {isConcluded ? Icons.diya : Icons.qrPhone} {isConcluded ? 'Upcoming Maharaj Aarti' : 'Scan to Bid'}
+              {isConcluded ? Icons.diya : Icons.qrPhone} {isConcluded ? 'Upcoming Maha Aarti' : 'Scan to Bid'}
             </div>
 
             <h3
@@ -1074,7 +1074,7 @@ export default function AartiDisplayLivePage() {
                 lineHeight: 1.15,
               }}
             >
-              {isConcluded ? 'Sponsor Upcoming Days' : 'Sponsor Tonight\'s Maharaj Aarti'}
+              {isConcluded ? 'Sponsor Upcoming Days' : 'Sponsor Tonight\'s Maha Aarti'}
             </h3>
 
             <p
@@ -1109,7 +1109,7 @@ export default function AartiDisplayLivePage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={qrDataUrl}
-                alt="Scan to Bid on Maharaj Aarti"
+                alt="Scan to Bid on Maha Aarti"
                 style={{
                   display: 'block',
                   borderRadius: '6px',

@@ -1,5 +1,5 @@
 -- ══════════════════════════════════════════════════════════════════════════════
--- NAVRATRI 2026 DAILY MAHARAJ AARTI & BIDDING SYSTEM MIGRATION
+-- NAVRATRI 2026 DAILY MAHA AARTI & BIDDING SYSTEM MIGRATION
 -- Run this in: Supabase Dashboard → SQL Editor → New Query → Run
 -- ══════════════════════════════════════════════════════════════════════════════
 

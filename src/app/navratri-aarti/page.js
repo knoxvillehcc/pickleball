@@ -387,7 +387,7 @@ export default function NavratriAartiPage() {
             lineHeight: 1.1,
           }}
         >
-          Daily Maharaj Aarti
+          Daily Maha Aarti
         </h1>
 
         <p
@@ -399,7 +399,7 @@ export default function NavratriAartiPage() {
             margin: '0 auto 24px',
           }}
         >
-          Devotees can sponsor and perform the sacred evening Maharaj Aarti for each night of Navratri.
+          Devotees can sponsor and perform the sacred evening Maha Aarti for each night of Navratri.
           Advance bidding is open for all 10 festival days. Daily bidding closes at <strong>9:45 PM EST</strong>.
         </p>
 
@@ -745,7 +745,7 @@ export default function NavratriAartiPage() {
                           gap: '6px',
                         }}
                       >
-                        {Icons.lock} Sponsorship Reserved · Maharaj Aarti
+                        {Icons.lock} Sponsorship Reserved · Maha Aarti
                       </div>
                     ) : isClosed ? (
                       <div
@@ -760,7 +760,7 @@ export default function NavratriAartiPage() {
                           fontWeight: '500',
                         }}
                       >
-                        Maharaj Aarti Sponsor: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>{day.current_winner_name || 'Devotee'}</strong>
+                        Maha Aarti Sponsor: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>{day.current_winner_name || 'Devotee'}</strong>
                       </div>
                     ) : (
                       <button
@@ -784,7 +784,7 @@ export default function NavratriAartiPage() {
                           transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
                         }}
                       >
-                        {Icons.diya} Place Maharaj Aarti Bid &rarr;
+                        {Icons.diya} Place Maha Aarti Bid &rarr;
                       </button>
                     )}
                   </div>

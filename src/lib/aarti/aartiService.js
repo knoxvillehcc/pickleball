@@ -1,6 +1,6 @@
 /**
  * aartiService.js
- * Master Service layer for Navratri 2026 Daily Maharaj Aarti & Bidding System.
+ * Master Service layer for Navratri 2026 Daily Maha Aarti & Bidding System.
  * Handles bid calculations, dynamic increment tiers, OTP verification,
  * outbid alerts, and administrative payment tracking.
  */
@@ -443,7 +443,7 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Verification Code - Daily Maharaj Aarti</title>
+      <title>Verification Code - Daily Maha Aarti</title>
     </head>
     <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -455,7 +455,7 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
               Hindu Community Center of Knoxville
             </div>
             <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
-              Navratri 2026 · Daily Maharaj Aarti
+              Navratri 2026 · Daily Maha Aarti
             </h1>
           </td>
         </tr>
@@ -467,7 +467,7 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
               Jai Mataji, ${cleanName}!
             </h2>
             <p style="margin: 0 0 20px; font-size: 14.5px; color: #515154; line-height: 1.55;">
-              Please enter the 6-digit verification code below to confirm and post your Maharaj Aarti bid. This code expires in <strong>5 minutes</strong>.
+              Please enter the 6-digit verification code below to confirm and post your Maha Aarti bid. This code expires in <strong>5 minutes</strong>.
             </p>
 
             <!-- OTP Box -->
@@ -747,7 +747,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Outbid Alert - Daily Maharaj Aarti</title>
+      <title>Outbid Alert - Daily Maha Aarti</title>
     </head>
     <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -759,7 +759,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
               Hindu Community Center of Knoxville
             </div>
             <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
-              Navratri 2026 · Daily Maharaj Aarti
+              Navratri 2026 · Daily Maha Aarti
             </h1>
           </td>
         </tr>
@@ -805,7 +805,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
             </table>
 
             <p style="margin: 0 0 24px; font-size: 14px; color: #515154; line-height: 1.5;">
-              Would you like to reclaim your Maharaj Aarti for this day? Tap the button below to view the live dashboard and submit your new bid. Bidding closes daily at <strong>9:45 PM EST</strong>.
+              Would you like to reclaim your Maha Aarti for this day? Tap the button below to view the live dashboard and submit your new bid. Bidding closes daily at <strong>9:45 PM EST</strong>.
             </p>
 
             <!-- Bulletproof CTA Button (Solid Orange with White Text) -->
@@ -813,7 +813,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
               <tr>
                 <td align="center" style="background-color: #E8780C; border-radius: 12px; box-shadow: 0 3px 12px rgba(232, 120, 12, 0.28);">
                   <a href="${rebidUrl}" target="_blank" style="display: block; width: 100%; box-sizing: border-box; padding: 16px 24px; font-size: 16px; font-weight: 800; color: #FFFFFF; text-decoration: none; border-radius: 12px; text-align: center; letter-spacing: 0.2px;">
-                    Reclaim Maharaj Aarti &amp; Rebid Now &rarr;
+                    Reclaim Maha Aarti &amp; Rebid Now &rarr;
                   </a>
                 </td>
               </tr>
@@ -878,7 +878,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Bid Cancellation Confirmation - Daily Maharaj Aarti</title>
+      <title>Bid Cancellation Confirmation - Daily Maha Aarti</title>
     </head>
     <body style="margin: 0; padding: 24px 10px; background-color: #F4F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px; margin: 0 auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
@@ -890,7 +890,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
               Hindu Community Center of Knoxville
             </div>
             <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.3px;">
-              Navratri 2026 · Daily Maharaj Aarti
+              Navratri 2026 · Daily Maha Aarti
             </h1>
           </td>
         </tr>
@@ -915,7 +915,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
             </h2>
 
             <p style="margin: 0 0 20px; font-size: 14.5px; color: #515154; line-height: 1.55;">
-              This email serves as official confirmation that your Maharaj Aarti bid has been voided and withdrawn from the festival register. You hold no further financial commitment for this entry.
+              This email serves as official confirmation that your Maha Aarti bid has been voided and withdrawn from the festival register. You hold no further financial commitment for this entry.
             </p>
 
             <!-- Highlighted Cancellation Summary Card -->
@@ -941,7 +941,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
             </table>
 
             <p style="margin: 0 0 24px; font-size: 14px; color: #515154; line-height: 1.5;">
-              If you wish to participate in Maharaj Aarti for another evening of Navratri 2026, or if you withdrew by mistake, you can place a new bid at any time on the live bidding dashboard:
+              If you wish to participate in Maha Aarti for another evening of Navratri 2026, or if you withdrew by mistake, you can place a new bid at any time on the live bidding dashboard:
             </p>
 
             <!-- CTA Button -->
@@ -949,7 +949,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
               <tr>
                 <td align="center" style="background-color: #E8780C; border-radius: 12px; box-shadow: 0 3px 12px rgba(232, 120, 12, 0.28);">
                   <a href="${aartiUrl}" target="_blank" style="display: block; width: 100%; box-sizing: border-box; padding: 16px 24px; font-size: 16px; font-weight: 800; color: #FFFFFF; text-decoration: none; border-radius: 12px; text-align: center; letter-spacing: 0.2px;">
-                    View Live Maharaj Aarti Bidding Dashboard &rarr;
+                    View Live Maha Aarti Bidding Dashboard &rarr;
                   </a>
                 </td>
               </tr>
@@ -990,7 +990,7 @@ async function sendBidVoidedEmail({ toEmail, toName, dayNumber, dayTitle, eventD
     await transporter.sendMail({
       from: `"HCC Navratri Aarti" <${process.env.GMAIL_USER}>`,
       to: toEmail,
-      subject: `Bid Cancellation Notice: Day ${dayNumber} Maharaj Aarti ($${Number(voidedAmount || 0).toLocaleString()})`,
+      subject: `Bid Cancellation Notice: Day ${dayNumber} Maha Aarti ($${Number(voidedAmount || 0).toLocaleString()})`,
       html,
     });
   } catch (err) {
