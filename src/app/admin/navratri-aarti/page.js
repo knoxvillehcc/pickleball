@@ -82,7 +82,21 @@ const Icons = {
       <line x1="12" y1="8" x2="12" y2="12" />
       <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
-  )
+  ),
+  eye: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  eyeOff: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+      <line x1="2" y1="2" x2="22" y2="22" />
+    </svg>
+  ),
 };
 
 export default function NavratriAartiAdminPage() {
@@ -97,7 +111,9 @@ export default function NavratriAartiAdminPage() {
   const [tier1Increment, setTier1Increment] = useState(500);
   const [tier2Increment, setTier2Increment] = useState(250);
   const [isPublished, setIsPublished] = useState(false);
+  const [showBidderNames, setShowBidderNames] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [togglingNames, setTogglingNames] = useState(false);
 
   // Payment Modal State
   const [paymentModalDay, setPaymentModalDay] = useState(null);
@@ -135,6 +151,7 @@ export default function NavratriAartiAdminPage() {
           setTier1Increment(json.settings.tier1_increment || 500);
           setTier2Increment(json.settings.tier2_increment || 250);
           setIsPublished(json.settings.is_published ?? false);
+          setShowBidderNames(json.settings.show_bidder_names !== false);
         }
         setHistoryDay((prev) => {
           if (!prev) return null;
@@ -153,6 +170,34 @@ export default function NavratriAartiAdminPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Quick 1-click toggle for public bidder names
+  const handleToggleBidderNames = async () => {
+    const nextVal = !showBidderNames;
+    setShowBidderNames(nextVal);
+    try {
+      setTogglingNames(true);
+      const res = await fetch('/api/navratri/aarti/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          show_bidder_names: nextVal,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        setShowBidderNames(!nextVal); // revert
+        alert(json.error || 'Failed to update setting');
+      } else {
+        await fetchData();
+      }
+    } catch {
+      setShowBidderNames(!nextVal);
+      alert('Network error updating setting');
+    } finally {
+      setTogglingNames(false);
+    }
+  };
 
   // Copy Link Handler
   const handleCopyLink = () => {
@@ -198,6 +243,7 @@ export default function NavratriAartiAdminPage() {
           tier1_increment: tier1Increment,
           tier2_increment: tier2Increment,
           is_published: isPublished,
+          show_bidder_names: showBidderNames,
         }),
       });
       const json = await res.json();
@@ -471,6 +517,32 @@ export default function NavratriAartiAdminPage() {
             >
               {Icons.external} Live Stage / TV View
             </Link>
+
+            {/* Quick 1-Click Toggle for Public Bidder Names */}
+            <button
+              onClick={handleToggleBidderNames}
+              disabled={togglingNames}
+              type="button"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: showBidderNames ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                border: showBidderNames ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid rgba(239, 68, 68, 0.35)',
+                color: showBidderNames ? '#059669' : '#DC2626',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                cursor: togglingNames ? 'wait' : 'pointer',
+                boxShadow: 'var(--shadow)',
+                transition: 'all 0.2s ease',
+              }}
+              title="Click to toggle whether bidder names are publicly displayed or masked on the TV screen and website"
+            >
+              {showBidderNames ? Icons.eye : Icons.eyeOff}
+              <span>{showBidderNames ? 'Public Names: Shown' : 'Public Names: Hidden'}</span>
+            </button>
 
             <button
               onClick={() => setShowSettingsModal(true)}
@@ -833,6 +905,24 @@ export default function NavratriAartiAdminPage() {
                   onChange={(e) => setTier2Increment(e.target.value)}
                   style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13.5px' }}
                 />
+              </div>
+
+              <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'flex-start', gap: '10px', background: 'var(--bg-input, #F2F2F5)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                <input
+                  type="checkbox"
+                  id="showNamesCheck"
+                  checked={showBidderNames}
+                  onChange={(e) => setShowBidderNames(e.target.checked)}
+                  style={{ width: '17px', height: '17px', accentColor: 'var(--accent, #E8780C)', marginTop: '2px' }}
+                />
+                <div>
+                  <label htmlFor="showNamesCheck" style={{ display: 'block', fontSize: '13px', color: 'var(--text-primary, #1D1D1F)', fontWeight: '700', cursor: 'pointer' }}>
+                    Show Bidder Names on Public Links & TV
+                  </label>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary, #6E6E73)', marginTop: '2px', lineHeight: 1.35 }}>
+                    When unchecked, winning names are masked as &ldquo;Devotee Sponsor&rdquo; on the public portal and TV screen to protect devotee privacy.
+                  </div>
+                </div>
               </div>
 
               <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-input, #F2F2F5)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border)' }}>

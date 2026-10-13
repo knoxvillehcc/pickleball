@@ -664,7 +664,9 @@ export default function AartiDisplayLivePage() {
                           boxShadow: '0 4px 18px rgba(232, 120, 12, 0.45)',
                         }}
                       >
-                        {getInitials(activeDay.current_winner_name)}
+                        {getInitials(
+                          settings?.show_bidder_names === false ? 'Devotee Sponsor' : activeDay.current_winner_name
+                        )}
                       </div>
                       <div
                         style={{
@@ -675,7 +677,7 @@ export default function AartiDisplayLivePage() {
                           lineHeight: 1.05,
                         }}
                       >
-                        {activeDay.current_winner_name}
+                        {settings?.show_bidder_names === false ? 'Devotee Sponsor' : activeDay.current_winner_name}
                       </div>
                     </div>
                   </>

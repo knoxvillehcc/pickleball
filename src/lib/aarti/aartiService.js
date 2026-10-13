@@ -34,6 +34,53 @@ function getTransporter() {
   });
 }
 
+async function getFallbackBidderNameSetting() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/pickleball_settings?key=eq.navratri_aarti_show_bidder_names&select=value`, {
+      headers: getServiceHeaders(),
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows && rows.length > 0) {
+        return rows[0].value !== 'false';
+      }
+    }
+  } catch (e) {
+    console.error('[getFallbackBidderNameSetting] error:', e);
+  }
+  return true;
+}
+
+async function saveFallbackBidderNameSetting(showBidderNames) {
+  try {
+    const headers = getServiceHeaders();
+    const strVal = showBidderNames ? 'true' : 'false';
+    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/pickleball_settings?key=eq.navratri_aarti_show_bidder_names&select=id`, {
+      headers,
+      cache: 'no-store',
+    });
+    if (checkRes.ok) {
+      const rows = await checkRes.json();
+      if (rows && rows.length > 0) {
+        await fetch(`${SUPABASE_URL}/rest/v1/pickleball_settings?key=eq.navratri_aarti_show_bidder_names`, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ value: strVal, updated_at: new Date().toISOString() }),
+        });
+        return;
+      }
+    }
+    await fetch(`${SUPABASE_URL}/rest/v1/pickleball_settings`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ key: 'navratri_aarti_show_bidder_names', value: strVal }),
+    });
+  } catch (e) {
+    console.error('[saveFallbackBidderNameSetting] error:', e);
+  }
+}
+
 /**
  * Fetch global Aarti auction settings
  */
@@ -43,22 +90,7 @@ export async function getAartiSettings() {
     cache: 'no-store',
   });
 
-  if (!res.ok) {
-    // Default fallback if table not yet seeded
-    return {
-      id: 'config',
-      is_published: true,
-      tier1_max: 3000,
-      tier1_increment: 500,
-      tier2_increment: 250,
-      daily_cutoff_time: '21:30',
-    };
-  }
-
-  const rows = await res.json();
-  if (rows && rows.length > 0) return rows[0];
-
-  return {
+  let settings = {
     id: 'config',
     is_published: true,
     tier1_max: 3000,
@@ -66,6 +98,20 @@ export async function getAartiSettings() {
     tier2_increment: 250,
     daily_cutoff_time: '21:30',
   };
+
+  if (res.ok) {
+    const rows = await res.json();
+    if (rows && rows.length > 0) {
+      settings = { ...settings, ...rows[0] };
+    }
+  }
+
+  // Ensure show_bidder_names is resolved even if column not yet added to SQL schema
+  if (settings.show_bidder_names === undefined || settings.show_bidder_names === null) {
+    settings.show_bidder_names = await getFallbackBidderNameSetting();
+  }
+
+  return settings;
 }
 
 /**
@@ -119,6 +165,7 @@ export function generateQuickBidOptions(currentBid, bidsCount, baseBid, settings
  */
 export async function getAartiDaysPublic() {
   const settings = await getAartiSettings();
+  const showBidderNames = settings?.show_bidder_names !== false;
 
   const res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?select=*&order=day_number.asc`, {
     headers: getServiceHeaders(),
@@ -147,6 +194,11 @@ export async function getAartiDaysPublic() {
     const [y, m, d] = (day.event_date || '').split('-');
     const formattedDate = (y && m && d) ? `${m}-${d}-${y}` : day.event_date;
 
+    let winnerName = day.current_winner_name || (bidsCount > 0 ? 'Devotee' : '');
+    if (!showBidderNames && winnerName) {
+      winnerName = 'Devotee Sponsor';
+    }
+
     return {
       day_number: day.day_number,
       event_date: day.event_date,
@@ -155,7 +207,8 @@ export async function getAartiDaysPublic() {
       is_maha_aarti: day.is_maha_aarti,
       base_bid: day.base_bid,
       current_highest_bid: currentBid,
-      current_winner_name: day.current_winner_name || (bidsCount > 0 ? 'Devotee' : ''),
+      current_winner_name: winnerName,
+      show_bidder_names: showBidderNames,
       bids_count: bidsCount,
       status: isClosed ? 'closed' : 'open',
       is_past_cutoff: isPastCutoff,
@@ -170,6 +223,9 @@ export async function getAartiDaysPublic() {
  */
 export async function getRecentAartiBidsPublic(limit = 12) {
   try {
+    const settings = await getAartiSettings();
+    const showBidderNames = settings?.show_bidder_names !== false;
+
     const res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_bids?is_verified=eq.true&select=id,day_number,bidder_name,bid_amount,created_at&order=created_at.desc&limit=${limit}`, {
       headers: getServiceHeaders(),
       cache: 'no-store',
@@ -184,7 +240,7 @@ export async function getRecentAartiBidsPublic(limit = 12) {
     return rows.map(b => ({
       id: b.id,
       day_number: b.day_number,
-      bidder_name: b.bidder_name || 'Devotee',
+      bidder_name: showBidderNames ? (b.bidder_name || 'Devotee') : 'Devotee Sponsor',
       bid_amount: Number(b.bid_amount),
       created_at: b.created_at,
     }));
@@ -929,17 +985,18 @@ export async function updateAdminPayment({ day_number, payment_status, payment_c
 }
 
 /**
- * Admin: Update increment settings
+ * Admin: Update increment settings & public display preferences
  */
-export async function updateAdminSettings({ tier1_max, tier1_increment, tier2_increment, is_published, daily_cutoff_time }) {
+export async function updateAdminSettings({ tier1_max, tier1_increment, tier2_increment, is_published, daily_cutoff_time, show_bidder_names }) {
   const updates = { updated_at: new Date().toISOString() };
   if (tier1_max !== undefined) updates.tier1_max = Number(tier1_max);
   if (tier1_increment !== undefined) updates.tier1_increment = Number(tier1_increment);
   if (tier2_increment !== undefined) updates.tier2_increment = Number(tier2_increment);
   if (is_published !== undefined) updates.is_published = Boolean(is_published);
   if (daily_cutoff_time !== undefined) updates.daily_cutoff_time = daily_cutoff_time;
+  if (show_bidder_names !== undefined) updates.show_bidder_names = Boolean(show_bidder_names);
 
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_settings?id=eq.config`, {
+  let res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_settings?id=eq.config`, {
     method: 'PATCH',
     headers: getServiceHeaders(),
     body: JSON.stringify(updates),
@@ -947,7 +1004,25 @@ export async function updateAdminSettings({ tier1_max, tier1_increment, tier2_in
 
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`Failed to update settings: ${errText}`);
+    // If show_bidder_names column doesn't exist yet in PostgreSQL schema
+    if (errText.includes('show_bidder_names') || errText.includes('column')) {
+      const { show_bidder_names: _sbn, ...safeUpdates } = updates;
+      if (Object.keys(safeUpdates).length > 1) {
+        res = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_settings?id=eq.config`, {
+          method: 'PATCH',
+          headers: getServiceHeaders(),
+          body: JSON.stringify(safeUpdates),
+        });
+      }
+      if (show_bidder_names !== undefined) {
+        await saveFallbackBidderNameSetting(Boolean(show_bidder_names));
+      }
+    } else {
+      throw new Error(`Failed to update settings: ${errText}`);
+    }
+  } else if (show_bidder_names !== undefined) {
+    // Also keep fallback in sync
+    await saveFallbackBidderNameSetting(Boolean(show_bidder_names));
   }
 
   return { success: true };

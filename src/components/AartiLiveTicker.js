@@ -281,7 +281,7 @@ export default function AartiLiveTicker({
                       ${Number(day.current_highest_bid).toLocaleString()}
                     </span>
                     <span style={{ color: 'var(--text-secondary, #6E6E73)', fontSize: '11.5px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {day.current_winner_name}
+                      {mode === 'public' && day.show_bidder_names === false ? 'Devotee Sponsor' : day.current_winner_name}
                     </span>
                   </span>
                 ) : (

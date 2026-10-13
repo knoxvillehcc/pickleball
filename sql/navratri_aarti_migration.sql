@@ -7,6 +7,7 @@
 CREATE TABLE IF NOT EXISTS public.navratri_aarti_settings (
   id                  TEXT PRIMARY KEY DEFAULT 'config',
   is_published        BOOLEAN NOT NULL DEFAULT false,  -- Hidden from public until admin publishes
+  show_bidder_names   BOOLEAN NOT NULL DEFAULT true,   -- Show/hide bidder names from public displays
   tier1_max           INTEGER NOT NULL DEFAULT 3000,   -- Threshold ($) where increment changes (e.g. $3,000)
   tier1_increment     INTEGER NOT NULL DEFAULT 500,    -- Increment ($) below tier1_max ($500)
   tier2_increment     INTEGER NOT NULL DEFAULT 250,    -- Increment ($) above tier1_max ($250)
@@ -14,9 +15,13 @@ CREATE TABLE IF NOT EXISTS public.navratri_aarti_settings (
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Ensure show_bidder_names column exists if table was previously created
+ALTER TABLE public.navratri_aarti_settings 
+  ADD COLUMN IF NOT EXISTS show_bidder_names BOOLEAN NOT NULL DEFAULT true;
+
 -- Seed default settings if not exists (Unpublished for safe testing)
-INSERT INTO public.navratri_aarti_settings (id, is_published, tier1_max, tier1_increment, tier2_increment, daily_cutoff_time)
-VALUES ('config', false, 3000, 500, 250, '21:30')
+INSERT INTO public.navratri_aarti_settings (id, is_published, show_bidder_names, tier1_max, tier1_increment, tier2_increment, daily_cutoff_time)
+VALUES ('config', false, true, 3000, 500, 250, '21:30')
 ON CONFLICT (id) DO UPDATE SET
   tier1_max = EXCLUDED.tier1_max;
 
