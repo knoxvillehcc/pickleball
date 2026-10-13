@@ -619,51 +619,47 @@ export default function NavratriAartiAdminPage() {
       });
 
       // ── 1. Top Organization & Branding Header ──
-      // HCC Saffron accent bar
-      doc.setFillColor(232, 120, 12); // #E8780C Saffron / Amber
-      doc.rect(14, 12, 4, 16, 'F');
+      doc.setFillColor(232, 120, 12); // HCC Saffron Accent Bar
+      doc.rect(14, 10, 3.5, 15, 'F');
 
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
+      doc.setFontSize(14);
       doc.setTextColor(232, 120, 12);
-      doc.text('HINDU COMMUNITY CENTER OF KNOXVILLE (HCC)', 22, 18);
+      doc.text('HINDU COMMUNITY CENTER OF KNOXVILLE (HCC)', 21, 15);
 
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.setTextColor(29, 29, 31);
-      doc.text('Navratri 2026 — Daily Maha Aarti Master Festival Roster & Reconciliation', 22, 25);
+      doc.setFontSize(10.5);
+      doc.setTextColor(30, 41, 59);
+      doc.text('Navratri 2026 — Daily Maha Aarti Master Festival Roster & Reconciliation', 21, 21);
 
-      // Metadata & KPI Summary Banner
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(110, 110, 115);
-      doc.text(
-        `Generated: ${dateStr} at ${timeStr} EST   |   Official Board & Puja Committee Operational Document`,
-        22,
-        31
-      );
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Report Date: ${dateStr} at ${timeStr} EST   |   Official Mandir Board & Puja Committee Document`, 21, 26);
 
-      // Mini KPI metrics line
+      // Executive KPI Summary Ribbon Strip
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(14, 29, 269, 7.5, 1.5, 1.5, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(14, 29, 269, 7.5, 1.5, 1.5, 'S');
+
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
+      doc.setFontSize(8);
       doc.setTextColor(30, 41, 59);
       doc.text(
-        `Total Pledged: $${stats.pledged.toLocaleString()}   •   Collected: $${stats.paid.toLocaleString()}   •   Pending: $${stats.pending.toLocaleString()}   •   Verified Bids: ${stats.bidsCount}`,
-        22,
-        37
+        `Total Pledged: $${stats.pledged.toLocaleString()}      •      Collected: $${stats.paid.toLocaleString()}      •      Pending Collection: $${stats.pending.toLocaleString()}      •      Verified Bids: ${stats.bidsCount}      •      Festival Duration: 10 Days`,
+        20,
+        34
       );
 
       // ── 2. Table Rows Construction ──
       const tableRows = data.days.map((day) => {
-        const dayDate = day.formatted_date || '';
-
-        // Sacred Theme / Title
         let themeTitle = day.day_title || '';
-        if (day.is_maha_aarti) {
-          themeTitle += ' ★ [Maha Aarti]';
+        if (day.is_maha_aarti && !themeTitle.toLowerCase().includes('maha aarti')) {
+          themeTitle += ' (Maha Aarti)';
         }
 
-        // Winning Sponsor Name
         const isLocked = Boolean(day.is_locked);
         let sponsorName = '— Open (No Bids) —';
         if (isLocked) {
@@ -672,7 +668,6 @@ export default function NavratriAartiAdminPage() {
           sponsorName = day.current_winner_name;
         }
 
-        // Contact info
         const phone = day.locked_sponsor_phone || day.current_winner_phone || '';
         const email = day.locked_sponsor_email || day.current_winner_email || '';
         let contact = '—';
@@ -684,22 +679,17 @@ export default function NavratriAartiAdminPage() {
           contact = email;
         }
 
-        // Bids count
         const bids = isLocked ? 'Lock' : `${day.bids_count || 0}`;
-
-        // Amount Pledged
         const amt = (day.bids_count > 0 || isLocked)
           ? Number(day.current_highest_bid || day.locked_sponsor_amount || 0)
           : 0;
         const amountStr = amt > 0 ? `$${amt.toLocaleString()}` : '$0';
 
-        // Payment Status
         let payStatusDisplay = '—';
         if (amt > 0) {
           payStatusDisplay = (day.payment_status || 'pending').toUpperCase();
         }
 
-        // Payment Method & Collector / Reference
         let payDetails = '—';
         if (day.payment_status === 'paid') {
           const m = (day.payment_method || '').toUpperCase();
@@ -716,22 +706,18 @@ export default function NavratriAartiAdminPage() {
           payDetails = 'Awaiting payment at event';
         }
 
-        // Cutoff / Day Status & Notes
-        let statusNotes = '';
-        if (day.status === 'closed' || day.is_past_cutoff) {
-          statusNotes = 'CLOSED';
-        } else {
-          statusNotes = 'ACTIVE';
-        }
-        if (day.locked_notes) {
-          statusNotes += `\n${day.locked_notes}`;
-        } else if (day.admin_notes) {
-          statusNotes += `\n${day.admin_notes}`;
+        const isClosed = day.status === 'closed' || day.is_past_cutoff;
+        let statusBadge = isClosed ? 'CLOSED' : 'ACTIVE';
+        const rawNote = (day.locked_notes || day.admin_notes || '').replace(/\s+/g, ' ').trim();
+        let noteText = statusBadge;
+        if (rawNote) {
+          const compactNote = rawNote.length > 35 ? rawNote.substring(0, 32) + '...' : rawNote;
+          noteText = `${statusBadge}: ${compactNote}`;
         }
 
         return [
           `Day ${day.day_number}`,
-          dayDate,
+          day.formatted_date || '',
           themeTitle,
           sponsorName,
           contact,
@@ -739,91 +725,94 @@ export default function NavratriAartiAdminPage() {
           amountStr,
           payStatusDisplay,
           payDetails,
-          statusNotes,
+          noteText,
         ];
       });
 
       // ── 3. Summary Footer Row ──
       const footerRow = [
-        'TOTALS',
-        `${data.days.length} Days`,
-        'Festival Maha Aarti Summary',
+        'TOTAL',
+        '10 Days',
+        'Master Festival Reconciliation',
         '',
         '',
-        `${stats.bidsCount} Bids`,
+        `${stats.bidsCount}`,
         `$${stats.pledged.toLocaleString()}`,
-        `Paid: $${stats.paid.toLocaleString()}`,
-        `Pending: $${stats.pending.toLocaleString()}`,
-        '',
+        stats.paid > 0 ? 'PAID' : 'DUE',
+        `Collected: $${stats.paid.toLocaleString()}`,
+        `Due: $${stats.pending.toLocaleString()}`,
       ];
 
       // ── 4. Render Table with autoTable ──
       autoTable(doc, {
-        startY: 42,
+        startY: 38.5,
         head: [[
-          'Day #',
-          'Date (MM-DD-YYYY)',
+          'Day',
+          'Date',
           'Festival Day & Sacred Theme',
-          'Winning Sponsor',
+          'Winning Devotee / Sponsor',
           'Contact Info',
           'Bids',
-          'Pledged ($)',
-          'Pay Status',
-          'Payment Details / Method',
-          'Status / Notes',
+          'Pledged',
+          'Status',
+          'Payment / Collector',
+          'Notes / Remarks',
         ]],
         body: tableRows,
         foot: [footerRow],
         theme: 'striped',
         headStyles: {
-          fillColor: [232, 120, 12], // HCC Saffron / Amber
+          fillColor: [232, 120, 12],
           textColor: [255, 255, 255],
           fontStyle: 'bold',
-          fontSize: 8.5,
-          halign: 'left',
-          cellPadding: 3,
+          fontSize: 7.5,
+          cellPadding: 2,
+          valign: 'middle',
         },
         footStyles: {
-          fillColor: [245, 245, 247],
-          textColor: [29, 29, 31],
+          fillColor: [241, 245, 249],
+          textColor: [30, 41, 59],
           fontStyle: 'bold',
-          fontSize: 8.5,
-          cellPadding: 3,
+          fontSize: 7.5,
+          cellPadding: 2,
+          valign: 'middle',
         },
         styles: {
-          fontSize: 8,
-          cellPadding: 2.5,
+          fontSize: 7.2,
+          cellPadding: 2,
           valign: 'middle',
           textColor: [30, 41, 59],
           overflow: 'linebreak',
+          lineColor: [226, 232, 240],
+          lineWidth: 0.1,
         },
         columnStyles: {
-          0: { cellWidth: 15, halign: 'center', fontStyle: 'bold' },
-          1: { cellWidth: 24, halign: 'center' },
-          2: { cellWidth: 50 },
-          3: { cellWidth: 42, fontStyle: 'bold' },
-          4: { cellWidth: 36, fontSize: 7.5 },
-          5: { cellWidth: 14, halign: 'center' },
-          6: { cellWidth: 22, halign: 'right', fontStyle: 'bold' },
-          7: { cellWidth: 20, halign: 'center' },
-          8: { cellWidth: 45, fontSize: 7.5 },
-          9: { cellWidth: 'auto', fontSize: 7.5 },
+          0: { cellWidth: 14, halign: 'center', fontStyle: 'bold' },
+          1: { cellWidth: 20, halign: 'center' },
+          2: { cellWidth: 44 },
+          3: { cellWidth: 40, fontStyle: 'bold' },
+          4: { cellWidth: 36, fontSize: 6.8 },
+          5: { cellWidth: 12, halign: 'center' },
+          6: { cellWidth: 20, halign: 'right', fontStyle: 'bold' },
+          7: { cellWidth: 18, halign: 'center' },
+          8: { cellWidth: 35, fontSize: 6.8 },
+          9: { cellWidth: 30, fontSize: 6.8 },
         },
         alternateRowStyles: {
           fillColor: [250, 250, 252],
         },
-        margin: { top: 42, bottom: 16, left: 14, right: 14 },
+        margin: { top: 38.5, bottom: 12, left: 14, right: 14 },
         didParseCell: (hookData) => {
           if (hookData.section === 'body' && hookData.column.index === 7) {
             const val = String(hookData.cell.raw || '').toUpperCase();
             if (val === 'PAID') {
-              hookData.cell.styles.textColor = [16, 185, 129]; // Emerald
+              hookData.cell.styles.textColor = [16, 185, 129];
               hookData.cell.styles.fontStyle = 'bold';
             } else if (val === 'PENDING') {
-              hookData.cell.styles.textColor = [217, 119, 6]; // Amber
+              hookData.cell.styles.textColor = [217, 119, 6];
               hookData.cell.styles.fontStyle = 'bold';
             } else if (val === 'WAIVED') {
-              hookData.cell.styles.textColor = [100, 116, 139]; // Slate
+              hookData.cell.styles.textColor = [100, 116, 139];
             }
           }
         },
@@ -834,19 +823,19 @@ export default function NavratriAartiAdminPage() {
 
           doc.setDrawColor(226, 232, 240);
           doc.setLineWidth(0.3);
-          doc.line(14, pageHeight - 12, pageWidth - 14, pageHeight - 12);
+          doc.line(14, pageHeight - 9, pageWidth - 14, pageHeight - 9);
 
-          doc.setFontSize(7.5);
+          doc.setFontSize(7);
           doc.setTextColor(140);
           doc.text(
             'Hindu Community Center of Knoxville (HCC) · Navratri 2026 Daily Maha Aarti Roster & Reconciliation',
             14,
-            pageHeight - 7
+            pageHeight - 5
           );
           doc.text(
-            `Page ${hookData.pageNumber} of ${doc.internal.getNumberOfPages()} · Confidential Mandir Document`,
+            `Page ${hookData.pageNumber} of ${doc.internal.getNumberOfPages()} · Confidential Mandir Board Document`,
             pageWidth - 14,
-            pageHeight - 7,
+            pageHeight - 5,
             { align: 'right' }
           );
         },
