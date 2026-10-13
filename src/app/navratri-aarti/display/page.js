@@ -246,6 +246,7 @@ export default function AartiDisplayLivePage() {
 
   return (
     <div
+      className="aarti-display-root"
       style={{
         height: '100vh',
         maxHeight: '100vh',
@@ -314,10 +315,94 @@ export default function AartiDisplayLivePage() {
         .display-qr-card {
           animation: ${isDark ? 'subtleGlowDark' : 'subtleGlowLight'} 4s ease-in-out infinite;
         }
+
+        /* ── Responsive Viewport Auto-Detection: iPhone -> iPad -> Desktop -> TV ── */
+        @media (max-width: 768px) {
+          .aarti-display-root {
+            height: auto !important;
+            min-height: 100vh !important;
+            max-height: none !important;
+            overflow-y: auto !important;
+            padding: 10px 10px 28px !important;
+          }
+          .aarti-stage-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            padding-bottom: 10px !important;
+          }
+          .aarti-stage-header-actions {
+            width: 100% !important;
+            justify-content: space-between !important;
+          }
+          .aarti-main-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 16px !important;
+            margin-top: 10px !important;
+          }
+          .display-hero-card {
+            min-height: auto !important;
+            padding: 16px 14px !important;
+          }
+          .display-qr-card {
+            min-height: auto !important;
+            padding: 20px 14px !important;
+          }
+          .aarti-bottom-stats {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+          .celebration-blessing-card {
+            padding: 14px 14px !important;
+          }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .aarti-display-root {
+            padding: 12px 14px !important;
+          }
+          .aarti-main-grid {
+            grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr) !important;
+            gap: 12px !important;
+          }
+          .display-hero-card {
+            padding: 16px 16px !important;
+          }
+          .aarti-bottom-stats {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8px !important;
+          }
+        }
+
+        @media (min-width: 1025px) and (max-width: 1440px) {
+          .aarti-main-grid {
+            grid-template-columns: minmax(0, 2.8fr) minmax(280px, 1fr) !important;
+            gap: 16px !important;
+          }
+        }
+
+        @media (min-width: 1441px) {
+          .aarti-display-root {
+            padding: 16px 28px !important;
+          }
+          .aarti-main-grid {
+            grid-template-columns: minmax(0, 3fr) minmax(320px, 1fr) !important;
+            gap: 20px !important;
+          }
+          .display-hero-card {
+            padding: 24px 32px !important;
+          }
+          .celebration-blessing-card {
+            max-width: 1200px !important;
+            padding: 24px 44px !important;
+          }
+        }
       `}</style>
 
       {/* ── TOP HEADER / EXECUTIVE STAGE NAVIGATION ─────────────────────────── */}
       <header
+        className="aarti-stage-header"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -360,7 +445,7 @@ export default function AartiDisplayLivePage() {
         </div>
 
         {/* Live Running Timer, Dark/Light Mode Switch & Fullscreen Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="aarti-stage-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {/* Running Seconds Countdown Beacon (No 'Live Auto-Sync' text) */}
           <div
             style={{
@@ -447,6 +532,7 @@ export default function AartiDisplayLivePage() {
 
       {/* ── 70-INCH JUMBOTRON STAGE: EXACT 75% HERO / 25% QR CODE SPLIT ────────── */}
       <main
+        className="aarti-main-grid"
         style={{
           flex: 1,
           minHeight: 0,
@@ -630,17 +716,19 @@ export default function AartiDisplayLivePage() {
 
             {/* ── CENTER JUMBOTRON: CELEBRATORY THANK YOU STAGE OR LIVE BIDDING STAGE ─ */}
             {isConcluded && hasWinner ? (
-              /* ── GRAND CELEBRATORY THANK YOU STAGE (AFTER 9:45 PM OR EXTENDED CUTOFF) ─ */
+              /* ── GRAND CELEBRATORY THANK YOU STAGE (AFTER CUTOFF) ─ */
               <div
+                className="celebration-center-stage"
                 style={{
-                  margin: 'auto 0',
-                  padding: '6px 0',
-                  textAlign: 'center',
+                  flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: 'space-evenly',
+                  textAlign: 'center',
                   width: '100%',
+                  padding: '8px 0',
+                  boxSizing: 'border-box',
                 }}
               >
                 {/* Celebratory Dhanyavad Ribbon */}
@@ -648,33 +736,32 @@ export default function AartiDisplayLivePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
+                    gap: '10px',
                     background: isDark
                       ? 'linear-gradient(135deg, rgba(255, 159, 10, 0.28) 0%, rgba(217, 119, 6, 0.16) 100%)'
                       : 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
                     border: isDark ? '1.5px solid #FF9F0A' : '1.5px solid #F59E0B',
                     borderRadius: '999px',
-                    padding: '5px 18px',
-                    fontSize: '12.5px',
+                    padding: 'clamp(7px, 1.2vh, 12px) clamp(22px, 2.5vw, 36px)',
+                    fontSize: 'clamp(12px, 1.1vw, 16px)',
                     fontWeight: '900',
                     color: isDark ? '#FFB340' : '#B45309',
-                    letterSpacing: '0.12em',
+                    letterSpacing: '0.14em',
                     textTransform: 'uppercase',
-                    marginBottom: '4px',
                     boxShadow: isDark ? '0 4px 20px rgba(255, 159, 10, 0.35)' : '0 2px 10px rgba(245, 158, 11, 0.2)',
                   }}
                 >
-                  <span>✨ Heartfelt Dhanyavad · Sacred Gratitude ✨</span>
+                  <span>Heartfelt Dhanyavad · Sacred Gratitude</span>
                 </div>
 
                 {/* Subtitle */}
                 <div
                   style={{
-                    fontSize: 'clamp(15px, 1.8vw, 22px)',
+                    fontSize: 'clamp(16px, 1.9vw, 26px)',
                     fontWeight: '800',
                     color: isDark ? '#E5E5E7' : '#374151',
                     letterSpacing: '-0.01em',
-                    marginBottom: '6px',
+                    margin: 'clamp(4px, 0.8vh, 10px) 0',
                   }}
                 >
                   Tonight&apos;s Sacred Maha Aarti Sponsor
@@ -686,19 +773,19 @@ export default function AartiDisplayLivePage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '16px',
-                    margin: '2px 0 8px',
+                    gap: 'clamp(14px, 2vw, 24px)',
+                    margin: 'clamp(4px, 1vh, 12px) 0',
                     flexWrap: 'wrap',
                   }}
                 >
                   <div
                     style={{
-                      width: 'clamp(52px, 5.5vw, 70px)',
-                      height: 'clamp(52px, 5.5vw, 70px)',
+                      width: 'clamp(58px, 6vw, 92px)',
+                      height: 'clamp(58px, 6vw, 92px)',
                       borderRadius: '50%',
                       background: 'linear-gradient(135deg, #FF9F0A 0%, #D97706 50%, #92400E 100%)',
                       color: '#FFFFFF',
-                      fontSize: 'clamp(20px, 2.3vw, 28px)',
+                      fontSize: 'clamp(22px, 2.4vw, 38px)',
                       fontWeight: '900',
                       display: 'flex',
                       alignItems: 'center',
@@ -707,7 +794,7 @@ export default function AartiDisplayLivePage() {
                       boxShadow: isDark
                         ? '0 0 35px rgba(255, 159, 10, 0.6), 0 4px 20px rgba(0, 0, 0, 0.5)'
                         : '0 0 25px rgba(217, 119, 6, 0.45), 0 4px 15px rgba(0, 0, 0, 0.1)',
-                      border: '2.5px solid #FFF',
+                      border: '3px solid #FFF',
                     }}
                   >
                     {getInitials(winnerDisplayName)}
@@ -715,12 +802,12 @@ export default function AartiDisplayLivePage() {
 
                   <div
                     style={{
-                      fontSize: 'clamp(36px, 4.8vw, 64px)',
+                      fontSize: 'clamp(36px, 5vw, 76px)',
                       fontWeight: '900',
                       color: isDark ? '#FFFFFF' : '#111827',
                       letterSpacing: '-0.03em',
                       lineHeight: 1.05,
-                      textShadow: isDark ? '0 2px 20px rgba(0, 0, 0, 0.6)' : 'none',
+                      textShadow: isDark ? '0 2px 25px rgba(0, 0, 0, 0.7)' : 'none',
                     }}
                   >
                     {winnerDisplayName}
@@ -733,17 +820,17 @@ export default function AartiDisplayLivePage() {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '0px',
-                    marginBottom: '8px',
+                    gap: '2px',
+                    margin: 'clamp(4px, 1vh, 10px) 0',
                   }}
                 >
                   <div
                     style={{
-                      fontSize: '11.5px',
+                      fontSize: 'clamp(11.5px, 1.1vw, 15px)',
                       fontWeight: '800',
                       color: isDark ? '#FF9F0A' : '#C25E00',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.14em',
+                      letterSpacing: '0.16em',
                     }}
                   >
                     Confirmed Maha Aarti Contribution
@@ -751,7 +838,7 @@ export default function AartiDisplayLivePage() {
                   <div
                     className={isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}
                     style={{
-                      fontSize: 'clamp(56px, 7.5vw, 105px)',
+                      fontSize: 'clamp(64px, 8.5vw, 135px)',
                       fontWeight: '900',
                       color: isDark ? '#FF9F0A' : '#D97706',
                       letterSpacing: '-0.04em',
@@ -759,65 +846,69 @@ export default function AartiDisplayLivePage() {
                       fontVariantNumeric: 'tabular-nums',
                     }}
                   >
-                    ${Number(activeDay.current_highest_bid || 500).toLocaleString()}
+                    ${Number(activeDay.current_highest_bid || activeDay.locked_sponsor_amount || activeDay.base_bid || 500).toLocaleString()}
                   </div>
                 </div>
 
                 {/* Heartfelt Divine Blessing Card */}
                 <div
+                  className="celebration-blessing-card"
                   style={{
                     background: isDark
-                      ? 'linear-gradient(135deg, rgba(255, 159, 10, 0.14) 0%, rgba(26, 26, 34, 0.85) 100%)'
-                      : 'linear-gradient(135deg, rgba(255, 247, 237, 0.95) 0%, rgba(254, 243, 199, 0.85) 100%)',
-                    border: isDark ? '1.5px solid rgba(255, 159, 10, 0.4)' : '1.5px solid rgba(245, 158, 11, 0.45)',
-                    borderRadius: '16px',
-                    padding: '10px 20px',
-                    maxWidth: '820px',
+                      ? 'linear-gradient(135deg, rgba(255, 159, 10, 0.16) 0%, rgba(26, 26, 34, 0.88) 100%)'
+                      : 'linear-gradient(135deg, rgba(255, 247, 237, 0.98) 0%, rgba(254, 243, 199, 0.9) 100%)',
+                    border: isDark ? '1.5px solid rgba(255, 159, 10, 0.45)' : '1.5px solid rgba(245, 158, 11, 0.45)',
+                    borderRadius: '20px',
+                    padding: 'clamp(14px, 2vh, 26px) clamp(20px, 3vw, 44px)',
+                    maxWidth: 'min(98%, 1150px)',
                     width: '100%',
                     boxSizing: 'border-box',
-                    boxShadow: isDark ? '0 8px 30px rgba(0, 0, 0, 0.4)' : '0 6px 20px rgba(245, 158, 11, 0.15)',
+                    boxShadow: isDark ? '0 10px 35px rgba(0, 0, 0, 0.45)' : '0 8px 24px rgba(245, 158, 11, 0.16)',
                   }}
                 >
                   <p
                     style={{
-                      fontSize: 'clamp(13px, 1.4vw, 16px)',
+                      fontSize: 'clamp(14px, 1.4vw, 21px)',
                       fontWeight: '700',
                       color: isDark ? '#F5F5F7' : '#1F2937',
-                      lineHeight: 1.4,
-                      margin: '0 0 4px',
+                      lineHeight: 1.5,
+                      margin: '0 0 clamp(8px, 1vh, 12px)',
                     }}
                   >
                     Dhanyavad, <strong style={{ color: isDark ? '#FFB340' : '#B45309' }}>{winnerDisplayName}</strong>, for sponsoring Day {activeDay.day_number}&apos;s sacred Maha Aarti! May Maa Durga bless you and your family with divine grace, vibrant health, peace, and eternal prosperity.
                   </p>
                   <div
                     style={{
-                      fontSize: '11.5px',
-                      fontWeight: '800',
+                      fontSize: 'clamp(11px, 1vw, 14.5px)',
+                      fontWeight: '900',
                       color: isDark ? '#FF9F0A' : '#C25E00',
-                      letterSpacing: '0.08em',
+                      letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                     }}
                   >
-                    🙏 Jai Mata Di · Hindu Community Center of Knoxville 🙏
+                    Jai Mata Di · Hindu Community Center of Knoxville
                   </div>
                 </div>
               </div>
             ) : isConcluded && !hasWinner ? (
               /* ── CONCLUDED WITH NO BIDS: GENERAL HCC SPONSORSHIP NOTICE ─ */
               <div
+                className="celebration-center-stage"
                 style={{
-                  margin: 'auto 0',
-                  padding: '12px 0',
-                  textAlign: 'center',
+                  flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: 'space-evenly',
+                  textAlign: 'center',
+                  width: '100%',
+                  padding: '12px 0',
+                  boxSizing: 'border-box',
                 }}
               >
                 <div
                   style={{
-                    fontSize: '13px',
+                    fontSize: 'clamp(13px, 1.2vw, 16px)',
                     fontWeight: '800',
                     color: isDark ? '#FF9F0A' : '#C25E00',
                     textTransform: 'uppercase',
@@ -829,7 +920,7 @@ export default function AartiDisplayLivePage() {
                 </div>
                 <div
                   style={{
-                    fontSize: 'clamp(44px, 6vw, 84px)',
+                    fontSize: 'clamp(54px, 7vw, 96px)',
                     fontWeight: '900',
                     color: isDark ? '#FF9F0A' : '#D97706',
                     letterSpacing: '-0.03em',
@@ -841,30 +932,33 @@ export default function AartiDisplayLivePage() {
                 </div>
                 <div
                   style={{
-                    fontSize: 'clamp(17px, 2.1vw, 25px)',
+                    fontSize: 'clamp(18px, 2.3vw, 28px)',
                     fontWeight: '800',
                     color: isDark ? '#FFFFFF' : '#1D1D1F',
-                    maxWidth: '680px',
-                    lineHeight: 1.3,
+                    maxWidth: 'min(96%, 850px)',
+                    lineHeight: 1.35,
                   }}
                 >
                   Tonight&apos;s Maha Aarti is open for General Devotee Sponsorship.
                 </div>
-                <div style={{ fontSize: '13px', color: isDark ? '#A1A1A6' : '#6E6E73', marginTop: '6px' }}>
+                <div style={{ fontSize: 'clamp(13px, 1.2vw, 16px)', color: isDark ? '#A1A1A6' : '#6E6E73', marginTop: '6px' }}>
                   Please visit the Mandir desk or scan the QR code to sponsor.
                 </div>
               </div>
             ) : (
-              /* ── ACTIVE STADIUM BIDDING (BEFORE 9:45 PM OR DURING EXTENSION) ─ */
+              /* ── ACTIVE STADIUM BIDDING (BEFORE CUTOFF OR EXTENSION) ─ */
               <div
+                className="celebration-center-stage"
                 style={{
-                  margin: 'auto 0',
-                  padding: '4px 0',
-                  textAlign: 'center',
+                  flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: 'space-evenly',
+                  textAlign: 'center',
+                  width: '100%',
+                  padding: '8px 0',
+                  boxSizing: 'border-box',
                 }}
               >
                 <div
@@ -969,6 +1063,7 @@ export default function AartiDisplayLivePage() {
 
             {/* Bottom Tier: 3 Large Stats Cards Spanning Full 75% Width */}
             <div
+              className="aarti-bottom-stats"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
