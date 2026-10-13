@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import AartiLiveTicker from '@/components/AartiLiveTicker';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 
 // Clean SVG Icons (Lucide Style)
 const Icons = {
@@ -48,6 +51,15 @@ const Icons = {
       <polyline points="6 9 6 2 18 2 18 9" />
       <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
       <rect width="12" height="8" x="6" y="14" />
+    </svg>
+  ),
+  pdf: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
     </svg>
   ),
   clock: (
@@ -577,6 +589,278 @@ export default function NavratriAartiAdminPage() {
     document.body.removeChild(link);
   };
 
+  // Executive Master PDF Report Export with Universal Native Share & Print Modal
+  const handleExportPDF = async () => {
+    if (!data?.days || data.days.length === 0) {
+      alert('No festival days available to generate report.');
+      return;
+    }
+
+    try {
+      // Landscape A4 orientation for full multi-column festival reconciliation
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const now = new Date();
+      // Rule 1: Strict MM-DD-YYYY date format
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const dateStr = `${mm}-${dd}-${yyyy}`;
+      const timeStr = now.toLocaleTimeString('en-US', {
+        timeZone: 'America/New_York',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+
+      // ── 1. Top Organization & Branding Header ──
+      // HCC Saffron accent bar
+      doc.setFillColor(232, 120, 12); // #E8780C Saffron / Amber
+      doc.rect(14, 12, 4, 16, 'F');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(232, 120, 12);
+      doc.text('HINDU COMMUNITY CENTER OF KNOXVILLE (HCC)', 22, 18);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(29, 29, 31);
+      doc.text('Navratri 2026 — Daily Maha Aarti Master Festival Roster & Reconciliation', 22, 25);
+
+      // Metadata & KPI Summary Banner
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(110, 110, 115);
+      doc.text(
+        `Generated: ${dateStr} at ${timeStr} EST   |   Official Board & Puja Committee Operational Document`,
+        22,
+        31
+      );
+
+      // Mini KPI metrics line
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(30, 41, 59);
+      doc.text(
+        `Total Pledged: $${stats.pledged.toLocaleString()}   •   Collected: $${stats.paid.toLocaleString()}   •   Pending: $${stats.pending.toLocaleString()}   •   Verified Bids: ${stats.bidsCount}`,
+        22,
+        37
+      );
+
+      // ── 2. Table Rows Construction ──
+      const tableRows = data.days.map((day) => {
+        const dayDate = day.formatted_date || '';
+
+        // Sacred Theme / Title
+        let themeTitle = day.day_title || '';
+        if (day.is_maha_aarti) {
+          themeTitle += ' ★ [Maha Aarti]';
+        }
+
+        // Winning Sponsor Name
+        const isLocked = Boolean(day.is_locked);
+        let sponsorName = '— Open (No Bids) —';
+        if (isLocked) {
+          sponsorName = `[LOCKED] ${day.locked_sponsor_name || day.current_winner_name || 'Sponsor'}`;
+        } else if (day.bids_count > 0 && day.current_winner_name) {
+          sponsorName = day.current_winner_name;
+        }
+
+        // Contact info
+        const phone = day.locked_sponsor_phone || day.current_winner_phone || '';
+        const email = day.locked_sponsor_email || day.current_winner_email || '';
+        let contact = '—';
+        if (phone && email) {
+          contact = `${phone}\n${email}`;
+        } else if (phone) {
+          contact = phone;
+        } else if (email) {
+          contact = email;
+        }
+
+        // Bids count
+        const bids = isLocked ? 'Lock' : `${day.bids_count || 0}`;
+
+        // Amount Pledged
+        const amt = (day.bids_count > 0 || isLocked)
+          ? Number(day.current_highest_bid || day.locked_sponsor_amount || 0)
+          : 0;
+        const amountStr = amt > 0 ? `$${amt.toLocaleString()}` : '$0';
+
+        // Payment Status
+        let payStatusDisplay = '—';
+        if (amt > 0) {
+          payStatusDisplay = (day.payment_status || 'pending').toUpperCase();
+        }
+
+        // Payment Method & Collector / Reference
+        let payDetails = '—';
+        if (day.payment_status === 'paid') {
+          const m = (day.payment_method || '').toUpperCase();
+          const col = day.payment_collector || '';
+          const ref = day.payment_ref || '';
+          const parts = [];
+          if (m) parts.push(m);
+          if (col) parts.push(`By: ${col}`);
+          if (ref) parts.push(`Ref: ${ref}`);
+          payDetails = parts.join(' | ') || 'PAID';
+        } else if (day.payment_status === 'waived') {
+          payDetails = 'WAIVED SEVA';
+        } else if (amt > 0) {
+          payDetails = 'Awaiting payment at event';
+        }
+
+        // Cutoff / Day Status & Notes
+        let statusNotes = '';
+        if (day.status === 'closed' || day.is_past_cutoff) {
+          statusNotes = 'CLOSED';
+        } else {
+          statusNotes = 'ACTIVE';
+        }
+        if (day.locked_notes) {
+          statusNotes += `\n${day.locked_notes}`;
+        } else if (day.admin_notes) {
+          statusNotes += `\n${day.admin_notes}`;
+        }
+
+        return [
+          `Day ${day.day_number}`,
+          dayDate,
+          themeTitle,
+          sponsorName,
+          contact,
+          bids,
+          amountStr,
+          payStatusDisplay,
+          payDetails,
+          statusNotes,
+        ];
+      });
+
+      // ── 3. Summary Footer Row ──
+      const footerRow = [
+        'TOTALS',
+        `${data.days.length} Days`,
+        'Festival Maha Aarti Summary',
+        '',
+        '',
+        `${stats.bidsCount} Bids`,
+        `$${stats.pledged.toLocaleString()}`,
+        `Paid: $${stats.paid.toLocaleString()}`,
+        `Pending: $${stats.pending.toLocaleString()}`,
+        '',
+      ];
+
+      // ── 4. Render Table with autoTable ──
+      autoTable(doc, {
+        startY: 42,
+        head: [[
+          'Day #',
+          'Date (MM-DD-YYYY)',
+          'Festival Day & Sacred Theme',
+          'Winning Sponsor',
+          'Contact Info',
+          'Bids',
+          'Pledged ($)',
+          'Pay Status',
+          'Payment Details / Method',
+          'Status / Notes',
+        ]],
+        body: tableRows,
+        foot: [footerRow],
+        theme: 'striped',
+        headStyles: {
+          fillColor: [232, 120, 12], // HCC Saffron / Amber
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 8.5,
+          halign: 'left',
+          cellPadding: 3,
+        },
+        footStyles: {
+          fillColor: [245, 245, 247],
+          textColor: [29, 29, 31],
+          fontStyle: 'bold',
+          fontSize: 8.5,
+          cellPadding: 3,
+        },
+        styles: {
+          fontSize: 8,
+          cellPadding: 2.5,
+          valign: 'middle',
+          textColor: [30, 41, 59],
+          overflow: 'linebreak',
+        },
+        columnStyles: {
+          0: { cellWidth: 15, halign: 'center', fontStyle: 'bold' },
+          1: { cellWidth: 24, halign: 'center' },
+          2: { cellWidth: 50 },
+          3: { cellWidth: 42, fontStyle: 'bold' },
+          4: { cellWidth: 36, fontSize: 7.5 },
+          5: { cellWidth: 14, halign: 'center' },
+          6: { cellWidth: 22, halign: 'right', fontStyle: 'bold' },
+          7: { cellWidth: 20, halign: 'center' },
+          8: { cellWidth: 45, fontSize: 7.5 },
+          9: { cellWidth: 'auto', fontSize: 7.5 },
+        },
+        alternateRowStyles: {
+          fillColor: [250, 250, 252],
+        },
+        margin: { top: 42, bottom: 16, left: 14, right: 14 },
+        didParseCell: (hookData) => {
+          if (hookData.section === 'body' && hookData.column.index === 7) {
+            const val = String(hookData.cell.raw || '').toUpperCase();
+            if (val === 'PAID') {
+              hookData.cell.styles.textColor = [16, 185, 129]; // Emerald
+              hookData.cell.styles.fontStyle = 'bold';
+            } else if (val === 'PENDING') {
+              hookData.cell.styles.textColor = [217, 119, 6]; // Amber
+              hookData.cell.styles.fontStyle = 'bold';
+            } else if (val === 'WAIVED') {
+              hookData.cell.styles.textColor = [100, 116, 139]; // Slate
+            }
+          }
+        },
+        didDrawPage: (hookData) => {
+          const pageSize = doc.internal.pageSize;
+          const pageHeight = pageSize.height || pageSize.getHeight();
+          const pageWidth = pageSize.width || pageSize.getWidth();
+
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(0.3);
+          doc.line(14, pageHeight - 12, pageWidth - 14, pageHeight - 12);
+
+          doc.setFontSize(7.5);
+          doc.setTextColor(140);
+          doc.text(
+            'Hindu Community Center of Knoxville (HCC) · Navratri 2026 Daily Maha Aarti Roster & Reconciliation',
+            14,
+            pageHeight - 7
+          );
+          doc.text(
+            `Page ${hookData.pageNumber} of ${doc.internal.getNumberOfPages()} · Confidential Mandir Document`,
+            pageWidth - 14,
+            pageHeight - 7,
+            { align: 'right' }
+          );
+        },
+      });
+
+      // ── 5. Open Universal Review & Native Share Modal ──
+      const filename = `Navratri_Maha_Aarti_Roster_${dateStr}.pdf`;
+      await exportPdfWithNativeShare(doc, filename);
+    } catch (err) {
+      console.error('PDF export error:', err);
+      alert('Failed to generate PDF report: ' + (err?.message || err));
+    }
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -835,22 +1119,25 @@ export default function NavratriAartiAdminPage() {
               </button>
 
               <button
-                onClick={() => window.print()}
+                onClick={handleExportPDF}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  background: 'var(--bg-input, #F2F2F5)',
-                  border: '1px solid var(--border, rgba(0,0,0,0.08))',
-                  color: 'var(--text-primary, #1D1D1F)',
-                  padding: '7px 12px',
+                  background: 'linear-gradient(135deg, rgba(232, 120, 12, 0.12) 0%, rgba(232, 120, 12, 0.05) 100%)',
+                  border: '1px solid rgba(232, 120, 12, 0.35)',
+                  color: 'var(--accent, #E8780C)',
+                  padding: '7px 14px',
                   borderRadius: '8px',
                   fontSize: '11.5px',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   cursor: 'pointer',
+                  boxShadow: 'var(--shadow)',
+                  transition: 'all 0.2s ease',
                 }}
+                title="Generate and review executive Master Maha Aarti PDF Roster & Reconciliation report"
               >
-                {Icons.printer} Print Roster
+                {Icons.pdf} PDF Roster Report
               </button>
             </div>
           </div>
