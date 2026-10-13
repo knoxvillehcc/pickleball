@@ -216,7 +216,19 @@ export default function AartiDisplayLivePage() {
         hour: 'numeric',
         minute: '2-digit',
       })
-    : '9:45 PM';
+    : (() => {
+        try {
+          const raw = settings?.daily_cutoff_time || '21:45';
+          const [hStr, mStr] = raw.split(':');
+          const h = parseInt(hStr, 10);
+          const m = parseInt(mStr, 10);
+          const ampm = h >= 12 ? 'PM' : 'AM';
+          const h12 = h % 12 === 0 ? 12 : h % 12;
+          return `${h12}:${isNaN(m) ? '00' : m.toString().padStart(2, '0')} ${ampm}`;
+        } catch {
+          return '9:45 PM';
+        }
+      })();
 
   // Check if bidding has concluded (time expired OR admin manually closed)
   const isPastCutoff = activeDay?.cutoff_time

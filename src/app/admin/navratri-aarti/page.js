@@ -131,13 +131,14 @@ export default function NavratriAartiAdminPage() {
   const [error, setError] = useState('');
   const [urlCopied, setUrlCopied] = useState(false);
 
-  // Settings Form State
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [tier1Max, setTier1Max] = useState(3000);
   const [tier1Increment, setTier1Increment] = useState(500);
   const [tier2Increment, setTier2Increment] = useState(250);
   const [isPublished, setIsPublished] = useState(false);
   const [showBidderNames, setShowBidderNames] = useState(true);
+  const [dailyCutoffTime, setDailyCutoffTime] = useState('21:45');
+  const [applyCutoffToDays, setApplyCutoffToDays] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
   const [togglingNames, setTogglingNames] = useState(false);
   const [togglingPublished, setTogglingPublished] = useState(false);
@@ -148,6 +149,7 @@ export default function NavratriAartiAdminPage() {
   const [editDayTitle, setEditDayTitle] = useState('');
   const [editBaseBid, setEditBaseBid] = useState(500);
   const [editIsMaha, setEditIsMaha] = useState(false);
+  const [editDayCutoffTime, setEditDayCutoffTime] = useState('21:45');
   const [editIsLocked, setEditIsLocked] = useState(false);
   const [editLockedName, setEditLockedName] = useState('');
   const [editLockedAmount, setEditLockedAmount] = useState('');
@@ -195,6 +197,7 @@ export default function NavratriAartiAdminPage() {
           setTier2Increment(json.settings.tier2_increment || 250);
           setIsPublished(json.settings.is_published ?? false);
           setShowBidderNames(json.settings.show_bidder_names !== false);
+          setDailyCutoffTime(json.settings.daily_cutoff_time || '21:45');
         }
         setHistoryDay((prev) => {
           if (!prev) return null;
@@ -285,6 +288,18 @@ export default function NavratriAartiAdminPage() {
     setEditLockedPayStatus(day.payment_status || 'pending');
     setEditLockedPayMethod(day.payment_method || 'cash');
     setEditLockedNotes(day.locked_notes || '');
+
+    // Extract HH:MM cutoff time
+    let cutoffHHMM = '21:45';
+    if (day.cutoff_time) {
+      try {
+        const d = new Date(day.cutoff_time);
+        const hours = d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour12: false, hour: '2-digit' }).padStart(2, '0');
+        const mins = d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', minute: '2-digit' }).padStart(2, '0');
+        cutoffHHMM = `${hours}:${mins}`;
+      } catch {}
+    }
+    setEditDayCutoffTime(cutoffHHMM);
   };
 
   // Save Day Edits & Sponsor Lock
@@ -310,6 +325,7 @@ export default function NavratriAartiAdminPage() {
           payment_status: editLockedPayStatus,
           payment_method: editLockedPayMethod,
           locked_notes: editLockedNotes,
+          cutoff_time: editDayCutoffTime ? `${editEventDate}T${editDayCutoffTime}:00-04:00` : undefined,
         }),
       });
       const json = await res.json();
@@ -372,6 +388,8 @@ export default function NavratriAartiAdminPage() {
           tier2_increment: tier2Increment,
           is_published: isPublished,
           show_bidder_names: showBidderNames,
+          daily_cutoff_time: dailyCutoffTime,
+          apply_to_open_days: applyCutoffToDays,
         }),
       });
       const json = await res.json();
@@ -780,7 +798,20 @@ export default function NavratriAartiAdminPage() {
           <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border, rgba(0,0,0,0.09))', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
             <div>
               <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)' }}>Festival Days & Reconciliation</span>
-              <span style={{ fontSize: '12px', color: 'var(--text-muted, #86868B)', marginLeft: '8px' }}>Daily 9:45 PM cutoff</span>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted, #86868B)', marginLeft: '8px' }}>
+                Daily {(() => {
+                  try {
+                    const [hStr, mStr] = dailyCutoffTime.split(':');
+                    const h = parseInt(hStr, 10);
+                    const m = parseInt(mStr, 10);
+                    const ampm = h >= 12 ? 'PM' : 'AM';
+                    const h12 = h % 12 === 0 ? 12 : h % 12;
+                    return `${h12}:${isNaN(m) ? '00' : m.toString().padStart(2, '0')} ${ampm}`;
+                  } catch {
+                    return '9:45 PM';
+                  }
+                })()} EST cutoff
+              </span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1067,13 +1098,93 @@ export default function NavratriAartiAdminPage() {
       {/* ── SETTINGS MODAL ──────────────────────────────────────────────── */}
       {showSettingsModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 9999 }}>
-          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.1))', borderRadius: '18px', maxWidth: '400px', width: '100%', padding: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.18)' }}>
+          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.1))', borderRadius: '18px', maxWidth: '440px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.18)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)' }}>Increment Rules & Visibility</h3>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: 'var(--text-primary, #1D1D1F)' }}>Increments & Configuration</h3>
+                <div style={{ fontSize: '11.5px', color: 'var(--text-secondary, #515154)', marginTop: '2px' }}>
+                  Daily Cutoff Time, Tier Limits & Visibility
+                </div>
+              </div>
               <button onClick={() => setShowSettingsModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>{Icons.close}</button>
             </div>
 
             <form onSubmit={handleSaveSettings}>
+              {/* Daily Bidding End Time (Cutoff) */}
+              <div style={{ marginBottom: '16px', background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '12px', padding: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-primary, #1D1D1F)', textTransform: 'uppercase', letterSpacing: '0.6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ color: 'var(--accent, #E8780C)' }}>{Icons.clock}</span>
+                    Daily Bidding End Time (Cutoff)
+                  </label>
+                  <span style={{ fontSize: '11.5px', fontWeight: '800', color: 'var(--accent, #E8780C)', background: 'rgba(232, 120, 12, 0.12)', padding: '2px 8px', borderRadius: '6px' }}>
+                    {(() => {
+                      try {
+                        const [hStr, mStr] = dailyCutoffTime.split(':');
+                        const h = parseInt(hStr, 10);
+                        const m = parseInt(mStr, 10);
+                        const ampm = h >= 12 ? 'PM' : 'AM';
+                        const h12 = h % 12 === 0 ? 12 : h % 12;
+                        return `${h12}:${isNaN(m) ? '00' : m.toString().padStart(2, '0')} ${ampm}`;
+                      } catch {
+                        return '9:45 PM';
+                      }
+                    })()} EST
+                  </span>
+                </div>
+
+                <input
+                  type="time"
+                  required
+                  value={dailyCutoffTime}
+                  onChange={(e) => setDailyCutoffTime(e.target.value)}
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 12px', color: 'var(--text-primary)', fontSize: '15px', fontWeight: '700' }}
+                />
+
+                {/* Preset Chips */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '10px' }}>
+                  {[
+                    { label: '9:30 PM', val: '21:30' },
+                    { label: '9:45 PM', val: '21:45' },
+                    { label: '10:00 PM', val: '22:00' },
+                    { label: '10:15 PM', val: '22:15' },
+                    { label: '10:30 PM', val: '22:30' },
+                  ].map((preset) => (
+                    <button
+                      key={preset.val}
+                      type="button"
+                      onClick={() => setDailyCutoffTime(preset.val)}
+                      style={{
+                        background: dailyCutoffTime === preset.val ? 'var(--accent, #E8780C)' : 'var(--bg-card, #FFFFFF)',
+                        color: dailyCutoffTime === preset.val ? '#FFFFFF' : 'var(--text-secondary, #515154)',
+                        border: dailyCutoffTime === preset.val ? '1px solid var(--accent, #E8780C)' : '1px solid var(--border)',
+                        padding: '4px 9px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Checkbox to apply to all open days */}
+                <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    id="applyCutoffDays"
+                    checked={applyCutoffToDays}
+                    onChange={(e) => setApplyCutoffToDays(e.target.checked)}
+                    style={{ width: '16px', height: '16px', accentColor: 'var(--accent, #E8780C)', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="applyCutoffDays" style={{ fontSize: '11.5px', color: 'var(--text-secondary, #515154)', fontWeight: '600', cursor: 'pointer', lineHeight: 1.3 }}>
+                    Apply new cutoff to all open festival days (updates countdowns on TV &amp; website)
+                  </label>
+                </div>
+              </div>
               <div style={{ marginBottom: '12px' }}>
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary, #515154)', marginBottom: '4px' }}>
                   Tier 1 Threshold Limit ($)
@@ -1198,6 +1309,36 @@ export default function NavratriAartiAdminPage() {
                     Standard Display: <strong>{(() => { const [y, m, d] = editEventDate.split('-'); return `${m}-${d}-${y}`; })()}</strong>
                   </div>
                 )}
+              </div>
+
+              {/* Day Cutoff Time (Bidding End Time) */}
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '11.5px', fontWeight: '700', color: 'var(--text-secondary, #515154)' }}>
+                    Bidding End Time (Cutoff)
+                  </label>
+                  <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent, #E8780C)' }}>
+                    {(() => {
+                      try {
+                        const [hStr, mStr] = editDayCutoffTime.split(':');
+                        const h = parseInt(hStr, 10);
+                        const m = parseInt(mStr, 10);
+                        const ampm = h >= 12 ? 'PM' : 'AM';
+                        const h12 = h % 12 === 0 ? 12 : h % 12;
+                        return `${h12}:${isNaN(m) ? '00' : m.toString().padStart(2, '0')} ${ampm}`;
+                      } catch {
+                        return '9:45 PM';
+                      }
+                    })()} EST
+                  </span>
+                </div>
+                <input
+                  type="time"
+                  required
+                  value={editDayCutoffTime}
+                  onChange={(e) => setEditDayCutoffTime(e.target.value)}
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600' }}
+                />
               </div>
 
               {/* Day Title / Description */}

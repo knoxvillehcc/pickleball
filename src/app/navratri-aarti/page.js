@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import AartiLiveTicker from '@/components/AartiLiveTicker';
 
@@ -131,6 +131,20 @@ export default function NavratriAartiPage() {
     }
     return () => clearInterval(timer);
   }, [step, countdown]);
+
+  const formattedCutoffTime = useMemo(() => {
+    const raw = settings?.daily_cutoff_time || '21:45';
+    try {
+      const [hStr, mStr] = raw.split(':');
+      const h = parseInt(hStr, 10);
+      const m = parseInt(mStr, 10);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      return `${h12}:${isNaN(m) ? '00' : m.toString().padStart(2, '0')} ${ampm} EST`;
+    } catch {
+      return '9:45 PM EST';
+    }
+  }, [settings]);
 
   const openBidModal = (day) => {
     setSelectedDay(day);
@@ -340,7 +354,7 @@ export default function NavratriAartiPage() {
             <span style={{ display: 'flex', color: 'var(--accent, #E8780C)' }}>
               {Icons.clock}
             </span>
-            <span>Daily Cutoff: <strong>9:45 PM EST</strong></span>
+            <span>Daily Cutoff: <strong>{formattedCutoffTime}</strong></span>
           </div>
         </div>
       </header>
@@ -400,7 +414,7 @@ export default function NavratriAartiPage() {
           }}
         >
           Devotees can sponsor and perform the sacred evening Maha Aarti for each night of Navratri.
-          Advance bidding is open for all 10 festival days. Daily bidding closes at <strong>9:45 PM EST</strong>.
+          Advance bidding is open for all 10 festival days. Daily bidding closes at <strong>{formattedCutoffTime}</strong>.
         </p>
 
         {/* Apple Segmented Feature Strip */}

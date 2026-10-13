@@ -96,7 +96,7 @@ export async function getAartiSettings() {
     tier1_max: 3000,
     tier1_increment: 500,
     tier2_increment: 250,
-    daily_cutoff_time: '21:30',
+    daily_cutoff_time: '21:45',
   };
 
   if (res.ok) {
@@ -112,6 +112,25 @@ export async function getAartiSettings() {
   }
 
   return settings;
+}
+
+/**
+ * Format a HH:MM 24-hr time string (e.g. '21:45') into human-readable 12-hr format (e.g. '9:45 PM EST')
+ */
+export function formatCutoffTimeString(timeStr, suffix = 'EST') {
+  if (!timeStr) return `9:45 PM ${suffix}`.trim();
+  try {
+    const [hStr, mStr] = timeStr.split(':');
+    const h = parseInt(hStr, 10);
+    const m = parseInt(mStr, 10);
+    if (isNaN(h)) return `9:45 PM ${suffix}`.trim();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    const min = isNaN(m) ? '00' : m.toString().padStart(2, '0');
+    return `${h12}:${min} ${ampm}${suffix ? ` ${suffix}` : ''}`.trim();
+  } catch {
+    return `9:45 PM ${suffix}`.trim();
+  }
 }
 
 /**
@@ -385,7 +404,7 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
   if (day.status === 'closed' || now > new Date(day.cutoff_time)) {
     const cutoffFormatted = day.cutoff_time
       ? new Date(day.cutoff_time).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }) + ' EST'
-      : '9:45 PM EST';
+      : formatCutoffTimeString(settings?.daily_cutoff_time);
     throw new Error(`Bidding for this day has concluded at ${cutoffFormatted}.`);
   }
 
@@ -608,7 +627,7 @@ export async function verifyBid({ bid_id, otp_code }) {
   if (day.status === 'closed' || now > new Date(day.cutoff_time)) {
     const cutoffFormatted = day.cutoff_time
       ? new Date(day.cutoff_time).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }) + ' EST'
-      : '9:45 PM EST';
+      : formatCutoffTimeString(settings?.daily_cutoff_time);
     throw new Error(`Bidding for this day has already concluded at ${cutoffFormatted}.`);
   }
 
@@ -669,6 +688,7 @@ export async function verifyBid({ bid_id, otp_code }) {
       eventDate: day.event_date,
       newHighBid: bid.bid_amount,
       newWinnerName: bid.bidder_name,
+      cutoffTime: day.cutoff_time,
     }).catch(err => console.error('[Outbid Email Error]', err));
   }
 
@@ -725,9 +745,12 @@ export async function resendOtp({ bid_id }) {
 /**
  * Send outbid alert email
  */
-async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate, newHighBid }) {
+async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate, newHighBid, cutoffTime }) {
   const [y, m, d] = (eventDate || '').split('-');
   const formattedDate = (y && m && d) ? `${m}-${d}-${y}` : eventDate;
+  const formattedCutoff = cutoffTime
+    ? new Date(cutoffTime).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }) + ' EST'
+    : '9:45 PM EST';
 
   // Calculate next minimum bid to take back the lead
   const settings = await getAartiSettings().catch(() => ({ tier1_max: 3000, tier1_increment: 500, tier2_increment: 250 }));
@@ -805,7 +828,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
             </table>
 
             <p style="margin: 0 0 24px; font-size: 14px; color: #515154; line-height: 1.5;">
-              Would you like to reclaim your Maha Aarti for this day? Tap the button below to view the live dashboard and submit your new bid. Bidding closes daily at <strong>9:45 PM EST</strong>.
+              Would you like to reclaim your Maha Aarti for this day? Tap the button below to view the live dashboard and submit your new bid. Bidding closes daily at <strong>${formattedCutoff}</strong>.
             </p>
 
             <!-- Bulletproof CTA Button (Solid Orange with White Text) -->
@@ -839,7 +862,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
               Hindu Community Center · 8580 Executive Park Dr, Knoxville, TN 37923
             </div>
             <div style="font-size: 11px; color: #94A3B8; margin-top: 4px;">
-              Daily Aarti bidding concludes each night at 9:45 PM EST.
+              Daily Aarti bidding concludes each night at ${formattedCutoff}.
             </div>
           </td>
         </tr>
@@ -1022,15 +1045,19 @@ export async function updateAdminDay({
 }) {
   const updates = { updated_at: new Date().toISOString() };
   if (status) updates.status = status;
-  if (cutoff_time) updates.cutoff_time = cutoff_time;
-  if (event_date) updates.event_date = event_date;
-  if (day_title !== undefined) updates.day_title = day_title.trim();
-  if (base_bid !== undefined) updates.base_bid = Number(base_bid);
-  if (is_maha_aarti !== undefined) updates.is_maha_aarti = Boolean(is_maha_aarti);
-
-  // If event_date was updated and cutoff_time was not explicitly passed, recompute cutoff_time for 9:45 PM EDT
-  if (event_date && !cutoff_time) {
-    updates.cutoff_time = `${event_date}T21:45:00-04:00`;
+  // If cutoff_time was explicitly passed (HH:MM or full ISO)
+  if (cutoff_time) {
+    if (cutoff_time.includes('T')) {
+      updates.cutoff_time = cutoff_time;
+    } else {
+      const targetDate = event_date || '2026-10-11';
+      updates.cutoff_time = `${targetDate}T${cutoff_time}:00-04:00`;
+    }
+  } else if (event_date) {
+    // If event_date was updated and cutoff_time was not explicitly passed, recompute cutoff_time using daily_cutoff_time
+    const currentSettings = await getAartiSettings().catch(() => null);
+    const dailyCutoff = currentSettings?.daily_cutoff_time || '21:45';
+    updates.cutoff_time = `${event_date}T${dailyCutoff}:00-04:00`;
   }
 
   // Handle Locking / Unlocking
@@ -1190,7 +1217,15 @@ export async function updateAdminPayment({ day_number, payment_status, payment_c
 /**
  * Admin: Update increment settings & public display preferences
  */
-export async function updateAdminSettings({ tier1_max, tier1_increment, tier2_increment, is_published, daily_cutoff_time, show_bidder_names }) {
+export async function updateAdminSettings({
+  tier1_max,
+  tier1_increment,
+  tier2_increment,
+  is_published,
+  daily_cutoff_time,
+  show_bidder_names,
+  apply_to_open_days = true,
+}) {
   const updates = { updated_at: new Date().toISOString() };
   if (tier1_max !== undefined) updates.tier1_max = Number(tier1_max);
   if (tier1_increment !== undefined) updates.tier1_increment = Number(tier1_increment);
@@ -1226,6 +1261,34 @@ export async function updateAdminSettings({ tier1_max, tier1_increment, tier2_in
   } else if (show_bidder_names !== undefined) {
     // Also keep fallback in sync
     await saveFallbackBidderNameSetting(Boolean(show_bidder_names));
+  }
+
+  // If daily_cutoff_time is updated and apply_to_open_days is requested, sync all open days
+  if (daily_cutoff_time && apply_to_open_days) {
+    try {
+      const daysRes = await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?status=neq.closed&select=day_number,event_date`, {
+        headers: getServiceHeaders(),
+        cache: 'no-store',
+      });
+      if (daysRes.ok) {
+        const openDays = await daysRes.json();
+        for (const od of openDays) {
+          if (od.event_date) {
+            const newCutoffIso = `${od.event_date}T${daily_cutoff_time}:00-04:00`;
+            await fetch(`${SUPABASE_URL}/rest/v1/navratri_aarti_days?day_number=eq.${od.day_number}`, {
+              method: 'PATCH',
+              headers: getServiceHeaders(),
+              body: JSON.stringify({
+                cutoff_time: newCutoffIso,
+                updated_at: new Date().toISOString(),
+              }),
+            });
+          }
+        }
+      }
+    } catch (syncErr) {
+      console.error('[updateAdminSettings apply_to_open_days error]:', syncErr);
+    }
   }
 
   return { success: true };

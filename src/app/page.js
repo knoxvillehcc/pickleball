@@ -1,6 +1,6 @@
 'use client';
 import Icon from '@/components/Icon';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useTheme } from '@/components/ClientLayout';
 
@@ -185,10 +185,24 @@ function PublicLanding() {
     }
   }, []);
 
+  const formattedDailyCutoff = useMemo(() => {
+    const raw = aartiData?.settings?.daily_cutoff_time || '21:45';
+    try {
+      const [hStr, mStr] = raw.split(':');
+      const h = parseInt(hStr, 10);
+      const m = parseInt(mStr, 10);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      return `${h12}:${isNaN(m) ? '00' : m.toString().padStart(2, '0')} ${ampm} EST`;
+    } catch {
+      return '9:45 PM EST';
+    }
+  }, [aartiData]);
+
   const options = [
     ...(aartiLive ? [{
       title: 'Navratri 2026 — Daily Maha Aarti',
-      desc: 'Sponsor and perform the sacred evening Maha Aarti each night. Live community bidding with dynamic increments and daily 9:45 PM EST cutoff.',
+      desc: `Sponsor and perform the sacred evening Maha Aarti each night. Live community bidding with dynamic increments and daily ${formattedDailyCutoff} cutoff.`,
       href: '/navratri-aarti',
       accentColor: '#E8780C',
       glowColor: 'rgba(232, 120, 12, 0.16)',
@@ -199,7 +213,7 @@ function PublicLanding() {
       isOpen: true,
       kpis: [
         { label: 'Reserve Opening', value: '$500' },
-        { label: 'Daily Cutoff', value: '9:45 PM EST' },
+        { label: 'Daily Cutoff', value: formattedDailyCutoff },
         { label: '10 Sacred Nights', value: '10-11-2026 to 10-20-2026' },
         { label: 'Day 8 Maha Aarti', value: '10-18-2026' },
       ],
