@@ -316,20 +316,203 @@ export default function AartiDisplayLivePage() {
           animation: ${isDark ? 'subtleGlowDark' : 'subtleGlowLight'} 4s ease-in-out infinite;
         }
 
-        /* ── Responsive Viewport Auto-Detection: iPhone -> iPad -> Desktop -> TV ── */
-        @media (max-width: 768px) {
+        /* ==========================================================================
+           MULTI-DEVICE AUTO-DETECTION ARCHITECTURE
+           Priority: (1) iPhone -> (2) iPad -> (3) Desktop Browser -> (4) TV Screen
+           Specifically optimized for Landscape view
+           ========================================================================== */
+
+        /* ── 1. IPHONE (FIRST PRIORITY) ───────────────────────────────────────── */
+
+        /* 1A. iPhone Landscape (Height <= 520px) ── */
+        /* Targets iPhone SE, 12, 13, 14, 15, 16 Pro/Max held horizontally */
+        @media (orientation: landscape) and (max-height: 520px),
+               (max-width: 950px) and (max-height: 480px) {
           .aarti-display-root {
             height: auto !important;
             min-height: 100vh !important;
             max-height: none !important;
             overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding: 6px 10px 18px !important;
+          }
+          .aarti-stage-header {
+            padding-bottom: 4px !important;
+            gap: 8px !important;
+          }
+          .aarti-header-diya {
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 8px !important;
+          }
+          .aarti-header-sub {
+            font-size: 8.5px !important;
+            letter-spacing: 0.1em !important;
+          }
+          .aarti-header-title {
+            font-size: 13px !important;
+          }
+          .aarti-header-btn {
+            padding: 3px 8px !important;
+            font-size: 10px !important;
+          }
+          .aarti-main-grid {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1.85fr) minmax(200px, 1fr) !important;
+            gap: 10px !important;
+            margin-top: 6px !important;
+          }
+          .display-hero-card {
+            padding: 10px 14px !important;
+            border-radius: 16px !important;
+            min-height: auto !important;
+          }
+          .day-switcher-bar {
+            margin-bottom: 6px !important;
+            gap: 4px !important;
+          }
+          .day-switcher-btn {
+            padding: 2px 7px !important;
+            font-size: 9.5px !important;
+          }
+          .day-meta-row {
+            margin-bottom: 2px !important;
+          }
+          .day-badge-pill {
+            font-size: 11px !important;
+            padding: 3px 9px !important;
+          }
+          .day-date-text {
+            font-size: 13px !important;
+          }
+          .day-maha-pill {
+            font-size: 10px !important;
+            padding: 2px 6px !important;
+          }
+          .day-status-pill {
+            font-size: 10.5px !important;
+            padding: 3px 10px !important;
+          }
+          .day-main-heading {
+            font-size: 19px !important;
+            margin-top: 2px !important;
+            line-height: 1.15 !important;
+          }
+          .celebration-center-stage {
+            padding: 4px 0 !important;
+          }
+          .celebration-ribbon {
+            padding: 3px 12px !important;
+            font-size: 10px !important;
+          }
+          .celebration-subhead {
+            font-size: 12px !important;
+            margin: 2px 0 !important;
+          }
+          .winner-row {
+            gap: 8px !important;
+            margin: 2px 0 !important;
+          }
+          .winner-avatar {
+            width: 34px !important;
+            height: 34px !important;
+            font-size: 14px !important;
+            border-width: 2px !important;
+          }
+          .winner-name {
+            font-size: 20px !important;
+            line-height: 1.05 !important;
+          }
+          .contribution-label {
+            font-size: 9px !important;
+            letter-spacing: 0.12em !important;
+          }
+          .contribution-amount {
+            font-size: 36px !important;
+            line-height: 0.95 !important;
+          }
+          .bidding-amount {
+            font-size: 44px !important;
+            line-height: 0.95 !important;
+            margin: 0 auto 4px !important;
+          }
+          .celebration-blessing-card {
+            padding: 8px 12px !important;
+            border-radius: 12px !important;
+          }
+          .celebration-blessing-text {
+            font-size: 11.5px !important;
+            line-height: 1.3 !important;
+            margin-bottom: 3px !important;
+          }
+          .celebration-blessing-footer {
+            font-size: 9px !important;
+          }
+          .aarti-bottom-stats {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 6px !important;
+            margin-top: 6px !important;
+          }
+          .stat-card {
+            padding: 5px 8px !important;
+            border-radius: 10px !important;
+          }
+          .stat-label {
+            font-size: 8.5px !important;
+          }
+          .stat-value {
+            font-size: 14px !important;
+            margin-top: 1px !important;
+          }
+          .display-qr-card {
+            padding: 8px 8px !important;
+            border-radius: 16px !important;
+          }
+          .qr-badge {
+            padding: 3px 8px !important;
+            font-size: 9px !important;
+            margin-bottom: 3px !important;
+          }
+          .qr-heading {
+            font-size: 13px !important;
+            margin-bottom: 1px !important;
+          }
+          .qr-subtext {
+            font-size: 9.5px !important;
+          }
+          .qr-squircle {
+            padding: 6px !important;
+            margin: 4px auto !important;
+          }
+          .qr-image {
+            width: 100px !important;
+            height: 100px !important;
+          }
+          .qr-url-badge {
+            font-size: 8px !important;
+            padding: 3px 5px !important;
+          }
+          .qr-trust-badge {
+            font-size: 8.5px !important;
+            margin-top: 2px !important;
+          }
+        }
+
+        /* 1B. iPhone Portrait (Width <= 640px, Height > 520px) ── */
+        @media (max-width: 640px) and (min-height: 521px) {
+          .aarti-display-root {
+            height: auto !important;
+            min-height: 100vh !important;
+            max-height: none !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
             padding: 10px 10px 28px !important;
           }
           .aarti-stage-header {
             flex-direction: column !important;
             align-items: flex-start !important;
-            gap: 12px !important;
-            padding-bottom: 10px !important;
+            gap: 10px !important;
+            padding-bottom: 8px !important;
           }
           .aarti-stage-header-actions {
             width: 100% !important;
@@ -338,64 +521,418 @@ export default function AartiDisplayLivePage() {
           .aarti-main-grid {
             display: flex !important;
             flex-direction: column !important;
-            gap: 16px !important;
-            margin-top: 10px !important;
+            gap: 14px !important;
+            margin-top: 8px !important;
           }
           .display-hero-card {
             min-height: auto !important;
             padding: 16px 14px !important;
+            border-radius: 18px !important;
           }
-          .display-qr-card {
-            min-height: auto !important;
-            padding: 20px 14px !important;
+          .day-main-heading {
+            font-size: 26px !important;
+          }
+          .celebration-ribbon {
+            font-size: 11px !important;
+            padding: 5px 14px !important;
+          }
+          .celebration-subhead {
+            font-size: 15px !important;
+          }
+          .winner-avatar {
+            width: 48px !important;
+            height: 48px !important;
+            font-size: 18px !important;
+          }
+          .winner-name {
+            font-size: 28px !important;
+          }
+          .contribution-amount {
+            font-size: 48px !important;
+          }
+          .bidding-amount {
+            font-size: 58px !important;
+          }
+          .celebration-blessing-card {
+            padding: 14px 14px !important;
+            border-radius: 16px !important;
+          }
+          .celebration-blessing-text {
+            font-size: 13.5px !important;
           }
           .aarti-bottom-stats {
             grid-template-columns: 1fr !important;
             gap: 8px !important;
           }
-          .celebration-blessing-card {
-            padding: 14px 14px !important;
+          .stat-card {
+            padding: 10px 14px !important;
+          }
+          .stat-value {
+            font-size: 20px !important;
+          }
+          .display-qr-card {
+            min-height: auto !important;
+            padding: 18px 14px !important;
+            border-radius: 18px !important;
+          }
+          .qr-image {
+            width: 145px !important;
+            height: 145px !important;
           }
         }
 
-        @media (min-width: 769px) and (max-width: 1024px) {
+        /* ── 2. IPAD & TABLETS (SECOND PRIORITY) ─────────────────────────────── */
+
+        /* 2A. iPad Landscape (Width: 951px–1279px, Height: 521px–900px) ── */
+        @media (min-width: 951px) and (max-width: 1279px) and (min-height: 521px) and (max-height: 900px) {
           .aarti-display-root {
-            padding: 12px 14px !important;
+            padding: 10px 14px !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            overflow: hidden !important;
           }
           .aarti-main-grid {
-            grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr) !important;
+            grid-template-columns: minmax(0, 2.35fr) minmax(235px, 1fr) !important;
             gap: 12px !important;
           }
           .display-hero-card {
-            padding: 16px 16px !important;
+            padding: 14px 18px !important;
+            border-radius: 20px !important;
+          }
+          .day-main-heading {
+            font-size: clamp(26px, 3.2vw, 36px) !important;
+          }
+          .celebration-ribbon {
+            padding: 6px 18px !important;
+            font-size: 12px !important;
+          }
+          .celebration-subhead {
+            font-size: 16px !important;
+            margin: 4px 0 !important;
+          }
+          .winner-avatar {
+            width: 52px !important;
+            height: 52px !important;
+            font-size: 20px !important;
+          }
+          .winner-name {
+            font-size: clamp(28px, 3.6vw, 44px) !important;
+          }
+          .contribution-amount {
+            font-size: clamp(48px, 6.2vw, 76px) !important;
+          }
+          .bidding-amount {
+            font-size: clamp(58px, 7.5vw, 92px) !important;
+          }
+          .celebration-blessing-card {
+            padding: 12px 18px !important;
+            max-width: 95% !important;
+          }
+          .celebration-blessing-text {
+            font-size: 13.5px !important;
+            line-height: 1.4 !important;
+            margin-bottom: 6px !important;
           }
           .aarti-bottom-stats {
             grid-template-columns: repeat(3, 1fr) !important;
             gap: 8px !important;
           }
-        }
-
-        @media (min-width: 1025px) and (max-width: 1440px) {
-          .aarti-main-grid {
-            grid-template-columns: minmax(0, 2.8fr) minmax(280px, 1fr) !important;
-            gap: 16px !important;
+          .stat-card {
+            padding: 8px 12px !important;
+          }
+          .stat-value {
+            font-size: 18px !important;
+          }
+          .display-qr-card {
+            padding: 14px 12px !important;
+            border-radius: 20px !important;
+          }
+          .qr-image {
+            width: clamp(120px, 16vh, 160px) !important;
+            height: clamp(120px, 16vh, 160px) !important;
           }
         }
 
-        @media (min-width: 1441px) {
+        /* 2B. iPad Portrait (Width: 641px–950px, Height: > 520px) ── */
+        @media (min-width: 641px) and (max-width: 950px) and (min-height: 521px) {
           .aarti-display-root {
-            padding: 16px 28px !important;
+            padding: 12px 16px !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
           }
           .aarti-main-grid {
-            grid-template-columns: minmax(0, 3fr) minmax(320px, 1fr) !important;
-            gap: 20px !important;
+            grid-template-columns: minmax(0, 1.8fr) minmax(220px, 1fr) !important;
+            gap: 12px !important;
           }
           .display-hero-card {
-            padding: 24px 32px !important;
+            padding: 16px !important;
+            border-radius: 20px !important;
+          }
+          .day-main-heading {
+            font-size: 28px !important;
+          }
+          .winner-avatar {
+            width: 50px !important;
+            height: 50px !important;
+          }
+          .winner-name {
+            font-size: 30px !important;
+          }
+          .contribution-amount {
+            font-size: 52px !important;
+          }
+          .bidding-amount {
+            font-size: 64px !important;
+          }
+          .aarti-bottom-stats {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+          .qr-image {
+            width: 140px !important;
+            height: 140px !important;
+          }
+        }
+
+        /* ── 3. DESKTOP BROWSER (THIRD PRIORITY) ─────────────────────────────── */
+
+        /* 3A. Standard Desktop & Laptops (Width: 1280px–1599px, Height >= 600px) ── */
+        @media (min-width: 1280px) and (max-width: 1599px) and (min-height: 600px) {
+          .aarti-display-root {
+            padding: 14px 20px !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            overflow: hidden !important;
+          }
+          .aarti-main-grid {
+            grid-template-columns: minmax(0, 2.75fr) minmax(280px, 1fr) !important;
+            gap: 16px !important;
+          }
+          .display-hero-card {
+            padding: 20px 24px !important;
+            border-radius: 24px !important;
+          }
+          .day-main-heading {
+            font-size: clamp(32px, 3.8vw, 48px) !important;
+          }
+          .winner-avatar {
+            width: 68px !important;
+            height: 68px !important;
+            font-size: 26px !important;
+          }
+          .winner-name {
+            font-size: clamp(36px, 4.2vw, 56px) !important;
+          }
+          .contribution-amount {
+            font-size: clamp(68px, 7.8vw, 110px) !important;
+          }
+          .bidding-amount {
+            font-size: clamp(86px, 10vw, 130px) !important;
           }
           .celebration-blessing-card {
-            max-width: 1200px !important;
+            max-width: min(96%, 1050px) !important;
+            padding: 18px 30px !important;
+          }
+          .aarti-bottom-stats {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 12px !important;
+          }
+          .stat-card {
+            padding: 10px 14px !important;
+          }
+          .stat-value {
+            font-size: 22px !important;
+          }
+          .qr-image {
+            width: clamp(150px, 20vh, 195px) !important;
+            height: clamp(150px, 20vh, 195px) !important;
+          }
+        }
+
+        /* 3B. Height-constrained Laptops / Displays (Height <= 720px on Wide Screens) ── */
+        @media (min-width: 951px) and (max-height: 720px) {
+          .day-main-heading {
+            font-size: clamp(22px, 2.8vw, 34px) !important;
+          }
+          .celebration-subhead {
+            margin: 2px 0 !important;
+            font-size: 14px !important;
+          }
+          .winner-avatar {
+            width: 44px !important;
+            height: 44px !important;
+            font-size: 17px !important;
+          }
+          .winner-name {
+            font-size: clamp(24px, 3vw, 38px) !important;
+          }
+          .contribution-amount {
+            font-size: clamp(46px, 5.8vw, 72px) !important;
+          }
+          .bidding-amount {
+            font-size: clamp(56px, 6.8vw, 86px) !important;
+          }
+          .celebration-blessing-card {
+            padding: 10px 16px !important;
+          }
+          .celebration-blessing-text {
+            font-size: 12.5px !important;
+            line-height: 1.35 !important;
+            margin-bottom: 4px !important;
+          }
+          .stat-card {
+            padding: 6px 10px !important;
+          }
+          .stat-value {
+            font-size: 18px !important;
+          }
+          .qr-squircle {
+            padding: 8px !important;
+          }
+          .qr-image {
+            width: clamp(110px, 17vh, 150px) !important;
+            height: clamp(110px, 17vh, 150px) !important;
+          }
+        }
+
+        /* ── 4. TV SCREEN / 4K / JUMBOTRON STAGE (FOURTH PRIORITY) ───────────── */
+        /* 1080p Full HD, 4K, 70-inch Temple TV Screens (Width >= 1600px, Height >= 800px) */
+        @media (min-width: 1600px) and (min-height: 800px) {
+          .aarti-display-root {
+            padding: 20px 32px !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            overflow: hidden !important;
+          }
+          .aarti-header-diya {
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 14px !important;
+          }
+          .aarti-header-sub {
+            font-size: 13px !important;
+            letter-spacing: 0.16em !important;
+          }
+          .aarti-header-title {
+            font-size: 24px !important;
+          }
+          .aarti-header-btn {
+            padding: 8px 18px !important;
+            font-size: 14px !important;
+          }
+          .aarti-main-grid {
+            grid-template-columns: minmax(0, 3fr) minmax(360px, 1fr) !important;
+            gap: 24px !important;
+            margin-top: 14px !important;
+          }
+          .display-hero-card {
+            padding: 26px 36px !important;
+            border-radius: 28px !important;
+          }
+          .day-switcher-btn {
+            padding: 6px 14px !important;
+            font-size: 13px !important;
+          }
+          .day-badge-pill {
+            font-size: 16px !important;
+            padding: 6px 18px !important;
+          }
+          .day-date-text {
+            font-size: 22px !important;
+          }
+          .day-maha-pill {
+            font-size: 14px !important;
+            padding: 5px 12px !important;
+          }
+          .day-status-pill {
+            font-size: 15px !important;
+            padding: 8px 22px !important;
+          }
+          .day-main-heading {
+            font-size: clamp(44px, 4.4vw, 64px) !important;
+          }
+          .celebration-ribbon {
+            padding: 12px 36px !important;
+            font-size: 16px !important;
+          }
+          .celebration-subhead {
+            font-size: 26px !important;
+            margin: 10px 0 !important;
+          }
+          .winner-avatar {
+            width: 90px !important;
+            height: 90px !important;
+            font-size: 38px !important;
+          }
+          .winner-name {
+            font-size: clamp(52px, 5vw, 84px) !important;
+          }
+          .contribution-label {
+            font-size: 16px !important;
+            letter-spacing: 0.18em !important;
+          }
+          .contribution-amount {
+            font-size: clamp(96px, 10vw, 150px) !important;
+          }
+          .bidding-amount {
+            font-size: clamp(120px, 13vw, 190px) !important;
+          }
+          .celebration-blessing-card {
+            max-width: 1250px !important;
             padding: 24px 44px !important;
+            border-radius: 24px !important;
+          }
+          .celebration-blessing-text {
+            font-size: 21px !important;
+            line-height: 1.55 !important;
+          }
+          .celebration-blessing-footer {
+            font-size: 15px !important;
+          }
+          .aarti-bottom-stats {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 16px !important;
+          }
+          .stat-card {
+            padding: 16px 20px !important;
+            border-radius: 18px !important;
+          }
+          .stat-label {
+            font-size: 13px !important;
+          }
+          .stat-value {
+            font-size: 30px !important;
+          }
+          .display-qr-card {
+            padding: 26px 22px !important;
+            border-radius: 28px !important;
+          }
+          .qr-badge {
+            padding: 6px 16px !important;
+            font-size: 13px !important;
+          }
+          .qr-heading {
+            font-size: 26px !important;
+          }
+          .qr-subtext {
+            font-size: 14px !important;
+          }
+          .qr-squircle {
+            padding: 16px !important;
+            border-radius: 22px !important;
+          }
+          .qr-image {
+            width: clamp(180px, 24vh, 250px) !important;
+            height: clamp(180px, 24vh, 250px) !important;
+          }
+          .qr-url-badge {
+            font-size: 12px !important;
+            padding: 8px 14px !important;
+          }
+          .qr-trust-badge {
+            font-size: 12px !important;
           }
         }
       `}</style>
@@ -416,6 +953,7 @@ export default function AartiDisplayLivePage() {
         {/* Mandir Branding */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div
+            className="aarti-header-diya"
             style={{
               width: '42px',
               height: '42px',
@@ -435,10 +973,10 @@ export default function AartiDisplayLivePage() {
             {Icons.diya}
           </div>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '0.14em', color: isDark ? '#FF9F0A' : '#D97706', textTransform: 'uppercase' }}>
+            <div className="aarti-header-sub" style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '0.14em', color: isDark ? '#FF9F0A' : '#D97706', textTransform: 'uppercase' }}>
               Hindu Community Center of Knoxville
             </div>
-            <div style={{ fontSize: '19px', fontWeight: '800', letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '1px' }}>
+            <div className="aarti-header-title" style={{ fontSize: '19px', fontWeight: '800', letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '1px' }}>
               Navratri 2026 · Daily Maha Aarti Stage
             </div>
           </div>
@@ -446,8 +984,9 @@ export default function AartiDisplayLivePage() {
 
         {/* Live Running Timer, Dark/Light Mode Switch & Fullscreen Toggle */}
         <div className="aarti-stage-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Running Seconds Countdown Beacon (No 'Live Auto-Sync' text) */}
+          {/* Running Seconds Countdown Beacon */}
           <div
+            className="aarti-header-btn aarti-header-timer"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -482,6 +1021,7 @@ export default function AartiDisplayLivePage() {
           {/* Dark / Light Mode Toggle Button */}
           <button
             id="theme-toggle-btn"
+            className="aarti-header-btn"
             onClick={toggleTheme}
             type="button"
             style={{
@@ -506,6 +1046,7 @@ export default function AartiDisplayLivePage() {
 
           {/* Fullscreen Button */}
           <button
+            className="aarti-header-btn"
             onClick={toggleFullscreen}
             type="button"
             style={{
@@ -530,7 +1071,7 @@ export default function AartiDisplayLivePage() {
         </div>
       </header>
 
-      {/* ── 70-INCH JUMBOTRON STAGE: EXACT 75% HERO / 25% QR CODE SPLIT ────────── */}
+      {/* ── JUMBOTRON STAGE: HERO 75% / QR CODE 25% SPLIT ──────────────────────── */}
       <main
         className="aarti-main-grid"
         style={{
@@ -543,7 +1084,7 @@ export default function AartiDisplayLivePage() {
           margin: '8px 0 0',
         }}
       >
-        {/* ── 75% COLUMN: CENTERED STADIUM TODAY'S AARTI (HERO JUMBOTRON) ─────── */}
+        {/* ── HERO STAGE (LEFT COLUMN) ────────────────────────────────────────── */}
         {activeDay ? (
           <div
             className="display-hero-card"
@@ -574,6 +1115,7 @@ export default function AartiDisplayLivePage() {
             <div>
               {/* D1–D10 Compact Day Switcher Pill Bar */}
               <div
+                className="day-switcher-bar"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -588,6 +1130,7 @@ export default function AartiDisplayLivePage() {
                   return (
                     <button
                       key={d.day_number}
+                      className="day-switcher-btn"
                       onClick={() => setSelectedDayNum(d.day_number)}
                       type="button"
                       style={{
@@ -614,10 +1157,11 @@ export default function AartiDisplayLivePage() {
                 })}
               </div>
 
-              {/* Day Badge, Date & Bidding Open (Orange Breathing Effect) */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px', flexWrap: 'wrap', gap: '8px' }}>
+              {/* Day Badge, Date & Status Pill */}
+              <div className="day-meta-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px', flexWrap: 'wrap', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span
+                    className="day-badge-pill"
                     style={{
                       background: '#FF9F0A',
                       color: '#000000',
@@ -632,12 +1176,13 @@ export default function AartiDisplayLivePage() {
                     Day {activeDay.day_number}
                   </span>
 
-                  <span style={{ fontSize: '18px', fontWeight: '800', color: isDark ? '#FFFFFF' : '#1D1D1F', fontVariantNumeric: 'tabular-nums' }}>
+                  <span className="day-date-text" style={{ fontSize: '18px', fontWeight: '800', color: isDark ? '#FFFFFF' : '#1D1D1F', fontVariantNumeric: 'tabular-nums' }}>
                     {activeDay.formatted_date}
                   </span>
 
                   {activeDay.is_maha_aarti && (
                     <span
+                      className="day-maha-pill"
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -658,8 +1203,9 @@ export default function AartiDisplayLivePage() {
                   )}
                 </div>
 
-                {/* Status Pill (Orange with Glowing Breathing Effect when Open, Gold when Concluded) */}
+                {/* Status Pill */}
                 <div
+                  className="day-status-pill"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -699,8 +1245,9 @@ export default function AartiDisplayLivePage() {
                 </div>
               </div>
 
-              {/* Festival Day Title (HUGE, COMMANDING ACROSS 75%) */}
+              {/* Festival Day Title */}
               <h2
+                className="day-main-heading"
                 style={{
                   fontSize: 'clamp(32px, 4.2vw, 52px)',
                   fontWeight: '900',
@@ -733,6 +1280,7 @@ export default function AartiDisplayLivePage() {
               >
                 {/* Celebratory Dhanyavad Ribbon */}
                 <div
+                  className="celebration-ribbon"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -756,6 +1304,7 @@ export default function AartiDisplayLivePage() {
 
                 {/* Subtitle */}
                 <div
+                  className="celebration-subhead"
                   style={{
                     fontSize: 'clamp(16px, 1.9vw, 26px)',
                     fontWeight: '800',
@@ -769,6 +1318,7 @@ export default function AartiDisplayLivePage() {
 
                 {/* Winning Devotee Sponsor Name & Radiant Avatar */}
                 <div
+                  className="winner-row"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -779,6 +1329,7 @@ export default function AartiDisplayLivePage() {
                   }}
                 >
                   <div
+                    className="winner-avatar"
                     style={{
                       width: 'clamp(58px, 6vw, 92px)',
                       height: 'clamp(58px, 6vw, 92px)',
@@ -801,6 +1352,7 @@ export default function AartiDisplayLivePage() {
                   </div>
 
                   <div
+                    className="winner-name"
                     style={{
                       fontSize: 'clamp(36px, 5vw, 76px)',
                       fontWeight: '900',
@@ -816,6 +1368,7 @@ export default function AartiDisplayLivePage() {
 
                 {/* Winning Contribution Amount */}
                 <div
+                  className="contribution-wrapper"
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -825,6 +1378,7 @@ export default function AartiDisplayLivePage() {
                   }}
                 >
                   <div
+                    className="contribution-label"
                     style={{
                       fontSize: 'clamp(11.5px, 1.1vw, 15px)',
                       fontWeight: '800',
@@ -836,7 +1390,7 @@ export default function AartiDisplayLivePage() {
                     Confirmed Maha Aarti Contribution
                   </div>
                   <div
-                    className={isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}
+                    className={`contribution-amount ${isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}`}
                     style={{
                       fontSize: 'clamp(64px, 8.5vw, 135px)',
                       fontWeight: '900',
@@ -867,6 +1421,7 @@ export default function AartiDisplayLivePage() {
                   }}
                 >
                   <p
+                    className="celebration-blessing-text"
                     style={{
                       fontSize: 'clamp(14px, 1.4vw, 21px)',
                       fontWeight: '700',
@@ -878,6 +1433,7 @@ export default function AartiDisplayLivePage() {
                     Dhanyavad, <strong style={{ color: isDark ? '#FFB340' : '#B45309' }}>{winnerDisplayName}</strong>, for sponsoring Day {activeDay.day_number}&apos;s sacred Maha Aarti! May Maa Durga bless you and your family with divine grace, vibrant health, peace, and eternal prosperity.
                   </p>
                   <div
+                    className="celebration-blessing-footer"
                     style={{
                       fontSize: 'clamp(11px, 1vw, 14.5px)',
                       fontWeight: '900',
@@ -907,6 +1463,7 @@ export default function AartiDisplayLivePage() {
                 }}
               >
                 <div
+                  className="contribution-label"
                   style={{
                     fontSize: 'clamp(13px, 1.2vw, 16px)',
                     fontWeight: '800',
@@ -919,6 +1476,7 @@ export default function AartiDisplayLivePage() {
                   Bidding Concluded at {formattedCutoffTime} EST
                 </div>
                 <div
+                  className={`contribution-amount ${isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}`}
                   style={{
                     fontSize: 'clamp(54px, 7vw, 96px)',
                     fontWeight: '900',
@@ -931,6 +1489,7 @@ export default function AartiDisplayLivePage() {
                   ${Number(activeDay.base_bid || 500).toLocaleString()}
                 </div>
                 <div
+                  className="celebration-subhead"
                   style={{
                     fontSize: 'clamp(18px, 2.3vw, 28px)',
                     fontWeight: '800',
@@ -962,6 +1521,7 @@ export default function AartiDisplayLivePage() {
                 }}
               >
                 <div
+                  className="contribution-label"
                   style={{
                     fontSize: '15px',
                     fontWeight: '800',
@@ -976,7 +1536,7 @@ export default function AartiDisplayLivePage() {
 
                 {/* Massive Stadium Size Amount ($1,000 / $500) Centered */}
                 <div
-                  className={isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}
+                  className={`bidding-amount ${isDark ? 'jumbotron-text-glow-dark' : 'jumbotron-text-glow-light'}`}
                   style={{
                     fontSize: 'clamp(98px, 14vw, 175px)',
                     fontWeight: '900',
@@ -990,7 +1550,7 @@ export default function AartiDisplayLivePage() {
                   ${Number(activeDay.current_highest_bid || 500).toLocaleString()}
                 </div>
 
-                {/* Leading Devotee Sponsor Row (Centered & Massive) */}
+                {/* Leading Devotee Sponsor Row (Centered) */}
                 <div
                   style={{
                     display: 'flex',
@@ -1005,10 +1565,11 @@ export default function AartiDisplayLivePage() {
                 >
                   {activeDay.current_winner_name ? (
                     <>
-                      <div style={{ fontSize: '13px', color: isDark ? '#98989D' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      <div className="celebration-subhead" style={{ fontSize: '13px', color: isDark ? '#98989D' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                         Leading Devotee Sponsor
                       </div>
                       <div
+                        className="winner-row"
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -1017,6 +1578,7 @@ export default function AartiDisplayLivePage() {
                         }}
                       >
                         <div
+                          className="winner-avatar"
                           style={{
                             width: '54px',
                             height: '54px',
@@ -1035,6 +1597,7 @@ export default function AartiDisplayLivePage() {
                           {getInitials(winnerDisplayName)}
                         </div>
                         <div
+                          className="winner-name"
                           style={{
                             fontSize: 'clamp(32px, 4.4vw, 56px)',
                             fontWeight: '900',
@@ -1072,6 +1635,7 @@ export default function AartiDisplayLivePage() {
             >
               {/* Daily Bids Placed */}
               <div
+                className="stat-card"
                 style={{
                   background: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F5F5F7',
                   borderRadius: '14px',
@@ -1079,16 +1643,17 @@ export default function AartiDisplayLivePage() {
                   border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)',
                 }}
               >
-                <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                <div className="stat-label" style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   {isConcluded ? 'Total Bids Placed' : 'Bids Placed Tonight'}
                 </div>
-                <div style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div className="stat-value" style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#FFFFFF' : '#1D1D1F', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   {activeDay.bids_count} {activeDay.bids_count === 1 ? 'bid' : 'bids'}
                 </div>
               </div>
 
               {/* Next Minimum Bid OR Confirmed Seva */}
               <div
+                className="stat-card"
                 style={{
                   background: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F5F5F7',
                   borderRadius: '14px',
@@ -1096,16 +1661,17 @@ export default function AartiDisplayLivePage() {
                   border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)',
                 }}
               >
-                <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                <div className="stat-label" style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   {isConcluded ? 'Winning Contribution' : 'Next Minimum Bid'}
                 </div>
-                <div style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#34D399' : '#059669', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div className="stat-value" style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#34D399' : '#059669', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   ${isConcluded ? Number(activeDay.current_highest_bid || activeDay.base_bid || 500).toLocaleString() : nextMinBid.toLocaleString()}
                 </div>
               </div>
 
               {/* Daily Cutoff Countdown OR Concluded Status */}
               <div
+                className="stat-card"
                 style={{
                   background: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F5F5F7',
                   borderRadius: '14px',
@@ -1113,11 +1679,11 @@ export default function AartiDisplayLivePage() {
                   border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)',
                 }}
               >
-                <div style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div className="stat-label" style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <span style={{ color: isDark ? '#FF9F0A' : '#D97706' }}>{Icons.clock}</span>
                   <span>{isConcluded ? `Concluded (${formattedCutoffTime} EST)` : `${formattedCutoffTime} Cutoff`}</span>
                 </div>
-                <div style={{ fontSize: '22px', fontWeight: '900', color: isConcluded ? (isDark ? '#34D399' : '#059669') : (isDark ? '#FF9F0A' : '#D97706'), marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
+                <div className="stat-value" style={{ fontSize: '22px', fontWeight: '900', color: isConcluded ? (isDark ? '#34D399' : '#059669') : (isDark ? '#FF9F0A' : '#D97706'), marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
                   {isConcluded ? 'Maha Aarti Confirmed' : (timeLeft || `${formattedCutoffTime} EST`)}
                 </div>
               </div>
@@ -1152,6 +1718,7 @@ export default function AartiDisplayLivePage() {
           {/* Header Tag and Title */}
           <div>
             <div
+              className="qr-badge"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1172,6 +1739,7 @@ export default function AartiDisplayLivePage() {
             </div>
 
             <h3
+              className="qr-heading"
               style={{
                 fontSize: 'clamp(18px, 2vw, 24px)',
                 fontWeight: '900',
@@ -1185,6 +1753,7 @@ export default function AartiDisplayLivePage() {
             </h3>
 
             <p
+              className="qr-subtext"
               style={{
                 fontSize: '12px',
                 color: isDark ? '#A1A1A6' : '#6E6E73',
@@ -1198,6 +1767,7 @@ export default function AartiDisplayLivePage() {
 
           {/* High-Contrast Pure White Squircle for QR Code */}
           <div
+            className="qr-squircle"
             style={{
               background: '#FFFFFF',
               padding: '12px',
@@ -1217,6 +1787,7 @@ export default function AartiDisplayLivePage() {
               <img
                 src={qrDataUrl}
                 alt="Scan to Bid on Maha Aarti"
+                className="qr-image"
                 style={{
                   display: 'block',
                   borderRadius: '6px',
@@ -1235,6 +1806,7 @@ export default function AartiDisplayLivePage() {
           {/* Direct URL and Trust Badge */}
           <div style={{ width: '100%' }}>
             <div
+              className="qr-url-badge"
               style={{
                 background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
                 border: isDark ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(0, 0, 0, 0.1)',
@@ -1254,7 +1826,7 @@ export default function AartiDisplayLivePage() {
               dashboard.knoxvillemandir.org/navratri-aarti
             </div>
 
-            <div style={{ fontSize: '10px', color: isDark ? '#8E8E93' : '#6E6E73', marginTop: '5px', fontWeight: '600' }}>
+            <div className="qr-trust-badge" style={{ fontSize: '10px', color: isDark ? '#8E8E93' : '#6E6E73', marginTop: '5px', fontWeight: '600' }}>
               {isConcluded ? 'Scan to sponsor upcoming days' : 'Instant OTP verification'}
             </div>
           </div>
