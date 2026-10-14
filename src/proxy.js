@@ -74,8 +74,22 @@ function getPageSlug(pathname) {
 
 function hasAccess(allowedPages, slug) {
   if (!allowedPages) return false;
-  const pages = Array.isArray(allowedPages) ? allowedPages : JSON.parse(allowedPages);
-  return pages.includes('*') || pages.includes(slug) || ((slug === 'navratri_vendors' || slug === 'navratri_aarti') && pages.includes('navratri'));
+  let pages = [];
+  try {
+    pages = Array.isArray(allowedPages) ? allowedPages : JSON.parse(allowedPages);
+  } catch {
+    pages = [];
+  }
+  const isStripe = slug === 'stripe' || slug === 'bank-statement';
+  return (
+    pages.includes('*') ||
+    pages.includes(slug) ||
+    pages.includes(`${slug}:edit`) ||
+    pages.includes(`${slug}:view`) ||
+    (isStripe && (pages.includes('stripe') || pages.includes('bank-statement') || pages.includes('stripe:edit') || pages.includes('bank-statement:edit') || pages.includes('stripe:view') || pages.includes('bank-statement:view'))) ||
+    ((slug === 'navratri_vendors' || slug === 'navratri_aarti') &&
+      (pages.includes('navratri') || pages.includes('navratri:edit') || pages.includes('navratri:view')))
+  );
 }
 
 // ── Next.js 16: exported function MUST be named 'proxy' ──────────────────────

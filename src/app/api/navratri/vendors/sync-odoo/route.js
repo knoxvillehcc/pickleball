@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import { getAllVendorRegistrations, getVendorSettings, setVendorSetting } from '@/lib/navratriVendorDb';
 import { postEventGeneralEntry, checkOdooGeneralEntry } from '@/lib/odooGeneralEntry';
 
@@ -10,7 +10,7 @@ const SETTING_KEY = 'odoo_general_entry_vendors';
 
 // ── GET: Check current Odoo General Entry sync status ─────────────────────────
 export async function GET() {
-  const auth = await getSessionAndPermissions('navratri');
+  const auth = await getSessionAndPermissions(['navratri', 'navratri_vendors']);
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
@@ -53,7 +53,7 @@ export async function GET() {
 
 // ── POST: Post End-of-Event General Entry to Odoo ─────────────────────────────
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('navratri');
+  const auth = await requireEditPermission(['navratri', 'navratri_vendors']);
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

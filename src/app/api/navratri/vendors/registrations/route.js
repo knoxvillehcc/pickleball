@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import {
   getAllVendorRegistrations,
   updateVendorRegistration,
@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 // ── GET: List all Navratri vendor registrations with dates ─────────────────────
 export async function GET(request) {
-  const auth = await getSessionAndPermissions('navratri');
+  const auth = await getSessionAndPermissions(['navratri', 'navratri_vendors']);
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
@@ -33,6 +33,8 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
+      canEdit: auth.canEdit,
+      isViewOnly: auth.isViewOnly,
       registrations,
       bookedCounts,
       settings,
@@ -45,7 +47,7 @@ export async function GET(request) {
 
 // ── PUT: Update vendor registration details or spot numbers ───────────────────
 export async function PUT(request) {
-  const auth = await getSessionAndPermissions('navratri');
+  const auth = await requireEditPermission(['navratri', 'navratri_vendors']);
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
@@ -99,7 +101,7 @@ export async function PUT(request) {
 
 // ── DELETE: Delete registration by ID ─────────────────────────────────────────
 export async function DELETE(request) {
-  const auth = await getSessionAndPermissions('navratri');
+  const auth = await requireEditPermission(['navratri', 'navratri_vendors']);
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

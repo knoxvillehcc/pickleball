@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import { getVendorSettings, setVendorSetting } from '@/lib/navratriVendorDb';
 
 export const dynamic = 'force-dynamic';
@@ -39,7 +39,7 @@ export async function GET(request) {
 
 // ── POST: Update setting (admin only) ──────────────────────────────────────────
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('navratri');
+  const auth = await requireEditPermission(['navratri', 'navratri_vendors']);
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

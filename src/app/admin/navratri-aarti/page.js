@@ -6,6 +6,7 @@ import AartiLiveTicker from '@/components/AartiLiveTicker';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import { useAuth } from '@/components/ClientLayout';
 
 // Clean SVG Icons (Lucide Style)
 const Icons = {
@@ -138,7 +139,10 @@ const Icons = {
 };
 
 export default function NavratriAartiAdminPage() {
+  const { canEdit: authCanEdit, isViewOnly: authIsViewOnly } = useAuth();
   const [data, setData] = useState(null);
+  const isViewOnly = data?.isViewOnly ?? (authIsViewOnly ? authIsViewOnly('navratri_aarti') : false);
+  const canEdit = data?.canEdit ?? (authCanEdit ? authCanEdit('navratri_aarti') : !isViewOnly);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [urlCopied, setUrlCopied] = useState(false);
@@ -989,6 +993,7 @@ export default function NavratriAartiAdminPage() {
               <span>{showBidderNames ? 'Public Names: Shown' : 'Public Names: Hidden'}</span>
             </button>
 
+            {canEdit && (
             <button
               onClick={() => setShowSettingsModal(true)}
               style={{
@@ -1008,8 +1013,31 @@ export default function NavratriAartiAdminPage() {
             >
               {Icons.settings} Increments & Config
             </button>
+            )}
           </div>
         </div>
+
+        {/* View Only Mode Banner */}
+        {isViewOnly && (
+          <div style={{
+            marginBottom: '16px',
+            padding: '12px 18px',
+            borderRadius: '12px',
+            background: 'rgba(245, 158, 11, 0.1)',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            color: '#D97706',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '13px',
+            fontWeight: '600',
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>
+              <strong>View-Only Access Mode:</strong> You can inspect daily bids, search winners, view bid histories, and export official PDF & CSV reports. Modifying bids, updating settings, changing payment status, and locking days are disabled.
+            </div>
+          </div>
+        )}
 
         {/* Live Scrolling Ticker Bar */}
         <div style={{ marginBottom: '18px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border, rgba(0,0,0,0.08))' }}>
@@ -1267,6 +1295,7 @@ export default function NavratriAartiAdminPage() {
                         <td style={{ padding: '12px 16px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                             {/* Edit Day & Sponsor Lock Action Button */}
+                            {canEdit && (
                             <button
                               onClick={() => openEditDayModal(day)}
                               title="Edit Day Date, Title, Starting Bid & Sponsor Lock"
@@ -1287,8 +1316,9 @@ export default function NavratriAartiAdminPage() {
                               {day.is_locked ? Icons.lock : Icons.edit}
                               <span>{day.is_locked ? 'Locked' : 'Edit & Lock'}</span>
                             </button>
+                            )}
 
-                            {hasWinnerOrLock && (
+                            {canEdit && hasWinnerOrLock && (
                               <>
                                 <button
                                   onClick={() => openPaymentModal(day)}
@@ -1330,6 +1360,7 @@ export default function NavratriAartiAdminPage() {
                               </>
                             )}
 
+                            {canEdit && (
                             <button
                               onClick={() => openCutoffModal(day)}
                               title="Extend Cutoff or Status"
@@ -1344,6 +1375,7 @@ export default function NavratriAartiAdminPage() {
                             >
                               {Icons.clock}
                             </button>
+                            )}
 
                             <button
                               onClick={() => setHistoryDay(day)}

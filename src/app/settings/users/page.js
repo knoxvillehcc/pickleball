@@ -81,17 +81,78 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
     : (typeof targetUser.allowed_pages === 'string' ? JSON.parse(targetUser.allowed_pages) : []);
 
   const isAll = currentPages.includes('*');
-  const [allAccess, setAllAccess]     = useState(isAll);
-  const [selected,  setSelected]      = useState(isAll ? HCC_PAGES.map(p => p.key) : currentPages);
-  const [saving,    setSaving]        = useState(false);
+  const [allAccess, setAllAccess] = useState(isAll);
 
-  const toggle = (key) => {
-    setSelected(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+  // Map of pageKey -> 'edit' | 'view'
+  const [pageModes, setPageModes] = useState(() => {
+    const modes = {};
+    if (isAll) {
+      HCC_PAGES.forEach(p => { modes[p.key] = 'edit'; });
+    } else {
+      HCC_PAGES.forEach(p => {
+        if (currentPages.includes(`${p.key}:view`)) {
+          modes[p.key] = 'view';
+        } else if (currentPages.includes(`${p.key}:edit`) || currentPages.includes(p.key)) {
+          modes[p.key] = 'edit';
+        }
+      });
+    }
+    return modes;
+  });
+
+  // Non-page permissions (e.g. pnl permissions, reports-view-only)
+  const [extraPerms, setExtraPerms] = useState(() => {
+    if (isAll) return [];
+    return currentPages.filter(k => !HCC_PAGES.some(p => k === p.key || k === `${p.key}:edit` || k === `${p.key}:view`));
+  });
+
+  const [saving, setSaving] = useState(false);
+
+  const togglePage = (key) => {
+    setPageModes(prev => {
+      const next = { ...prev };
+      if (next[key]) {
+        delete next[key];
+      } else {
+        next[key] = 'edit'; // Default to Edit when newly checked
+      }
+      return next;
+    });
+  };
+
+  const setPageMode = (key, mode) => {
+    setPageModes(prev => ({ ...prev, [key]: mode }));
+  };
+
+  const setAllPagesTo = (mode) => {
+    const next = {};
+    HCC_PAGES.forEach(p => { next[p.key] = mode; });
+    setPageModes(next);
+  };
+
+  const clearAllPages = () => setPageModes({});
+
+  const toggleExtra = (key) => {
+    setExtraPerms(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
   };
 
   const handleSave = async () => {
     setSaving(true);
-    const pages = allAccess ? ['*'] : selected;
+    let pages = [];
+    if (allAccess) {
+      pages = ['*'];
+    } else {
+      HCC_PAGES.forEach(p => {
+        const mode = pageModes[p.key];
+        if (mode === 'view') {
+          pages.push(`${p.key}:view`);
+        } else if (mode === 'edit') {
+          pages.push(`${p.key}:edit`);
+        }
+      });
+      pages.push(...extraPerms);
+    }
+
     const res = await fetch(`/api/auth/users/${targetUser.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -115,148 +176,237 @@ function ManageAccessModal({ targetUser, onClose, onSave, onToast }) {
     }}>
       <div style={{
         background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`,
-        borderRadius: '14px', width: '100%', maxWidth: '540px',
+        borderRadius: '14px', width: '100%', maxWidth: '580px',
         boxShadow: '0 24px 80px var(--shadow-color)', maxHeight: 'calc(100dvh - 32px)', display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         {/* Header */}
         <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: C.text }}>Manage Access</h2>
-            <p style={{ margin: '4px 0 0', fontSize: '13px', color: C.muted }}>{targetUser.email}</p>
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: C.text }}>Manage Page Access</h2>
+            <p style={{ margin: '4px 0 0', fontSize: '13px', color: C.muted }}>Configure per-page Edit vs View-Only access for <strong>{targetUser.email}</strong></p>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: '20px', padding: '0 4px' }}>✕</button>
         </div>
 
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain' }}>
-        {/* All Access Toggle */}
-        <div style={{ padding: '20px 28px 0' }}>
-          <label style={{
-            display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer',
-            background: allAccess ? 'rgba(244,164,11,0.08)' : 'var(--bg-input)',
-            border: `1px solid ${allAccess ? 'rgba(244,164,11,0.25)' : 'var(--border)'}`,
-            borderRadius: '12px', padding: '14px 16px',
-          }}>
-            <input
-              type="checkbox"
-              checked={allAccess}
-              onChange={e => { setAllAccess(e.target.checked); if (e.target.checked) setSelected(HCC_PAGES.map(p => p.key)); }}
-              style={{ width: '18px', height: '18px', accentColor: C.gold, cursor: 'pointer' }}
-            />
-            <div>
-              <div style={{ fontWeight: '700', fontSize: '14px', color: allAccess ? C.gold : C.text }}>
-                Full Access (Super Admin equivalent)
-              </div>
-              <div style={{ fontSize: '12px', color: C.muted, marginTop: '2px' }}>
-                Grant access to all current and future pages
-              </div>
-            </div>
-          </label>
-        </div>
-
-        {/* Individual Pages */}
-        <div style={{ padding: '16px 28px', display: 'flex', flexDirection: 'column', gap: '8px', opacity: allAccess ? 0.5 : 1 }}>
-          <div style={{ fontSize: '11px', fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>
-            Individual Pages
-          </div>
-          {HCC_PAGES.map(page => {
-            const on = selected.includes(page.key);
-            return (
-              <label key={page.key} style={{
-                display: 'flex', alignItems: 'center', gap: '12px', cursor: allAccess ? 'default' : 'pointer',
-                background: on ? 'rgba(129,140,248,0.08)' : 'var(--bg-input)',
-                border: `1px solid ${on ? 'rgba(129,140,248,0.25)' : 'var(--border)'}`,
-                borderRadius: '10px', padding: '12px 14px', transition: 'all 0.15s',
-              }}>
-                <input
-                  type="checkbox"
-                  checked={on}
-                  disabled={allAccess}
-                  onChange={() => toggle(page.key)}
-                  style={{ width: '16px', height: '16px', accentColor: C.indigo, cursor: allAccess ? 'default' : 'pointer' }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: '600', color: on ? C.text : C.muted }}>{page.label}</div>
-                  <div style={{ fontSize: '12px', color: C.muted }}>{page.desc}</div>
+          {/* All Access Toggle */}
+          <div style={{ padding: '20px 28px 0' }}>
+            <label style={{
+              display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer',
+              background: allAccess ? 'rgba(244,164,11,0.08)' : 'var(--bg-input)',
+              border: `1px solid ${allAccess ? 'rgba(244,164,11,0.25)' : 'var(--border)'}`,
+              borderRadius: '12px', padding: '14px 16px',
+            }}>
+              <input
+                type="checkbox"
+                checked={allAccess}
+                onChange={e => {
+                  setAllAccess(e.target.checked);
+                  if (e.target.checked) {
+                    const full = {};
+                    HCC_PAGES.forEach(p => { full[p.key] = 'edit'; });
+                    setPageModes(full);
+                  }
+                }}
+                style={{ width: '18px', height: '18px', accentColor: C.gold, cursor: 'pointer' }}
+              />
+              <div>
+                <div style={{ fontWeight: '700', fontSize: '14px', color: allAccess ? C.gold : C.text }}>
+                  Full Access (Super Admin equivalent)
                 </div>
-                {on && <span style={{ fontSize: '11px', fontWeight: '700', color: C.indigo, background: 'rgba(129,140,248,0.15)', padding: '2px 8px', borderRadius: '14px' }}>✓ On</span>}
-              </label>
-            );
-          })}
-        </div>
-
-        {/* HCC P&L Permissions */}
-        <div style={{ padding: '0 28px 16px', opacity: allAccess ? 0.5 : 1 }}>
-          <div style={{
-            fontSize: '11px', fontWeight: '700', color: 'var(--accent)',
-            textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px',
-            display: 'flex', alignItems: 'center', gap: '8px',
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/><rect x="2" y="2" width="20" height="20" rx="2"/></svg>
-            HCC P&L Permissions
+                <div style={{ fontSize: '12px', color: C.muted, marginTop: '2px' }}>
+                  Grant full write & edit access to all current and future pages
+                </div>
+              </div>
+            </label>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {PNL_PERMISSIONS.map(perm => {
-              const on = selected.includes(perm.key);
-              const isSensitive = perm.key === 'pnl-costs' || perm.key === 'pnl-settings';
+
+          {/* Individual Pages */}
+          <div style={{ padding: '16px 28px', display: 'flex', flexDirection: 'column', gap: '8px', opacity: allAccess ? 0.5 : 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ fontSize: '11px', fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                Individual Page Access ({Object.keys(pageModes).length}/{HCC_PAGES.length} assigned)
+              </div>
+              {!allAccess && (
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setAllPagesTo('edit')}
+                    style={{
+                      fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '6px',
+                      background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.25)',
+                      color: 'var(--accent)', cursor: 'pointer',
+                    }}
+                  >
+                    All Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAllPagesTo('view')}
+                    style={{
+                      fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '6px',
+                      background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.25)',
+                      color: '#D97706', cursor: 'pointer',
+                    }}
+                  >
+                    All View Only
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearAllPages}
+                    style={{
+                      fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px',
+                      background: 'var(--bg-input)', border: '1px solid var(--border)',
+                      color: 'var(--text-muted)', cursor: 'pointer',
+                    }}
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {HCC_PAGES.map(page => {
+              const mode = pageModes[page.key]; // 'edit' | 'view' | undefined
+              const on = !!mode;
               return (
-                <label key={perm.key} style={{
+                <div key={page.key} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
+                  background: on ? (mode === 'view' ? 'rgba(245,158,11,0.06)' : 'rgba(129,140,248,0.06)') : 'var(--bg-input)',
+                  border: `1px solid ${on ? (mode === 'view' ? 'rgba(245,158,11,0.3)' : 'rgba(129,140,248,0.25)') : 'var(--border)'}`,
+                  borderRadius: '10px', padding: '10px 14px', transition: 'all 0.15s',
+                }}>
+                  <label style={{
+                    display: 'flex', alignItems: 'center', gap: '12px', flex: 1, cursor: allAccess ? 'default' : 'pointer', margin: 0,
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      disabled={allAccess}
+                      onChange={() => togglePage(page.key)}
+                      style={{ width: '16px', height: '16px', accentColor: C.indigo, cursor: allAccess ? 'default' : 'pointer' }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '13px', fontWeight: '600', color: on ? C.text : C.muted }}>{page.label}</div>
+                      <div style={{ fontSize: '11px', color: C.muted }}>{page.desc}</div>
+                    </div>
+                  </label>
+
+                  {on && !allAccess && (
+                    <div style={{
+                      display: 'inline-flex', background: 'var(--bg-card)', border: '1px solid var(--border)',
+                      borderRadius: '8px', padding: '2px', gap: '2px', flexShrink: 0,
+                    }}>
+                      <button
+                        type="button"
+                        onClick={() => setPageMode(page.key, 'view')}
+                        title="View Only: Can inspect records and download PDF/CSV reports. Cannot add, edit, delete, or change status."
+                        style={{
+                          padding: '4px 9px', borderRadius: '6px', border: 'none', fontSize: '11px',
+                          fontWeight: mode === 'view' ? '700' : '500', cursor: 'pointer',
+                          background: mode === 'view' ? '#F59E0B' : 'transparent',
+                          color: mode === 'view' ? '#000000' : 'var(--text-secondary)',
+                          display: 'flex', alignItems: 'center', gap: '4px', transition: 'all 0.15s',
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Only
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPageMode(page.key, 'edit')}
+                        title="Edit (Full): Can add, edit, delete, refund, and manage records."
+                        style={{
+                          padding: '4px 9px', borderRadius: '6px', border: 'none', fontSize: '11px',
+                          fontWeight: mode === 'edit' ? '700' : '500', cursor: 'pointer',
+                          background: mode === 'edit' ? 'var(--accent)' : 'transparent',
+                          color: mode === 'edit' ? '#FFFFFF' : 'var(--text-secondary)',
+                          display: 'flex', alignItems: 'center', gap: '4px', transition: 'all 0.15s',
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        Edit (Full)
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* HCC P&L Permissions */}
+          <div style={{ padding: '0 28px 16px', opacity: allAccess ? 0.5 : 1 }}>
+            <div style={{
+              fontSize: '11px', fontWeight: '700', color: 'var(--accent)',
+              textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px',
+              display: 'flex', alignItems: 'center', gap: '8px',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/><rect x="2" y="2" width="20" height="20" rx="2"/></svg>
+              HCC P&L Permissions
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {PNL_PERMISSIONS.map(perm => {
+                const on = extraPerms.includes(perm.key);
+                const isSensitive = perm.key === 'pnl-costs' || perm.key === 'pnl-settings';
+                return (
+                  <label key={perm.key} style={{
+                    display: 'flex', alignItems: 'center', gap: '12px', cursor: allAccess ? 'default' : 'pointer',
+                    background: on ? (isSensitive ? 'rgba(245,158,11,0.08)' : 'rgba(129,140,248,0.08)') : 'var(--bg-input)',
+                    border: `1px solid ${on ? (isSensitive ? 'rgba(245,158,11,0.3)' : 'rgba(129,140,248,0.25)') : 'var(--border)'}`,
+                    borderRadius: '10px', padding: '10px 14px', transition: 'all 0.15s',
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      disabled={allAccess}
+                      onChange={() => toggleExtra(perm.key)}
+                      style={{ width: '16px', height: '16px', accentColor: isSensitive ? '#F59E0B' : C.indigo, cursor: allAccess ? 'default' : 'pointer' }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '13px', fontWeight: '600', color: on ? C.text : C.muted, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {perm.label}
+                        {isSensitive && <span style={{ fontSize: '10px', background: 'rgba(245,158,11,0.15)', color: '#D97706', padding: '1px 6px', borderRadius: '9999px', fontWeight: 700 }}>SENSITIVE</span>}
+                      </div>
+                      <div style={{ fontSize: '11px', color: C.muted }}>{perm.desc}</div>
+                    </div>
+                    {on && <span style={{ fontSize: '11px', fontWeight: '700', color: isSensitive ? '#D97706' : C.indigo, background: isSensitive ? 'rgba(245,158,11,0.12)' : 'rgba(129,140,248,0.15)', padding: '2px 8px', borderRadius: '14px' }}>✓ On</span>}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Membership page restriction */}
+          <div style={{ padding: '0 28px 16px', opacity: allAccess ? 0.5 : 1 }}>
+            <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
+              Membership Page Restriction
+            </div>
+            {(() => {
+              const perm = MEMBERSHIP_RESTRICTION;
+              const on = extraPerms.includes(perm.key);
+              return (
+                <label style={{
                   display: 'flex', alignItems: 'center', gap: '12px', cursor: allAccess ? 'default' : 'pointer',
-                  background: on ? (isSensitive ? 'rgba(245,158,11,0.08)' : 'rgba(129,140,248,0.08)') : 'var(--bg-input)',
-                  border: `1px solid ${on ? (isSensitive ? 'rgba(245,158,11,0.3)' : 'rgba(129,140,248,0.25)') : 'var(--border)'}`,
+                  background: on ? 'rgba(245,158,11,0.08)' : 'var(--bg-input)',
+                  border: `1px solid ${on ? 'rgba(245,158,11,0.3)' : 'var(--border)'}`,
                   borderRadius: '10px', padding: '10px 14px', transition: 'all 0.15s',
                 }}>
                   <input
                     type="checkbox"
                     checked={on}
                     disabled={allAccess}
-                    onChange={() => toggle(perm.key)}
-                    style={{ width: '16px', height: '16px', accentColor: isSensitive ? '#F59E0B' : C.indigo, cursor: allAccess ? 'default' : 'pointer' }}
+                    onChange={() => toggleExtra(perm.key)}
+                    style={{ width: '16px', height: '16px', accentColor: '#F59E0B', cursor: allAccess ? 'default' : 'pointer' }}
                   />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: '600', color: on ? C.text : C.muted, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      {perm.label}
-                      {isSensitive && <span style={{ fontSize: '10px', background: 'rgba(245,158,11,0.15)', color: '#D97706', padding: '1px 6px', borderRadius: '9999px', fontWeight: 700 }}>SENSITIVE</span>}
-                    </div>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: on ? C.text : C.muted }}>{perm.label}</div>
                     <div style={{ fontSize: '11px', color: C.muted }}>{perm.desc}</div>
                   </div>
-                  {on && <span style={{ fontSize: '11px', fontWeight: '700', color: isSensitive ? '#D97706' : C.indigo, background: isSensitive ? 'rgba(245,158,11,0.12)' : 'rgba(129,140,248,0.15)', padding: '2px 8px', borderRadius: '14px' }}>✓ On</span>}
+                  {on && <span style={{ fontSize: '11px', fontWeight: '700', color: '#D97706', background: 'rgba(245,158,11,0.12)', padding: '2px 8px', borderRadius: '14px' }}>✓ On</span>}
                 </label>
               );
-            })}
+            })()}
           </div>
-        </div>
-
-        {/* Membership page restriction */}
-        <div style={{ padding: '0 28px 16px', opacity: allAccess ? 0.5 : 1 }}>
-          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
-            Membership Page Restriction
-          </div>
-          {(() => {
-            const perm = MEMBERSHIP_RESTRICTION;
-            const on = selected.includes(perm.key);
-            return (
-              <label style={{
-                display: 'flex', alignItems: 'center', gap: '12px', cursor: allAccess ? 'default' : 'pointer',
-                background: on ? 'rgba(245,158,11,0.08)' : 'var(--bg-input)',
-                border: `1px solid ${on ? 'rgba(245,158,11,0.3)' : 'var(--border)'}`,
-                borderRadius: '10px', padding: '10px 14px', transition: 'all 0.15s',
-              }}>
-                <input
-                  type="checkbox"
-                  checked={on}
-                  disabled={allAccess}
-                  onChange={() => toggle(perm.key)}
-                  style={{ width: '16px', height: '16px', accentColor: '#F59E0B', cursor: allAccess ? 'default' : 'pointer' }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '13px', fontWeight: '600', color: on ? C.text : C.muted }}>{perm.label}</div>
-                  <div style={{ fontSize: '11px', color: C.muted }}>{perm.desc}</div>
-                </div>
-                {on && <span style={{ fontSize: '11px', fontWeight: '700', color: '#D97706', background: 'rgba(245,158,11,0.12)', padding: '2px 8px', borderRadius: '14px' }}>✓ On</span>}
-              </label>
-            );
-          })()}
-        </div>
 
         </div>
         {/* Footer */}
@@ -395,23 +545,52 @@ function EditUserModal({ targetUser, onClose, onSave, onToast }) {
 
 // ── Add User Modal ────────────────────────────────────────────────────────────
 function AddUserModal({ onClose, onCreated, onToast }) {
-  const [form,   setForm]   = useState({ email: '', pin: '', name: '', role: 'staff', allowedPages: [] });
+  const [form, setForm] = useState({ email: '', pin: '', name: '', role: 'staff' });
   const [saving, setSaving] = useState(false);
   const [allAccess, setAllAccess] = useState(false);
+  const [pageModes, setPageModes] = useState({});
 
-  const togglePage = (key) => setForm(f => ({
-    ...f,
-    allowedPages: f.allowedPages.includes(key) ? f.allowedPages.filter(k => k !== key) : [...f.allowedPages, key],
-  }));
+  const togglePage = (key) => {
+    setPageModes(prev => {
+      const next = { ...prev };
+      if (next[key]) delete next[key];
+      else next[key] = 'edit';
+      return next;
+    });
+  };
+
+  const setPageMode = (key, mode) => {
+    setPageModes(prev => ({ ...prev, [key]: mode }));
+  };
+
+  const setAllPagesTo = (mode) => {
+    const next = {};
+    HCC_PAGES.forEach(p => { next[p.key] = mode; });
+    setPageModes(next);
+  };
+
+  const clearAllPages = () => setPageModes({});
 
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!/^\d{6}$/.test(form.pin)) { onToast('PIN must be 6 digits', 'error'); return; }
     setSaving(true);
+
+    let allowedPages = [];
+    if (allAccess) {
+      allowedPages = ['*'];
+    } else {
+      HCC_PAGES.forEach(p => {
+        const mode = pageModes[p.key];
+        if (mode === 'view') allowedPages.push(`${p.key}:view`);
+        else if (mode === 'edit') allowedPages.push(`${p.key}:edit`);
+      });
+    }
+
     const res = await fetch('/api/auth/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, allowedPages: allAccess ? ['*'] : form.allowedPages }),
+      body: JSON.stringify({ ...form, allowedPages }),
     });
     const data = await res.json();
     if (res.ok) { onToast('User created'); onCreated(data.user); onClose(); }
@@ -424,9 +603,12 @@ function AddUserModal({ onClose, onCreated, onToast }) {
       position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', padding: '16px',
     }}>
-      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '14px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div style={{ background: 'var(--bg-modal)', border: `1px solid var(--border-modal)`, borderRadius: '14px', width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto' }}>
         <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid var(--border)`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: C.text }}>Add User</h2>
+          <div>
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: C.text }}>Add New User</h2>
+            <p style={{ margin: '4px 0 0', fontSize: '13px', color: C.muted }}>Assign staff credentials and per-page permissions</p>
+          </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: '20px' }}>✕</button>
         </div>
 
@@ -448,8 +630,8 @@ function AddUserModal({ onClose, onCreated, onToast }) {
           <div>
             <label style={labelStyle}>Role</label>
             <select value={form.role} onChange={e => setForm(f => ({...f, role: e.target.value}))} style={{ ...inputStyle, cursor: 'pointer' }}>
-              <option value="staff">Staff</option>
-              <option value="super_admin">Super Admin</option>
+              <option value="staff">Staff (Custom Page Permissions)</option>
+              <option value="super_admin">Super Admin (Full Access to Everything)</option>
             </select>
           </div>
 
@@ -460,22 +642,109 @@ function AddUserModal({ onClose, onCreated, onToast }) {
               background: allAccess ? 'rgba(244,164,11,0.08)' : 'var(--bg-input)',
               border: `1px solid ${allAccess ? 'rgba(244,164,11,0.25)' : 'var(--border)'}`,
               borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
-              <input type="checkbox" checked={allAccess} onChange={e => { setAllAccess(e.target.checked); if(e.target.checked) setForm(f=>({...f,allowedPages:HCC_PAGES.map(p=>p.key)})); }}
+              <input type="checkbox" checked={allAccess} onChange={e => {
+                setAllAccess(e.target.checked);
+                if (e.target.checked) {
+                  const full = {};
+                  HCC_PAGES.forEach(p => { full[p.key] = 'edit'; });
+                  setPageModes(full);
+                }
+              }}
                 style={{ width:'16px',height:'16px',accentColor:C.gold,cursor:'pointer' }} />
-              <span style={{ fontSize: '13px', fontWeight: '700', color: allAccess ? C.gold : C.muted }}><Icon name="crown" />All pages (Full Access)</span>
+              <span style={{ fontSize: '13px', fontWeight: '700', color: allAccess ? C.gold : C.muted }}><Icon name="crown" /> All pages (Full Access)</span>
             </label>
+
+            {!allAccess && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginBottom: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setAllPagesTo('edit')}
+                  style={{
+                    fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '6px',
+                    background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.25)',
+                    color: 'var(--accent)', cursor: 'pointer',
+                  }}
+                >
+                  All Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAllPagesTo('view')}
+                  style={{
+                    fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '6px',
+                    background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.25)',
+                    color: '#D97706', cursor: 'pointer',
+                  }}
+                >
+                  All View Only
+                </button>
+                <button
+                  type="button"
+                  onClick={clearAllPages}
+                  style={{
+                    fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px',
+                    background: 'var(--bg-input)', border: '1px solid var(--border)',
+                    color: 'var(--text-muted)', cursor: 'pointer',
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', opacity: allAccess ? 0.5 : 1 }}>
               {HCC_PAGES.map(page => {
-                const on = form.allowedPages.includes(page.key);
+                const mode = pageModes[page.key];
+                const on = !!mode;
                 return (
-                  <label key={page.key} style={{ display:'flex',alignItems:'center',gap:'10px',cursor:allAccess?'default':'pointer',
-                    background: on?'rgba(129,140,248,0.08)':'var(--bg-input)',
-                    border:`1px solid ${on?'rgba(129,140,248,0.2)':'var(--border)'}`,
-                    borderRadius:'8px',padding:'9px 12px' }}>
-                    <input type="checkbox" checked={on} disabled={allAccess} onChange={() => togglePage(page.key)}
-                      style={{ width:'15px',height:'15px',accentColor:C.indigo,cursor:allAccess?'default':'pointer' }} />
-                    <span style={{ fontSize:'13px',fontWeight:'600',color:on?C.text:C.muted }}>{page.label}</span>
-                  </label>
+                  <div key={page.key} style={{
+                    display:'flex',alignItems:'center',justifyContent:'space-between',gap:'10px',
+                    background: on ? (mode === 'view' ? 'rgba(245,158,11,0.06)' : 'rgba(129,140,248,0.08)') : 'var(--bg-input)',
+                    border:`1px solid ${on ? (mode === 'view' ? 'rgba(245,158,11,0.3)' : 'rgba(129,140,248,0.2)') : 'var(--border)'}`,
+                    borderRadius:'8px',padding:'8px 12px'
+                  }}>
+                    <label style={{ display:'flex',alignItems:'center',gap:'10px',flex:1,cursor:allAccess?'default':'pointer',margin:0 }}>
+                      <input type="checkbox" checked={on} disabled={allAccess} onChange={() => togglePage(page.key)}
+                        style={{ width:'15px',height:'15px',accentColor:C.indigo,cursor:allAccess?'default':'pointer' }} />
+                      <span style={{ fontSize:'13px',fontWeight:'600',color:on?C.text:C.muted }}>{page.label}</span>
+                    </label>
+
+                    {on && !allAccess && (
+                      <div style={{
+                        display: 'inline-flex', background: 'var(--bg-card)', border: '1px solid var(--border)',
+                        borderRadius: '6px', padding: '1px', gap: '2px', flexShrink: 0,
+                      }}>
+                        <button
+                          type="button"
+                          onClick={() => setPageMode(page.key, 'view')}
+                          style={{
+                            padding: '3px 8px', borderRadius: '5px', border: 'none', fontSize: '10px',
+                            fontWeight: mode === 'view' ? '700' : '500', cursor: 'pointer',
+                            background: mode === 'view' ? '#F59E0B' : 'transparent',
+                            color: mode === 'view' ? '#000000' : 'var(--text-secondary)',
+                            display: 'flex', alignItems: 'center', gap: '3px',
+                          }}
+                        >
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                          View
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPageMode(page.key, 'edit')}
+                          style={{
+                            padding: '3px 8px', borderRadius: '5px', border: 'none', fontSize: '10px',
+                            fontWeight: mode === 'edit' ? '700' : '500', cursor: 'pointer',
+                            background: mode === 'edit' ? 'var(--accent)' : 'transparent',
+                            color: mode === 'edit' ? '#FFFFFF' : 'var(--text-secondary)',
+                            display: 'flex', alignItems: 'center', gap: '3px',
+                          }}
+                        >
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                          Edit
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -492,6 +761,7 @@ function AddUserModal({ onClose, onCreated, onToast }) {
     </div>
   );
 }
+
 
 // ── Shared style helpers ──────────────────────────────────────────────────────
 const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' };
@@ -685,20 +955,50 @@ export default function UsersPage() {
                         </span>
                       </td>
                       {/* Pages */}
-                      <td style={{ padding: '16px 20px', maxWidth: '220px' }}>
+                      <td style={{ padding: '16px 20px', maxWidth: '260px' }}>
                         {isFullAccess ? (
-                          <span style={{ fontSize: '12px', fontWeight: '700', color: C.gold }}>All Pages ✦</span>
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '6px',
+                            fontSize: '12px', fontWeight: '700', color: C.gold,
+                            background: 'rgba(244,164,11,0.12)', padding: '4px 10px', borderRadius: '12px',
+                            border: '1px solid rgba(244,164,11,0.25)',
+                          }}>
+                            <Icon name="crown" /> All Pages (Full Admin)
+                          </span>
                         ) : (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                             {pages.length === 0 ? (
                               <span style={{ fontSize: '12px', color: C.muted }}>No access</span>
                             ) : pages.map(pk => {
-                               const page = HCC_PAGES.find(p => p.key === pk) || (pk === MEMBERSHIP_RESTRICTION.key ? MEMBERSHIP_RESTRICTION : null);
-                               return (
-                                 <span key={pk} style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '14px', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo }}>
-                                   {page?.label || pk}
-                                 </span>
-                               );
+                              const isView = pk.endsWith(':view');
+                              const cleanKey = pk.replace(/:(view|edit)$/, '');
+                              const page = HCC_PAGES.find(p => p.key === cleanKey) ||
+                                           PNL_PERMISSIONS.find(p => p.key === cleanKey) ||
+                                           (cleanKey === MEMBERSHIP_RESTRICTION.key ? MEMBERSHIP_RESTRICTION : null);
+                              const label = page?.label || cleanKey;
+
+                              if (isView) {
+                                return (
+                                  <span key={pk} style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                    fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '14px',
+                                    background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', color: '#D97706',
+                                  }}>
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    {label} · View Only
+                                  </span>
+                                );
+                              }
+
+                              return (
+                                <span key={pk} style={{
+                                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                  fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '14px',
+                                  background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: C.indigo,
+                                }}>
+                                  {label}
+                                </span>
+                              );
                             })}
                           </div>
                         )}

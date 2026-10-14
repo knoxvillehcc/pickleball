@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { updateAdminPayment } from '@/lib/aarti/aartiService';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { requireEditPermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('navratri_aarti');
+  const auth = await requireEditPermission('navratri_aarti');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

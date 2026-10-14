@@ -9,6 +9,41 @@ import Link from 'next/link';
 export const ThemeContext = createContext({ theme: 'light', themePref: 'system', isDark: false, toggleTheme: () => {}, setThemePref: () => {} });
 export const useTheme = () => useContext(ThemeContext);
 
+// ── Auth & Permission Context ──────────────────────────────────────────────────
+export const AuthContext = createContext({
+  user: null,
+  canEdit: () => false,
+  isViewOnly: () => false,
+  canAccess: () => false,
+});
+export const useAuth = () => useContext(AuthContext);
+
+export function checkPageAccess(user, slug) {
+  if (!user) return { canAccess: false, canEdit: false, isViewOnly: false };
+  if (user.role === 'super_admin') return { canAccess: true, canEdit: true, isViewOnly: false };
+
+  const pages = Array.isArray(user.allowedPages) ? user.allowedPages : [];
+  if (pages.includes('*')) return { canAccess: true, canEdit: true, isViewOnly: false };
+
+  const hasDirectView = pages.includes(`${slug}:view`);
+  const hasDirectEdit = pages.includes(`${slug}:edit`) || pages.includes(slug);
+  const isNavratriSub = slug === 'navratri_vendors' || slug === 'navratri_aarti';
+  const hasParentView = isNavratriSub && pages.includes('navratri:view');
+  const hasParentEdit = isNavratriSub && (pages.includes('navratri:edit') || pages.includes('navratri'));
+
+  // Support stripe vs bank-statement alias
+  const isStripe = slug === 'stripe' || slug === 'bank-statement';
+  const hasStripeView = isStripe && (pages.includes('stripe:view') || pages.includes('bank-statement:view'));
+  const hasStripeEdit = isStripe && (pages.includes('stripe:edit') || pages.includes('bank-statement:edit') || pages.includes('stripe') || pages.includes('bank-statement'));
+
+  if (hasDirectView || hasStripeView) return { canAccess: true, canEdit: false, isViewOnly: true };
+  if (hasDirectEdit || hasStripeEdit) return { canAccess: true, canEdit: true, isViewOnly: false };
+  if (hasParentView) return { canAccess: true, canEdit: false, isViewOnly: true };
+  if (hasParentEdit) return { canAccess: true, canEdit: true, isViewOnly: false };
+
+  return { canAccess: false, canEdit: false, isViewOnly: false };
+}
+
 // ── Icons (Lucide-style, 1.75 stroke) ─────────────────────────────────────────
 const Ico = ({ children, size = 17 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>
@@ -150,9 +185,20 @@ export default function ClientLayout({ children }) {
   const isDark = theme === 'dark';
   const ctx = { theme, themePref, isDark, toggleTheme, setThemePref: applyPref };
 
+  const canEdit = useCallback((slug) => checkPageAccess(user, slug).canEdit, [user]);
+  const isViewOnly = useCallback((slug) => checkPageAccess(user, slug).isViewOnly, [user]);
+  const canAccess = useCallback((slug) => checkPageAccess(user, slug).canAccess, [user]);
+  const authCtx = { user, canEdit, isViewOnly, canAccess };
+
   // ── Public pages: no sidebar ───────────────────────────────────────────────
   if (isPublicRoute(pathname) || (pathname === '/' && !user)) {
-    return <ThemeContext.Provider value={ctx}>{children}</ThemeContext.Provider>;
+    return (
+      <ThemeContext.Provider value={ctx}>
+        <AuthContext.Provider value={authCtx}>
+          {children}
+        </AuthContext.Provider>
+      </ThemeContext.Provider>
+    );
   }
 
   // ── Admin pages: sidebar layout ───────────────────────────────────────────
@@ -160,9 +206,7 @@ export default function ClientLayout({ children }) {
     if (link.adminOnly) return user?.role === 'super_admin';
     if (!user) return true; // show all while loading
     if (link.href === '/') return true;
-    if (user.role === 'super_admin') return true;
-    const pages = user.allowedPages || [];
-    return pages.includes('*') || pages.includes(link.slug) || ((link.slug === 'navratri_vendors' || link.slug === 'navratri_aarti') && pages.includes('navratri'));
+    return checkPageAccess(user, link.slug).canAccess;
   };
   const isActive = (href) => pathname === href || (href !== '/' && pathname.startsWith(href) &&
     // don't highlight a parent when a more specific sibling matches (e.g. /reports vs /reports/monthly)
@@ -180,7 +224,8 @@ export default function ClientLayout({ children }) {
 
   return (
     <ThemeContext.Provider value={ctx}>
-      <div className="app-shell" style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', fontFamily: 'var(--font-sans)', opacity: mounted ? 1 : 0, transition: 'opacity 0.2s', position: 'relative' }}>
+      <AuthContext.Provider value={authCtx}>
+        <div className="app-shell" style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', fontFamily: 'var(--font-sans)', opacity: mounted ? 1 : 0, transition: 'opacity 0.2s', position: 'relative' }}>
 
         {/* Mobile top bar */}
         <header className="mobile-header-bar" style={{
@@ -365,6 +410,7 @@ export default function ClientLayout({ children }) {
           .sb-collapse-btn { display: none !important; }
         }
       `}</style>
+      </AuthContext.Provider>
     </ThemeContext.Provider>
   );
 }

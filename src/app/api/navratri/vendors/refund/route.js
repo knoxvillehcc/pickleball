@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import {
   getVendorRegistrationByNumber,
   updateVendorRegistration,
@@ -12,7 +12,7 @@ const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(request) {
   // Auth check
-  const auth = await getSessionAndPermissions('navratri');
+  const auth = await requireEditPermission(['navratri', 'navratri_vendors']);
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

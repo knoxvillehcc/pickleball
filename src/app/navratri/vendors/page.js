@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import { useAuth } from '@/components/ClientLayout';
 
 const SAFFRON = '#FF6B35';
 const GOLD = '#FFB800';
@@ -140,6 +141,9 @@ export default function NavratriVendorsDashboard() {
   const [odooSyncMsg, setOdooSyncMsg] = useState('');
   const [forceOdooSync, setForceOdooSync] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const { canEdit: authCanEdit, isViewOnly: authIsViewOnly } = useAuth();
+  const isViewOnly = authIsViewOnly ? authIsViewOnly('navratri_vendors') : false;
+  const canEdit = authCanEdit ? authCanEdit('navratri_vendors') : !isViewOnly;
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/navratri/vendor`

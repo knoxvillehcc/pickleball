@@ -14,6 +14,8 @@ export async function GET() {
     const data = await getAartiDaysAdmin();
     return NextResponse.json({
       success: true,
+      canEdit: auth.canEdit,
+      isViewOnly: auth.isViewOnly,
       ...data,
     });
   } catch (error) {
