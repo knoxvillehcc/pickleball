@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import { useAuth } from '@/components/ClientLayout';
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const C = {
@@ -111,6 +112,9 @@ export default function IndiafestVendorDashboard() {
   const [syncingId,     setSyncingId]     = useState(null);
   const [syncingAll,    setSyncingAll]    = useState(false);
   const [syncResults,   setSyncResults]   = useState({});
+  const { canEdit: authCanEdit, isViewOnly: authIsViewOnly } = useAuth();
+  const isViewOnly = authIsViewOnly ? authIsViewOnly('indiafest') : false;
+  const canEdit = authCanEdit ? authCanEdit('indiafest') : !isViewOnly;
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/indiafest/vendor`
@@ -346,9 +350,36 @@ export default function IndiafestVendorDashboard() {
 
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, sans-serif", padding: '32px 24px', maxWidth: '1400px', margin: '0 auto' }}>
+      {/* ── View-Only Mode Banner ── */}
+      {isViewOnly && (
+        <div style={{
+          marginBottom: '20px',
+          padding: '12px 18px',
+          borderRadius: '12px',
+          background: 'rgba(245, 158, 11, 0.1)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          color: '#D97706',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontSize: '13.5px',
+          fontWeight: '600',
+        }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <div>
+            <span>View-Only Access Mode:</span>{' '}
+            <span style={{ fontWeight: '400', color: 'var(--text-secondary)' }}>
+              You have permission to view IndiaFest registrations and export reports. Modifying records, issuing refunds, and Odoo sync are disabled.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* ── Publish Banner — super_admin only ────────────────────────────── */}
-      {currentUser?.role === 'super_admin' && (
+      {(currentUser?.role === 'super_admin' || canEdit) && (
         <div style={{
           borderRadius: '14px', padding: '18px 24px', marginBottom: '24px',
           background: isPublished
@@ -453,6 +484,7 @@ export default function IndiafestVendorDashboard() {
           ))}
 
           {/* Sync All to Odoo */}
+          {canEdit && (
           <button onClick={async () => {
             const paid = registrations.filter(r => r.payment_status === 'paid');
             if (!paid.length) return alert('No paid registrations to sync');
@@ -488,6 +520,7 @@ export default function IndiafestVendorDashboard() {
           }}>
             {syncingAll ? 'Syncing All...' : 'Sync All to Odoo'}
           </button>
+          )}
         </div>
       </div>
 
@@ -605,8 +638,10 @@ export default function IndiafestVendorDashboard() {
                           </div>
 
                           {/* Row Actions */}
-                          <div style={{ background: 'rgba(255,153,51,0.04)', padding: '0 24px 20px 24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                            <button
+                          <div style={{ background: 'rgba(255,153,51,0.04)', padding: '0 24px 20px 24px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+                            {canEdit ? (
+                              <>
+                              <button
                               onClick={() => setEditingReg(r)}
                               style={{
                                 padding: '8px 16px', borderRadius: '8px', border: '1px solid var(--border)',
@@ -732,6 +767,12 @@ export default function IndiafestVendorDashboard() {
                             >
                               Delete Registration
                             </button>
+                              </>
+                            ) : (
+                              <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '500', padding: '6px 0' }}>
+                                View-only mode: record editing, refunds, and Odoo syncing are disabled.
+                              </span>
+                            )}
                           </div>
                         </td>
                       </tr>

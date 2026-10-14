@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { sendLedAdConfirmationEmail, sendLedAdPaymentLinkEmail } from '@/lib/emailService';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { requireEditPermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('led_ads');
+  const auth = await requireEditPermission('led_ads');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

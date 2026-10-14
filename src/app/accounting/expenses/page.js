@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { HCC_ACCOUNT_CATEGORIES } from '@/lib/expensesDb';
+import { useAuth } from '@/components/ClientLayout';
 
 function formatMMDDYYYY(d) {
   if (!d) return '—';
@@ -23,7 +24,10 @@ const SKY_BLUE = '#0284C7';
 const EMERALD = '#10B981';
 
 export default function ExpensesManagementPage() {
-  const [activeTab, setActiveTab] = useState('event'); // 'event' | 'utilities' | 'all'
+  const [activeTab, setActiveTab] = useState('event');
+  const { canEdit: authCanEdit, isViewOnly: authIsViewOnly } = useAuth();
+  const isViewOnly = authIsViewOnly ? authIsViewOnly('expenses') : false;
+  const canEdit = authCanEdit ? authCanEdit('expenses') : !isViewOnly; // 'event' | 'utilities' | 'all'
   const [expenses, setExpenses] = useState([]);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState('Navratri 2026');
@@ -416,6 +420,7 @@ export default function ExpensesManagementPage() {
           </div>
 
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+            {canEdit && (
             <button
               onClick={openAddExpenseModal}
               style={{
@@ -429,6 +434,7 @@ export default function ExpensesManagementPage() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               <span>+ Add Expense</span>
             </button>
+            )}
 
             <button
               onClick={loadExpenses}
@@ -444,6 +450,28 @@ export default function ExpensesManagementPage() {
             </button>
           </div>
         </div>
+
+        {/* View-Only Mode Banner */}
+        {isViewOnly && (
+          <div style={{
+            marginBottom: '20px',
+            padding: '12px 18px',
+            borderRadius: '12px',
+            background: 'rgba(245, 158, 11, 0.1)',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            color: '#D97706',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '13px',
+            fontWeight: '600',
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>
+              <strong>View-Only Access Mode:</strong> You can view all expense records, review utility bills, inspect reconciliation numbers, and export reports. Entering new expenses, creating custom events, and settling entries in Odoo are disabled.
+            </div>
+          </div>
+        )}
 
         {/* ── MODE TABS ────────────────────────────────────────────────────────── */}
         <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '24px', gap: '8px' }}>
@@ -500,6 +528,7 @@ export default function ExpensesManagementPage() {
                     <option key={ev.event_name} value={ev.event_name}>{ev.event_name}</option>
                   ))}
                 </select>
+                {canEdit && (
                 <button
                   onClick={() => setShowNewEventModal(true)}
                   style={{
@@ -509,9 +538,11 @@ export default function ExpensesManagementPage() {
                 >
                   + Add Custom Event
                 </button>
+                )}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {canEdit && (
                 <button
                   onClick={() => setShowSettlementModal(true)}
                   style={{
@@ -525,6 +556,7 @@ export default function ExpensesManagementPage() {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                   <span>Post Final Settlement to Odoo</span>
                 </button>
+                )}
               </div>
             </div>
 
@@ -692,26 +724,32 @@ export default function ExpensesManagementPage() {
                       )}
                     </td>
                     <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <button
-                          onClick={() => openEditExpenseModal(exp)}
-                          style={{
-                            padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--border)',
-                            background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '11px', fontWeight: '700', cursor: 'pointer',
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteExpense(exp.id, exp.vendor_name)}
-                          style={{
-                            padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(239,68,68,0.3)',
-                            background: 'rgba(239,68,68,0.06)', color: '#EF4444', fontSize: '11px', fontWeight: '700', cursor: 'pointer',
-                          }}
-                        >
-                          Delete
-                        </button>
-                      </div>
+                      {canEdit ? (
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            onClick={() => openEditExpenseModal(exp)}
+                            style={{
+                              padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--border)',
+                              background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '11px', fontWeight: '700', cursor: 'pointer',
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteExpense(exp.id, exp.vendor_name)}
+                            style={{
+                              padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(239,68,68,0.3)',
+                              background: 'rgba(239,68,68,0.06)', color: '#EF4444', fontSize: '11px', fontWeight: '700', cursor: 'pointer',
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600' }}>
+                          View Only
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );

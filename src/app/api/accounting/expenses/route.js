@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import { getExpenses, insertExpense, updateExpense, deleteExpense } from '@/lib/expensesDb';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,12 @@ export async function GET(request) {
     const status   = searchParams.get('status') || 'all';
 
     const expenses = await getExpenses({ eventTag, status });
-    return NextResponse.json({ success: true, expenses });
+    return NextResponse.json({
+      success: true,
+      canEdit: auth.canEdit,
+      isViewOnly: auth.isViewOnly,
+      expenses,
+    });
   } catch (err) {
     console.error('[Expenses API GET] Error:', err.message);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -24,7 +29,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('expenses');
+  const auth = await requireEditPermission('expenses');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
@@ -74,7 +79,7 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  const auth = await getSessionAndPermissions('expenses');
+  const auth = await requireEditPermission('expenses');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
@@ -100,7 +105,7 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  const auth = await getSessionAndPermissions('expenses');
+  const auth = await requireEditPermission('expenses');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

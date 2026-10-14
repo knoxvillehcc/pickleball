@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { sendVendorConfirmationEmail } from '@/lib/emailService';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { requireEditPermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
-  // ── Auth check — requires 'indiafest' permission ──
-  const auth = await getSessionAndPermissions('indiafest');
+  // ── Auth check — requires edit permission for 'indiafest' ──
+  const auth = await requireEditPermission('indiafest');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

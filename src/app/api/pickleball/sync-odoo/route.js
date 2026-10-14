@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import { getAllRegistrations } from '@/lib/supabaseClient';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
 
@@ -71,6 +71,8 @@ export async function GET(request) {
   const syncData = await getSyncSetting();
   return NextResponse.json({
     success: true,
+    canEdit: auth.canEdit,
+    isViewOnly: auth.isViewOnly,
     isSynced: !!syncData,
     syncInfo: syncData || null,
   });
@@ -78,7 +80,7 @@ export async function GET(request) {
 
 // ── POST: Sync tournament revenue to Odoo ──────────────────────────────────────
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('pickleball');
+  const auth = await requireEditPermission('pickleball');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

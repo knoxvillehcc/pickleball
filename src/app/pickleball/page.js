@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import { useAuth } from '@/components/ClientLayout';
 
 // ── Color tokens ──────────────────────────────────────────────────────────────
 const C = {
@@ -225,6 +226,9 @@ export default function PickleballDashboard() {
   const [syncingOdoo,  setSyncingOdoo]  = useState(false);
   const [syncMsg,      setSyncMsg]      = useState('');
   const [forceSync,    setForceSync]    = useState(false);
+  const { canEdit: authCanEdit, isViewOnly: authIsViewOnly } = useAuth();
+  const isViewOnly = authIsViewOnly ? authIsViewOnly('pickleball') : false;
+  const canEdit = authCanEdit ? authCanEdit('pickleball') : !isViewOnly;
 
   const PUBLIC_URL = typeof window !== 'undefined'
     ? `${window.location.origin}/register/pickleball`
@@ -472,6 +476,32 @@ export default function PickleballDashboard() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
+      {/* ── View-Only Mode Banner ── */}
+      {isViewOnly && (
+        <div style={{
+          padding: '12px 18px',
+          borderRadius: '12px',
+          background: 'rgba(245, 158, 11, 0.1)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          color: '#D97706',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontSize: '13.5px',
+          fontWeight: '600',
+        }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <div>
+            <span>View-Only Access Mode:</span>{' '}
+            <span style={{ fontWeight: '400', color: 'var(--text-secondary)' }}>
+              You have permission to view Pickleball registrations and export reports. Editing players, sending payment links, and Odoo revenue sync are disabled.
+            </span>
+          </div>
+        </div>
+      )}
       {payLinkReg && <PaymentLinkModal reg={payLinkReg} onClose={() => setPayLinkReg(null)} />}
       {editingReg && (
         <EditRegistrationModal
@@ -485,7 +515,7 @@ export default function PickleballDashboard() {
       )}
 
       {/* ── Publish Banner — super_admin only ────────────────────────── */}
-      {currentUser?.role === 'super_admin' && <div style={{
+      {(currentUser?.role === 'super_admin' || canEdit) && <div style={{
         ...card,
         padding: '20px 24px',
         background: isPublished
@@ -607,6 +637,7 @@ export default function PickleballDashboard() {
           ))}
 
           {/* Sync to Odoo button */}
+          {canEdit && (
           <button onClick={() => { setSyncMsg(''); setForceSync(false); setOdooModalOpen(true); }} style={{
             background: 'linear-gradient(135deg, #10B981, #059669)',
             border: 'none', color: '#FFFFFF', fontWeight: '700', fontSize: '13.5px',
@@ -616,6 +647,7 @@ export default function PickleballDashboard() {
           }}>
             <span><Icon name="briefcase" />Sync Revenue to Odoo</span>
           </button>
+          )}
 
           {syncStatus && (
             <div style={{
@@ -793,7 +825,9 @@ export default function PickleballDashboard() {
                     </td>
                     <td style={{ padding: '13px 16px' }}>
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <button
+                        {canEdit ? (
+                          <>
+                          <button
                           onClick={() => setEditingReg(r)}
                           title="Edit registration details"
                           style={{
@@ -842,7 +876,12 @@ export default function PickleballDashboard() {
                             }
                           </button>
                         )}
-                      </div>
+                          </>
+                        ) : (
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600' }}>
+                            View Only
+                          </span>
+                        )}</div>
                     </td>
                   </tr>
                 ))}

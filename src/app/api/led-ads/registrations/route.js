@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import { insertLedAdRegistration, updateLedAdRegistration } from '@/lib/supabaseClient';
 
 export const dynamic = 'force-dynamic';
@@ -72,7 +72,12 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ success: true, registrations });
+    return NextResponse.json({
+      success: true,
+      canEdit: auth.canEdit,
+      isViewOnly: auth.isViewOnly,
+      registrations,
+    });
   } catch (err) {
     console.error('[LED-Ads Registrations GET] Error:', err.message);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -81,7 +86,7 @@ export async function GET() {
 
 // ── Manual Admin Registration (POST) ─────────────────────────────────────────
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('led_ads');
+  const auth = await requireEditPermission('led_ads');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
@@ -148,7 +153,7 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  const auth = await getSessionAndPermissions('led_ads');
+  const auth = await requireEditPermission('led_ads');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
@@ -195,7 +200,7 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  const auth = await getSessionAndPermissions('led_ads');
+  const auth = await requireEditPermission('led_ads');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

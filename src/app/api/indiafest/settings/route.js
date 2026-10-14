@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import fs from 'fs';
 import path from 'path';
 
@@ -91,7 +91,7 @@ export async function GET(request) {
 // ── POST: update a setting ─────────────────────────────────────────────────────
 export async function POST(request) {
   // Require 'indiafest' or 'settings' permission
-  const auth = await getSessionAndPermissions('indiafest');
+  const auth = await requireEditPermission('indiafest');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

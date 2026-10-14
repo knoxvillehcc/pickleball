@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import { postEventGeneralEntry, checkOdooGeneralEntry } from '@/lib/odooGeneralEntry';
 
 export const dynamic = 'force-dynamic';
@@ -86,7 +86,7 @@ export async function GET() {
 
 // ── POST: Post End-of-Event General Entry to Odoo for LED Ads ────────────────
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('led_ads');
+  const auth = await requireEditPermission('led_ads');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

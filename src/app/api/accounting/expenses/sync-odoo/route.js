@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
 import { ensureAnalyticAccount } from '@/lib/odooGeneralEntry';
 import { updateExpense } from '@/lib/expensesDb';
@@ -28,7 +28,7 @@ async function findAccount(creds, uid, code, fallbackTypes = ['expense', 'bank',
 }
 
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('expenses');
+  const auth = await requireEditPermission('expenses');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

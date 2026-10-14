@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { requireEditPermission } from '@/lib/auth';
 import fs from 'fs';
 import path from 'path';
 
@@ -94,7 +94,7 @@ export async function GET(request) {
 
 // ── POST: update a setting ─────────────────────────────────────────────────────
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('settings');
+  const auth = await requireEditPermission(['pickleball', 'settings']);
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

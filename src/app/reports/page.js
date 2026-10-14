@@ -32,11 +32,11 @@ export default function ReportsPage() {
   const [currentUser, setCurrentUser] = useState(null);
   const [query, setQuery] = useState('');
 
-  // Users flagged 'reports-view-only' can view and search but not export or sync.
+  // Users flagged 'reports-view-only' or 'reports:view' can view and search but not export or sync.
   const viewOnly = !!currentUser && currentUser.role !== 'super_admin'
     && Array.isArray(currentUser.allowedPages)
     && !currentUser.allowedPages.includes('*')
-    && currentUser.allowedPages.includes('reports-view-only');
+    && (currentUser.allowedPages.includes('reports-view-only') || currentUser.allowedPages.includes('reports:view'));
 
   const digitsOf = (s) => String(s || '').replace(/\D/g, '');
   const q = query.trim().toLowerCase();

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 import { getCredentials, odooAuth, odooCall } from '@/lib/odooClient';
 import Stripe from 'stripe';
 
@@ -153,7 +153,7 @@ async function createInvoiceAndPayment(creds, uid, reg, partnerId, productId, jo
 
 // ── POST handler ─────────────────────────────────────────────────────────────
 export async function POST(request) {
-  const auth = await getSessionAndPermissions('indiafest');
+  const auth = await requireEditPermission('indiafest');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

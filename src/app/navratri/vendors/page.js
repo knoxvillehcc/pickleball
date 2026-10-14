@@ -647,6 +647,7 @@ export default function NavratriVendorsDashboard() {
           </button>
 
           {/* Toggle Public Registration */}
+          {canEdit && (
           <button
             onClick={handleTogglePublish}
             disabled={isPublishing}
@@ -662,8 +663,10 @@ export default function NavratriVendorsDashboard() {
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: settings.is_published === 'true' ? '#10B981' : '#EF4444' }} />
             <span>{settings.is_published === 'true' ? 'Registration Open' : 'Registration Closed'}</span>
           </button>
+          )}
 
           {/* Capacity Settings */}
+          {canEdit && (
           <button
             onClick={() => setShowSettingsModal(true)}
             style={{
@@ -676,8 +679,10 @@ export default function NavratriVendorsDashboard() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             <span>Capacity Settings</span>
           </button>
+          )}
 
           {/* Post General Entry to Odoo */}
+          {canEdit && (
           <button
             onClick={() => { setOdooSyncMsg(''); setForceOdooSync(false); setShowOdooModal(true); }}
             style={{
@@ -693,6 +698,7 @@ export default function NavratriVendorsDashboard() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
             <span>{odooSyncStatus ? `Posted to Odoo (${odooSyncStatus.moveName || 'Synced'})` : 'Post General Entry to Odoo'}</span>
           </button>
+          )}
 
           {/* Refresh Button */}
           <button
@@ -709,6 +715,34 @@ export default function NavratriVendorsDashboard() {
           </button>
         </div>
       </div>
+
+      {/* ── View-Only Mode Banner ── */}
+      {isViewOnly && (
+        <div style={{
+          marginBottom: '20px',
+          padding: '12px 18px',
+          borderRadius: '12px',
+          background: 'rgba(245, 158, 11, 0.1)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          color: '#D97706',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontSize: '13.5px',
+          fontWeight: '600',
+        }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <div>
+            <span>View-Only Access Mode:</span>{' '}
+            <span style={{ fontWeight: '400', color: 'var(--text-secondary)' }}>
+              You have permission to view vendor reservations, booth assignments, and export reports. Modifying bookings, capacity settings, issuing refunds, and Odoo sync are disabled.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Odoo Synced Notice Pill */}
       {odooSyncStatus && (
@@ -1044,7 +1078,9 @@ export default function NavratriVendorsDashboard() {
                       {/* Actions */}
                       <td style={{ padding: '16px', verticalAlign: 'top', textAlign: 'right' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', flexWrap: 'wrap' }}>
-                          {/* Resend Confirmation Email */}
+                          {canEdit ? (
+                            <>
+                            {/* Resend Confirmation Email */}
                           <button
                             onClick={() => handleResendEmail(reg)}
                             disabled={resendingId === reg.registration_number}
@@ -1099,7 +1135,12 @@ export default function NavratriVendorsDashboard() {
                           >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                           </button>
-                        </div>
+                            </>
+                          ) : (
+                            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600' }}>
+                              View Only
+                            </span>
+                          )}</div>
                       </td>
                     </tr>
                   );

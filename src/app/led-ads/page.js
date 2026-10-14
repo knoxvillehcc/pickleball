@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import { useAuth } from '@/components/ClientLayout';
 
 function formatMMDDYYYY(d) {
   if (!d) return '—';
@@ -31,6 +32,9 @@ function getPaymentMethodLabel(reg) {
 
 export default function LedAdsAdminPage() {
   const [registrations, setRegistrations] = useState([]);
+  const { canEdit: authCanEdit, isViewOnly: authIsViewOnly } = useAuth();
+  const isViewOnly = authIsViewOnly ? authIsViewOnly('led_ads') : false;
+  const canEdit = authCanEdit ? authCanEdit('led_ads') : !isViewOnly;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -312,6 +316,7 @@ export default function LedAdsAdminPage() {
             </a>
 
             {/* + Add Manual Registration Button */}
+            {canEdit && (
             <button
               onClick={() => setShowAddModal(true)}
               style={{
@@ -324,6 +329,7 @@ export default function LedAdsAdminPage() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               <span>Add Registration</span>
             </button>
+            )}
 
             {/* Public Link Copy Button */}
             <button
@@ -341,6 +347,7 @@ export default function LedAdsAdminPage() {
             </button>
 
             {/* Registration Open/Closed Toggle */}
+            {canEdit && (
             <button onClick={togglePublish} disabled={publishing} style={{
               padding: '9px 15px', borderRadius: '10px',
               border: `1.5px solid ${isPublished ? '#10B981' : '#EF4444'}`,
@@ -352,8 +359,10 @@ export default function LedAdsAdminPage() {
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: isPublished ? '#10B981' : '#EF4444' }} />
               <span>{publishing ? 'Saving...' : isPublished ? 'Registration Open' : 'Registration Closed'}</span>
             </button>
+            )}
 
             {/* Post General Entry to Odoo */}
+            {canEdit && (
             <button
               onClick={() => { setOdooSyncMsg(''); setForceOdooSync(false); setShowOdooModal(true); }}
               style={{
@@ -368,6 +377,7 @@ export default function LedAdsAdminPage() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
               <span>{odooSyncStatus ? `Posted to Odoo (${odooSyncStatus.moveName || 'Synced'})` : 'Post General Entry to Odoo'}</span>
             </button>
+            )}
           </div>
         </div>
 

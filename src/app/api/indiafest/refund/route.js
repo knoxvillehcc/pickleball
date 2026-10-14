@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { requireEditPermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -8,7 +8,7 @@ const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 // ── POST: Issue a full Stripe refund for a vendor registration ────────────────
 export async function POST(request) {
   // Auth check — requires 'indiafest' permission
-  const auth = await getSessionAndPermissions('indiafest');
+  const auth = await requireEditPermission('indiafest');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +43,12 @@ export async function GET(request) {
     }
 
     const registrations = await res.json();
-    return NextResponse.json({ success: true, registrations });
+    return NextResponse.json({
+      success: true,
+      canEdit: auth.canEdit,
+      isViewOnly: auth.isViewOnly,
+      registrations,
+    });
 
   } catch (err) {
     console.error('[IndiafestRegistrations] Error:', err.message);
@@ -53,7 +58,7 @@ export async function GET(request) {
 
 export async function PUT(request) {
   // ── Auth check — requires 'indiafest' permission ──
-  const auth = await getSessionAndPermissions('indiafest');
+  const auth = await requireEditPermission('indiafest');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
@@ -100,7 +105,7 @@ export async function PUT(request) {
 
 export async function DELETE(request) {
   // ── Auth check — requires 'indiafest' permission ──
-  const auth = await getSessionAndPermissions('indiafest');
+  const auth = await requireEditPermission('indiafest');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }

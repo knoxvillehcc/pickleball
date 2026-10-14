@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { queryRegistrations, getAllRegistrations } from '@/lib/supabaseClient';
-import { getSessionAndPermissions } from '@/lib/auth';
+import { getSessionAndPermissions, requireEditPermission } from '@/lib/auth';
 
 export async function GET(request) {
   const auth = await getSessionAndPermissions('pickleball');
@@ -32,7 +32,13 @@ export async function GET(request) {
         .reduce((sum, r) => sum + (r.amount_paid || 0), 0),
     };
 
-    return NextResponse.json({ success: true, records, stats });
+    return NextResponse.json({
+      success: true,
+      canEdit: auth.canEdit,
+      isViewOnly: auth.isViewOnly,
+      records,
+      stats,
+    });
   } catch (err) {
     return NextResponse.json(
       { success: false, error: err.message },
@@ -42,7 +48,7 @@ export async function GET(request) {
 }
 
 export async function PUT(request) {
-  const auth = await getSessionAndPermissions('pickleball');
+  const auth = await requireEditPermission('pickleball');
   if (!auth.success) {
     return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
   }
