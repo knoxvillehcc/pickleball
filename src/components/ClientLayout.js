@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -169,11 +169,263 @@ export default function ClientLayout({ children }) {
     return () => { document.body.style.overflow = ''; };
   }, [sidebarOpen]);
 
-  const handleLogout = useCallback(async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+  const handleLogout = useCallback(async (reason = 'manual') => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      });
+    } catch {}
     setUser(null);
-    router.push('/login');
-  }, [router]);
+    try {
+      localStorage.removeItem('hcc_last_active');
+    } catch {}
+    if (reason === 'inactivity') {
+      const redirectParam = pathname && pathname !== '/' ? `&redirect=${encodeURIComponent(pathname)}` : '';
+      router.push(`/login?timeout=1&reason=inactivity${redirectParam}`);
+    } else {
+      router.push('/login');
+    }
+  }, [router, pathname]);
+
+  // ── Inactivity Auto-Logout Tracking ──────────────────────────────────────────
+  const [inactivityWarning, setInactivityWarning] = useState(null); // seconds remaining or null
+  const lastActiveRef = useRef(Date.now());
+
+  const DEFAULT_TIMEOUT_MINS = 15;
+  const WARNING_SECONDS = 60;
+
+  const getTimeoutMs = useCallback(() => {
+    try {
+      const saved = localStorage.getItem('hcc_inactivity_timeout_mins');
+      const mins = saved ? parseInt(saved, 10) : DEFAULT_TIMEOUT_MINS;
+      return (mins > 0 ? mins : DEFAULT_TIMEOUT_MINS) * 60 * 1000;
+    } catch {
+      return DEFAULT_TIMEOUT_MINS * 60 * 1000;
+    }
+  }, []);
+
+  const recordActivity = useCallback(() => {
+    const now = Date.now();
+    lastActiveRef.current = now;
+    try {
+      localStorage.setItem('hcc_last_active', String(now));
+    } catch {}
+    setInactivityWarning(null);
+  }, []);
+
+  useEffect(() => {
+    if (!user || isPublicRoute(pathname)) {
+      setInactivityWarning(null);
+      return;
+    }
+
+    const now = Date.now();
+    lastActiveRef.current = now;
+    try {
+      localStorage.setItem('hcc_last_active', String(now));
+    } catch {}
+
+    let lastThrottle = 0;
+    const handleUserInteraction = () => {
+      const currentTime = Date.now();
+      if (currentTime - lastThrottle > 2000) {
+        lastThrottle = currentTime;
+        lastActiveRef.current = currentTime;
+        try {
+          localStorage.setItem('hcc_last_active', String(currentTime));
+        } catch {}
+        setInactivityWarning(null);
+      }
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove', 'wheel'];
+    events.forEach(evt => window.addEventListener(evt, handleUserInteraction, { passive: true }));
+
+    const handleStorageChange = (e) => {
+      if (e.key === 'hcc_last_active' && e.newValue) {
+        const val = parseInt(e.newValue, 10);
+        if (val > lastActiveRef.current) {
+          lastActiveRef.current = val;
+          setInactivityWarning(null);
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const timeoutMs = getTimeoutMs();
+        let last = lastActiveRef.current;
+        try {
+          const stored = parseInt(localStorage.getItem('hcc_last_active') || '0', 10);
+          if (stored > last) last = stored;
+        } catch {}
+        if (Date.now() - last >= timeoutMs) {
+          handleLogout('inactivity');
+        } else {
+          handleUserInteraction();
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const interval = setInterval(() => {
+      const timeoutMs = getTimeoutMs();
+      const warningMs = WARNING_SECONDS * 1000;
+      let last = lastActiveRef.current;
+      try {
+        const stored = parseInt(localStorage.getItem('hcc_last_active') || '0', 10);
+        if (stored > last) {
+          last = stored;
+          lastActiveRef.current = stored;
+        }
+      } catch {}
+
+      const elapsed = Date.now() - last;
+      const remainingMs = timeoutMs - elapsed;
+
+      if (remainingMs <= 0) {
+        setInactivityWarning(null);
+        handleLogout('inactivity');
+      } else if (remainingMs <= warningMs) {
+        setInactivityWarning(Math.max(1, Math.ceil(remainingMs / 1000)));
+      } else {
+        setInactivityWarning(null);
+      }
+    }, 1000);
+
+    return () => {
+      events.forEach(evt => window.removeEventListener(evt, handleUserInteraction));
+      window.removeEventListener('storage', handleStorageChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
+    };
+  }, [user, pathname, getTimeoutMs, handleLogout]);
+
+  const renderInactivityModal = () => {
+    if (inactivityWarning === null) return null;
+    return (
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 999999,
+        backgroundColor: 'rgba(0, 0, 0, 0.72)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        animation: 'fadeIn 0.2s ease-out',
+      }}>
+        <div style={{
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          borderRadius: '18px',
+          maxWidth: '440px',
+          width: '100%',
+          padding: '28px 24px',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5)',
+          textAlign: 'center',
+        }}>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            border: '2px solid rgba(245, 158, 11, 0.35)',
+            color: '#D97706',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px auto',
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </div>
+
+          <h2 style={{
+            margin: '0 0 8px 0',
+            fontSize: '20px',
+            fontWeight: '700',
+            color: 'var(--text-primary)',
+            letterSpacing: '-0.3px',
+          }}>
+            Session Inactivity Warning
+          </h2>
+
+          <p style={{
+            margin: '0 0 16px 0',
+            fontSize: '13.5px',
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+          }}>
+            You have been inactive for a while. For your security, your dashboard session will automatically log off in:
+          </p>
+
+          <div style={{
+            display: 'inline-block',
+            padding: '8px 20px',
+            borderRadius: '99px',
+            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            border: '1.5px solid rgba(245, 158, 11, 0.4)',
+            color: '#D97706',
+            fontSize: '26px',
+            fontWeight: '800',
+            fontFamily: 'monospace',
+            letterSpacing: '1px',
+            marginBottom: '22px',
+          }}>
+            {inactivityWarning}s
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              type="button"
+              onClick={() => handleLogout('inactivity')}
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                borderRadius: '12px',
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-secondary)',
+                fontWeight: '600',
+                fontSize: '13.5px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              Log Out Now
+            </button>
+            <button
+              type="button"
+              onClick={recordActivity}
+              style={{
+                flex: 1.4,
+                padding: '12px 20px',
+                borderRadius: '12px',
+                border: 'none',
+                background: 'var(--accent)',
+                color: '#FFFFFF',
+                fontWeight: '700',
+                fontSize: '14px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px var(--accent-glow)',
+                transition: 'all 0.2s',
+              }}
+            >
+              Stay Logged In
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const toggleTheme = () => applyPref(theme === 'dark' ? 'light' : 'dark');
   const toggleCollapsed = () => {
@@ -196,6 +448,7 @@ export default function ClientLayout({ children }) {
       <ThemeContext.Provider value={ctx}>
         <AuthContext.Provider value={authCtx}>
           {children}
+          {renderInactivityModal()}
         </AuthContext.Provider>
       </ThemeContext.Provider>
     );
@@ -410,6 +663,7 @@ export default function ClientLayout({ children }) {
           .sb-collapse-btn { display: none !important; }
         }
       `}</style>
+      {renderInactivityModal()}
       </AuthContext.Provider>
     </ThemeContext.Provider>
   );

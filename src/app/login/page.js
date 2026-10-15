@@ -20,6 +20,7 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const redirect     = searchParams.get('redirect') || '/';
   const expired      = searchParams.get('expired') === '1';
+  const timeout      = searchParams.get('timeout') === '1' || searchParams.get('reason') === 'inactivity';
   const { theme, toggleTheme, isDark } = useTheme();
 
   const [step,    setStep]    = useState('email');
@@ -183,6 +184,27 @@ function LoginContent() {
             Operator & Staff Sign-In
           </p>
         </div>
+
+                {/* Inactivity Notice Banner */}
+        {timeout && (
+          <div style={{
+            padding: '12px 16px', borderRadius: '12px',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.35)',
+            color: '#D97706', fontSize: '13px', fontWeight: '600',
+            display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px',
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <div>
+              <div style={{ fontWeight: '700' }}>Logged Out Due to Inactivity</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '500', marginTop: '2px' }}>
+                Your session was safely closed due to lack of activity.
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Login Box */}
         <div className="login-card" style={{ boxShadow: 'var(--shadow)' }}>

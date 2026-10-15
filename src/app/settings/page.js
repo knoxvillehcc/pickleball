@@ -43,6 +43,21 @@ export default function SettingsPage() {
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [inactivityMins, setInactivityMins] = useState('15');
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('hcc_inactivity_timeout_mins');
+      if (stored) setInactivityMins(stored);
+    } catch {}
+  }, []);
+
+  const handleInactivityChange = (val) => {
+    setInactivityMins(val);
+    try {
+      localStorage.setItem('hcc_inactivity_timeout_mins', val);
+    } catch {}
+  };
 
   useEffect(() => {
     fetch('/api/settings')
@@ -161,6 +176,44 @@ export default function SettingsPage() {
                 required
               />
            </div>
+        </div>
+
+        
+        {/* Inactivity Session Timeout Card */}
+        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+          <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', display: 'flex', alignItems: 'center', color: '#D97706', justifyContent: 'center' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>Inactivity Auto-Logout</h2>
+              <p style={{ margin: '2px 0 0', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: '500' }}>Automatically sign out operator session when no keyboard or mouse activity is detected</p>
+            </div>
+          </div>
+          <div style={{ padding: '20px 28px' }}>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
+              Auto-Logout Threshold
+            </label>
+            <select
+              value={inactivityMins}
+              onChange={(e) => handleInactivityChange(e.target.value)}
+              style={{
+                width: '100%', maxWidth: '320px',
+                padding: '12px 16px', borderRadius: '10px',
+                border: '1px solid var(--border)', background: 'var(--bg-input)',
+                color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600',
+              }}
+            >
+              <option value="5">5 Minutes (High Security)</option>
+              <option value="10">10 Minutes</option>
+              <option value="15">15 Minutes (Default Standard)</option>
+              <option value="30">30 Minutes</option>
+              <option value="60">60 Minutes (1 Hour)</option>
+            </select>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px', fontWeight: '500' }}>
+              A 60-second warning countdown modal will appear before the dashboard logs out. Interacting with the screen or clicking "Stay Logged In" resets the timer.
+            </p>
+          </div>
         </div>
 
         {/* Security Note Card */}
