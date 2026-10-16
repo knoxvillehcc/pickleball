@@ -861,7 +861,7 @@ export default function NavratriAartiAdminPage() {
       background: 'var(--bg-primary, #F5F5F7)',
       color: 'var(--text-primary, #1D1D1F)',
       fontFamily: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif)",
-      padding: '24px 20px 48px',
+      padding: 'clamp(16px, 3vw, 24px) clamp(12px, 2.5vw, 20px) 48px',
       transition: 'background-color 0.25s, color 0.25s',
     }}>
       <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
@@ -1048,45 +1048,45 @@ export default function NavratriAartiAdminPage() {
         {/* Compact, Clean Executive KPI Bar */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '12px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
+          gap: 'clamp(8px, 1.5vw, 12px)',
           marginBottom: '20px',
         }}>
-          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: '14px 18px', boxShadow: 'var(--shadow)' }}>
+          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: 'clamp(12px, 1.8vw, 16px)', boxShadow: 'var(--shadow)' }}>
             <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #515154)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               Total Pledged Maha Aarti
             </div>
-            <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--accent, #E8780C)', marginTop: '2px' }}>
+            <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 24px)', fontWeight: '800', color: 'var(--accent, #E8780C)', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
               ${stats.pledged.toLocaleString()}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)', marginTop: '2px' }}>Across all 10 festival days</div>
           </div>
 
-          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: '14px 18px', boxShadow: 'var(--shadow)' }}>
+          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: 'clamp(12px, 1.8vw, 16px)', boxShadow: 'var(--shadow)' }}>
             <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #515154)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               Collected (iPads)
             </div>
-            <div style={{ fontSize: '22px', fontWeight: '800', color: '#10B981', marginTop: '2px' }}>
+            <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 24px)', fontWeight: '800', color: '#10B981', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
               ${stats.paid.toLocaleString()}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)', marginTop: '2px' }}>Cash / Check / POS Swipe</div>
           </div>
 
-          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: '14px 18px', boxShadow: 'var(--shadow)' }}>
+          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: 'clamp(12px, 1.8vw, 16px)', boxShadow: 'var(--shadow)' }}>
             <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #515154)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               Pending Collection
             </div>
-            <div style={{ fontSize: '22px', fontWeight: '800', color: '#F59E0B', marginTop: '2px' }}>
+            <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 24px)', fontWeight: '800', color: '#F59E0B', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
               ${stats.pending.toLocaleString()}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)', marginTop: '2px' }}>Awaiting payment at event</div>
           </div>
 
-          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: '14px 18px', boxShadow: 'var(--shadow)' }}>
+          <div style={{ background: 'var(--bg-card, #FFFFFF)', border: '1px solid var(--border, rgba(0,0,0,0.09))', borderRadius: '12px', padding: 'clamp(12px, 1.8vw, 16px)', boxShadow: 'var(--shadow)' }}>
             <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #515154)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               Verified Bids
             </div>
-            <div style={{ fontSize: '22px', fontWeight: '800', color: '#0284C7', marginTop: '2px' }}>
+            <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 24px)', fontWeight: '800', color: '#0284C7', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
               {stats.bidsCount}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)', marginTop: '2px' }}>OTP verified submissions</div>

@@ -103,7 +103,7 @@ function SummaryCard({ label, value, icon, color = 'var(--accent)', sublabel, ne
     <div style={{
       background: 'var(--bg-card)', border: '1px solid var(--border)',
       borderTop: `3px solid ${color}`,
-      borderRadius: '14px', padding: '20px',
+      borderRadius: '14px', padding: 'clamp(14px, 2.2vw, 18px) clamp(12px, 1.8vw, 16px)',
       display: 'flex', flexDirection: 'column', gap: '8px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
       transition: 'box-shadow 0.2s',
@@ -114,7 +114,7 @@ function SummaryCard({ label, value, icon, color = 'var(--accent)', sublabel, ne
           {label}
         </span>
       </div>
-      <div style={{ fontSize: '26px', fontWeight: '700', color: displayColor, lineHeight: 1, letterSpacing: '-0.5px' }}>
+      <div className="kpi-stat-value" style={{ fontSize: 'clamp(18px, 2.8vw, 24px)', fontWeight: '700', color: displayColor, lineHeight: 1.1, letterSpacing: '-0.5px', fontVariantNumeric: 'tabular-nums' }}>
         {value ?? <span style={{ color: 'var(--text-muted)', fontSize: '16px' }}>—</span>}
       </div>
       {sublabel && <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '500' }}>{sublabel}</div>}
@@ -1089,7 +1089,7 @@ export default function PnLPage() {
       )}
 
       {/* ── Summary Cards ────────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))', gap: 'clamp(8px, 1.5vw, 14px)' }}>
         {loading ? (
           Array.from({ length: canViewCosts ? 10 : 7 }).map((_, i) => <SkeletonCard key={i} />)
         ) : s ? (

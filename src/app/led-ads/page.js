@@ -281,7 +281,7 @@ export default function LedAdsAdminPage() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '32px 28px', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 28px)', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
 
         {/* ── HEADER ──────────────────────────────────────────────────────────── */}
@@ -405,7 +405,7 @@ export default function LedAdsAdminPage() {
         )}
 
         {/* ── KPI CARDS ───────────────────────────────────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
           {[
             { label: 'Total Registrations', value: registrations.length, color: '#0284C7' },
             { label: 'Paid', value: paidCount, color: '#10B981' },
@@ -415,11 +415,11 @@ export default function LedAdsAdminPage() {
             { label: 'Revenue Collected', value: `$${(totalRevenue / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: '#6366F1' },
           ].map(kpi => (
             <div key={kpi.label} style={{
-              padding: '20px', borderRadius: '14px', background: 'var(--bg-card)',
+              padding: 'clamp(14px, 2.2vw, 18px)', borderRadius: '14px', background: 'var(--bg-card)',
               border: '1px solid var(--border)', boxShadow: 'var(--shadow)',
             }}>
-              <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '8px' }}>{kpi.label}</div>
-              <div style={{ fontSize: '28px', fontWeight: '700', color: kpi.color }}>{kpi.value}</div>
+              <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: '8px' }}>{kpi.label}</div>
+              <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: kpi.color, lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{kpi.value}</div>
             </div>
           ))}
         </div>

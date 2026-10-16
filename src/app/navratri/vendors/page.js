@@ -93,13 +93,13 @@ function StatCard({ label, value, accent, sub }) {
   return (
     <div style={{
       backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)',
-      borderRadius: '14px', padding: '22px 20px', borderTop: `3.5px solid ${accent}`,
+      borderRadius: '14px', padding: 'clamp(14px, 2.5vw, 18px) clamp(12px, 2vw, 18px)', borderTop: `3.5px solid ${accent}`,
       boxShadow: 'var(--shadow)', width: '100%', boxSizing: 'border-box',
     }}>
       <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
         {label}
       </div>
-      <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{value}</div>
+      <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.5vw, 28px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
       {sub && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', fontWeight: '600' }}>{sub}</div>}
     </div>
   );
@@ -607,7 +607,7 @@ export default function NavratriVendorsDashboard() {
   };
 
   return (
-    <div style={{ padding: '32px 28px', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
+    <div style={{ padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 28px)', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
       {/* ── TOP HEADER BAR ───────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
@@ -761,7 +761,7 @@ export default function NavratriVendorsDashboard() {
       )}
 
       {/* ── STATS ROW ────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
         <StatCard
           label="Total Vendors"
           value={registrations.length}

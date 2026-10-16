@@ -232,41 +232,41 @@ export default function ReportsPage() {
       ) : (
         <>
           {/* Global Totals */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
-            <div style={{ ...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)' }}>
+            <div style={{ ...card, padding: 'clamp(14px, 2.2vw, 18px)', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Total Active Members</div>
-                <div style={{ fontSize: '36px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(22px, 3.5vw, 32px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{totalMembers}</div>
               </div>
             </div>
 
-            <div style={{ ...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--text-success)', boxShadow: 'var(--shadow)' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(16,185,129,0.08)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ ...card, padding: 'clamp(14px, 2.2vw, 18px)', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--text-success)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'rgba(16,185,129,0.08)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-success)" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>All Membership Payments Received</div>
-                <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-success)', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: 'var(--text-success)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
               </div>
             </div>
           </div>
 
           {/* Summary Cards per Type */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)' }}>
             {Object.entries(data.summary).map(([type, stats]) => (
-              <div key={type} style={{ ...card, padding: '16px 18px', position: 'relative', overflow: 'hidden', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
-                <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '24px', lineHeight: 1.4 }}>{type}</div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+              <div key={type} style={{ ...card, padding: 'clamp(14px, 2.2vw, 18px)', position: 'relative', overflow: 'hidden', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+                <div style={{ fontSize: '13.5px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '16px', lineHeight: 1.3 }}>{type}</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '8px' }}>
                   <div>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Active Members</div>
-                    <div style={{ fontSize: '36px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{stats.count}</div>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>Active Members</div>
+                    <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{stats.count}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Revenue</div>
-                    <div style={{ fontSize: '20px', fontWeight: '700', color: 'var(--accent)' }}>${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>Revenue</div>
+                    <div className="kpi-stat-value" style={{ fontSize: 'clamp(16px, 2.6vw, 20px)', fontWeight: '700', color: 'var(--accent)', fontVariantNumeric: 'tabular-nums' }}>${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                   </div>
                 </div>
               </div>

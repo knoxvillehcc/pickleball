@@ -155,3 +155,6 @@ export const config = {
     '/((?!api|_next/static|_next/image|privacy|.*\\.png$).*)',
   ],
 };
+
+export { proxy as middleware };
+export default proxy;

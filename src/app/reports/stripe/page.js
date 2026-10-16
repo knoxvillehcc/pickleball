@@ -14,7 +14,7 @@ const card = {
 
 const kpiCard = {
   ...card,
-  padding: '20px 24px',
+  padding: 'clamp(12px, 2.2vw, 20px) clamp(12px, 2vw, 20px)',
   display: 'flex',
   flexDirection: 'column',
   gap: '4px',
@@ -955,26 +955,26 @@ export default function StripeStatementPage() {
           {data && !loading && (
             <>
               {/* KPI Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Charges</span>
-                  <span style={{ color: 'var(--text-primary)', fontSize: '28px', fontWeight: '700' }}>{data.totals.count}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Total Charges</span>
+                  <span className="kpi-stat-value" style={{ color: 'var(--text-primary)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{data.totals.count}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{data.dailySummary.length} days</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gross Amount</span>
-                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.gross)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Gross Amount</span>
+                  <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.totals.gross)}</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Processing Fees</span>
-                  <span style={{ color: '#f87171', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.fee)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Processing Fees</span>
+                  <span className="kpi-stat-value" style={{ color: '#f87171', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.totals.fee)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
                     {data.totals.gross > 0 ? ((data.totals.fee / data.totals.gross) * 100).toFixed(2) : '0'}% effective rate
                   </span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Net Deposited</span>
-                  <span style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: '700' }}>{fmt(data.totals.net)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Net Deposited</span>
+                  <span className="kpi-stat-value" style={{ color: 'var(--accent)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.totals.net)}</span>
                 </div>
               </div>
 
@@ -1104,27 +1104,27 @@ export default function StripeStatementPage() {
           {depositData && !depositLoading && (
             <>
               {/* KPI Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payouts</span>
-                  <span style={{ color: 'var(--text-primary)', fontSize: '28px', fontWeight: '700' }}>{depositData.totals.payouts}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Payouts</span>
+                  <span className="kpi-stat-value" style={{ color: 'var(--text-primary)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{depositData.totals.payouts}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{depositData.totals.charges} charges</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gross</span>
-                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(depositData.totals.gross)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Gross</span>
+                  <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(depositData.totals.gross)}</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Fees</span>
-                  <span style={{ color: '#f87171', fontSize: '28px', fontWeight: '700' }}>{fmt(depositData.totals.fees)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Fees</span>
+                  <span className="kpi-stat-value" style={{ color: '#f87171', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(depositData.totals.fees)}</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Deposited</span>
-                  <span style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: '700' }}>{fmt(depositData.totals.deposited)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Deposited</span>
+                  <span className="kpi-stat-value" style={{ color: 'var(--accent)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(depositData.totals.deposited)}</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Resolved</span>
-                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{depositData.totals.resolved}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Resolved</span>
+                  <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{depositData.totals.resolved}</span>
                   <span style={{ color: depositData.totals.unmatched > 0 ? '#FBBF24' : 'var(--text-muted)', fontSize: '12px' }}>
                     {depositData.totals.unmatched > 0 ? `${depositData.totals.unmatched} unmatched` : 'All matched ✓'}
                   </span>
@@ -1257,20 +1257,20 @@ export default function StripeStatementPage() {
           {cashCheckData && !cashCheckLoading && (
             <>
               {/* KPI Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="money" />Cash</span>
-                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(cashCheckData.totals.cash)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}><Icon name="money" />Cash</span>
+                  <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(cashCheckData.totals.cash)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{cashCheckData.totals.cashCount} payments</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="note" />Check</span>
-                  <span style={{ color: '#818CF8', fontSize: '28px', fontWeight: '700' }}>{fmt(cashCheckData.totals.check)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}><Icon name="note" />Check</span>
+                  <span className="kpi-stat-value" style={{ color: '#818CF8', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(cashCheckData.totals.check)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{cashCheckData.totals.checkCount} payments</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Grand Total</span>
-                  <span style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: '700' }}>{fmt(cashCheckData.totals.total)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Grand Total</span>
+                  <span className="kpi-stat-value" style={{ color: 'var(--accent)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(cashCheckData.totals.total)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{cashCheckData.totals.totalCount} payments</span>
                 </div>
               </div>
@@ -1537,20 +1537,20 @@ export default function StripeStatementPage() {
           {invoiceData && !invoiceLoading && (
             <>
               {/* KPI Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="check" />Paid</span>
-                  <span style={{ color: '#4ade80', fontSize: '28px', fontWeight: '700' }}>{fmt(invoiceData.totals.paid)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}><Icon name="check" />Paid</span>
+                  <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(invoiceData.totals.paid)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{invoiceData.totals.countPaid} invoices</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Unpaid</span>
-                  <span style={{ color: '#f87171', fontSize: '28px', fontWeight: '700' }}>{fmt(invoiceData.totals.unpaid)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Unpaid</span>
+                  <span className="kpi-stat-value" style={{ color: '#f87171', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(invoiceData.totals.unpaid)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{invoiceData.totals.countUnpaid} invoices</span>
                 </div>
                 <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Invoiced</span>
-                  <span style={{ color: 'var(--accent)', fontSize: '28px', fontWeight: '700' }}>{fmt(invoiceData.totals.all)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Total Invoiced</span>
+                  <span className="kpi-stat-value" style={{ color: 'var(--accent)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(invoiceData.totals.all)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{invoiceData.totals.countAll} invoices (excl. {invoiceData.excluded?.posInvoices || 0} POS)</span>
                 </div>
               </div>
@@ -1658,35 +1658,35 @@ export default function StripeStatementPage() {
             return (
               <>
                 {/* Grand Summary KPI */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: 'clamp(8px, 1.5vw, 12px)', marginBottom: '24px' }}>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="card" />Stripe Gross</span>
-                    <span style={{ color: '#818CF8', fontSize: '24px', fontWeight: '700' }}>{fmt(t.stripeGross)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}><Icon name="card" />Stripe Gross</span>
+                    <span className="kpi-stat-value" style={{ color: '#818CF8', fontSize: 'clamp(18px, 2.8vw, 24px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(t.stripeGross)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.stripeCount} charges</span>
                   </div>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Stripe Fees</span>
-                    <span style={{ color: '#f87171', fontSize: '24px', fontWeight: '700' }}>-{fmt(t.stripeFees)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Stripe Fees</span>
+                    <span className="kpi-stat-value" style={{ color: '#f87171', fontSize: 'clamp(18px, 2.8vw, 24px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>-{fmt(t.stripeFees)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.stripeGross > 0 ? ((t.stripeFees / t.stripeGross) * 100).toFixed(2) : 0}% rate</span>
                   </div>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="money" />Cash</span>
-                    <span style={{ color: '#4ade80', fontSize: '24px', fontWeight: '700' }}>{fmt(t.totalCash)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}><Icon name="money" />Cash</span>
+                    <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(18px, 2.8vw, 24px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(t.totalCash)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.cashCount} payments</span>
                   </div>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="note" />Check</span>
-                    <span style={{ color: '#FBBF24', fontSize: '24px', fontWeight: '700' }}>{fmt(t.totalCheck)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}><Icon name="note" />Check</span>
+                    <span className="kpi-stat-value" style={{ color: '#FBBF24', fontSize: 'clamp(18px, 2.8vw, 24px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(t.totalCheck)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.checkCount} payments</span>
                   </div>
                   <div style={kpiCard}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}><Icon name="clipboard" />Invoices</span>
-                    <span style={{ color: '#38BDF8', fontSize: '24px', fontWeight: '700' }}>{fmt(t.invPaid + t.invUnpaid)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}><Icon name="clipboard" />Invoices</span>
+                    <span className="kpi-stat-value" style={{ color: '#38BDF8', fontSize: 'clamp(18px, 2.8vw, 24px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(t.invPaid + t.invUnpaid)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{t.invCount} invoices ({t.invUnpaid > 0 ? fmt(t.invUnpaid) + ' unpaid' : 'all paid'})</span>
                   </div>
                   <div style={{ ...kpiCard, borderColor: 'var(--accent)', borderWidth: '2px' }}>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Grand Total</span>
-                    <span style={{ color: 'var(--accent)', fontSize: '24px', fontWeight: '700' }}>{fmt(t.grandTotal)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Grand Total</span>
+                    <span className="kpi-stat-value" style={{ color: 'var(--accent)', fontSize: 'clamp(18px, 2.8vw, 24px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(t.grandTotal)}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Net: {fmt(t.grandTotal - t.stripeFees)}</span>
                   </div>
                 </div>

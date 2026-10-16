@@ -59,15 +59,15 @@ function StatCard({ label, value, accent, sub }) {
   return (
     <div style={{
       ...card,
-      padding: '16px 18px',
+      padding: 'clamp(14px, 2.2vw, 18px)',
       borderTop: `2px solid ${accent}`,
       width: '100%',
     }}>
-      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
         {label}
       </div>
-      <div style={{ fontSize: '40px', fontWeight: '700', color: accent, lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '6px' }}>{sub}</div>}
+      <div className="kpi-stat-value" style={{ fontSize: 'clamp(22px, 3.5vw, 36px)', fontWeight: '700', color: accent, lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
+      {sub && <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '6px', fontWeight: '500' }}>{sub}</div>}
     </div>
   );
 }
@@ -679,7 +679,7 @@ export default function PickleballDashboard() {
 
       {/* ── Stats Cards ─────────────────────────────────────────────────── */}
       {stats && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)' }}>
           <StatCard label="Total Registered" value={stats.total}     accent="var(--accent)"/>
           <StatCard label="Paid"              value={stats.paid}      accent="var(--text-success)"  sub={`$${(stats.totalRevenue || 0).toFixed(2)} collected`}/>
           <StatCard label="Pending Payment"   value={stats.pending}   accent="var(--accent)"/>

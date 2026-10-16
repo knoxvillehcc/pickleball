@@ -396,7 +396,7 @@ export default function ExpensesManagementPage() {
   }, [expenses, selectedExpenseIds]);
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '32px 28px', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 28px)', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
       <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
 
         {/* ── TOP HEADER ────────────────────────────────────────────────────────── */}
@@ -561,26 +561,26 @@ export default function ExpensesManagementPage() {
             </div>
 
             {/* Live Financial P&L Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-              <div style={{ padding: '20px', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: `3.5px solid ${EMERALD}`, boxShadow: 'var(--shadow)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)' }}>
+              <div style={{ padding: 'clamp(14px, 2.5vw, 18px)', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: `3.5px solid ${EMERALD}`, boxShadow: 'var(--shadow)' }}>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Total Event Revenue</div>
-                <div style={{ fontSize: '28px', fontWeight: '700', color: EMERALD }}>${(eventRevenue.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: EMERALD, fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>${(eventRevenue.totalGross || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
                   Booths: ${eventRevenue.boothsGross?.toFixed(2)} · Ads: ${eventRevenue.adsGross?.toFixed(2)}
                 </div>
               </div>
 
-              <div style={{ padding: '20px', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: '3.5px solid #EF4444', boxShadow: 'var(--shadow)' }}>
+              <div style={{ padding: 'clamp(14px, 2.5vw, 18px)', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: '3.5px solid #EF4444', boxShadow: 'var(--shadow)' }}>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Total Event Expenses</div>
-                <div style={{ fontSize: '28px', fontWeight: '700', color: '#EF4444' }}>${eventExpensesTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: '#EF4444', fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>${eventExpensesTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
                   {expenses.filter(e => e.event_tag === selectedEvent).length} logged receipts/bills
                 </div>
               </div>
 
-              <div style={{ padding: '20px', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: `3.5px solid ${eventNetProfit >= 0 ? SKY_BLUE : '#EF4444'}`, boxShadow: 'var(--shadow)' }}>
+              <div style={{ padding: 'clamp(14px, 2.5vw, 18px)', borderRadius: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderTop: `3.5px solid ${eventNetProfit >= 0 ? SKY_BLUE : '#EF4444'}`, boxShadow: 'var(--shadow)' }}>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>Projected Net Profit / (Loss)</div>
-                <div style={{ fontSize: '28px', fontWeight: '700', color: eventNetProfit >= 0 ? SKY_BLUE : '#EF4444' }}>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: eventNetProfit >= 0 ? SKY_BLUE : '#EF4444', fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
                   ${eventNetProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>

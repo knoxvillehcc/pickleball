@@ -195,48 +195,48 @@ export default function MonthlyReportPage() {
       ) : (
         <>
           {/* KPI Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)' }}>
             {/* Total Members */}
-            <div style={{ ...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ ...card, padding: 'clamp(14px, 2.2vw, 18px)', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Total Members</div>
-                <div style={{ fontSize: '36px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{totalMembers}</div>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{totalMembers}</div>
               </div>
             </div>
 
             {/* Total Revenue */}
-            <div style={{ ...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--text-success)', boxShadow: 'var(--shadow)' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'rgba(16,185,129,0.08)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ ...card, padding: 'clamp(14px, 2.2vw, 18px)', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--text-success)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'rgba(16,185,129,0.08)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-success)" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Total Revenue</div>
-                <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-success)', lineHeight: 1 }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: 'var(--text-success)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
               </div>
             </div>
 
             {/* Active Months */}
-            <div style={{ ...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ ...card, padding: 'clamp(14px, 2.2vw, 18px)', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
               </div>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Months Active</div>
-                <div style={{ fontSize: '36px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{monthCount}</div>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{monthCount}</div>
               </div>
             </div>
 
             {/* Avg per Month */}
-            <div style={{ ...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
-              <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ ...card, padding: 'clamp(14px, 2.2vw, 18px)', display: 'flex', alignItems: 'center', gap: '14px', borderTop: '3.5px solid var(--accent)', boxShadow: 'var(--shadow)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'var(--accent-glow)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               </div>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>Avg / Month</div>
-                <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>
+                <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>
                   {monthCount > 0 ? (totalMembers / monthCount).toFixed(1) : '0'}
                 </div>
               </div>

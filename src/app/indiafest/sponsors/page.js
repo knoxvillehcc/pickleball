@@ -32,13 +32,13 @@ function StatCard({ label, value, accent, sub }) {
   return (
     <div style={{
       backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)',
-      borderRadius: '14px', padding: '16px 18px', borderTop: `3.5px solid ${accent}`,
+      borderRadius: '14px', padding: 'clamp(14px, 2.2vw, 18px)', borderTop: `3.5px solid ${accent}`,
       width: '100%', boxShadow: 'var(--shadow)',
     }}>
-      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
         {label}
       </div>
-      <div style={{ fontSize: '36px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>{value}</div>
+      <div className="kpi-stat-value" style={{ fontSize: 'clamp(20px, 3.2vw, 32px)', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
       {sub && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', fontWeight: '600' }}>{sub}</div>}
     </div>
   );
@@ -284,7 +284,7 @@ export default function SponsorDashboard() {
   const tdStyle = { padding: '14px 16px', fontSize: '13px', borderBottom: '1px solid var(--border)', verticalAlign: 'middle' };
 
   return (
-    <div style={{ fontFamily: "'Inter', -apple-system, sans-serif", padding: '32px 24px', maxWidth: '1400px', margin: '0 auto' }}>
+    <div style={{ fontFamily: "'Inter', -apple-system, sans-serif", padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px)', maxWidth: '1400px', margin: '0 auto' }}>
 
       {/* ── Publish Banner — super_admin only ──────────────────────────────── */}
       {currentUser?.role === 'super_admin' && (
@@ -400,7 +400,7 @@ export default function SponsorDashboard() {
       </div>
 
       {/* ── Stats ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
         <StatCard label="Total Sponsors"     value={registrations.length} accent={GOLD}      sub={`${grandRegs.length} grand · ${basicRegs.length} basic`} />
         <StatCard label="Confirmed (Paid)"   value={paid.length}          accent="#10B981"   sub={`${pending.length} pending`} />
         <StatCard label="Revenue Collected"  value={`$${(revenue / 100).toFixed(0)}`}        accent={GOLD}  sub="from confirmed sponsors" />
