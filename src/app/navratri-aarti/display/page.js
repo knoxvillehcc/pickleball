@@ -317,7 +317,7 @@ export default function AartiDisplayLivePage() {
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif",
         display: 'flex',
         flexDirection: 'column',
-        padding: '12px 20px',
+        padding: 'clamp(20px, 2.8vh, 32px) clamp(24px, 3.2vw, 44px)',
         boxSizing: 'border-box',
         overflow: 'hidden',
         userSelect: 'none',
@@ -861,138 +861,160 @@ export default function AartiDisplayLivePage() {
         /* 1080p Full HD, 4K, 70-inch Temple TV Screens (Width >= 1600px, Height >= 800px) */
         @media (min-width: 1600px) and (min-height: 800px) {
           .aarti-display-root {
-            padding: 20px 32px !important;
+            padding: clamp(24px, 3vh, 36px) clamp(30px, 3.8vw, 54px) !important;
             height: 100vh !important;
             max-height: 100vh !important;
             overflow: hidden !important;
+            box-sizing: border-box !important;
           }
           .aarti-header-diya {
-            width: 50px !important;
-            height: 50px !important;
-            border-radius: 14px !important;
+            width: 42px !important;
+            height: 42px !important;
+            border-radius: 12px !important;
           }
           .aarti-header-sub {
-            font-size: 13px !important;
-            letter-spacing: 0.16em !important;
+            font-size: 11.5px !important;
+            letter-spacing: 0.14em !important;
           }
           .aarti-header-title {
-            font-size: 24px !important;
+            font-size: 20px !important;
           }
           .aarti-header-btn {
-            padding: 8px 18px !important;
-            font-size: 14px !important;
-          }
-          .aarti-main-grid {
-            grid-template-columns: minmax(0, 3fr) minmax(360px, 1fr) !important;
-            gap: 24px !important;
-            margin-top: 14px !important;
-          }
-          .display-hero-card {
-            padding: 26px 36px !important;
-            border-radius: 28px !important;
-          }
-          .day-switcher-btn {
-            padding: 6px 14px !important;
+            padding: 7px 16px !important;
             font-size: 13px !important;
           }
+          .aarti-main-grid {
+            grid-template-columns: minmax(0, 3fr) minmax(320px, 1fr) !important;
+            gap: 20px !important;
+            margin-top: 10px !important;
+            flex: 1 !important;
+            min-height: 0 !important;
+          }
+          .display-hero-card {
+            padding: clamp(16px, 2vh, 22px) clamp(20px, 2vw, 30px) !important;
+            border-radius: 24px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justifyContent: space-between !important;
+            overflow: hidden !important;
+          }
+          .day-switcher-btn {
+            padding: 5px 12px !important;
+            font-size: 12px !important;
+          }
           .day-badge-pill {
-            font-size: 16px !important;
-            padding: 6px 18px !important;
+            font-size: 14px !important;
+            padding: 5px 14px !important;
           }
           .day-date-text {
-            font-size: 22px !important;
+            font-size: 18px !important;
           }
           .day-maha-pill {
-            font-size: 14px !important;
-            padding: 5px 12px !important;
+            font-size: 12px !important;
+            padding: 4px 10px !important;
           }
           .day-status-pill {
-            font-size: 15px !important;
-            padding: 8px 22px !important;
+            font-size: 13.5px !important;
+            padding: 6px 16px !important;
           }
           .day-main-heading {
-            font-size: clamp(44px, 4.4vw, 64px) !important;
+            font-size: clamp(32px, 3.2vw, 44px) !important;
+            margin: 0 !important;
           }
           .celebration-ribbon {
-            padding: 12px 36px !important;
-            font-size: 16px !important;
+            padding: 7px 22px !important;
+            font-size: 12.5px !important;
           }
           .celebration-subhead {
-            font-size: 26px !important;
-            margin: 10px 0 !important;
+            font-size: clamp(16px, 1.6vw, 20px) !important;
+            margin: 4px 0 6px !important;
           }
           .winner-avatar {
-            width: 90px !important;
-            height: 90px !important;
-            font-size: 38px !important;
+            width: 56px !important;
+            height: 56px !important;
+            font-size: 22px !important;
           }
           .winner-name {
-            font-size: clamp(52px, 5vw, 84px) !important;
+            font-size: clamp(32px, 3.4vw, 46px) !important;
           }
           .contribution-label {
-            font-size: 16px !important;
-            letter-spacing: 0.18em !important;
+            font-size: 12px !important;
+            letter-spacing: 0.14em !important;
           }
           .contribution-amount {
-            font-size: clamp(96px, 10vw, 150px) !important;
+            font-size: clamp(60px, 6.2vw, 84px) !important;
+            line-height: 1 !important;
+            margin: 2px 0 6px !important;
           }
           .bidding-amount {
-            font-size: clamp(120px, 13vw, 190px) !important;
+            font-size: clamp(70px, 7.2vw, 96px) !important;
+            line-height: 1 !important;
           }
           .celebration-blessing-card {
-            max-width: 1250px !important;
-            padding: 24px 44px !important;
-            border-radius: 24px !important;
+            max-width: 900px !important;
+            padding: 12px 24px !important;
+            border-radius: 16px !important;
+            margin: 4px auto 8px !important;
           }
           .celebration-blessing-text {
-            font-size: 21px !important;
-            line-height: 1.55 !important;
+            font-size: clamp(13px, 1.15vw, 15px) !important;
+            line-height: 1.4 !important;
+            margin-bottom: 3px !important;
           }
           .celebration-blessing-footer {
-            font-size: 15px !important;
+            font-size: 11.5px !important;
           }
           .aarti-bottom-stats {
             grid-template-columns: repeat(3, 1fr) !important;
-            gap: 16px !important;
+            gap: 12px !important;
           }
           .stat-card {
-            padding: 16px 20px !important;
-            border-radius: 18px !important;
+            padding: 9px 14px !important;
+            border-radius: 14px !important;
           }
           .stat-label {
-            font-size: 13px !important;
+            font-size: 11px !important;
           }
           .stat-value {
-            font-size: 30px !important;
+            font-size: clamp(19px, 1.8vw, 23px) !important;
           }
           .display-qr-card {
-            padding: 26px 22px !important;
-            border-radius: 28px !important;
+            padding: clamp(16px, 2vh, 22px) clamp(14px, 1.5vw, 20px) !important;
+            border-radius: 24px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justifyContent: space-between !important;
+            align-items: center !important;
+            overflow: hidden !important;
           }
           .qr-badge {
-            padding: 6px 16px !important;
-            font-size: 13px !important;
+            padding: 5px 12px !important;
+            font-size: 11.5px !important;
+            margin-bottom: 4px !important;
           }
           .qr-heading {
-            font-size: 26px !important;
+            font-size: clamp(18px, 1.8vw, 22px) !important;
+            margin: 0 0 2px !important;
           }
           .qr-subtext {
-            font-size: 14px !important;
+            font-size: 11.5px !important;
           }
           .qr-squircle {
-            padding: 16px !important;
-            border-radius: 22px !important;
+            padding: 10px !important;
+            border-radius: 16px !important;
+            margin: auto 0 !important;
           }
           .qr-image {
-            width: clamp(180px, 24vh, 250px) !important;
-            height: clamp(180px, 24vh, 250px) !important;
+            width: clamp(135px, 18.5vh, 180px) !important;
+            height: clamp(135px, 18.5vh, 180px) !important;
           }
           .qr-url-badge {
-            font-size: 12px !important;
-            padding: 8px 14px !important;
+            font-size: 10px !important;
+            padding: 5px 8px !important;
           }
           .qr-trust-badge {
-            font-size: 12px !important;
+            font-size: 10.5px !important;
+            margin-top: 3px !important;
           }
         }
       `}</style>
@@ -1062,17 +1084,6 @@ export default function AartiDisplayLivePage() {
             }}
             title="Auto-refresh countdown"
           >
-            <span
-              style={{
-                width: '7.5px',
-                height: '7.5px',
-                borderRadius: '50%',
-                background: '#10B981',
-                boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.35)',
-                animation: 'pulseDot 2s infinite ease-in-out',
-                display: 'inline-block',
-              }}
-            />
             <span style={{ color: isDark ? '#FF9F0A' : '#C25E00', fontWeight: '900' }}>
               {nextRefreshIn}s
             </span>
