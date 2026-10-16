@@ -72,11 +72,14 @@ export default function NavratriAartiPage() {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showPastDays, setShowPastDays] = useState(false);
 
   // Bid Modal State
   const [selectedDay, setSelectedDay] = useState(null);
   const [step, setStep] = useState(1); // 1: Select & Info, 2: OTP, 3: Success
   const [bidAmount, setBidAmount] = useState(null);
+  const [customBidInput, setCustomBidInput] = useState('');
+  const [isCustomBid, setIsCustomBid] = useState(false);
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -146,6 +149,43 @@ export default function NavratriAartiPage() {
     }
   }, [settings]);
 
+  // Compute Eastern Time (America/New_York) Today's ISO date string (YYYY-MM-DD)
+  const todayEasternIso = useMemo(() => {
+    try {
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/New_York',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(new Date());
+    } catch {
+      return new Date().toISOString().split('T')[0];
+    }
+  }, []);
+
+  // Partition days into Current/Remaining Days and Past Days so bidders only see relevant active festival days
+  const { currentAndRemainingDays, pastDays } = useMemo(() => {
+    if (!days || days.length === 0) return { currentAndRemainingDays: [], pastDays: [] };
+
+    const currentAndRemaining = [];
+    const past = [];
+
+    days.forEach((day) => {
+      // Days prior to today in Eastern Time are past days
+      if (day.event_date < todayEasternIso) {
+        past.push(day);
+      } else {
+        currentAndRemaining.push(day);
+      }
+    });
+
+    // If the entire festival has concluded, fallback to all days so the page is never blank
+    return {
+      currentAndRemainingDays: currentAndRemaining.length > 0 ? currentAndRemaining : days,
+      pastDays: currentAndRemaining.length > 0 ? past : [],
+    };
+  }, [days, todayEasternIso]);
+
   const openBidModal = (day) => {
     setSelectedDay(day);
     setStep(1);
@@ -155,6 +195,8 @@ export default function NavratriAartiPage() {
       : Number(settings?.tier1_increment || 500);
     const fallbackAmount = Number(day.bids_count || 0) > 0 ? (curr + step) : curr;
     setBidAmount(day.quick_options?.[0]?.amount || fallbackAmount);
+    setCustomBidInput('');
+    setIsCustomBid(false);
     setFormError('');
     setOtpCode('');
   };
@@ -175,6 +217,8 @@ export default function NavratriAartiPage() {
           : Number(settings?.tier1_increment || 500);
         const fallbackAmount = Number(targetDay.bids_count || 0) > 0 ? (curr + step) : curr;
         setBidAmount(targetDay.quick_options?.[0]?.amount || fallbackAmount);
+        setCustomBidInput('');
+        setIsCustomBid(false);
         setFormError('');
         setOtpCode('');
       }
@@ -190,6 +234,8 @@ export default function NavratriAartiPage() {
   const closeBidModal = () => {
     setSelectedDay(null);
     setStep(1);
+    setCustomBidInput('');
+    setIsCustomBid(false);
     setFormError('');
     setOtpCode('');
   };
@@ -201,6 +247,30 @@ export default function NavratriAartiPage() {
 
     if (!fullName.trim() || !phone.trim() || !email.trim()) {
       setFormError('Please enter your full name, phone number, and email.');
+      return;
+    }
+
+    const curr = Number(selectedDay?.current_highest_bid || selectedDay?.base_bid || settings?.base_bid || 500);
+    const bidsCount = Number(selectedDay?.bids_count || 0);
+    const activeStep = (curr >= Number(settings?.tier1_max || 3000))
+      ? Number(settings?.tier2_increment || 250)
+      : Number(settings?.tier1_increment || 500);
+    const minNext = bidsCount > 0 ? (curr + activeStep) : Number(selectedDay?.base_bid || settings?.base_bid || 500);
+
+    const numBid = Number(bidAmount);
+    if (!numBid || isNaN(numBid) || numBid <= 0) {
+      setFormError('Please select or enter a valid bid amount.');
+      return;
+    }
+
+    if (numBid < minNext) {
+      setFormError(`Bid amount must be at least $${minNext.toLocaleString()} (higher than current bid).`);
+      return;
+    }
+
+    const diff = bidsCount > 0 ? (numBid - curr) : (numBid - Number(selectedDay?.base_bid || settings?.base_bid || 500));
+    if (diff % activeStep !== 0 && numBid % activeStep !== 0) {
+      setFormError(`Bid amount must be in valid increments of +$${activeStep.toLocaleString()} (e.g. $${minNext.toLocaleString()}, $${(minNext + activeStep).toLocaleString()}).`);
       return;
     }
 
@@ -370,7 +440,7 @@ export default function NavratriAartiPage() {
       </header>
 
       {/* Live Scrolling Ticker Bar */}
-      <AartiLiveTicker days={days} mode="public" />
+      <AartiLiveTicker days={currentAndRemainingDays} mode="public" />
 
       {/* Apple-Style Hero Section */}
       <section
@@ -424,7 +494,7 @@ export default function NavratriAartiPage() {
           }}
         >
           Devotees can sponsor and perform the sacred evening Maha Aarti for each night of Navratri.
-          Advance bidding is open for all 10 festival days. Daily bidding closes at <strong>{formattedCutoffTime}</strong>.
+          Advance bidding is open for all remaining festival days. Daily bidding closes at <strong>{formattedCutoffTime}</strong>.
         </p>
 
         {/* Apple Segmented Feature Strip */}
@@ -494,10 +564,11 @@ export default function NavratriAartiPage() {
           </div>
         ) : (
           <div className="aarti-festival-grid">
-            {days.map((day) => {
+            {currentAndRemainingDays.map((day) => {
               const isClosed = day.status === 'closed' || day.is_past_cutoff;
               const isMaha = day.is_maha_aarti;
               const hasWinner = day.bids_count > 0 && day.current_winner_name;
+              const isToday = day.event_date === todayEasternIso;
 
               return (
                 <div
@@ -507,9 +578,11 @@ export default function NavratriAartiPage() {
                     background: isMaha
                       ? 'linear-gradient(180deg, rgba(232, 120, 12, 0.06) 0%, var(--bg-card, #FFFFFF) 100%)'
                       : 'var(--bg-card, #FFFFFF)',
-                    border: isMaha
-                      ? '1.5px solid var(--accent, #E8780C)'
-                      : '1px solid var(--border, rgba(0,0,0,0.09))',
+                    border: isToday
+                      ? '2px solid var(--accent, #E8780C)'
+                      : (isMaha
+                        ? '1.5px solid var(--accent, #E8780C)'
+                        : '1px solid var(--border, rgba(0,0,0,0.09))'),
                     borderRadius: '16px',
                     padding: '18px 16px',
                     display: 'flex',
@@ -547,6 +620,23 @@ export default function NavratriAartiPage() {
                       >
                         <span style={{ color: 'var(--accent, #E8780C)' }}>{Icons.diya}</span>
                         <span>Day {day.day_number} · {day.formatted_date}</span>
+                        {isToday && (
+                          <span
+                            style={{
+                              fontSize: '9.5px',
+                              fontWeight: '800',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.04em',
+                              background: 'rgba(232, 120, 12, 0.15)',
+                              color: 'var(--accent, #E8780C)',
+                              padding: '2px 6px',
+                              borderRadius: '6px',
+                              marginLeft: '2px',
+                            }}
+                          >
+                            Today
+                          </span>
+                        )}
                       </div>
 
                       {day.is_locked ? (
@@ -820,6 +910,192 @@ export default function NavratriAartiPage() {
               );
             })}
           </div>
+
+            {pastDays.length > 0 && (
+              <div style={{ marginTop: '36px', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowPastDays((prev) => !prev)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'var(--bg-card, #FFFFFF)',
+                    border: '1px solid var(--border, rgba(0,0,0,0.12))',
+                    borderRadius: '999px',
+                    padding: '9px 20px',
+                    fontSize: '12.5px',
+                    fontWeight: '600',
+                    color: 'var(--text-secondary, #6E6E73)',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--shadow)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <span>{showPastDays ? 'Hide Past Concluded Days' : `View ${pastDays.length} Past Concluded Days`}</span>
+                </button>
+
+                {showPastDays && (
+                  <div style={{ marginTop: '28px', textAlign: 'left' }}>
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: '700',
+                        color: 'var(--text-muted, #86868B)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      Concluded Past Festival Days
+                    </div>
+                    <div className="aarti-festival-grid" style={{ opacity: 0.85 }}>
+                      {pastDays.map((day) => (
+                        <div
+                          key={day.day_number}
+                          id={`day-card-${day.day_number}`}
+                          style={{
+                            background: 'var(--bg-card, #FFFFFF)',
+                            border: '1px solid var(--border, rgba(0,0,0,0.09))',
+                            borderRadius: '16px',
+                            padding: '18px 16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            boxShadow: 'var(--shadow)',
+                          }}
+                        >
+                          <div>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginBottom: '12px',
+                                gap: '6px',
+                                flexWrap: 'wrap',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  fontSize: '11.5px',
+                                  fontWeight: '700',
+                                  color: 'var(--text-secondary, #6E6E73)',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '5px',
+                                  fontVariantNumeric: 'tabular-nums',
+                                }}
+                              >
+                                <span style={{ color: 'var(--accent, #E8780C)' }}>{Icons.diya}</span>
+                                <span>Day {day.day_number} · {day.formatted_date}</span>
+                              </div>
+                              <span
+                                style={{
+                                  fontSize: '11px',
+                                  fontWeight: '600',
+                                  padding: '3px 9px',
+                                  borderRadius: '999px',
+                                  background: 'var(--bg-input, #F2F2F5)',
+                                  color: 'var(--text-muted, #86868B)',
+                                  border: '1px solid var(--border, rgba(0,0,0,0.06))',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                }}
+                              >
+                                {Icons.lock} Concluded
+                              </span>
+                            </div>
+                            <div
+                              style={{
+                                fontSize: '17px',
+                                fontWeight: '700',
+                                color: 'var(--text-primary, #1D1D1F)',
+                                marginBottom: '14px',
+                                letterSpacing: '-0.01em',
+                                lineHeight: 1.3,
+                              }}
+                            >
+                              {day.day_title}
+                            </div>
+                            <div
+                              style={{
+                                background: 'var(--bg-input, #F2F2F5)',
+                                border: '1px solid var(--border, rgba(0,0,0,0.06))',
+                                borderRadius: '14px',
+                                padding: '14px 16px',
+                                marginBottom: '18px',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  fontSize: '11px',
+                                  fontWeight: '700',
+                                  color: 'var(--text-muted, #86868B)',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.06em',
+                                  marginBottom: '4px',
+                                }}
+                              >
+                                Winning Contribution
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: '32px',
+                                  fontWeight: '800',
+                                  color: 'var(--accent, #E8780C)',
+                                  fontVariantNumeric: 'tabular-nums',
+                                  letterSpacing: '-0.02em',
+                                }}
+                              >
+                                ${day.current_highest_bid.toLocaleString()}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: '12.5px',
+                                  color: 'var(--text-secondary, #515154)',
+                                  marginTop: '8px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                }}
+                              >
+                                <span style={{ fontWeight: '600', color: 'var(--text-primary, #1D1D1F)' }}>
+                                  {day.is_locked ? 'Sponsor: ' : 'Winner: '}{day.current_winner_name || 'Devotee'}
+                                </span>
+                                {day.bids_count > 0 && (
+                                  <span style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)' }}>
+                                    {day.bids_count} bids
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <div
+                              style={{
+                                textAlign: 'center',
+                                padding: '12px 14px',
+                                background: 'var(--bg-input, #F2F2F5)',
+                                border: '1px solid var(--border, rgba(0,0,0,0.06))',
+                                borderRadius: '12px',
+                                fontSize: '13px',
+                                color: 'var(--text-secondary, #515154)',
+                                fontWeight: '500',
+                              }}
+                            >
+                              Maha Aarti Sponsor: <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>{day.current_winner_name || 'Devotee'}</strong>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
       </main>
 
@@ -952,14 +1228,19 @@ export default function NavratriAartiPage() {
                         Increment: +${(Number(selectedDay.current_highest_bid || selectedDay.base_bid || 500) >= Number(settings?.tier1_max || 3000) ? Number(settings?.tier2_increment || 250) : Number(settings?.tier1_increment || 500)).toLocaleString()}
                       </span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '10px' }}>
                       {selectedDay.quick_options?.map((opt) => {
-                        const isSelected = bidAmount === opt.amount;
+                        const isSelected = !isCustomBid && bidAmount === opt.amount;
                         return (
                           <button
                             type="button"
                             key={opt.amount}
-                            onClick={() => setBidAmount(opt.amount)}
+                            onClick={() => {
+                              setIsCustomBid(false);
+                              setBidAmount(opt.amount);
+                              setCustomBidInput('');
+                              setFormError('');
+                            }}
                             style={{
                               background: isSelected ? 'rgba(232, 120, 12, 0.12)' : 'var(--bg-input, #F2F2F5)',
                               border: isSelected ? '2px solid var(--accent, #E8780C)' : '1px solid var(--border, rgba(0,0,0,0.12))',
@@ -990,6 +1271,80 @@ export default function NavratriAartiPage() {
                         );
                       })}
                     </div>
+
+                    {/* Custom Bid Amount Field */}
+                    {(() => {
+                      const curr = Number(selectedDay?.current_highest_bid || selectedDay?.base_bid || settings?.base_bid || 500);
+                      const bCount = Number(selectedDay?.bids_count || 0);
+                      const stepVal = (curr >= Number(settings?.tier1_max || 3000))
+                        ? Number(settings?.tier2_increment || 250)
+                        : Number(settings?.tier1_increment || 500);
+                      const minNext = bCount > 0 ? (curr + stepVal) : Number(selectedDay?.base_bid || settings?.base_bid || 500);
+
+                      return (
+                        <div
+                          style={{
+                            background: isCustomBid ? 'rgba(232, 120, 12, 0.05)' : 'var(--bg-input, #F2F2F5)',
+                            border: isCustomBid ? '2px solid var(--accent, #E8780C)' : '1px solid var(--border, rgba(0,0,0,0.10))',
+                            borderRadius: '12px',
+                            padding: '10px 14px',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: isCustomBid ? 'var(--accent, #E8780C)' : 'var(--text-primary, #1D1D1F)' }}>
+                              Or Enter Custom Amount
+                            </span>
+                            <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted, #86868B)' }}>
+                              Min: ${minNext.toLocaleString()} (+${stepVal.toLocaleString()} increments)
+                            </span>
+                          </div>
+                          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <span style={{ position: 'absolute', left: '12px', fontSize: '16px', fontWeight: '800', color: isCustomBid ? 'var(--accent, #E8780C)' : 'var(--text-secondary, #6E6E73)' }}>
+                              $
+                            </span>
+                            <input
+                              type="number"
+                              step={stepVal}
+                              min={minNext}
+                              placeholder={`e.g. ${(minNext + stepVal).toLocaleString()}`}
+                              value={customBidInput}
+                              onFocus={() => {
+                                setIsCustomBid(true);
+                                if (!customBidInput) {
+                                  setCustomBidInput(String(minNext));
+                                  setBidAmount(minNext);
+                                }
+                              }}
+                              onChange={(e) => {
+                                const raw = e.target.value;
+                                setCustomBidInput(raw);
+                                setIsCustomBid(true);
+                                const parsed = parseInt(raw, 10);
+                                if (!isNaN(parsed) && parsed > 0) {
+                                  setBidAmount(parsed);
+                                } else {
+                                  setBidAmount(null);
+                                }
+                                setFormError('');
+                              }}
+                              style={{
+                                width: '100%',
+                                boxSizing: 'border-box',
+                                padding: '9px 12px 9px 28px',
+                                background: '#FFFFFF',
+                                border: '1px solid var(--border, rgba(0,0,0,0.15))',
+                                borderRadius: '8px',
+                                fontSize: '16px',
+                                fontWeight: '700',
+                                color: 'var(--text-primary, #1D1D1F)',
+                                outline: 'none',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Devotee Inputs */}

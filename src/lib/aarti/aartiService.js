@@ -408,19 +408,34 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
     throw new Error(`Bidding for this day has concluded at ${cutoffFormatted}.`);
   }
 
-  // 2. Validate bid amount meets minimum
+  // 2. Validate bid amount meets minimum and increment rules
   const openingReserve = Number(day.base_bid || settings?.base_bid || 500);
   const currentBid = Number(day.current_highest_bid || openingReserve);
   const bidsCount = Number(day.bids_count || 0);
+  const minStep = calculateNextStep(currentBid, settings);
+
+  if (!Number.isInteger(amount) || amount <= 0) {
+    throw new Error('Bid amount must be a valid whole dollar number.');
+  }
 
   if (bidsCount === 0) {
     if (amount < openingReserve) {
       throw new Error(`The opening bid must be at least $${openingReserve.toLocaleString()}.`);
     }
+    const diff = amount - openingReserve;
+    if (diff % minStep !== 0 && amount % minStep !== 0) {
+      throw new Error(`Bid amount must be in valid increments of $${minStep.toLocaleString()} (e.g. $${openingReserve.toLocaleString()}, $${(openingReserve + minStep).toLocaleString()}).`);
+    }
   } else {
-    const minStep = calculateNextStep(currentBid, settings);
+    if (amount <= currentBid) {
+      throw new Error(`Your bid must be higher than the current bid of $${currentBid.toLocaleString()}.`);
+    }
     if (amount < currentBid + minStep) {
-      throw new Error(`The minimum next bid is $${(currentBid + minStep).toLocaleString()} (increments of at least $${minStep.toLocaleString()}).`);
+      throw new Error(`The minimum next bid is $${(currentBid + minStep).toLocaleString()} (increments of at least +$${minStep.toLocaleString()} above current bid).`);
+    }
+    const diff = amount - currentBid;
+    if (diff % minStep !== 0 && amount % minStep !== 0) {
+      throw new Error(`Bid amount must be in valid increments of +$${minStep.toLocaleString()} above current bid (e.g. $${(currentBid + minStep).toLocaleString()}, $${(currentBid + minStep * 2).toLocaleString()}).`);
     }
   }
 
