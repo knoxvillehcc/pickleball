@@ -39,6 +39,11 @@ const Icons = {
       <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
     </svg>
   ),
+  bolt: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  ),
 };
 
 const getInitials = (name) => {
@@ -58,6 +63,61 @@ export default function AartiDisplayLivePage() {
   const [nextRefreshIn, setNextRefreshIn] = useState(15);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [theme, setTheme] = useState('dark');
+  const [wakeLockActive, setWakeLockActive] = useState(false);
+
+  // Screen Wake Lock API (keeps TV, Firestick Silk Browser, and devices active without sleeping)
+  const requestWakeLock = useCallback(async () => {
+    try {
+      if (typeof navigator !== 'undefined' && 'wakeLock' in navigator) {
+        const sentinel = await navigator.wakeLock.request('screen');
+        setWakeLockActive(true);
+        sentinel.addEventListener('release', () => {
+          setWakeLockActive(false);
+        });
+        return sentinel;
+      }
+    } catch (err) {
+      console.warn('Screen Wake Lock request:', err);
+    }
+    return null;
+  }, []);
+
+  useEffect(() => {
+    let sentinel = null;
+
+    requestWakeLock().then((s) => {
+      sentinel = s;
+    });
+
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        requestWakeLock().then((s) => {
+          sentinel = s;
+        });
+      }
+    };
+
+    const handleInteraction = () => {
+      requestWakeLock().then((s) => {
+        sentinel = s;
+      });
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      if (sentinel) {
+        sentinel.release().catch(() => {});
+      }
+    };
+  }, [requestWakeLock]);
 
   // Load saved theme preference
   useEffect(() => {
@@ -1042,6 +1102,36 @@ export default function AartiDisplayLivePage() {
           >
             {isDark ? Icons.sun : Icons.moon}
             <span>{isDark ? 'Light' : 'Dark'}</span>
+          </button>
+
+          {/* TV / Firestick Screen Wake Lock Toggle */}
+          <button
+            id="screen-wake-lock-btn"
+            className="aarti-header-btn"
+            onClick={() => requestWakeLock()}
+            type="button"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: wakeLockActive
+                ? (isDark ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.14)')
+                : (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'),
+              border: wakeLockActive
+                ? '1.5px solid #10B981'
+                : (isDark ? '1.5px solid rgba(255, 255, 255, 0.18)' : '1.5px solid rgba(0, 0, 0, 0.12)'),
+              borderRadius: '999px',
+              padding: '6px 13px',
+              fontSize: '12px',
+              fontWeight: '700',
+              color: wakeLockActive ? '#10B981' : (isDark ? '#FFFFFF' : '#1D1D1F'),
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            title={wakeLockActive ? 'Screen Wake Lock is Active (TV will not sleep)' : 'Click to Keep Firestick / TV Screen Awake'}
+          >
+            {Icons.bolt}
+            <span>{wakeLockActive ? 'Screen Awake: ON' : 'Keep Screen On'}</span>
           </button>
 
           {/* Fullscreen Button */}
