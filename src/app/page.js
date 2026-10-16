@@ -212,10 +212,10 @@ function PublicLanding() {
       cta: 'Place Maha Aarti Bid',
       isOpen: true,
       kpis: [
-        { label: 'Reserve Opening', value: '$500' },
+        { label: 'Reserve Opening', value: `$${Number(aartiData?.settings?.base_bid || aartiData?.days?.[0]?.base_bid || 500).toLocaleString()}` },
+        { label: 'Min Increment', value: `+$${Number(aartiData?.settings?.tier1_increment || 500).toLocaleString()}` },
         { label: 'Daily Cutoff', value: formattedDailyCutoff },
         { label: '10 Sacred Nights', value: '10-11-2026 to 10-20-2026' },
-        { label: 'Day 8 Maha Aarti', value: '10-18-2026' },
       ],
     }] : []),
     ...(vendorLive ? [{
@@ -229,6 +229,12 @@ function PublicLanding() {
       badge: 'Now Open',
       cta: 'Reserve Booth',
       isOpen: true,
+      kpis: [
+        { label: 'Standard Booth', value: '$201 / night' },
+        { label: 'Peak / Weekend', value: '$351 / night' },
+        { label: 'Setup Time', value: '5:30 PM Daily' },
+        { label: '13 Total Dates', value: '10-09 to 10-25' },
+      ],
     }] : []),
     ...(ledAdsLive ? [{
       title: 'LED Screen Ads — Navratri 2026',
@@ -241,6 +247,12 @@ function PublicLanding() {
       badge: 'Now Open',
       cta: 'Register Now',
       isOpen: true,
+      kpis: [
+        { label: 'Ad Investment', value: '$1,500 / slot' },
+        { label: 'Resolution', value: '1920×1080 FHD' },
+        { label: 'Nightly Reach', value: '1,500+ Devotees' },
+        { label: 'Festival Run', value: 'All 10 Nights' },
+      ],
     }] : []),
     {
       title: 'Admin & Staff Portal',
@@ -253,6 +265,12 @@ function PublicLanding() {
       badge: 'Staff Only',
       cta: 'Operator Login',
       isOpen: true,
+      kpis: [
+        { label: 'Access Level', value: 'Authorized Staff' },
+        { label: 'Operations', value: '10 Active Hubs' },
+        { label: 'Security', value: 'PIN & Role Auth' },
+        { label: 'Live Audit', value: 'Supabase & Odoo' },
+      ],
     },
   ];
 
@@ -273,13 +291,14 @@ function PublicLanding() {
       <div style={{ height: '5px', background: 'linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%)', flexShrink: 0 }}/>
 
       {/* Responsive Rounded Pill Header Header */}
-      <header style={{ width: '100%', maxWidth: '1100px', margin: '24px auto 0', padding: '0 24px', flexShrink: 0 }}>
+      <header style={{ width: '100%', maxWidth: '1240px', margin: '20px auto 0', padding: '0 16px', flexShrink: 0 }}>
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           background: 'var(--bg-card)', border: '1px solid var(--border)',
           borderRadius: '50px', padding: '12px 28px',
           boxShadow: 'var(--shadow)',
-        }}>
+        }}
+        className="landing-header-pill">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img src="/hcc_logo.png" alt="HCC Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
             <div style={{ borderLeft: '1.5px solid var(--border)', paddingLeft: '12px' }}>
@@ -288,7 +307,7 @@ function PublicLanding() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <a href="https://www.knoxvillemandir.org" target="_blank" rel="noreferrer" style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.2s' }}>
+            <a href="https://www.knoxvillemandir.org" target="_blank" rel="noreferrer" className="temple-link-desktop" style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.2s' }}>
               Visit Temple Website
             </a>
             <button
@@ -322,13 +341,7 @@ function PublicLanding() {
         </div>
 
         {/* Three Option Cards Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
-          gap: '16px',
-          width: '100%',
-          maxWidth: '1000px',
-        }}>
+        <div className="landing-cards-grid">
           {options.map((opt, i) => {
             const active = hovered === i;
 
@@ -344,7 +357,7 @@ function PublicLanding() {
                       ? `2px solid ${opt.accentColor}`
                       : '2px solid var(--border)',
                     borderRadius: '14px',
-                    padding: '36px 28px',
+                    padding: '24px 20px', display: 'flex', flexDirection: 'column', height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
@@ -433,6 +446,8 @@ function PublicLanding() {
                     fontSize: '13.5px', fontWeight: '700',
                     color: opt.isOpen ? opt.accentColor : 'var(--text-muted)',
                     transition: 'all 0.25s',
+                    marginTop: 'auto',
+                    paddingTop: '8px',
                   }}>
                     <span>{opt.cta}</span>
                     {opt.isOpen && <span style={{ transition: 'transform 0.2s', transform: active ? 'translateX(4px)' : 'translateX(0)' }}>→</span>}
@@ -445,7 +460,7 @@ function PublicLanding() {
         </div>
 
         {/* Footer info and address */}
-        <footer style={{ marginTop: '64px', textAlign: 'center', borderTop: '1px solid var(--border)', paddingTop: '28px', width: '100%', maxWidth: '1000px' }}>
+        <footer style={{ marginTop: '64px', textAlign: 'center', borderTop: '1px solid var(--border)', paddingTop: '28px', width: '100%', maxWidth: '1240px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: '700', marginBottom: '8px', flexWrap: 'wrap' }}>
             <span>8580 Hickory Creek Rd, Lenoir City, TN 37771</span>
             <span style={{ opacity: 0.4 }}>•</span>

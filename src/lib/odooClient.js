@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { decrypt } from './encryption';
+import { decrypt } from './encryption.js';
 
 const credFilePath = path.join(process.cwd(), 'credentials.json');
 

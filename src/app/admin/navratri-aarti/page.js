@@ -412,6 +412,7 @@ export default function NavratriAartiAdminPage() {
       if (json.success) {
         setShowSettingsModal(false);
         fetchData();
+        alert(`Increment & festival settings updated successfully!\n• Tier 1 Increment: +$${Number(tier1Increment).toLocaleString()} (bids below $${Number(tier1Max).toLocaleString()})\n• Tier 2 Increment: +$${Number(tier2Increment).toLocaleString()} (bids above $${Number(tier1Max).toLocaleString()})\n• Daily Cutoff: ${dailyCutoffTime} EST`);
       } else {
         alert(json.error || 'Failed to update settings');
       }
@@ -1527,6 +1528,41 @@ export default function NavratriAartiAdminPage() {
                   onChange={(e) => setTier2Increment(e.target.value)}
                   style={{ width: '100%', boxSizing: 'border-box', background: 'var(--bg-input, #F2F2F5)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13.5px' }}
                 />
+              </div>
+
+              {/* Dynamic Live Increment Preview */}
+              <div
+                style={{
+                  marginBottom: '16px',
+                  background: 'rgba(232, 120, 12, 0.06)',
+                  border: '1.5px solid rgba(232, 120, 12, 0.25)',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  fontSize: '12px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ fontWeight: '800', color: 'var(--accent, #E8780C)', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+                    Live Increment Calculation Preview
+                  </span>
+                  <span style={{ fontSize: '10.5px', fontWeight: '700', color: '#10B981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '999px' }}>
+                    Dynamic Sync
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', color: 'var(--text-secondary, #515154)', lineHeight: 1.4 }}>
+                  <div>
+                    &bull; <strong>Bids under ${Number(tier1Max || 3000).toLocaleString()}:</strong> Step is <strong>+${Number(tier1Increment || 500).toLocaleString()}</strong>
+                    <span style={{ color: 'var(--text-muted, #86868B)', marginLeft: '4px' }}>
+                      (e.g. $1,000 &rarr; ${1000 + Number(tier1Increment || 500)}, ${1000 + 2 * Number(tier1Increment || 500)})
+                    </span>
+                  </div>
+                  <div>
+                    &bull; <strong>Bids at or above ${Number(tier1Max || 3000).toLocaleString()}:</strong> Step shifts to <strong>+${Number(tier2Increment || 250).toLocaleString()}</strong>
+                    <span style={{ color: 'var(--text-muted, #86868B)', marginLeft: '4px' }}>
+                      (e.g. ${Number(tier1Max || 3000).toLocaleString()} &rarr; ${Number(tier1Max || 3000) + Number(tier2Increment || 250)})
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'flex-start', gap: '10px', background: 'var(--bg-input, #F2F2F5)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border)' }}>

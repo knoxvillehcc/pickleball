@@ -149,7 +149,12 @@ export default function NavratriAartiPage() {
   const openBidModal = (day) => {
     setSelectedDay(day);
     setStep(1);
-    setBidAmount(day.quick_options?.[0]?.amount || (day.current_highest_bid + 500));
+    const curr = Number(day.current_highest_bid || day.base_bid || settings?.base_bid || 500);
+    const step = curr >= Number(settings?.tier1_max || 3000)
+      ? Number(settings?.tier2_increment || 250)
+      : Number(settings?.tier1_increment || 500);
+    const fallbackAmount = Number(day.bids_count || 0) > 0 ? (curr + step) : curr;
+    setBidAmount(day.quick_options?.[0]?.amount || fallbackAmount);
     setFormError('');
     setOtpCode('');
   };
@@ -164,7 +169,12 @@ export default function NavratriAartiPage() {
       if (targetDay && targetDay.status !== 'closed' && !targetDay.is_past_cutoff) {
         setSelectedDay(targetDay);
         setStep(1);
-        setBidAmount(targetDay.quick_options?.[0]?.amount || (targetDay.current_highest_bid + 500));
+        const curr = Number(targetDay.current_highest_bid || targetDay.base_bid || settings?.base_bid || 500);
+        const step = curr >= Number(settings?.tier1_max || 3000)
+          ? Number(settings?.tier2_increment || 250)
+          : Number(settings?.tier1_increment || 500);
+        const fallbackAmount = Number(targetDay.bids_count || 0) > 0 ? (curr + step) : curr;
+        setBidAmount(targetDay.quick_options?.[0]?.amount || fallbackAmount);
         setFormError('');
         setOtpCode('');
       }
@@ -427,8 +437,8 @@ export default function NavratriAartiPage() {
             gap: '12px 18px',
             background: 'var(--bg-card, #FFFFFF)',
             border: '1px solid var(--border, rgba(0,0,0,0.09))',
-            borderRadius: '999px',
-            padding: '10px 22px',
+            borderRadius: '16px',
+            padding: '8px 18px',
             fontSize: '12.5px',
             color: 'var(--text-secondary, #515154)',
             boxShadow: 'var(--shadow)',
@@ -436,13 +446,21 @@ export default function NavratriAartiPage() {
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
             <span>Opening Reserve:</span>
-            <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>$500</strong>
+            <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>
+              ${Number(settings?.base_bid || days[0]?.base_bid || 500).toLocaleString()}
+            </strong>
           </span>
           <span style={{ color: 'var(--border, rgba(0,0,0,0.15))' }}>•</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
             <span>Increments:</span>
-            <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>$500</strong>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)' }}>(+$250 over $3k)</span>
+            <strong style={{ color: 'var(--text-primary, #1D1D1F)' }}>
+              ${Number(settings?.tier1_increment || 500).toLocaleString()}
+            </strong>
+            {Number(settings?.tier2_increment) && Number(settings?.tier2_increment) !== Number(settings?.tier1_increment) ? (
+              <span style={{ fontSize: '11px', color: 'var(--text-muted, #86868B)' }}>
+                (+${Number(settings?.tier2_increment).toLocaleString()} over ${Number(settings?.tier1_max || 3000).toLocaleString()})
+              </span>
+            ) : null}
           </span>
           <span style={{ color: 'var(--border, rgba(0,0,0,0.15))' }}>•</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
@@ -453,7 +471,7 @@ export default function NavratriAartiPage() {
       </section>
 
       {/* 10 Festival Days Grid */}
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+      <main style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 20px' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted, #86868B)', fontSize: '14px' }}>
             Loading festival schedule...
@@ -475,13 +493,7 @@ export default function NavratriAartiPage() {
             {error}
           </div>
         ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
-              gap: '20px',
-            }}
-          >
+          <div className="aarti-festival-grid">
             {days.map((day) => {
               const isClosed = day.status === 'closed' || day.is_past_cutoff;
               const isMaha = day.is_maha_aarti;
@@ -498,8 +510,8 @@ export default function NavratriAartiPage() {
                     border: isMaha
                       ? '1.5px solid var(--accent, #E8780C)'
                       : '1px solid var(--border, rgba(0,0,0,0.09))',
-                    borderRadius: '18px',
-                    padding: '22px',
+                    borderRadius: '16px',
+                    padding: '18px 16px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
@@ -517,18 +529,20 @@ export default function NavratriAartiPage() {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         marginBottom: '12px',
-                        gap: '8px',
+                        gap: '6px',
+                        flexWrap: 'wrap',
                       }}
                     >
                       <div
                         style={{
-                          fontSize: '12px',
+                          fontSize: '11.5px',
                           fontWeight: '700',
                           color: isMaha ? 'var(--accent, #E8780C)' : 'var(--text-secondary, #6E6E73)',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '6px',
+                          gap: '5px',
                           fontVariantNumeric: 'tabular-nums',
+                          whiteSpace: 'nowrap',
                         }}
                       >
                         <span style={{ color: 'var(--accent, #E8780C)' }}>{Icons.diya}</span>
@@ -659,7 +673,7 @@ export default function NavratriAartiPage() {
 
                       <div
                         style={{
-                          fontSize: '28px',
+                          fontSize: 'clamp(20px, 2.2vw, 26px)',
                           fontWeight: '800',
                           color: (hasWinner || day.is_locked) ? 'var(--accent, #E8780C)' : 'var(--text-primary, #1D1D1F)',
                           marginTop: '3px',
@@ -832,6 +846,9 @@ export default function NavratriAartiPage() {
               borderRadius: '20px',
               maxWidth: '430px',
               width: '100%',
+              maxHeight: 'calc(100dvh - 24px)',
+              display: 'flex',
+              flexDirection: 'column',
               overflow: 'hidden',
               boxShadow: '0 24px 60px rgba(0,0,0,0.25)',
               color: 'var(--text-primary, #1D1D1F)',
@@ -893,7 +910,7 @@ export default function NavratriAartiPage() {
             </div>
 
             {/* Modal Body */}
-            <div style={{ padding: '22px' }}>
+            <div style={{ padding: '18px 20px', overflowY: 'auto' }}>
               {/* STEP 1: Select 1-Click Bid & Enter Info */}
               {step === 1 && (
                 <form onSubmit={handleInitiateBid}>
@@ -919,19 +936,22 @@ export default function NavratriAartiPage() {
 
                   {/* 1-Click Increment Pills */}
                   <div style={{ marginBottom: '18px' }}>
-                    <label
-                      style={{
-                        display: 'block',
-                        fontSize: '11.5px',
-                        fontWeight: '700',
-                        color: 'var(--text-secondary, #6E6E73)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.06em',
-                        marginBottom: '8px',
-                      }}
-                    >
-                      Select Your Bid Amount
-                    </label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <label
+                        style={{
+                          fontSize: '11.5px',
+                          fontWeight: '700',
+                          color: 'var(--text-secondary, #6E6E73)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.06em',
+                        }}
+                      >
+                        Select Your Bid Amount
+                      </label>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent, #E8780C)' }}>
+                        Increment: +${(Number(selectedDay.current_highest_bid || selectedDay.base_bid || 500) >= Number(settings?.tier1_max || 3000) ? Number(settings?.tier2_increment || 250) : Number(settings?.tier1_increment || 500)).toLocaleString()}
+                      </span>
+                    </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                       {selectedDay.quick_options?.map((opt) => {
                         const isSelected = bidAmount === opt.amount;
@@ -964,7 +984,7 @@ export default function NavratriAartiPage() {
                                 marginTop: '2px',
                               }}
                             >
-                              {opt.label.split('(')[1]?.replace(')', '') || 'Next'}
+                              {opt.stepText || opt.label.split('(')[1]?.replace(')', '') || 'Next'}
                             </div>
                           </button>
                         );

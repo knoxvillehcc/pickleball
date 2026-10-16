@@ -202,12 +202,12 @@ export default function AartiDisplayLivePage() {
   };
 
   // Next Minimum Bid for Active Day
-  const activeCurrentBid = Number(activeDay?.current_highest_bid || activeDay?.base_bid || 500);
+  const activeCurrentBid = Number(activeDay?.current_highest_bid || activeDay?.base_bid || settings?.base_bid || 500);
   const activeBidsCount = Number(activeDay?.bids_count || 0);
-  const activeNextStep = (activeCurrentBid >= (settings?.tier1_max || 3000))
-    ? (settings?.tier2_increment || 250)
-    : (settings?.tier1_increment || 500);
-  const nextMinBid = activeBidsCount > 0 ? (activeCurrentBid + activeNextStep) : (activeDay?.base_bid || 500);
+  const activeNextStep = (activeCurrentBid >= Number(settings?.tier1_max || 3000))
+    ? Number(settings?.tier2_increment || 250)
+    : Number(settings?.tier1_increment || 500);
+  const nextMinBid = activeBidsCount > 0 ? (activeCurrentBid + activeNextStep) : Number(activeDay?.base_bid || settings?.base_bid || 500);
 
   // Dynamic Knoxville / Eastern cutoff time formatting (e.g. "9:45 PM", "10:00 PM")
   const formattedCutoffTime = activeDay?.cutoff_time
@@ -1547,7 +1547,7 @@ export default function AartiDisplayLivePage() {
                     fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  ${Number(activeDay.current_highest_bid || 500).toLocaleString()}
+                  ${Number(activeDay.current_highest_bid || activeDay.base_bid || settings?.base_bid || 500).toLocaleString()}
                 </div>
 
                 {/* Leading Devotee Sponsor Row (Centered) */}
@@ -1613,9 +1613,11 @@ export default function AartiDisplayLivePage() {
                   ) : (
                     <div>
                       <div style={{ fontSize: '15px', color: isDark ? '#98989D' : '#6E6E73' }}>
-                        Opening Reserve: <strong style={{ color: isDark ? '#FFFFFF' : '#1D1D1F' }}>${Number(activeDay.base_bid || 500).toLocaleString()}</strong>
+                        Opening Reserve: <strong style={{ color: isDark ? '#FFFFFF' : '#1D1D1F' }}>${Number(activeDay.base_bid || settings?.base_bid || 500).toLocaleString()}</strong>
+                        <span style={{ margin: '0 8px', opacity: 0.5 }}>·</span>
+                        Min Increment: <strong style={{ color: isDark ? '#34D399' : '#059669' }}>+${activeNextStep.toLocaleString()}</strong>
                       </div>
-                      <div style={{ fontSize: 'clamp(22px, 2.8vw, 34px)', fontWeight: '800', color: isDark ? '#FF9F0A' : '#D97706', marginTop: '2px' }}>
+                      <div style={{ fontSize: 'clamp(22px, 2.8vw, 34px)', fontWeight: '800', color: isDark ? '#FF9F0A' : '#D97706', marginTop: '4px' }}>
                         First verified bid takes the lead!
                       </div>
                     </div>
@@ -1664,8 +1666,13 @@ export default function AartiDisplayLivePage() {
                 <div className="stat-label" style={{ fontSize: '11px', color: isDark ? '#8E8E93' : '#6E6E73', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   {isConcluded ? 'Winning Contribution' : 'Next Minimum Bid'}
                 </div>
-                <div className="stat-value" style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#34D399' : '#059669', marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-                  ${isConcluded ? Number(activeDay.current_highest_bid || activeDay.base_bid || 500).toLocaleString() : nextMinBid.toLocaleString()}
+                <div className="stat-value" style={{ fontSize: '24px', fontWeight: '900', color: isDark ? '#34D399' : '#059669', marginTop: '2px', fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                  <span>${isConcluded ? Number(activeDay.current_highest_bid || activeDay.base_bid || settings?.base_bid || 500).toLocaleString() : nextMinBid.toLocaleString()}</span>
+                  {!isConcluded && (
+                    <span style={{ fontSize: '12px', fontWeight: '700', color: isDark ? '#10B981' : '#047857', opacity: 0.9 }}>
+                      (+${activeNextStep.toLocaleString()} min)
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -1749,7 +1756,7 @@ export default function AartiDisplayLivePage() {
                 lineHeight: 1.15,
               }}
             >
-              {isConcluded ? 'Sponsor Upcoming Days' : 'Sponsor Tonight\'s Maha Aarti'}
+              {isConcluded ? 'Sponsor Upcoming Maha Aarti' : 'Sponsor Maha Aarti'}
             </h3>
 
             <p
@@ -1761,7 +1768,7 @@ export default function AartiDisplayLivePage() {
                 lineHeight: 1.4,
               }}
             >
-              {isConcluded ? 'Scan to view upcoming festival days & pledge early' : 'Point camera to bid on phone'}
+              {isConcluded ? 'Point camera to pledge for upcoming festival days' : 'Point camera to bid on phone'}
             </p>
           </div>
 
@@ -1827,7 +1834,7 @@ export default function AartiDisplayLivePage() {
             </div>
 
             <div className="qr-trust-badge" style={{ fontSize: '10px', color: isDark ? '#8E8E93' : '#6E6E73', marginTop: '5px', fontWeight: '600' }}>
-              {isConcluded ? 'Scan to sponsor upcoming days' : 'Instant OTP verification'}
+              {isConcluded ? 'Scan to sponsor upcoming Maha Aarti' : 'Instant OTP verification'}
             </div>
           </div>
         </div>

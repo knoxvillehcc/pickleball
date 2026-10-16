@@ -116,13 +116,34 @@ async function resolveViaCheckout(stripe, paymentIntentId) {
 }
 
 // ── Resolve category via Odoo POS ─────────────────────────────────────────────
-async function resolveViaPOS(creds, uid, paymentIntentId) {
-  if (!paymentIntentId) return null;
+async function resolveViaPOS(creds, uid, charge) {
+  const paymentIntentId = charge?.payment_intent;
+  const chargeId = charge?.id;
   try {
-    // 1. Find POS payment by transaction_id
-    const posPayments = await odooCall(creds, uid, 'pos.payment', 'search_read', [
-      [['transaction_id', 'ilike', paymentIntentId]]
-    ], { fields: ['id', 'pos_order_id'], limit: 1 });
+    // 1. Find POS payment by payment_intent transaction_id
+    let posPayments = [];
+    if (paymentIntentId) {
+      posPayments = await odooCall(creds, uid, 'pos.payment', 'search_read', [
+        [['transaction_id', 'ilike', paymentIntentId]]
+      ], { fields: ['id', 'pos_order_id'], limit: 1 });
+    }
+
+    // 1b. Fallback: find POS payment by charge ID
+    if (!posPayments.length && chargeId) {
+      posPayments = await odooCall(creds, uid, 'pos.payment', 'search_read', [
+        [['transaction_id', 'ilike', chargeId]]
+      ], { fields: ['id', 'pos_order_id'], limit: 1 });
+    }
+
+    // 1c. Fallback: match by amount & timestamp (+/- 3 minutes) if terminal transaction_id wasn't saved
+    if (!posPayments.length && charge?.created && charge?.amount) {
+      const dt = new Date(charge.created * 1000);
+      const dtFrom = new Date(dt.getTime() - 180000).toISOString().replace('T', ' ').slice(0, 19);
+      const dtTo = new Date(dt.getTime() + 180000).toISOString().replace('T', ' ').slice(0, 19);
+      posPayments = await odooCall(creds, uid, 'pos.payment', 'search_read', [
+        [['amount', '=', charge.amount / 100], ['payment_date', '>=', dtFrom], ['payment_date', '<=', dtTo]]
+      ], { fields: ['id', 'pos_order_id'], limit: 1 });
+    }
 
     if (!posPayments.length || !posPayments[0].pos_order_id) return null;
 
@@ -164,7 +185,55 @@ async function resolveViaPOS(creds, uid, paymentIntentId) {
     return { category: topCategory, orderName };
 
   } catch (err) {
-    console.warn(`[deposit-breakdown] POS lookup failed for ${paymentIntentId}: ${err.message}`);
+    console.warn(`[deposit-breakdown] POS lookup failed for ${chargeId || paymentIntentId}: ${err.message}`);
+    return null;
+  }
+}
+
+// ── Resolve category via Odoo Sale Order (e.g. S00288 membership/donation) ───
+async function resolveViaSaleOrder(creds, uid, charge) {
+  const desc = (charge.description || '').trim();
+  if (!desc || !/^S\d{4,}/i.test(desc)) return null;
+
+  try {
+    const orders = await odooCall(creds, uid, 'sale.order', 'search_read', [
+      [['name', '=', desc]]
+    ], { fields: ['id', 'name', 'order_line', 'partner_id'], limit: 1 });
+
+    if (!orders.length || !orders[0].order_line?.length) return null;
+
+    const orderLines = await odooCall(creds, uid, 'sale.order.line', 'read', [
+      orders[0].order_line
+    ], { fields: ['product_id', 'price_subtotal'] });
+
+    if (!orderLines.length) return { category: 'Membership', orderName: desc };
+
+    const productIds = [...new Set(orderLines.map(l => l.product_id?.[0]).filter(Boolean))];
+    if (!productIds.length) return { category: 'Membership', orderName: desc };
+
+    const products = await odooCall(creds, uid, 'product.product', 'read', [
+      productIds
+    ], { fields: ['id', 'categ_id'] });
+
+    const categoryNames = new Set();
+    for (const prod of products) {
+      if (prod.categ_id) categoryNames.add(prod.categ_id[1]);
+    }
+
+    if (categoryNames.size === 1) return { category: [...categoryNames][0], orderName: desc };
+    if (categoryNames.size > 1) {
+      const catTotals = {};
+      for (const line of orderLines) {
+        const prod = products.find(p => p.id === line.product_id?.[0]);
+        const cat = prod?.categ_id?.[1] || 'Uncategorized';
+        catTotals[cat] = (catTotals[cat] || 0) + (line.price_subtotal || 0);
+      }
+      const top = Object.entries(catTotals).sort((a, b) => b[1] - a[1])[0][0];
+      return { category: top, orderName: desc };
+    }
+    return { category: 'Membership', orderName: desc };
+  } catch (err) {
+    console.warn(`[deposit-breakdown] Sale order lookup failed for ${desc}: ${err.message}`);
     return null;
   }
 }
@@ -247,12 +316,15 @@ async function resolveCategories(stripe, charges, creds, uid) {
   const chargeIds = charges.map(c => c.id);
   const cached = await getCachedCategories(chargeIds);
 
-  const uncached = charges.filter(c => !cached[c.id]);
-  console.log(`[deposit-breakdown] ${Object.keys(cached).length} cached, ${uncached.length} to resolve`);
+  // Uncached or previously unmatched charges should always be attempted
+  const uncached = charges.filter(c => !cached[c.id] || cached[c.id].category === 'Unmatched');
+  console.log(`[deposit-breakdown] ${Object.keys(cached).length} in cache, ${uncached.length} to resolve/retry`);
 
-  // Use cached values
+  // Use cached values for established categories
   for (const [id, data] of Object.entries(cached)) {
-    results[id] = { category: data.category, source: data.source, posOrder: data.pos_order };
+    if (data.category && data.category !== 'Unmatched') {
+      results[id] = { category: data.category, source: data.source, posOrder: data.pos_order };
+    }
   }
 
   // Resolve uncached charges
@@ -279,9 +351,29 @@ async function resolveCategories(stripe, charges, creds, uid) {
       continue;
     }
 
-    // Try Odoo POS
+    // Try Odoo POS & Sale Orders
     if (creds && uid) {
-      const posResult = await resolveViaPOS(creds, uid, pi);
+      // 1. Try Sale Order (e.g. S00288 membership/donation)
+      const soResult = await resolveViaSaleOrder(creds, uid, ch);
+      if (soResult) {
+        results[ch.id] = { category: soResult.category, source: 'pos', posOrder: soResult.orderName };
+        toCache.push({
+          charge_id: ch.id,
+          payout_id: ch._payoutId || null,
+          category: soResult.category,
+          source: 'pos',
+          amount: ch.amount / 100,
+          fee: ch._fee || 0,
+          net: (ch.amount / 100) - (ch._fee || 0),
+          charge_date: new Date(ch.created * 1000).toISOString().split('T')[0],
+          customer: ch.billing_details?.name || '',
+          pos_order: soResult.orderName || null,
+        });
+        continue;
+      }
+
+      // 2. Try POS payments
+      const posResult = await resolveViaPOS(creds, uid, ch);
       if (posResult) {
         results[ch.id] = { category: posResult.category, source: 'pos', posOrder: posResult.orderName };
         toCache.push({
@@ -299,7 +391,7 @@ async function resolveCategories(stripe, charges, creds, uid) {
         continue;
       }
 
-      // Try Odoo Website Payment (payment.transaction with tx- reference)
+      // 3. Try Odoo Website Payment (payment.transaction with tx- reference)
       const webResult = await resolveViaOdooWebsite(creds, uid, ch);
       if (webResult) {
         results[ch.id] = { category: webResult.category, source: 'pos', posOrder: webResult.orderName };
@@ -338,7 +430,7 @@ async function resolveCategories(stripe, charges, creds, uid) {
   // Save newly resolved to cache
   if (toCache.length > 0) {
     await cacheCategories(toCache);
-    console.log(`[deposit-breakdown] Cached ${toCache.length} new resolutions`);
+    console.log(`[deposit-breakdown] Cached ${toCache.length} resolutions`);
   }
 
   return results;
@@ -450,7 +542,22 @@ export async function GET(request) {
         }
 
         if (creds && uid) {
-          const posResult = await resolveViaPOS(creds, uid, pi);
+          // 1. Try Sale Order (e.g. S00288)
+          const soResult = await resolveViaSaleOrder(creds, uid, ch);
+          if (soResult) {
+            categoryMap[ch.id] = { category: soResult.category, source: 'pos', posOrder: soResult.orderName };
+            toCache.push({
+              charge_id: ch.id, payout_id: ch._payoutId, category: soResult.category,
+              source: 'pos', amount: ch.amount / 100, fee: ch._fee || 0,
+              net: (ch.amount / 100) - (ch._fee || 0),
+              charge_date: new Date(ch.created * 1000).toISOString().split('T')[0],
+              customer: ch.billing_details?.name || '', pos_order: soResult.orderName || null,
+            });
+            continue;
+          }
+
+          // 2. Try POS payments
+          const posResult = await resolveViaPOS(creds, uid, ch);
           if (posResult) {
             categoryMap[ch.id] = { category: posResult.category, source: 'pos', posOrder: posResult.orderName };
             toCache.push({
@@ -463,7 +570,7 @@ export async function GET(request) {
             continue;
           }
 
-          // Try Odoo Website Payment (payment.transaction with tx- reference)
+          // 3. Try Odoo Website Payment (payment.transaction with tx- reference)
           const webResult = await resolveViaOdooWebsite(creds, uid, ch);
           if (webResult) {
             categoryMap[ch.id] = { category: webResult.category, source: 'pos', posOrder: webResult.orderName };

@@ -151,20 +151,20 @@ export function calculateNextStep(currentBid, settings) {
  * Generate 3 smart 1-click bid options for the UI
  */
 export function generateQuickBidOptions(currentBid, bidsCount, baseBid, settings) {
-  const base = Number(baseBid || 500);
+  const base = Number(baseBid || settings?.base_bid || 500);
   const current = Number(currentBid || base);
 
   if (Number(bidsCount || 0) === 0) {
-    // No bids yet: first bid can be base bid ($500), base + step ($1,000), base + 2*step ($1,500)
+    // No bids yet: opening bid is reserve, followed by increments
     const step = calculateNextStep(base, settings);
     return [
-      { amount: base, label: `$${base.toLocaleString()} (Opening Bid)` },
-      { amount: base + step, label: `$${(base + step).toLocaleString()}` },
-      { amount: base + (step * 2), label: `$${(base + (step * 2)).toLocaleString()}` },
+      { amount: base, label: `$${base.toLocaleString()} (Opening Reserve)`, stepText: 'Opening Reserve' },
+      { amount: base + step, label: `$${(base + step).toLocaleString()} (+$${step.toLocaleString()})`, stepText: `+$${step.toLocaleString()}` },
+      { amount: base + (step * 2), label: `$${(base + (step * 2)).toLocaleString()} (+$${(step * 2).toLocaleString()})`, stepText: `+$${(step * 2).toLocaleString()}` },
     ];
   }
 
-  // Existing bids: compute increments
+  // Existing bids: compute dynamic increments
   const step1 = calculateNextStep(current, settings);
   const bid1 = current + step1;
   const step2 = calculateNextStep(bid1, settings);
@@ -173,9 +173,9 @@ export function generateQuickBidOptions(currentBid, bidsCount, baseBid, settings
   const bid3 = bid2 + step3;
 
   return [
-    { amount: bid1, label: `$${bid1.toLocaleString()} (Next Bid)` },
-    { amount: bid2, label: `$${bid2.toLocaleString()} (+1 Step)` },
-    { amount: bid3, label: `$${bid3.toLocaleString()} (+2 Steps)` },
+    { amount: bid1, label: `$${bid1.toLocaleString()} (+$${step1.toLocaleString()} Next)`, stepText: `+$${step1.toLocaleString()} Next` },
+    { amount: bid2, label: `$${bid2.toLocaleString()} (+$${step2.toLocaleString()})`, stepText: `+$${step2.toLocaleString()}` },
+    { amount: bid3, label: `$${bid3.toLocaleString()} (+$${(step2 + step3).toLocaleString()})`, stepText: `+$${(step2 + step3).toLocaleString()}` },
   ];
 }
 
@@ -409,17 +409,18 @@ export async function initiateBid({ day_number, bidder_name, bidder_phone, bidde
   }
 
   // 2. Validate bid amount meets minimum
-  const currentBid = Number(day.current_highest_bid || day.base_bid || 500);
+  const openingReserve = Number(day.base_bid || settings?.base_bid || 500);
+  const currentBid = Number(day.current_highest_bid || openingReserve);
   const bidsCount = Number(day.bids_count || 0);
 
   if (bidsCount === 0) {
-    if (amount < Number(day.base_bid || 500)) {
-      throw new Error(`The opening bid must be at least $${Number(day.base_bid || 500).toLocaleString()}.`);
+    if (amount < openingReserve) {
+      throw new Error(`The opening bid must be at least $${openingReserve.toLocaleString()}.`);
     }
   } else {
     const minStep = calculateNextStep(currentBid, settings);
     if (amount < currentBid + minStep) {
-      throw new Error(`The minimum next bid is $${(currentBid + minStep).toLocaleString()}.`);
+      throw new Error(`The minimum next bid is $${(currentBid + minStep).toLocaleString()} (increments of at least $${minStep.toLocaleString()}).`);
     }
   }
 
@@ -633,11 +634,13 @@ export async function verifyBid({ bid_id, otp_code }) {
 
   const previousWinnerEmail = day.current_winner_email;
   const previousWinnerName = day.current_winner_name;
-  const previousHighBid = Number(day.current_highest_bid || day.base_bid || 500);
+  const previousHighBid = Number(day.current_highest_bid || day.base_bid || settings?.base_bid || 500);
 
   // If another verified bid beat this amount while the user was entering OTP
   if (day.bids_count > 0 && bid.bid_amount <= previousHighBid) {
-    throw new Error(`Another devotee just placed a verified bid of $${previousHighBid.toLocaleString()}. Please place a higher bid to take the lead.`);
+    const settings = await getAartiSettings().catch(() => ({ tier1_max: 3000, tier1_increment: 500, tier2_increment: 250 }));
+    const minStep = calculateNextStep(previousHighBid, settings);
+    throw new Error(`Another devotee just placed a verified bid of $${previousHighBid.toLocaleString()}. The minimum next bid is $${(previousHighBid + minStep).toLocaleString()} (increments of at least $${minStep.toLocaleString()}).`);
   }
 
   // 3. Mark this bid verified & highest
@@ -821,7 +824,7 @@ async function sendOutbidAlert({ toEmail, toName, dayNumber, dayTitle, eventDate
                     $${newHighBid.toLocaleString()}
                   </div>
                   <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #E5E7EB; font-size: 13px; color: #515154;">
-                    Minimum next bid to reclaim lead: <strong style="color: #10B981; font-weight: 700;">$${minNextBid.toLocaleString()}</strong>
+                    Minimum next bid to reclaim lead: <strong style="color: #10B981; font-weight: 700;">$${minNextBid.toLocaleString()}</strong> (increments of $${minStep.toLocaleString()})
                   </div>
                 </td>
               </tr>
