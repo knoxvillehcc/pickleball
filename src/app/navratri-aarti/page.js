@@ -563,8 +563,9 @@ export default function NavratriAartiPage() {
             {error}
           </div>
         ) : (
-          <div className="aarti-festival-grid">
-            {currentAndRemainingDays.map((day) => {
+          <>
+            <div className="aarti-festival-grid">
+              {currentAndRemainingDays.map((day) => {
               const isClosed = day.status === 'closed' || day.is_past_cutoff;
               const isMaha = day.is_maha_aarti;
               const hasWinner = day.bids_count > 0 && day.current_winner_name;
