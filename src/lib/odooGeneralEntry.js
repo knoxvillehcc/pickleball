@@ -98,6 +98,7 @@ export async function postEventGeneralEntry({
   totalFees = 0,
   registrationsCount = 0,
   forceReSync = false,
+  notes = '',
 }) {
   if (!sourceRef) throw new Error('sourceRef is required for general entry');
   if (totalGross <= 0) throw new Error('Total gross revenue must be greater than zero');
@@ -187,13 +188,17 @@ export async function postEventGeneralEntry({
     ...(analyticDistribution ? { analytic_distribution: analyticDistribution } : {}),
   }]);
 
+  const narrationText = notes
+    ? `${lineDescription}\nRegistrations: ${registrationsCount}\nGross: $${safeGross.toFixed(2)}\nFees: $${safeFee.toFixed(2)}\nNet Bank: $${safeNetBank.toFixed(2)}\nAnalytic: ${eventName}\n\n${notes}`
+    : `${lineDescription}\nRegistrations: ${registrationsCount}\nGross: $${safeGross.toFixed(2)}\nFees: $${safeFee.toFixed(2)}\nNet Bank: $${safeNetBank.toFixed(2)}\nAnalytic: ${eventName}`;
+
   // 6. Create General Entry (account.move with move_type: 'entry')
   const moveId = await odooCall(creds, uid, 'account.move', 'create', [{
     move_type: 'entry',
     journal_id: journal.id,
     date: todayStr,
     ref: sourceRef,
-    narration: `${lineDescription}\nRegistrations: ${registrationsCount}\nGross: $${safeGross.toFixed(2)}\nFees: $${safeFee.toFixed(2)}\nNet Bank: $${safeNetBank.toFixed(2)}\nAnalytic: ${eventName}`,
+    narration: narrationText,
     line_ids: lineIds,
   }]);
 

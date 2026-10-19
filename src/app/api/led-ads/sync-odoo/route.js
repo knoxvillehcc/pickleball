@@ -129,6 +129,19 @@ export async function POST(request) {
       return sum + (gross * 0.029 + 0.30);
     }, 0);
 
+    // Format business names and sponsor details for Odoo Internal Notes
+    const businessList = paidRegistrations.map((r, idx) => {
+      const bName = r.business_name || 'N/A';
+      const cName = r.contact_name ? ` (Contact: ${r.contact_name})` : '';
+      const amount = ((r.amount_paid || 0) / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      const method = (r.payment_method || 'stripe').toUpperCase();
+      const check = r.check_number ? ` · Check #${r.check_number}` : '';
+      const reg = r.registration_number ? ` [${r.registration_number}]` : '';
+      return `${idx + 1}. ${bName}${cName} — ${amount} (${method}${check})${reg}`;
+    }).join('\n');
+
+    const notes = `Registered Businesses & Sponsors (${paidRegistrations.length}):\n${businessList}`;
+
     // 3. Post General Entry to Odoo
     const result = await postEventGeneralEntry({
       eventName: 'Navratri 2026',
@@ -139,6 +152,7 @@ export async function POST(request) {
       totalFees,
       registrationsCount: paidRegistrations.length,
       forceReSync,
+      notes,
     });
 
     if (result.alreadyExists) {
