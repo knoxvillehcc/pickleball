@@ -467,6 +467,7 @@ export async function GET(request) {
 
     // ── 2. Fetch balance transactions for each payout ───────────────────────
     const allCharges = [];
+    const allRefunds = [];
     const payoutDetails = [];
 
     for (const po of payouts) {
@@ -475,8 +476,9 @@ export async function GET(request) {
         ? new Date(po.arrival_date * 1000).toISOString().split('T')[0]
         : poDate;
 
-      let poCharges = 0, poGross = 0, poFees = 0;
+      let poCharges = 0, poGross = 0, poFees = 0, poRefunds = 0, poRefundCount = 0;
       const chargeIds = [];
+      const refundIds = [];
 
       for await (const txn of stripe.balanceTransactions.list({
         payout: po.id,
@@ -492,6 +494,18 @@ export async function GET(request) {
           poCharges++;
           poGross += txn.amount / 100;
           poFees += txn.fee / 100;
+        } else if (txn.type === 'refund' && txn.source) {
+          const ref = txn.source;
+          const refAmount = txn.amount / 100; // negative
+          const refFee = txn.fee / 100;
+          ref._payoutId = po.id;
+          ref._amount = refAmount;
+          ref._fee = refFee;
+          allRefunds.push(ref);
+          refundIds.push(ref.id);
+          poRefundCount++;
+          poRefunds += refAmount;
+          poFees += refFee;
         }
       }
 
@@ -502,10 +516,13 @@ export async function GET(request) {
         amount: po.amount / 100,
         status: po.status,
         chargeCount: poCharges,
+        refundCount: poRefundCount,
         gross: poGross,
+        refunds: poRefunds,
         fees: poFees,
         net: po.amount / 100,
         chargeIds,
+        refundIds,
         categories: {}, // Filled in step 4
       });
     }
@@ -632,6 +649,22 @@ export async function GET(request) {
         }
       }
 
+      // Add refunds to categories
+      for (const refId of (po.refundIds || [])) {
+        const ref = allRefunds.find(r => r.id === refId);
+        if (!ref) continue;
+        const origChargeId = typeof ref.charge === 'string' ? ref.charge : ref.charge?.id;
+        const resolved = origChargeId ? (categoryMap[origChargeId] || { category: 'Refunds', source: 'refund' }) : { category: 'Refunds', source: 'refund' };
+        const cat = resolved.category || 'Refunds';
+
+        if (!cats[cat]) {
+          cats[cat] = { category: cat, source: resolved.source || 'refund', charges: 0, gross: 0, fees: 0, net: 0 };
+        }
+        cats[cat].gross += ref._amount; // negative
+        cats[cat].fees += ref._fee || 0;
+        cats[cat].net += ref._amount - (ref._fee || 0);
+      }
+
       // Round values and sort categories by gross desc
       po.categories = Object.values(cats)
         .map(c => ({
@@ -644,6 +677,7 @@ export async function GET(request) {
 
       // Clean up
       delete po.chargeIds;
+      delete po.refundIds;
     }
 
     // ── 5. Overall summary ──────────────────────────────────────────────────
@@ -673,7 +707,9 @@ export async function GET(request) {
     const totals = {
       payouts: payoutDetails.length,
       charges: allCharges.length,
+      refundsCount: allRefunds.length,
       gross: Math.round(payoutDetails.reduce((s, p) => s + p.gross, 0) * 100) / 100,
+      refunds: Math.round(payoutDetails.reduce((s, p) => s + (p.refunds || 0), 0) * 100) / 100,
       fees: Math.round(payoutDetails.reduce((s, p) => s + p.fees, 0) * 100) / 100,
       deposited: Math.round(payoutDetails.reduce((s, p) => s + p.net, 0) * 100) / 100,
       resolved: allCharges.length - unmatchedCharges.length,

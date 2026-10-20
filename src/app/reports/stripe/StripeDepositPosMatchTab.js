@@ -82,6 +82,15 @@ function GlobeIcon() {
   );
 }
 
+function RotateCcwIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="1 4 1 10 7 10" />
+      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+    </svg>
+  );
+}
+
 export default function StripeDepositPosMatchTab({
   startDate,
   endDate,
@@ -98,6 +107,7 @@ export default function StripeDepositPosMatchTab({
   const [loading, setLoading] = useState(false);
   const [expandedPayouts, setExpandedPayouts] = useState({});
   const [showReceiptsMap, setShowReceiptsMap] = useState({});
+  const [showOnlineListMap, setShowOnlineListMap] = useState({});
   const [filterQuery, setFilterQuery] = useState('');
 
   // Quick Date Presets
@@ -125,7 +135,6 @@ export default function StripeDepositPosMatchTab({
       const json = await res.json();
       if (json.success) {
         setData(json);
-        // Default expand the first payout if available
         if (json.payouts && json.payouts.length > 0) {
           setExpandedPayouts({ [json.payouts[0].id]: true });
         }
@@ -145,35 +154,84 @@ export default function StripeDepositPosMatchTab({
     setShowReceiptsMap(prev => ({ ...prev, [payoutId]: !prev[payoutId] }));
   };
 
-  // CSV Export
+  const toggleOnlineList = (payoutId) => {
+    setShowOnlineListMap(prev => ({ ...prev, [payoutId]: !prev[payoutId] }));
+  };
+
+  // CSV Export with Dedicated Refund Columns
   const downloadCSV = () => {
     if (!data?.payouts?.length) return;
 
     const rows = [
-      ['Deposit Date (MM-DD-YYYY)', 'Arrival Date (MM-DD-YYYY)', 'Payout ID', 'Gross Amount', 'Stripe Fees', 'Net Deposited', 'Odoo Reconciled', 'Type', 'Product / Description', 'Quantity', 'Amount']
+      [
+        'Deposit Date (MM-DD-YYYY)',
+        'Arrival Date (MM-DD-YYYY)',
+        'Payout ID',
+        'Deposit Gross',
+        'Deposit Refunds',
+        'Deposit Fees',
+        'Net Deposited',
+        'Odoo Bank Clearance',
+        'Channel',
+        'Type (Charge/Refund)',
+        'Refund Reason',
+        'Original Sale Date (MM-DD-YYYY)',
+        'Product / Service Description',
+        'Quantity',
+        'Line Amount'
+      ]
     ];
 
     for (const po of data.payouts) {
       const odooStatus = po.isOdooCleared ? 'Cleared' : (po.odooReconciledCount > 0 ? 'Partial' : 'Pending');
 
-      // POS Products
-      if (po.posProductSummary?.length) {
+      // POS Products Summary & Transactions
+      if (po.posTransactions?.length) {
+        for (const tx of po.posTransactions) {
+          const typeStr = tx.isRefund ? 'Refund' : 'Charge';
+          const reasonStr = tx.refundReason || '';
+          const origDateStr = tx.originalDate || '';
+          const itemsStr = tx.items?.map(it => `${it.productName} (x${it.qty})`).join('; ') || tx.orderName;
+
+          rows.push([
+            po.payoutDate, po.arrivalDate, po.id,
+            po.gross.toFixed(2), (po.refunds || 0).toFixed(2), po.fees.toFixed(2), po.net.toFixed(2),
+            odooStatus, 'POS Register', typeStr, reasonStr, origDateStr,
+            itemsStr, tx.items?.reduce((s, i) => s + (i.qty || 1), 0) || 1, tx.amount.toFixed(2)
+          ]);
+        }
+      } else if (po.posProductSummary?.length) {
         for (const item of po.posProductSummary) {
           rows.push([
             po.payoutDate, po.arrivalDate, po.id,
-            po.gross.toFixed(2), po.fees.toFixed(2), po.net.toFixed(2),
-            odooStatus, 'POS Register', item.productName, item.qty, item.amount.toFixed(2)
+            po.gross.toFixed(2), (po.refunds || 0).toFixed(2), po.fees.toFixed(2), po.net.toFixed(2),
+            odooStatus, 'POS Register', item.isRefund ? 'Refund' : 'Charge', '', '',
+            item.productName, item.qty, item.amount.toFixed(2)
           ]);
         }
       }
 
-      // Online Web Items
-      if (po.onlineSummary?.length) {
+      // Online Web Transactions
+      if (po.onlineTransactions?.length) {
+        for (const tx of po.onlineTransactions) {
+          const typeStr = tx.isRefund ? 'Refund' : 'Charge';
+          const reasonStr = tx.refundReason || '';
+          const origDateStr = tx.originalDate || '';
+
+          rows.push([
+            po.payoutDate, po.arrivalDate, po.id,
+            po.gross.toFixed(2), (po.refunds || 0).toFixed(2), po.fees.toFixed(2), po.net.toFixed(2),
+            odooStatus, 'Online Web', typeStr, reasonStr, origDateStr,
+            tx.productName || tx.description, 1, tx.amount.toFixed(2)
+          ]);
+        }
+      } else if (po.onlineSummary?.length) {
         for (const item of po.onlineSummary) {
           rows.push([
             po.payoutDate, po.arrivalDate, po.id,
-            po.gross.toFixed(2), po.fees.toFixed(2), po.net.toFixed(2),
-            odooStatus, 'Online Web', item.name, item.count, item.amount.toFixed(2)
+            po.gross.toFixed(2), (po.refunds || 0).toFixed(2), po.fees.toFixed(2), po.net.toFixed(2),
+            odooStatus, 'Online Web', item.isRefund ? 'Refund' : 'Charge', '', '',
+            item.name, item.count, item.amount.toFixed(2)
           ]);
         }
       }
@@ -189,12 +247,12 @@ export default function StripeDepositPosMatchTab({
     document.body.removeChild(link);
   };
 
-  // Professional PDF Statement Export
+  // Professional PDF Statement Export with Dedicated Refund Metrics
   const downloadPDF = async () => {
     if (!data?.payouts?.length) return;
 
     const doc = new jsPDF('p', 'mm', 'a4');
-    const primaryOrange = [234, 88, 12]; // #EA580C
+    const primaryOrange = [234, 88, 12];
     const darkSlate = [30, 41, 59];
 
     // Header Branding
@@ -209,49 +267,49 @@ export default function StripeDepositPosMatchTab({
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 116, 139);
-    doc.text('Stripe Bank Deposits vs POS Product Sales Reconciliation', 14, 26);
+    doc.text('Stripe Bank Deposits vs POS Product Sales & Refunds Reconciliation', 14, 26);
     doc.text(`Period: ${data.startDate} to ${data.endDate} | Generated: ${new Date().toLocaleDateString('en-US')}`, 14, 32);
 
-    // Summary Box
+    // KPI Summary Box with Dedicated Refunds Card
     doc.setFillColor(248, 250, 252);
     doc.roundedRect(14, 36, 182, 22, 2, 2, 'F');
     doc.setDrawColor(226, 232, 240);
     doc.roundedRect(14, 36, 182, 22, 2, 2, 'S');
 
-    doc.setFontSize(9);
+    doc.setFontSize(8.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(100, 116, 139);
-    doc.text('TOTAL NET DEPOSITS', 20, 43);
-    doc.text('GROSS CHARGES', 75, 43);
-    doc.text('STRIPE FEES', 125, 43);
-    doc.text('POS ITEMS SOLD', 165, 43);
+    doc.text('NET DEPOSITED', 18, 43);
+    doc.text('GROSS CHARGES', 60, 43);
+    doc.text('TOTAL REFUNDS', 105, 43);
+    doc.text('STRIPE FEES', 148, 43);
 
-    doc.setFontSize(13);
+    doc.setFontSize(12);
     doc.setTextColor(16, 185, 129); // Emerald
-    doc.text(fmt(data.kpis.totalNet), 20, 52);
+    doc.text(fmt(data.kpis.totalNet), 18, 52);
 
     doc.setTextColor(15, 23, 42);
-    doc.text(fmt(data.kpis.totalGross), 75, 52);
+    doc.text(fmt(data.kpis.totalGross), 60, 52);
 
-    doc.setTextColor(239, 68, 68);
-    doc.text(fmt(data.kpis.totalFees), 125, 52);
+    doc.setTextColor(239, 68, 68); // Red
+    doc.text(fmt(data.kpis.totalRefunds || 0), 105, 52);
 
-    doc.setTextColor(2, 132, 199);
-    doc.text(String(data.kpis.totalPosItems), 165, 52);
+    doc.setTextColor(245, 158, 11); // Amber
+    doc.text(fmt(data.kpis.totalFees), 148, 52);
 
     let currentY = 64;
 
     // Table of Deposits
     const tableBody = [];
     data.payouts.forEach(po => {
-      const posProductsText = po.posProductSummary?.map(p => `${p.productName} (x${p.qty})`).join(', ') || 'No POS items';
+      const posProductsText = po.posProductSummary?.map(p => `${p.productName} (x${p.qty})`).join(', ') || 'None';
       const odooBadge = po.isOdooCleared ? 'Cleared' : (po.odooReconciledCount > 0 ? 'Partial' : 'Pending');
 
       tableBody.push([
-        po.payoutDate,
         po.arrivalDate,
         po.id,
         fmt(po.gross),
+        fmt(po.refunds || 0),
         fmt(po.fees),
         fmt(po.net),
         odooBadge,
@@ -261,52 +319,47 @@ export default function StripeDepositPosMatchTab({
 
     autoTable(doc, {
       startY: currentY,
-      head: [['Deposit Date', 'Bank Arrival', 'Payout ID', 'Gross', 'Fees', 'Net Deposited', 'Odoo Status', 'POS Products Sold']],
+      head: [['Arrival Date', 'Payout Ref', 'Gross', 'Refunds', 'Fees', 'Net', 'Odoo Status', 'POS Products Sold']],
       body: tableBody,
       theme: 'grid',
       headStyles: {
-        fillColor: [30, 41, 59],
-        textColor: [255, 255, 255],
+        fillColor: [241, 245, 249],
+        textColor: [51, 65, 85],
         fontSize: 8,
         fontStyle: 'bold',
-        halign: 'center',
-      },
-      styles: {
-        fontSize: 7.5,
-        cellPadding: 2.5,
-        valign: 'middle',
+        halign: 'left',
       },
       columnStyles: {
-        0: { halign: 'center', cellWidth: 20 },
-        1: { halign: 'center', cellWidth: 20 },
-        2: { cellWidth: 24, font: 'courier' },
-        3: { halign: 'right', cellWidth: 16 },
-        4: { halign: 'right', cellWidth: 16 },
-        5: { halign: 'right', cellWidth: 20, fontStyle: 'bold', textColor: [16, 185, 129] },
-        6: { halign: 'center', cellWidth: 18 },
-        7: { cellWidth: 48 },
+        0: { cellWidth: 22, fontSize: 8 },
+        1: { cellWidth: 26, fontSize: 7, font: 'courier' },
+        2: { cellWidth: 16, halign: 'right', fontSize: 8 },
+        3: { cellWidth: 16, halign: 'right', fontSize: 8, textColor: [239, 68, 68] },
+        4: { cellWidth: 14, halign: 'right', fontSize: 8, textColor: [245, 158, 11] },
+        5: { cellWidth: 18, halign: 'right', fontSize: 8, fontStyle: 'bold', textColor: [16, 185, 129] },
+        6: { cellWidth: 18, halign: 'center', fontSize: 7.5 },
+        7: { cellWidth: 'auto', fontSize: 7.5 },
       },
+      styles: { cellPadding: 3, overflow: 'linebreak' },
     });
 
-    const filename = `stripe-deposit-pos-reconciliation-${startDate}-to-${endDate}.pdf`;
-    await exportPdfWithNativeShare(doc, filename, { title: 'Stripe Deposit POS Reconciliation' });
+    // Share / Save
+    await exportPdfWithNativeShare(doc, `stripe-deposit-pos-statement-${data.startDate}-to-${data.endDate}.pdf`);
   };
 
+  // Filter payouts by user query
   const filteredPayouts = (data?.payouts || []).filter(po => {
     if (!filterQuery) return true;
     const q = filterQuery.toLowerCase();
-    return (
-      po.id.toLowerCase().includes(q) ||
-      po.payoutDate.includes(q) ||
-      po.arrivalDate.includes(q) ||
-      po.posProductSummary?.some(p => p.productName.toLowerCase().includes(q)) ||
-      po.onlineSummary?.some(o => o.name.toLowerCase().includes(q))
-    );
+    const matchesId = po.id.toLowerCase().includes(q);
+    const matchesDate = po.arrivalDate.includes(q) || po.payoutDate.includes(q);
+    const matchesPos = po.posProductSummary?.some(p => p.productName.toLowerCase().includes(q));
+    const matchesOnline = po.onlineSummary?.some(p => p.name.toLowerCase().includes(q));
+    return matchesId || matchesDate || matchesPos || matchesOnline;
   });
 
   return (
     <div>
-      {/* ── TOP PRESETS & FILTER BAR ─────────────────────────────────────── */}
+      {/* ── TOP ACTION BAR: PRESETS & ACTIONS ───────────────────────────── */}
       <div style={{ ...card, padding: '16px 20px', marginBottom: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
@@ -392,9 +445,9 @@ export default function StripeDepositPosMatchTab({
         </div>
       </div>
 
-      {/* ── KPI STATS CARDS ─────────────────────────────────────────────── */}
+      {/* ── KPI STATS CARDS WITH DEDICATED REFUND CARD ───────────────────── */}
       {data?.kpis && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
           <div style={{ ...kpiCard, borderTop: '3.5px solid #10B981' }}>
             <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Total Net Deposited</span>
             <span className="kpi-stat-value" style={{ color: '#10B981', fontSize: 'clamp(20px, 3.2vw, 26px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
@@ -408,20 +461,28 @@ export default function StripeDepositPosMatchTab({
             <span className="kpi-stat-value" style={{ color: '#0284C7', fontSize: 'clamp(20px, 3.2vw, 26px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
               {fmt(data.kpis.totalGross)}
             </span>
-            <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Before Stripe processing fees</span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Before Stripe fees &amp; returns</span>
           </div>
 
           <div style={{ ...kpiCard, borderTop: '3.5px solid #EF4444' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Stripe CC Fees</span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Total Refunds</span>
             <span className="kpi-stat-value" style={{ color: '#EF4444', fontSize: 'clamp(20px, 3.2vw, 26px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
+              {fmt(data.kpis.totalRefunds || 0)}
+            </span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{data.kpis.totalRefundsCount || 0} returned transactions</span>
+          </div>
+
+          <div style={{ ...kpiCard, borderTop: '3.5px solid #F59E0B' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Stripe CC Fees</span>
+            <span className="kpi-stat-value" style={{ color: '#F59E0B', fontSize: 'clamp(20px, 3.2vw, 26px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
               {fmt(data.kpis.totalFees)}
             </span>
             <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Deducted automatically</span>
           </div>
 
-          <div style={{ ...kpiCard, borderTop: '3.5px solid #F59E0B' }}>
+          <div style={{ ...kpiCard, borderTop: '3.5px solid #8B5CF6' }}>
             <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>POS Products Sold</span>
-            <span className="kpi-stat-value" style={{ color: '#F59E0B', fontSize: 'clamp(20px, 3.2vw, 26px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
+            <span className="kpi-stat-value" style={{ color: '#8B5CF6', fontSize: 'clamp(20px, 3.2vw, 26px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
               {data.kpis.totalPosItems} items
             </span>
             <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>across {data.kpis.totalPosOrders} register orders</span>
@@ -432,10 +493,10 @@ export default function StripeDepositPosMatchTab({
       {/* ── SEARCH & TABLE CONTROLS ─────────────────────────────────────── */}
       {data?.payouts?.length > 0 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ maxWidth: '320px', width: '100%' }}>
+          <div style={{ maxWidth: '340px', width: '100%' }}>
             <input
               type="text"
-              placeholder="Filter by product, deposit ID, or date..."
+              placeholder="Filter by product, refund, payout ID, or date..."
               value={filterQuery}
               onChange={e => setFilterQuery(e.target.value)}
               style={{ ...inputStyle, padding: '8px 14px', fontSize: '13px' }}
@@ -453,6 +514,7 @@ export default function StripeDepositPosMatchTab({
           {filteredPayouts.map(po => {
             const isExpanded = !!expandedPayouts[po.id];
             const showReceipts = !!showReceiptsMap[po.id];
+            const showOnline = !!showOnlineListMap[po.id];
 
             return (
               <div key={po.id} style={{ ...card, overflow: 'hidden', border: isExpanded ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid var(--border)' }}>
@@ -490,9 +552,20 @@ export default function StripeDepositPosMatchTab({
                           {po.isOdooCleared ? <CheckIcon /> : null}
                           {po.isOdooCleared ? 'Cleared in Odoo Bank Feed' : `Odoo Matched: ${po.odooReconciledCount}/${po.chargeCount}`}
                         </span>
+
+                        {po.refundCount > 0 && (
+                          <span style={{
+                            fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '6px',
+                            background: 'rgba(239, 68, 68, 0.12)', color: '#EF4444',
+                            display: 'flex', alignItems: 'center', gap: '4px'
+                          }}>
+                            <RotateCcwIcon />
+                            <span>{po.refundCount} Refund{po.refundCount > 1 ? 's' : ''} ({fmt(po.refunds)})</span>
+                          </span>
+                        )}
                       </div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        {po.chargeCount} card transactions · {po.destination}
+                        {po.chargeCount} card transactions {po.refundCount > 0 ? `· ${po.refundCount} refund(s)` : ''} · {po.destination}
                       </div>
                     </div>
                   </div>
@@ -502,9 +575,15 @@ export default function StripeDepositPosMatchTab({
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gross</div>
                       <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontFamily: 'monospace', fontWeight: '600' }}>{fmt(po.gross)}</div>
                     </div>
+                    {po.refunds < 0 && (
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '11px', color: '#EF4444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Refunds</div>
+                        <div style={{ fontSize: '14px', color: '#EF4444', fontFamily: 'monospace', fontWeight: '700' }}>{fmt(po.refunds)}</div>
+                      </div>
+                    )}
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Fees</div>
-                      <div style={{ fontSize: '14px', color: '#EF4444', fontFamily: 'monospace', fontWeight: '600' }}>{fmt(po.fees)}</div>
+                      <div style={{ fontSize: '14px', color: '#F59E0B', fontFamily: 'monospace', fontWeight: '600' }}>{fmt(po.fees)}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Net Deposited</div>
@@ -555,19 +634,23 @@ export default function StripeDepositPosMatchTab({
                               </tr>
                             </thead>
                             <tbody>
-                              {po.posProductSummary.map((item, idx) => (
-                                <tr key={item.productId || idx} style={{ borderTop: '1px solid var(--border)' }}>
-                                  <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600' }}>
-                                    {item.productName}
-                                  </td>
-                                  <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontVariantNumeric: 'tabular-nums', fontWeight: '600' }}>
-                                    {item.qty}
-                                  </td>
-                                  <td style={{ padding: '10px 16px', textAlign: 'right', color: '#10B981', fontSize: '13px', fontFamily: 'monospace', fontWeight: '700' }}>
-                                    {fmt(item.amount)}
-                                  </td>
-                                </tr>
-                              ))}
+                              {po.posProductSummary.map((item, idx) => {
+                                const isRef = item.isRefund || item.amount < 0;
+                                return (
+                                  <tr key={item.productId || idx} style={{ borderTop: '1px solid var(--border)', background: isRef ? 'rgba(239, 68, 68, 0.04)' : 'transparent' }}>
+                                    <td style={{ padding: '10px 16px', color: isRef ? '#EF4444' : 'var(--text-primary)', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                      {isRef && <span style={{ fontSize: '10px', fontWeight: '700', padding: '1px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.12)', color: '#EF4444' }}>REFUND</span>}
+                                      <span>{item.productName}</span>
+                                    </td>
+                                    <td style={{ padding: '10px 16px', textAlign: 'right', color: isRef ? '#EF4444' : 'var(--text-primary)', fontSize: '13px', fontVariantNumeric: 'tabular-nums', fontWeight: '600' }}>
+                                      {item.qty}
+                                    </td>
+                                    <td style={{ padding: '10px 16px', textAlign: 'right', color: isRef ? '#EF4444' : '#10B981', fontSize: '13px', fontFamily: 'monospace', fontWeight: '700' }}>
+                                      {fmt(item.amount)}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
                           </table>
                         </div>
@@ -588,40 +671,52 @@ export default function StripeDepositPosMatchTab({
                               <thead>
                                 <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
                                   <th style={{ padding: '8px 12px', textAlign: 'left' }}>Order / Receipt</th>
-                                  <th style={{ padding: '8px 12px', textAlign: 'left' }}>Session</th>
                                   <th style={{ padding: '8px 12px', textAlign: 'left' }}>Customer</th>
                                   <th style={{ padding: '8px 12px', textAlign: 'left' }}>Card</th>
-                                  <th style={{ padding: '8px 12px', textAlign: 'left' }}>Purchased Items</th>
+                                  <th style={{ padding: '8px 12px', textAlign: 'left' }}>Items / Reason</th>
                                   <th style={{ padding: '8px 12px', textAlign: 'right' }}>Amount</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {po.posTransactions.map((tx, tIdx) => (
-                                  <tr key={tx.orderId || tIdx} style={{ borderTop: '1px solid var(--border)' }}>
-                                    <td style={{ padding: '8px 12px', fontWeight: '600', color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-                                      {tx.orderName}
-                                    </td>
-                                    <td style={{ padding: '8px 12px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                                      {tx.sessionName}
-                                    </td>
-                                    <td style={{ padding: '8px 12px', color: 'var(--text-primary)' }}>
-                                      {tx.customer}
-                                    </td>
-                                    <td style={{ padding: '8px 12px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                                      {tx.cardBrand} ···{tx.last4}
-                                    </td>
-                                    <td style={{ padding: '8px 12px', color: 'var(--text-primary)' }}>
-                                      {tx.items?.map((it, iIdx) => (
-                                        <div key={iIdx}>
-                                          <span style={{ fontWeight: '600' }}>{it.productName}</span> &times; {it.qty} (${it.amount})
-                                        </div>
-                                      ))}
-                                    </td>
-                                    <td style={{ padding: '8px 12px', textAlign: 'right', fontFamily: 'monospace', fontWeight: '700', color: '#10B981', whiteSpace: 'nowrap' }}>
-                                      {fmt(tx.amount)}
-                                    </td>
-                                  </tr>
-                                ))}
+                                {po.posTransactions.map((tx, tIdx) => {
+                                  const isRef = tx.isRefund || tx.amount < 0;
+                                  return (
+                                    <tr key={tx.id || tx.orderId || tIdx} style={{ borderTop: '1px solid var(--border)', background: isRef ? 'rgba(239, 68, 68, 0.05)' : 'transparent' }}>
+                                      <td style={{ padding: '8px 12px', fontWeight: '600', color: isRef ? '#EF4444' : 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                                        {isRef ? (
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span style={{ fontSize: '10px', fontWeight: '700', padding: '1px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.12)', color: '#EF4444' }}>REFUND</span>
+                                            <span>{tx.orderName}</span>
+                                          </div>
+                                        ) : (
+                                          tx.orderName
+                                        )}
+                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{tx.date} {tx.time}</div>
+                                      </td>
+                                      <td style={{ padding: '8px 12px', color: 'var(--text-primary)' }}>
+                                        {tx.customer}
+                                      </td>
+                                      <td style={{ padding: '8px 12px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                                        {tx.cardBrand} ···{tx.last4}
+                                      </td>
+                                      <td style={{ padding: '8px 12px', color: 'var(--text-primary)' }}>
+                                        {isRef && tx.refundReason && (
+                                          <div style={{ color: '#EF4444', fontWeight: '600', fontSize: '11px', marginBottom: '2px' }}>
+                                            Reason: {tx.refundReason} {tx.originalDate ? `(Sale: ${tx.originalDate})` : ''}
+                                          </div>
+                                        )}
+                                        {tx.items?.map((it, iIdx) => (
+                                          <div key={iIdx}>
+                                            <span style={{ fontWeight: '600' }}>{it.productName}</span> &times; {it.qty} ({fmt(it.amount)})
+                                          </div>
+                                        ))}
+                                      </td>
+                                      <td style={{ padding: '8px 12px', textAlign: 'right', fontFamily: 'monospace', fontWeight: '700', color: isRef ? '#EF4444' : '#10B981', whiteSpace: 'nowrap' }}>
+                                        {fmt(tx.amount)}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
                               </tbody>
                             </table>
                           </div>
@@ -631,14 +726,30 @@ export default function StripeDepositPosMatchTab({
 
                     {/* SECTION B: ONLINE / WEB TRANSACTIONS */}
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                        <span style={{ color: '#0284C7' }}><GlobeIcon /></span>
-                        <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>
-                          Online &amp; Website Transactions
-                        </span>
-                        <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                          (Website passes, memberships, donations)
-                        </span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ color: '#0284C7' }}><GlobeIcon /></span>
+                          <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                            Online &amp; Website Transactions
+                          </span>
+                          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                            (Website passes, memberships, donations, refunds)
+                          </span>
+                        </div>
+
+                        {po.onlineTransactions?.length > 0 && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleOnlineList(po.id); }}
+                            style={{
+                              padding: '5px 12px', borderRadius: '6px', border: '1px solid var(--border)',
+                              background: showOnline ? '#0284C7' : 'var(--bg-button-secondary)',
+                              color: showOnline ? '#FFFFFF' : 'var(--text-primary)',
+                              fontSize: '12px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.15s'
+                            }}
+                          >
+                            {showOnline ? 'Hide Transactions' : `Show Individual Online Items (${po.onlineTransactions.length})`}
+                          </button>
+                        )}
                       </div>
 
                       {po.onlineSummary?.length > 0 ? (
@@ -647,30 +758,94 @@ export default function StripeDepositPosMatchTab({
                             <thead>
                               <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
                                 <th style={{ padding: '10px 16px', textAlign: 'left', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Category / Source</th>
-                                <th style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Transactions</th>
+                                <th style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Count</th>
                                 <th style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-table-header)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Amount</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {po.onlineSummary.map((item, idx) => (
-                                <tr key={idx} style={{ borderTop: '1px solid var(--border)' }}>
-                                  <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '600' }}>
-                                    {item.name}
-                                  </td>
-                                  <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontVariantNumeric: 'tabular-nums', fontWeight: '600' }}>
-                                    {item.count}
-                                  </td>
-                                  <td style={{ padding: '10px 16px', textAlign: 'right', color: '#0284C7', fontSize: '13px', fontFamily: 'monospace', fontWeight: '700' }}>
-                                    {fmt(item.amount)}
-                                  </td>
-                                </tr>
-                              ))}
+                              {po.onlineSummary.map((item, idx) => {
+                                const isRef = item.isRefund || item.amount < 0;
+                                return (
+                                  <tr key={idx} style={{ borderTop: '1px solid var(--border)', background: isRef ? 'rgba(239, 68, 68, 0.04)' : 'transparent' }}>
+                                    <td style={{ padding: '10px 16px', color: isRef ? '#EF4444' : 'var(--text-primary)', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                      {isRef && <span style={{ fontSize: '10px', fontWeight: '700', padding: '1px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.12)', color: '#EF4444' }}>REFUND</span>}
+                                      <span>{item.name}</span>
+                                    </td>
+                                    <td style={{ padding: '10px 16px', textAlign: 'right', color: isRef ? '#EF4444' : 'var(--text-primary)', fontSize: '13px', fontVariantNumeric: 'tabular-nums', fontWeight: '600' }}>
+                                      {item.count}
+                                    </td>
+                                    <td style={{ padding: '10px 16px', textAlign: 'right', color: isRef ? '#EF4444' : '#0284C7', fontSize: '13px', fontFamily: 'monospace', fontWeight: '700' }}>
+                                      {fmt(item.amount)}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
                           </table>
                         </div>
                       ) : (
                         <div style={{ padding: '14px', borderRadius: '8px', background: 'var(--bg-input)', color: 'var(--text-muted)', fontSize: '13px', fontStyle: 'italic' }}>
                           No online web payments in this deposit bundle.
+                        </div>
+                      )}
+
+                      {/* INDIVIDUAL ONLINE TRANSACTIONS TABLE (TOGGLEABLE) */}
+                      {showOnline && po.onlineTransactions?.length > 0 && (
+                        <div style={{ marginTop: '14px', borderRadius: '10px', border: '1px solid rgba(2, 132, 199, 0.3)', overflow: 'hidden' }}>
+                          <div style={{ padding: '10px 16px', background: 'rgba(2, 132, 199, 0.08)', fontSize: '12px', fontWeight: '700', color: '#0284C7' }}>
+                            Individual Online Registrations &amp; Refund Details
+                          </div>
+                          <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                              <thead>
+                                <tr style={{ backgroundColor: 'var(--bg-table-header)' }}>
+                                  <th style={{ padding: '8px 12px', textAlign: 'left' }}>Item / Service</th>
+                                  <th style={{ padding: '8px 12px', textAlign: 'left' }}>Customer</th>
+                                  <th style={{ padding: '8px 12px', textAlign: 'left' }}>Card</th>
+                                  <th style={{ padding: '8px 12px', textAlign: 'left' }}>Date &amp; Details</th>
+                                  <th style={{ padding: '8px 12px', textAlign: 'right' }}>Amount</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {po.onlineTransactions.map((tx, tIdx) => {
+                                  const isRef = tx.isRefund || tx.amount < 0;
+                                  return (
+                                    <tr key={tx.id || tIdx} style={{ borderTop: '1px solid var(--border)', background: isRef ? 'rgba(239, 68, 68, 0.05)' : 'transparent' }}>
+                                      <td style={{ padding: '8px 12px', fontWeight: '600', color: isRef ? '#EF4444' : 'var(--text-primary)' }}>
+                                        {isRef ? (
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span style={{ fontSize: '10px', fontWeight: '700', padding: '1px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.12)', color: '#EF4444' }}>REFUND</span>
+                                            <span>{tx.productName || tx.description}</span>
+                                          </div>
+                                        ) : (
+                                          tx.productName || tx.description
+                                        )}
+                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{tx.id}</div>
+                                      </td>
+                                      <td style={{ padding: '8px 12px', color: 'var(--text-primary)' }}>
+                                        <div>{tx.customer}</div>
+                                        {tx.email && <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{tx.email}</div>}
+                                      </td>
+                                      <td style={{ padding: '8px 12px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                                        {tx.cardBrand} ···{tx.last4}
+                                      </td>
+                                      <td style={{ padding: '8px 12px', color: 'var(--text-primary)' }}>
+                                        <div>{tx.date} {tx.time}</div>
+                                        {isRef && tx.refundReason && (
+                                          <div style={{ color: '#EF4444', fontSize: '11px', fontWeight: '600' }}>
+                                            Reason: {tx.refundReason} {tx.originalDate ? `(Sale: ${tx.originalDate})` : ''}
+                                          </div>
+                                        )}
+                                      </td>
+                                      <td style={{ padding: '8px 12px', textAlign: 'right', fontFamily: 'monospace', fontWeight: '700', color: isRef ? '#EF4444' : '#0284C7', whiteSpace: 'nowrap' }}>
+                                        {fmt(tx.amount)}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -691,7 +866,7 @@ export default function StripeDepositPosMatchTab({
               No Stripe Deposits Loaded
             </h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '14px', maxWidth: '460px', margin: '0 auto 18px' }}>
-              Select a date range or choose a quick preset (like <strong>Navratri 2026</strong>), then click <strong>Match Deposits</strong> to view exact product sales per bank payout.
+              Select a date range or choose a quick preset (like <strong>Navratri 2026</strong>), then click <strong>Match Deposits</strong> to view exact product sales and refunds per bank payout.
             </p>
             <button onClick={fetchData} style={btnPrimary}>
               Match Deposits Now

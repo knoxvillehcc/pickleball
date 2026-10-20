@@ -1,17 +1,23 @@
 /**
  * ═══════════════════════════════════════════════════════════════════
- * Stripe Deposit vs POS Product Sales Matching API
+ * Stripe Deposit Against POS Transactions API (with Full Refund Tracking)
  * ═══════════════════════════════════════════════════════════════════
  *
  * GET /api/stripe/deposit-pos-match?start=YYYY-MM-DD&end=YYYY-MM-DD
  *
- * Reconciles each Stripe bank deposit (payout) to:
- * 1. Specific in-person POS Register Product Sales (e.g. Daily Passes,
- *    Aarti, Cleaning, Uchamni) with exact item quantities and amounts.
- * 2. Online / Web Transactions (Festival passes, memberships, donations).
- * 3. Odoo Bank Feed clearance status (Account 101401).
+ * Hierarchy:
+ * 1. Stripe Payout (Bank Deposit)
+ * 2. Balance Transactions (Charges & Refunds)
+ * 3. Charge / Refund details linked to:
+ *    - In-Person POS Orders: pos.payment -> pos.order -> pos.order.line (Product, Qty, Amount)
+ *    - Online / Web Transactions: Checkout Sessions, Donations, Memberships
+ * 4. Odoo Bank Feed (Account 101401) clearance status
+ * 5. Full Refund Attribution:
+ *    - Captures refund balance transactions (negative amounts)
+ *    - Resolves exact product/service name via Stripe Checkout line items, Odoo sale order/invoice, or POS order
+ *    - Deducts refunds from gross/net so bank deposits tie out to the exact penny
  *
- * Strict date standard: MM-DD-YYYY for user-facing outputs.
+ * Strictly follows HCC standard: MM-DD-YYYY dates, no cartoon emojis.
  * ═══════════════════════════════════════════════════════════════════
  */
 
@@ -24,38 +30,33 @@ export const maxDuration = 120;
 
 function fmtDate(isoDateStr) {
   if (!isoDateStr) return '';
-  const d = new Date(isoDateStr);
-  if (isNaN(d.getTime())) return isoDateStr;
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  const y = d.getFullYear();
-  return `${m}-${day}-${y}`;
+  const parts = isoDateStr.split('T')[0].split('-');
+  if (parts.length === 3) {
+    return `${parts[1]}-${parts[2]}-${parts[0]}`;
+  }
+  return isoDateStr;
 }
 
-function fmtDateFromUnix(unixSecs) {
-  if (!unixSecs) return '';
-  return fmtDate(new Date(unixSecs * 1000).toISOString());
+function fmtDateFromUnix(unixSec) {
+  if (!unixSec) return '';
+  const d = new Date(unixSec * 1000);
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const y = d.getUTCFullYear();
+  return `${m}-${day}-${y}`;
 }
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const startStr = searchParams.get('start');
-    const endStr = searchParams.get('end');
+    const start = searchParams.get('start');
+    const end = searchParams.get('end');
 
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeKey) {
-      return NextResponse.json({ success: false, error: 'STRIPE_SECRET_KEY not configured' }, { status: 500 });
+    if (!start || !end) {
+      return NextResponse.json({ success: false, error: 'Start and end date required' }, { status: 400 });
     }
-    const stripe = new Stripe(stripeKey);
 
-    // Default to last 30 days if not provided
-    const now = new Date();
-    const defaultStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const defaultEnd = now.toISOString().split('T')[0];
-
-    const start = startStr || defaultStart;
-    const end = endStr || defaultEnd;
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const startTs = Math.floor(new Date(`${start}T00:00:00Z`).getTime() / 1000);
     const endTs = Math.floor(new Date(`${end}T23:59:59Z`).getTime() / 1000);
@@ -68,7 +69,7 @@ export async function GET(request) {
 
     const payouts = payoutsList.data;
 
-    // 2. Connect to Odoo (optional gracefully fallback)
+    // 2. Connect to Odoo (graceful fallback)
     let creds = null, uid = null;
     try {
       creds = await getCredentials();
@@ -79,10 +80,12 @@ export async function GET(request) {
 
     const matchedPayouts = [];
     let grandGross = 0;
+    let grandRefunds = 0;
     let grandFees = 0;
     let grandNet = 0;
     let grandPosOrdersCount = 0;
     let grandPosItemsCount = 0;
+    let grandRefundsCount = 0;
 
     for (const po of payouts) {
       const netAmount = po.amount / 100;
@@ -95,15 +98,20 @@ export async function GET(request) {
       });
 
       const chargeTxns = bTxns.data.filter(t => t.type === 'charge');
+      const refundTxns = bTxns.data.filter(t => t.type === 'refund');
+
       const grossAmount = chargeTxns.reduce((s, t) => s + (t.amount / 100), 0);
-      const feeAmount = chargeTxns.reduce((s, t) => s + (t.fee / 100), 0);
+      const refundAmount = refundTxns.reduce((s, t) => s + (t.amount / 100), 0); // negative number (e.g. -1001.00)
+      const feeAmount = bTxns.data.reduce((s, t) => s + (t.fee / 100), 0);
+
       grandGross += grossAmount;
+      grandRefunds += refundAmount;
       grandFees += feeAmount;
+      grandRefundsCount += refundTxns.length;
 
       const chargeIds = chargeTxns.map(t => t.source);
 
       // Collect PaymentIntent IDs for POS matching
-      // Fetch details for these charges from Stripe
       const chargeDetails = [];
       const piIds = [];
 
@@ -115,7 +123,28 @@ export async function GET(request) {
         for (const ch of fetched) {
           if (!ch) continue;
           chargeDetails.push(ch);
-          if (ch.payment_intent) piIds.push(ch.payment_intent);
+          if (ch.payment_intent) piIds.push(typeof ch.payment_intent === 'object' ? ch.payment_intent.id : ch.payment_intent);
+        }
+      }
+
+      // Collect Refund details
+      const refundDetails = [];
+      for (const rt of refundTxns) {
+        try {
+          const ref = await stripe.refunds.retrieve(rt.source, {
+            expand: ['charge', 'charge.payment_intent'],
+          });
+          if (ref) {
+            refundDetails.push({
+              ref,
+              balanceTxn: rt,
+            });
+            const ch = ref.charge;
+            const pi = ch?.payment_intent?.id || ch?.payment_intent;
+            if (pi && !piIds.includes(pi)) piIds.push(pi);
+          }
+        } catch (err) {
+          console.warn('[deposit-pos-match] Failed to retrieve refund:', rt.source, err.message);
         }
       }
 
@@ -127,7 +156,6 @@ export async function GET(request) {
 
       if (creds && uid && (piIds.length > 0 || chargeIds.length > 0)) {
         try {
-          // A. Search pos.payment
           const searchDomain = [];
           if (piIds.length > 0 && chargeIds.length > 0) {
             searchDomain.push('|', ['transaction_id', 'in', piIds], ['transaction_id', 'in', chargeIds]);
@@ -144,13 +172,11 @@ export async function GET(request) {
           const matchedOrderIds = [...new Set(posPayments.map(p => p.pos_order_id[0]))];
 
           if (matchedOrderIds.length > 0) {
-            // B. Fetch pos.order details
             const orders = await odooCall(creds, uid, 'pos.order', 'read', [matchedOrderIds], {
               fields: ['id', 'name', 'pos_reference', 'partner_id', 'date_order', 'session_id', 'lines']
             });
             orders.forEach(o => { orderMap[o.id] = o; });
 
-            // C. Fetch pos.order.line items
             const allLineIds = orders.flatMap(o => o.lines || []);
             if (allLineIds.length > 0) {
               const lines = await odooCall(creds, uid, 'pos.order.line', 'read', [allLineIds], {
@@ -164,7 +190,7 @@ export async function GET(request) {
             }
           }
 
-          // D. Check Odoo Bank Statement lines for this payout / charges
+          // Check Odoo Bank Statement lines for this payout / charges
           const chargeRefQueries = chargeIds.map(c => `Stripe ${c}`);
           const bsl = await odooCall(creds, uid, 'account.bank.statement.line', 'search_read', [
             ['|', ['payment_ref', 'in', chargeRefQueries], ['payment_ref', 'ilike', po.id]]
@@ -186,21 +212,20 @@ export async function GET(request) {
 
       let odooReconciledCharges = 0;
 
+      // A. Process standard successful charges
       for (const ch of chargeDetails) {
         const bTxn = chargeTxns.find(t => t.source === ch.id);
         const chGross = ch.amount / 100;
         const chFee = bTxn ? bTxn.fee / 100 : 0;
         const chNet = chGross - chFee;
 
-        // Check Odoo bank match
         const bslMatch = bankLinesMap[`Stripe ${ch.id}`];
         if (bslMatch && bslMatch.is_reconciled) odooReconciledCharges++;
 
-        // Find POS payment
-        const posPay = posPayments.find(p => p.transaction_id === ch.payment_intent || p.transaction_id === ch.id);
+        const chPi = typeof ch.payment_intent === 'object' ? ch.payment_intent?.id : ch.payment_intent;
+        const posPay = posPayments.find(p => p.transaction_id === chPi || p.transaction_id === ch.id);
 
         if (posPay && orderMap[posPay.pos_order_id[0]]) {
-          // POS Register Transaction!
           const ord = orderMap[posPay.pos_order_id[0]];
           const oLines = orderLinesMap[ord.id] || [];
 
@@ -225,6 +250,9 @@ export async function GET(request) {
 
           grandPosOrdersCount++;
           posTransactions.push({
+            id: ch.id,
+            isRefund: false,
+            type: 'charge',
             orderId: ord.id,
             orderName: ord.name,
             sessionName: ord.session_id ? ord.session_id[1] : 'POS Register',
@@ -241,7 +269,6 @@ export async function GET(request) {
           });
 
         } else {
-          // Online / Web Checkout / Donation / Membership
           let desc = ch.description || 'Online Web Transaction';
           if (desc.startsWith('Order #')) desc = 'Online Festival / Event Order';
           else if (/^S\d{4,}/i.test(desc)) desc = `Membership / Donor Order (${desc})`;
@@ -252,9 +279,12 @@ export async function GET(request) {
 
           onlineTransactions.push({
             id: ch.id,
+            isRefund: false,
+            type: 'charge',
             customer: ch.billing_details?.name || 'Online Donor',
             email: ch.billing_details?.email || ch.receipt_email || '',
             description: desc,
+            productName: desc,
             cardBrand: (ch.payment_method_details?.card?.brand || 'card').toUpperCase(),
             last4: ch.payment_method_details?.card?.last4 || '••••',
             amount: chGross,
@@ -263,6 +293,124 @@ export async function GET(request) {
             date: fmtDateFromUnix(ch.created),
             time: new Date(ch.created * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' }),
             isReconciled: !!(bslMatch?.is_reconciled),
+          });
+        }
+      }
+
+      // B. Process Refunds
+      for (const { ref, balanceTxn } of refundDetails) {
+        const refAmount = -(ref.amount / 100); // e.g. -1001.00
+        const refFee = balanceTxn ? balanceTxn.fee / 100 : 0;
+        const refNet = refAmount - refFee;
+        const refDate = fmtDateFromUnix(ref.created);
+        const refTime = new Date(ref.created * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' });
+        const refReason = ref.reason ? (ref.reason.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())) : 'Requested by Customer';
+
+        const ch = ref.charge;
+        const chPi = ch?.payment_intent?.id || ch?.payment_intent;
+        const origDate = ch?.created ? fmtDateFromUnix(ch.created) : '';
+
+        // Check if refund belongs to POS
+        const posPay = posPayments.find(p => p.transaction_id === chPi || p.transaction_id === ch?.id);
+
+        if (posPay && orderMap[posPay.pos_order_id[0]]) {
+          const ord = orderMap[posPay.pos_order_id[0]];
+          const oLines = orderLinesMap[ord.id] || [];
+
+          const itemDetails = [];
+          for (const l of oLines) {
+            const pId = l.product_id ? l.product_id[0] : 0;
+            const pName = l.product_id ? l.product_id[1] : 'Refunded Product';
+            const qty = -(Math.abs(l.qty || 1));
+            const lineAmt = -(Math.abs(l.price_subtotal_incl || 0));
+
+            posProductTotals[`ref_${pId}`] = posProductTotals[`ref_${pId}`] || { productId: pId, productName: `[REFUND] ${pName}`, qty: 0, amount: 0, isRefund: true };
+            posProductTotals[`ref_${pId}`].qty += qty;
+            posProductTotals[`ref_${pId}`].amount += lineAmt;
+
+            itemDetails.push({
+              productName: `[REFUND] ${pName}`,
+              qty,
+              amount: lineAmt,
+            });
+          }
+
+          posTransactions.push({
+            id: ref.id,
+            isRefund: true,
+            type: 'refund',
+            refundReason: refReason,
+            originalDate: origDate,
+            orderId: ord.id,
+            orderName: `REFUND: ${ord.name}`,
+            sessionName: ord.session_id ? ord.session_id[1] : 'POS Register',
+            customer: ord.partner_id ? ord.partner_id[1] : (ch?.billing_details?.name || 'Customer'),
+            cardBrand: (ch?.payment_method_details?.card?.brand || posPay.card_type || 'card').toUpperCase(),
+            last4: ch?.payment_method_details?.card?.last4 || '••••',
+            amount: refAmount,
+            fee: refFee,
+            net: refNet,
+            date: refDate,
+            time: refTime,
+            items: itemDetails,
+            isReconciled: false,
+          });
+
+        } else {
+          // Resolve product name for online / invoice refund
+          let resolvedProduct = ch?.description || 'Refunded Online Transaction';
+
+          // 1. Check if checkout session exists
+          if (chPi) {
+            try {
+              const sess = await stripe.checkout.sessions.list({ payment_intent: chPi, expand: ['data.line_items'] });
+              if (sess.data[0]?.line_items?.data?.length) {
+                resolvedProduct = sess.data[0].line_items.data.map(i => i.description || i.price?.product).join(', ');
+              }
+            } catch (sessErr) {
+              // Ignore session lookup errors
+            }
+          }
+
+          // 2. Check if Odoo Sale Order (e.g., S00288) or Invoice
+          if (creds && uid && resolvedProduct.match(/^S\d{4,}/i)) {
+            const soName = resolvedProduct.match(/^S\d{4,}/i)[0];
+            try {
+              const soList = await odooCall(creds, uid, 'sale.order', 'search_read', [[['name', '=', soName]]], { fields: ['order_line'] });
+              if (soList.length > 0 && soList[0].order_line?.length) {
+                const soLines = await odooCall(creds, uid, 'sale.order.line', 'read', [soList[0].order_line], ['name', 'product_id']);
+                if (soLines.length > 0) {
+                  resolvedProduct = soLines.map(sl => sl.product_id ? sl.product_id[1] : sl.name).join(', ');
+                }
+              }
+            } catch (soErr) {
+              // Ignore Odoo SO lookup error
+            }
+          }
+
+          const desc = `[REFUND] ${resolvedProduct}`;
+          onlineSummaryMap[desc] = onlineSummaryMap[desc] || { name: desc, count: 0, amount: 0, isRefund: true };
+          onlineSummaryMap[desc].count += 1;
+          onlineSummaryMap[desc].amount += refAmount;
+
+          onlineTransactions.push({
+            id: ref.id,
+            isRefund: true,
+            type: 'refund',
+            refundReason: refReason,
+            originalDate: origDate,
+            customer: ch?.billing_details?.name || ch?.receipt_email || 'Customer',
+            email: ch?.billing_details?.email || ch?.receipt_email || '',
+            description: desc,
+            productName: resolvedProduct,
+            cardBrand: (ch?.payment_method_details?.card?.brand || 'card').toUpperCase(),
+            last4: ch?.payment_method_details?.card?.last4 || '••••',
+            amount: refAmount,
+            fee: refFee,
+            net: refNet,
+            date: refDate,
+            time: refTime,
+            isReconciled: false,
           });
         }
       }
@@ -277,9 +425,11 @@ export async function GET(request) {
         status: po.status,
         destination: po.destination ? `Bank ••••${po.destination.slice(-4)}` : 'HCC Bank',
         gross: grossAmount,
+        refunds: refundAmount,
         fees: feeAmount,
         net: netAmount,
         chargeCount: chargeTxns.length,
+        refundCount: refundTxns.length,
         odooReconciledCount: odooReconciledCharges,
         isOdooCleared: odooReconciledCharges > 0 && odooReconciledCharges >= chargeTxns.length,
         posProductSummary: posSummary,
@@ -296,10 +446,12 @@ export async function GET(request) {
       kpis: {
         totalNet: grandNet,
         totalGross: grandGross,
+        totalRefunds: grandRefunds,
         totalFees: grandFees,
         payoutsCount: payouts.length,
         totalPosOrders: grandPosOrdersCount,
         totalPosItems: grandPosItemsCount,
+        totalRefundsCount: grandRefundsCount,
       },
       payouts: matchedPayouts,
     });

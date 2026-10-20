@@ -457,30 +457,42 @@ export default function StripeStatementPage() {
     // Summary
     autoTable(doc, {
       startY: 30,
-      head: [['Total Charges', 'Gross Amount', 'Processing Fees', 'Net Amount']],
+      head: [['Total Items', 'Gross Charges', 'Total Refunds', 'Processing Fees', 'Net Amount']],
       body: [[
         data.totals.count.toString(),
         fmt(data.totals.gross),
+        fmt(data.totals.refunds || 0),
         fmt(data.totals.fee),
         fmt(data.totals.net),
       ]],
       theme: 'grid',
       headStyles: { fillColor: [255, 153, 51] },
+      columnStyles: {
+        2: { textColor: [239, 68, 68] },
+        3: { textColor: [245, 158, 11] },
+        4: { textColor: [16, 185, 129], fontStyle: 'bold' },
+      }
     });
 
     // Daily breakdown
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 10,
-      head: [['Date', 'Charges', 'Gross', 'Fees', 'Net']],
+      head: [['Date (MM-DD-YYYY)', 'Items', 'Gross', 'Refunds', 'Fees', 'Net']],
       body: data.dailySummary.map(d => [
         fmtDate(d.date),
         d.count.toString(),
         fmt(d.gross),
+        fmt(d.refunds || 0),
         fmt(d.fee),
         fmt(d.net),
       ]),
       theme: 'striped',
       headStyles: { fillColor: [15, 23, 42] },
+      columnStyles: {
+        3: { textColor: [239, 68, 68] },
+        4: { textColor: [245, 158, 11] },
+        5: { textColor: [16, 185, 129], fontStyle: 'bold' },
+      }
     });
 
     await exportPdfWithNativeShare(doc, `bank-statement-${startDate}-to-${endDate}.pdf`);
@@ -501,7 +513,7 @@ export default function StripeStatementPage() {
     // Overall category summary
     autoTable(doc, {
       startY: 30,
-      head: [['Category', 'Charges', 'Gross', 'Fees', 'Net']],
+      head: [['Category', 'Count', 'Gross', 'Fees', 'Net']],
       body: depositData.summary.map(s => [
         s.category,
         s.charges.toString(),
@@ -517,10 +529,11 @@ export default function StripeStatementPage() {
 
     // Per-payout breakdown
     for (const po of depositData.payouts) {
+      const payoutHeader = `Payout ${fmtDate(po.date)} — Deposited ${fmt(po.net)}${po.refunds < 0 ? ` (Refunds: ${fmt(po.refunds)})` : ''}`;
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 12,
         head: [[
-          { content: `Payout ${fmtDate(po.date)} — Deposited ${fmt(po.net)}`, colSpan: 5, styles: { fillColor: [30, 41, 59] } },
+          { content: payoutHeader, colSpan: 5, styles: { fillColor: [30, 41, 59] } },
         ]],
         body: po.categories.map(c => [
           c.category + (c.source === 'unmatched' ? ' ' : ''),
@@ -541,10 +554,10 @@ export default function StripeStatementPage() {
   const downloadDepositCSV = () => {
     if (!depositData) return;
     const rows = [
-      ['Payout Date', 'Payout Amount', 'Category', 'Charges', 'Gross', 'Fees', 'Net'],
+      ['Payout Date (MM-DD-YYYY)', 'Payout Net Deposited', 'Category', 'Count', 'Category Amount', 'Category Fees', 'Category Net'],
       ...depositData.payouts.flatMap(po =>
         po.categories.map(c => [
-          po.date, po.net.toFixed(2), c.category, c.charges,
+          fmtDate(po.date), po.net.toFixed(2), c.category, c.charges,
           c.gross.toFixed(2), c.fees.toFixed(2), c.net.toFixed(2),
         ])
       ),
@@ -582,10 +595,15 @@ export default function StripeStatementPage() {
     if (topTab === 'invoices' && invoiceData) return downloadInvoiceCSV();
     if (!data) return;
     const rows = view === 'daily'
-      ? [['Date', 'Charges', 'Gross', 'Fees', 'Net'],
-         ...data.dailySummary.map(d => [d.date, d.count, d.gross.toFixed(2), d.fee.toFixed(2), d.net.toFixed(2)])]
-      : [['Date', 'Time', 'ID', 'Customer', 'Amount', 'Fee', 'Net', 'Card', 'Description'],
-         ...data.charges.map(c => [c.date, c.time, c.id, c.customer, c.amount.toFixed(2), c.fee.toFixed(2), c.net.toFixed(2), `${c.card_brand} ${c.card_last4}`, c.description])];
+      ? [['Date (MM-DD-YYYY)', 'Total Items', 'Gross Charges', 'Total Refunds', 'Fees', 'Net Deposited'],
+         ...data.dailySummary.map(d => [fmtDate(d.date), d.count, (d.gross || 0).toFixed(2), (d.refunds || 0).toFixed(2), d.fee.toFixed(2), d.net.toFixed(2)])]
+      : [['Date (MM-DD-YYYY)', 'Time', 'Type (Charge/Refund)', 'Refund Reason', 'Product / Service Description', 'Customer', 'Email', 'Amount', 'Fee', 'Net', 'Card', 'Transaction ID'],
+         ...data.charges.map(c => [
+           fmtDate(c.date), c.time, c.is_refund ? 'Refund' : 'Charge', c.refund_reason || '',
+           c.product_name || c.description, c.customer, c.email || '',
+           c.amount.toFixed(2), c.fee.toFixed(2), c.net.toFixed(2),
+           `${c.card_brand} ${c.card_last4}`.trim(), c.id
+         ])];
 
     const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -966,19 +984,25 @@ export default function StripeStatementPage() {
           {data && !loading && (
             <>
               {/* KPI Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))', gap: 'clamp(10px, 1.8vw, 16px)', marginBottom: '24px' }}>
                 <div style={kpiCard}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Total Charges</span>
-                  <span className="kpi-stat-value" style={{ color: 'var(--text-primary)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{data.totals.count}</span>
+                  <span className="kpi-stat-value" style={{ color: 'var(--text-primary)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{data.totals.chargesCount || data.totals.count}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{data.dailySummary.length} days</span>
                 </div>
                 <div style={kpiCard}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Gross Amount</span>
                   <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.totals.gross)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Before returns &amp; fees</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Total Refunds</span>
+                  <span className="kpi-stat-value" style={{ color: '#f87171', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.totals.refunds || 0)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{data.totals.refundsCount || 0} returned</span>
                 </div>
                 <div style={kpiCard}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Processing Fees</span>
-                  <span className="kpi-stat-value" style={{ color: '#f87171', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.totals.fee)}</span>
+                  <span className="kpi-stat-value" style={{ color: '#fbbf24', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.totals.fee)}</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
                     {data.totals.gross > 0 ? ((data.totals.fee / data.totals.gross) * 100).toFixed(2) : '0'}% effective rate
                   </span>
@@ -986,6 +1010,7 @@ export default function StripeStatementPage() {
                 <div style={kpiCard}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Net Deposited</span>
                   <span className="kpi-stat-value" style={{ color: 'var(--accent)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(data.totals.net)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Credited to bank</span>
                 </div>
               </div>
 
@@ -1062,24 +1087,35 @@ export default function StripeStatementPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {data.charges.map((c, i) => (
-                          <tr key={c.id} style={{ backgroundColor: i % 2 ? 'var(--bg-table-stripe)' : 'transparent', transition: 'background 0.15s' }}
-                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--accent-glow)'}
-                            onMouseLeave={e => e.currentTarget.style.backgroundColor = i % 2 ? 'var(--bg-table-stripe)' : 'transparent'}>
-                            <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
-                              {new Date(c.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            </td>
-                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.time}</td>
-                            <td style={{ padding: '10px 16px', color: 'var(--text-secondary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.customer || '—'}</td>
-                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
-                              {c.card_brand ? `${c.card_brand.toUpperCase()} ••${c.card_last4}` : '—'}
-                            </td>
-                            <td style={{ padding: '10px 16px', textAlign: 'right', color: '#4ade80', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.amount)}</td>
-                            <td style={{ padding: '10px 16px', textAlign: 'right', color: '#f87171', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.fee)}</td>
-                            <td style={{ padding: '10px 16px', textAlign: 'right', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.net)}</td>
-                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '12px', borderBottom: '1px solid var(--border-table)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.description || '—'}</td>
-                          </tr>
-                        ))}
+                        {data.charges.map((c, i) => {
+                          const isRef = c.is_refund || c.amount < 0;
+                          return (
+                            <tr key={c.id} style={{ backgroundColor: isRef ? 'rgba(239, 68, 68, 0.05)' : (i % 2 ? 'var(--bg-table-stripe)' : 'transparent'), transition: 'background 0.15s' }}
+                              onMouseEnter={e => e.currentTarget.style.backgroundColor = isRef ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-glow)'}
+                              onMouseLeave={e => e.currentTarget.style.backgroundColor = isRef ? 'rgba(239, 68, 68, 0.05)' : (i % 2 ? 'var(--bg-table-stripe)' : 'transparent')}>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-primary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
+                                {fmtDate(c.date)}
+                              </td>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)' }}>{c.time}</td>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-secondary)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  {isRef && <span style={{ fontSize: '10px', fontWeight: '700', padding: '1px 5px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.15)', color: '#EF4444' }}>REFUND</span>}
+                                  <span>{c.customer || '—'}</span>
+                                </div>
+                              </td>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '13px', borderBottom: '1px solid var(--border-table)', whiteSpace: 'nowrap' }}>
+                                {c.card_brand ? `${c.card_brand.toUpperCase()} ••${c.card_last4}` : '—'}
+                              </td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: isRef ? '#f87171' : '#4ade80', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.amount)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: '#fbbf24', fontSize: '13px', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.fee)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'right', color: isRef ? '#f87171' : 'var(--text-primary)', fontSize: '13px', fontWeight: '600', fontFamily: 'monospace', borderBottom: '1px solid var(--border-table)' }}>{fmt(c.net)}</td>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: '12px', borderBottom: '1px solid var(--border-table)', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {c.product_name || c.description || '—'}
+                                {isRef && c.refund_reason && <span style={{ color: '#f87171', marginLeft: '6px' }}>({c.refund_reason})</span>}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -1124,21 +1160,22 @@ export default function StripeStatementPage() {
                 <div style={kpiCard}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Gross</span>
                   <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(depositData.totals.gross)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Before fees</span>
+                </div>
+                <div style={kpiCard}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Refunds</span>
+                  <span className="kpi-stat-value" style={{ color: '#f87171', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(depositData.totals.refunds || 0)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{depositData.totals.refundsCount || 0} returned</span>
                 </div>
                 <div style={kpiCard}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Fees</span>
-                  <span className="kpi-stat-value" style={{ color: '#f87171', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(depositData.totals.fees)}</span>
+                  <span className="kpi-stat-value" style={{ color: '#fbbf24', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(depositData.totals.fees)}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Stripe charges</span>
                 </div>
                 <div style={kpiCard}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Deposited</span>
                   <span className="kpi-stat-value" style={{ color: 'var(--accent)', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{fmt(depositData.totals.deposited)}</span>
-                </div>
-                <div style={kpiCard}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Resolved</span>
-                  <span className="kpi-stat-value" style={{ color: '#4ade80', fontSize: 'clamp(20px, 3.2vw, 28px)', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{depositData.totals.resolved}</span>
-                  <span style={{ color: depositData.totals.unmatched > 0 ? '#FBBF24' : 'var(--text-muted)', fontSize: '12px' }}>
-                    {depositData.totals.unmatched > 0 ? `${depositData.totals.unmatched} unmatched` : 'All matched ✓'}
-                  </span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Net in bank</span>
                 </div>
               </div>
 
