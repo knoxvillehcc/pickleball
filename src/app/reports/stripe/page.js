@@ -5,6 +5,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
 import StripeDepositPosMatchTab from './StripeDepositPosMatchTab';
+import UserGuideTab from './UserGuideTab';
 
 const card = {
   backgroundColor: 'var(--bg-card)',
@@ -851,10 +852,22 @@ export default function StripeStatementPage() {
             color: topTab === 'fullreport' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
           Full Report
         </button>
+        <button onClick={() => setTopTab('userguide')}
+          style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
+            backgroundColor: topTab === 'userguide' ? 'var(--accent)' : 'transparent',
+            color: topTab === 'userguide' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600',
+            display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          </svg>
+          User Guide
+        </button>
       </div>
 
-      {/* Date Range Picker */}
-      <div style={{ ...card, padding: '16px 18px', marginBottom: '24px' }}>
+      {/* Date Range Picker (Hidden on User Guide tab) */}
+      {topTab !== 'userguide' && (
+        <div style={{ ...card, padding: '16px 18px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <div style={{ flex: '1', minWidth: '160px' }}>
             <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600', letterSpacing: '0.5px', marginBottom: '6px', display: 'block', textTransform: 'uppercase' }}>
@@ -968,6 +981,7 @@ export default function StripeStatementPage() {
           ))}
         </div>
       </div>
+      )}
 
       {/* ═══ STATEMENT TAB ═══ */}
       {topTab === 'statement' && (
@@ -1941,6 +1955,16 @@ export default function StripeStatementPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* ═══ USER GUIDE TAB ═══ */}
+      {topTab === 'userguide' && (
+        <UserGuideTab
+          setTopTab={setTopTab}
+          card={card}
+          btnPrimary={btnPrimary}
+          btnSecondary={btnSecondary}
+        />
       )}
     </div>
   );
