@@ -4,6 +4,7 @@ import { useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { exportPdfWithNativeShare } from '@/lib/pdfShareHelper';
+import StripeDepositPosMatchTab from './StripeDepositPosMatchTab';
 
 const card = {
   backgroundColor: 'var(--bg-card)',
@@ -808,6 +809,12 @@ export default function StripeStatementPage() {
             color: topTab === 'deposits' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
           Deposit Breakdown
         </button>
+        <button onClick={() => setTopTab('stripedeposit')}
+          style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
+            backgroundColor: topTab === 'stripedeposit' ? 'var(--accent)' : 'transparent',
+            color: topTab === 'stripedeposit' ? '#fff' : 'var(--text-muted)', border: 'none', fontWeight: '600' }}>
+          Stripe Deposit
+        </button>
         <button onClick={() => setTopTab('cashcheck')}
           style={{ ...btnSecondary, padding: '10px 24px', fontSize: '14px', borderRadius: '12px',
             backgroundColor: topTab === 'cashcheck' ? 'var(--accent)' : 'transparent',
@@ -881,6 +888,10 @@ export default function StripeStatementPage() {
                 </>
               )}
             </>
+          ) : topTab === 'stripedeposit' ? (
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)', alignSelf: 'center', fontWeight: '500' }}>
+              Select dates above or use the quick presets below
+            </span>
           ) : topTab === 'invoices' ? (
             <>
               <button onClick={fetchInvoices} disabled={invoiceLoading} style={{ ...btnPrimary, opacity: invoiceLoading ? 0.6 : 1, minWidth: '160px' }}>
@@ -1239,6 +1250,22 @@ export default function StripeStatementPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* ═══ STRIPE DEPOSIT VS POS PRODUCTS TAB ═══ */}
+      {topTab === 'stripedeposit' && (
+        <StripeDepositPosMatchTab
+          startDate={startDate}
+          endDate={endDate}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+          fmt={fmt}
+          card={card}
+          kpiCard={kpiCard}
+          btnPrimary={btnPrimary}
+          btnSecondary={btnSecondary}
+          inputStyle={inputStyle}
+        />
       )}
 
       {/* ═══ CASH/CHECK TAB ═══ */}
